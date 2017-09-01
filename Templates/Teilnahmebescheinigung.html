@@ -1,0 +1,137 @@
+<html>
+<head>
+  <link rel="stylesheet" href="Teilnahmebescheinigung.css">
+</head>
+
+<body>
+<div class="center">
+
+<div> <img src="../DHBW1" alt=""> </div>
+
+<div class="head"> Teilnahmebescheinigung </div>
+
+<div> <p class="p-first"> <i>{{ user.getFullname }}</i>, hat am Studienvorbereitungsprogramm mit
+  Schwerpunkt "Mathematik" auf der Lernplattform studienvorbereitung.dhbw.de
+  teilgenommen. </p> </div>
+
+<div> <p class="p-first"> Die Teilnahme von <i>{{ user.getFullname }}</i> vor Studienbeginn an der DHBW
+  Karlsruhe zum Wintersemester {{ date.get }} umfasste:</p> </div>
+
+ <div class="table1"> <p class="p-first"> <b>Studienvorbereitung - Mathematik:</b></p>
+<table id="table1">
+  <tr>
+    <td class="align-left" id="td1"> Abschluss
+      des diagnostischen <br> Einstiegstest </td>
+    <td class="align-center" id="td2">
+      <img class="checkimg" src="{{CHECK_EINSTIEGSTEST}}" alt=""></td>
+  </tr>
+  <tr>
+    <td class="align-left" class="align-top">
+      Bearbeitung von empfohlenen <br> Mathematik - Lernmodulen </td>
+    <td class="align-center" id="td3">
+      {{ result.learnmodule }} </td>
+  </tr>
+</table>
+</div>
+
+<div class="table1"> <p class="p-first"> <b>Studienvorbereitung - eMentoring: </b></p>
+<table id="table2">
+ <tr>
+   <td class="align-left" id="td4">
+     Aktive Teilnahme an <br> Videokonferenzen </td>
+   <td class="align-center" id="td5">
+     <img class="checkimg" src="{{CHECK_VIDEOKONFERENZ}}" alt="">
+     </td>
+ </tr>
+ <tr>
+   <td class="align-left" id="td6">Bearbeitung von Aufgaben zur <br>
+     Vertiefung von Inhalten des <br> Studienvorbereitungsprogramms</td>
+   <td class="align-center" id="td7">
+     {{ result.recess }}</td>
+ </tr>
+</table>
+</div>
+
+ <div class="date"> <p> Karlsruhe, den {{ date.get }}</p>  </div>
+<div class="align-left"><p> <b> {{ teacher.getFullname }} </b> </p>
+<p> <b> {{ teacher.getFunction }} </b> </p></div>
+
+</div>
+<!-- ENDE SEITE EINS -->
+<div class="pagebreak">
+</div>
+<!-- BEGIN SEITE ZWEI -->
+<div class="center">
+<div> <img src="../DHBW1" alt=""> </div>
+<div> <h1> Erläuterungen zur Bescheinigung </h1> </div>
+</div>
+
+<div class="justify"> <p> Das Studienvorbereitungsprogramm mit Schwerpunkt
+  Mathematik auf der Lernplatform studienstart.dhbw.de, richtet sich an
+  Studienanfänger/-innen der Wirtschaftsinformatik der
+DHBW Karlsruhe. Die Teilnehmer/-innen des Programms erhalten die Möglichkeit
+sich bereits vor Studienbeginn, Studientechniken anzueignen sowie das fehlende
+Vorwissen im Fach "Mathematik" aufzuarbeiten.
+Dadurch haben Studierende mehr Zeit ihre Wissenslücken in Mathematik zu
+schliessen und sich mit dem neuen Lernen auseinanderzusetzen. <br> <br>
+
+Ziel des Programms ist es, Studienanfänger/-innen vor Studienbeginn auf das Fach
+ Mathematik im Studium vorzubereiten. Neben der Vermittlung von mathematikschen
+ Inhalten, fördert der Online-Vorkurs
+überfachliche Kompetenzen wie Zeitmanagement und Lerntechniken sowie die
+Fähigkeit zum Selbststudium <br> </p>
+</div>
+
+<p>
+<b>{{TEILNEHMER}} hat im Rahmen des Studienvorbereitungsprogramms mit
+  <br>Schwerpunkt Mathematik mit folgenden Aufgabestellungen teilgenommen:</b>
+</p>
+
+<div>
+  <p> <b> Studienvorbereitung - Mathematik </b></p>
+<table id="table3">
+  <tr>
+    <td id="td8"> Abschluss des Diagnostischer
+      Einstiegstest Mathematik</td>
+    <td id="td9"> {{ questions.getCount }} Fragen aus den Themengebieten: <ul>
+      <li> {{ theme.get }}</li>
+      <li> {{ theme.get }}</li>
+      <li> {{ theme.get }}</li>
+      <li> {{ theme.get }}</li>
+      <li> {{ theme.get }}</li>
+      <li> {{ theme.get }}</li>
+      <li> {{ theme.get }}</li>
+      <li> {{ theme.get }}</li>
+      <li> {{ theme.get }}</li>
+      <li> {{ theme.get }}</li>
+    </ul></td>
+  </tr>
+  <tr>
+    <td class="align-top"> Bearbeitung von empfohlenen
+      Mathematik-Lernmodulen</td>
+    <td> <mark>{{ modules.done }}</mark> der empfohlenen Module
+      bearbeitet aus den zehn <br> genannten Themengebieten</td>
+  </tr>
+</table>
+</div>
+
+<div class="table2">
+  <p><b> Studienvorbereitung - eMentoring </b> </p>
+<table id="table4">
+  <tr>
+    <td id="td10"> Aktive Teilnahme an <br> Videokonferenzen </td>
+    <td id="td11"> Teilnahme an <mark> {{ conferences.participated }} </mark>
+      von 5 Videokonferenzen</td>
+  </tr>
+  <tr>
+    <td class="align-top"> Bearbeitung von<br> Aufgaben zur <br>
+      Vertiefung von <br> Inhalten des <br> Studienvorbereitungs- <br>programms</td>
+    <td> Abgabe von <mark>{{ homework.done }}</mark> von 5 Hausaufgaben</td>
+  </tr>
+</table>
+</div>
+
+
+
+</body>
+</html>
