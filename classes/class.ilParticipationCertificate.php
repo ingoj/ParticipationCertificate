@@ -1,5 +1,5 @@
 <?php
-require_once (dirname(dirname(__FILE__)) . '/Parser/class.ilParticipationCertificateTwigParser.php');
+require_once (dirname(dirname(__FILE__)) . '/classes/Parser/class.ilParticipationCertificateTwigParser.php');
 
 /**
  * Class ilParticipationCertificate
@@ -8,7 +8,7 @@ require_once (dirname(dirname(__FILE__)) . '/Parser/class.ilParticipationCertifi
  */
 class ilParticipationCertificate extends ActiveRecord{
 
-	const TABLE_NAME = 'il_participationcertificate';
+	const TABLE_NAME = 'participationcert';
 
 
 	/**
@@ -35,7 +35,7 @@ class ilParticipationCertificate extends ActiveRecord{
 	 * @db_has_field    true
 	 * @db_fieldtype    date
 	 */
-	protected $date;
+	protected $dates;
 	/**
 	 * @var string
 	 *
@@ -73,8 +73,8 @@ class ilParticipationCertificate extends ActiveRecord{
 	/**
 	 * @var bool
 	 *
-	 * @db_has_field true
-	 * @db_fieldtype    image
+	 * @db_has_field    true
+	 * @db_fieldtype    blob
 	 * check ja/nein
 	 */
 	protected $result_startexam;
@@ -91,7 +91,7 @@ class ilParticipationCertificate extends ActiveRecord{
 	 * @var bool
 	 *
 	 * @db_has_field true
-	 * @db_fieldtype image
+	 * @db_fieldtype blob
 	 * check ja/nein
 	 */
 	protected $participation_videoconference;
@@ -113,7 +113,7 @@ class ilParticipationCertificate extends ActiveRecord{
 	 * @var integer
 	 *
 	 * @db_has_field    true
-	 * @db_fieldtype    int
+	 * @db_fieldtype    integer
 	 */
 	protected $questions_count;
 	/**
@@ -127,14 +127,14 @@ class ilParticipationCertificate extends ActiveRecord{
 	 * @var integer
 	 *
 	 * @db_has_field    true
-	 * @db_fieldtype    int
+	 * @db_fieldtype    integer
 	 */
 	protected $conferences_participated;
 	/**
 	 * @var integer
 	 *
 	 * @db_has_field    true
-	 * @db_fieldtype    int
+	 * @db_fieldtype    integer
 	 */
 	protected $homework_done;
 
@@ -143,6 +143,10 @@ class ilParticipationCertificate extends ActiveRecord{
 		return static::where(array('student' => $student))->first();
 	}
 
+
+	public static function returnDbTableName(){
+		return self::TABLE_NAME;
+	}
 
 	/**
 	 * @return int

@@ -25,29 +25,30 @@ class ilParticipationCertificatePDFGenerator {
 
 
 	public function __construct() {
-
-
+		global $tpl, $ilCtrl;
+		$this->tpl = $tpl;
+		$this->ctrl = $ilCtrl;
 	}
 
-
-	function executeCommand() {
-		$cmd = $this->ctrl->getCmd();
-		switch ($cmd) {
-			case self::CMD_PDF:
-				$this->{$cmd}();
-				break;
-			default:
-				throw new Exception('Not allowed');
-				break;
-		}
+public function executeCommand()
+{
+	$this->tpl->getStandardTemplate();
+	$cmd = $this->ctrl->getCmd();
+	switch ($cmd){
+		default:
+			$cmd = $this->ctrl->getCmd(self::CMD_PDF);
+			$this->{$cmd}();
+			break;
 	}
+}
+
 
 
 	public function generatePDF() {
 		$mpdf = new mPDF();
 		$mpdf->SetHeader('Teilnahmebescheinigung');
-		$html = file_get_contents('Teilnahmebescheinigung.html');
-		$css = file_get_contents('Teilnahmebescheinigung.css');
+		$html = file_get_contents('Templates/Teilnahmebescheinigung.html');
+		$css = file_get_contents('/Templates/Teilnahmebescheinigung.css');
 		$mpdf->WriteHTML($css, 1);
 		$mpdf->WriteHTML($html, 2);
 		$mpdf->Output('test.pdf', './ParticipationCertificate');

@@ -4,6 +4,8 @@ include_once './Customizing/global/plugins/Services/UIComponent/UserInterfaceHoo
 
 /**
  * Class ilParticipationCertificateUIHookGUI
+ *
+ * @author Silas Stulz <sst@studer-raimann.ch>
  */
 class ilParticipationCertificateUIHookGUI extends ilUIHookPluginGUI{
 
@@ -17,9 +19,7 @@ class ilParticipationCertificateUIHookGUI extends ilUIHookPluginGUI{
 	public function __construct() {
 		global $ilCtrl;
 		$this->ctrl = $ilCtrl;
-
 	}
-
 
 	/**
 	 *
@@ -30,7 +30,7 @@ class ilParticipationCertificateUIHookGUI extends ilUIHookPluginGUI{
 	 */
 
 	function modifyGUI($a_comp, $a_part, $a_par = array()) {
-		if ($a_part == 'tabs' && $this->checkCourse()){
+		if ($a_part == 'tabs' && $this->checkGroup()){
 			/**
 			 * @var ilTabsGUI $tabs
 			 */
@@ -42,10 +42,16 @@ class ilParticipationCertificateUIHookGUI extends ilUIHookPluginGUI{
 	}
 
 
-	function checkCourse(){
-		//check if tab should be displayed in this course or class or whatever
-
-		return true;
+	/**
+	 * @return bool
+	 * check if tab should be displayed, only displayed in groups!
+	 */
+	function checkGroup(){
+		foreach ($this->ctrl->getCallHistory() as $GUIClassesArray) {
+			if ($GUIClassesArray['class'] == 'ilObjGroupGUI')
+				return true;
+		}
+		return false;
 	}
 }
 

@@ -17,10 +17,10 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI {
 	const CMD_CONFIGURE = 'configure';
 	const CMD_SAVE = 'save';
 	const CMD_CANCEL = 'cancel';
-
-
-
-
+	/**
+	 * @var ilParticipationCertificate
+	 */
+	protected $object;
 	/**
 	 * @var ilParticipationCertificatePlugin
 	 */
@@ -62,7 +62,6 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI {
 		$this->pl = ilParticipationCertificatePlugin::getInstance();
 
 		$this->courseobject = ilObjectFactory::getInstanceByRefId($_GET['ref_id']);
-		//$this->learnGroupParticipants = ilObjectFactory::getInstanceByRefId($_GET['ref_id']);
 
 	}
 
@@ -70,6 +69,7 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI {
 		switch ($cmd) {
 			case 'configure':
 			case 'save':
+			case 'cancel':
 				$this->$cmd();
 				break;
 		}
@@ -82,9 +82,11 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI {
 	 * @return
 	 */
 	public function configure() {
+
 		$this->tpl->getStandardTemplate();
 
 		$form = new ilPropertyFormGUI();
+		$form->setTitle('Placeholders');
 
 		$title = new ilTextInputGUI();
 		$title->setTitle('Titel');
@@ -102,6 +104,10 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI {
 		$form->addCommandButton(ilParticipationCertificateConfigGUI::CMD_CANCEL, 'Cancel');
 
 		$button1 = ilLinkButton::getInstance();
+		$button1->setCaption('Print PDF');
+		//$button1->setUrl($this->ctrl->getLinkTargetByClass(ilParticipationCertificatePDFGenerator::class,
+			//ilParticipationCertificatePDFGenerator::CMD_PDF));
+		//$button1->setUrl($this->ctrl->getLinkTarget($this, self::CMD_CONFIGURE));
 		$button1->setUrl($this->ctrl->getLinkTargetByClass(ilParticipationCertificatePDFGenerator::class,
 			ilParticipationCertificatePDFGenerator::CMD_PDF));
 		$this->ilToolbar->addButtonInstance($button1);
@@ -110,22 +116,15 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI {
 	}
 
 
-	public function executeCommand() {
-		$cmd = $this->ctrl->getCmd();
-		switch ($cmd) {
-			case self::CMD_CONFIGURE:
-				$this->{$cmd}();
-				break;
-			default:
-				throw new Exception('Not allowed');
-				break;
-		}
-	}
+
 
 	public function save()
 	{
+		//TODO implement method to save the inputs to the db
+	}
 
-
+	public function cancel(){
+		//TODO implement method to cancel and reset the input
 	}
 
 
