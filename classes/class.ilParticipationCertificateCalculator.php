@@ -98,8 +98,8 @@ left join tmp_test_result on tmp_test_result.active_fi = test_act.active_id
 where grp_ref.ref_id = 73;";
 
 		$results = $this->db->query($sql);
-
-		if (true/* check if Einstiegstest abgeschlossen*/) {
+		/*
+		if (true) {
 			//Resultat in Prozent des jeweiligen Lernziels. z.B. LO1
 			foreach ($results->fetchRow() as $row) {
 				$lowResult [] = $row['result.points'] / $row['result.maxpoints'] * 100;
@@ -114,7 +114,8 @@ where grp_ref.ref_id = 73;";
 		else{
 			$finalResult = '0%';
 		}
-		return $finalResult;
+		*/
+		return $results;
 	}
 	/*
 		public function calculateFinal() {

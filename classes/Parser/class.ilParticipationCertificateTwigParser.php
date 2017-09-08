@@ -120,7 +120,9 @@ class ilParticipationCertificateTwigParser implements ParticipationParser{
 		$loader = new \Twig_Loader_Filesystem('./Templates');
 		$twig = new \Twig_Environment($loader, $this->options);
 
+		//loads template for twig
 		$template = $twig->load('./Templates/Teilnahmebescheinigung.html');
+
 		//TODO Fill Placeholders with Name and etc.
 		echo $template->render(array(' result.startexam ' => '$this->result_startexam' , 'result.learnmodule' => '', 'participation_videoconference' => '', 'result.recess' => '',
 			'teacher.getFullname' => '', 'teacher.getFunction' => '', 'user.getFullname' => '', 'questions.getCount' => '', 'theme.get' => '',

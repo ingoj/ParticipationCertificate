@@ -4,6 +4,7 @@ include_once './Services/Object/classes/class.ilObjectListGUIFactory.php';
 include_once './Modules/Course/classes/class.ilObjCourseGUI.php';
 include_once './Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/ParticipationCertificate/classes/class.ilParticipationCertificateConfigGUI.php';
 include_once './Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/ParticipationCertificate/classes/class.ilParticipationCertificatePDFGenerator.php';
+
 /**
  * Class ilParticipationCertificateGUI
  *
@@ -39,34 +40,38 @@ class ilParticipationCertificateGUI {
 	 */
 	public $learnGroupParticipants;
 	/**
-	 * @var
+	 * @var ilObjGroup
 	 */
 	public $learningGroup;
+	/**
+	 * @var ilToolbarGUI
+	 */
+	public $ilToolbar;
 
 
 	function __construct() {
-		global $ilCtrl, $tpl, $ilTabs, $objDefinition;
+		global $ilCtrl, $tpl, $ilTabs, $objDefinition, $ilToolbar;
 
 		$this->ctrl = $ilCtrl;
 		$this->tpl = $tpl;
 		$this->tabs = $ilTabs;
+		$this->ilToolbar = $ilToolbar;
 		$this->objectDefinition = $objDefinition;
-		$this->learnGroupParticipants = ilObjectFactory::getInstanceByRefId($_GET['ref_id']);
-		//	$this->courseObject = ilObjectFactory::getInstanceByRefId($_GET['ref_id']);
-		//	$this->learnGroupParticipants = new ilCourseParticipants($this->courseObject->getId());
-
+		$this->learnGroup = ilObjectFactory::getInstanceByRefId($_GET['ref_id']);
+		$this->ctrl->saveParameterByClass('ilParticipationCertificateGUI','ref_id');
 	}
 
 
 	function executeCommand() {
 		$cmd = $this->ctrl->getCmd();
-		switch ($cmd) {
-			case self::CMD_DISPLAY:
-				$this->{$cmd}();
-				break;
+		$nextClass = $this->ctrl->getNextClass();
+		switch ($nextClass){
+		case 'ilparticipationcertificatepdfgenerator':
+			$ilParticipationCertificatePDFGenerator = new ilParticipationCertificatePDFGenerator();
+			$ret = $this->ctrl->forwardCommand($ilParticipationCertificatePDFGenerator);
+			break;
 			default:
-				throw new Exception('not allowed');
-				break;
+				$this->{$cmd}();
 		}
 	}
 
@@ -82,12 +87,12 @@ class ilParticipationCertificateGUI {
 
 
 	function initHeader() {
-		$this->tpl->setTitle($this->courseObject->getTitle());
-		$this->tpl->setDescription($this->learnGroupParticipants->getMembers());
-		//$this->tpl->setTitleIcon(ilObject::_getIcon($this->courseObject->getId()));
+		$this->tpl->setTitle($this->learnGroup->getTitle());
+		$this->tpl->setDescription($this->learnGroup->getDescription());
+		$this->tpl->setTitleIcon(ilObject::_getIcon($this->learnGroup->getId()));
 
-		$this->ctrl->saveParameterByClass('ilObjCourseGUI', 'ref_id');
-		$this->tabs->setBackTarget('Back', $this->ctrl->getLinkTargetByClass(array( 'ilRepositoryGUI', 'ilObjCourseGUI' ), 'members'));
+		$this->ctrl->saveParameterByClass('ilObjGroup', 'ref_id');
+		$this->tabs->setBackTarget('Back', $this->ctrl->getLinkTargetByClass('ilRepositoryGUI', 'members'));
 	}
 
 
@@ -95,6 +100,7 @@ class ilParticipationCertificateGUI {
 		$form = new ilPropertyFormGUI();
 		$form->setFormAction($this->ctrl->getFormAction($this));
 		$form->setTitle('Teilnahmebescheinigungen');
+
 		$title = new ilTextInputGUI();
 		$title->setTitle('Titel');
 		$form->addItem($title);
@@ -109,16 +115,16 @@ class ilParticipationCertificateGUI {
 
 		$form->addCommandButton(ilParticipationCertificateGUI::CMD_SAVE, 'Save');
 		$form->addCommandButton(ilParticipationCertificateGUI::CMD_CANCEL, 'Cancel');
-		$form->addCommandButton('print', 'PRINT PDF');
-		/*$this->ctrl->getLinkTargetByClass('ilparticipationcertificatepdfgenerator', ilParticipationCertificatePDFGenerator::CMD_PDF);
 
 		$button = ilLinkButton::getInstance();
 		$button->setCaption('Print PDF');
 		$button->setOnClick(ilParticipationCertificatePDFGenerator::class);
-		$button->setUrl($this->ctrl->getLinkTargetByClass(ilParticipationCertificateConfigGUI::class, ilParticipationCertificateConfigGUI::CMD_CONFIGURE));
+		$button->setUrl($this->ctrl->getLinkTargetByClass(ilParticipationCertificatePDFGenerator::class, ilParticipationCertificatePDFGenerator::CMD_PDF));
+		$this->ilToolbar->addButtonInstance($button);
 
-		$form->addItem($button);
-*/
+
+
+
 		return $form;
 	}
 }
