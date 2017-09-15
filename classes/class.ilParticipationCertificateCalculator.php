@@ -98,6 +98,10 @@ left join tmp_test_result on tmp_test_result.active_fi = test_act.active_id
 where grp_ref.ref_id = 73;";
 
 		$results = $this->db->query($sql);
+
+		while ($set = $this->db->fetchAssoc($results)) {
+			
+		}
 		/*
 		if (true) {
 			//Resultat in Prozent des jeweiligen Lernziels. z.B. LO1

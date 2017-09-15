@@ -4,28 +4,31 @@
 
 <div> <img src="./Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/ParticipationCertificate/src/dhbw2.jpg" alt=""> </div>
 
-<div class="head"> Teilnahmebescheinigungs </div>
+<div class="head"> {{ TITLE }} </div>
 
+  <div> <p class="p-first"> <i> {{username}} {{INTRODUCTION}} </i></p> </div>
+<!--
 <div> <p class="p-first"> <i>{{ user.getFullname }}</i>, hat am Studienvorbereitungsprogramm mit
   Schwerpunkt "Mathematik" auf der Lernplattform studienvorbereitung.dhbw.de
   teilgenommen. </p> </div>
 
 <div> <p class="p-first"> Die Teilnahme von <i>{{ user.getFullname }}</i> vor Studienbeginn an der DHBW
   Karlsruhe zum {{ semester.get }} umfasste:</p> </div>
-
+-->
  <div class="table1"> <p class="p-first"> <b>Studienvorbereitung - Mathematik:</b></p>
 <table id="table1">
   <tr>
     <td class="align-left" id="td1"> Abschluss
       des diagnostischen <br> Einstiegstest </td>
     <td class="align-center" id="td2">
-      <img class="checkimg" src="./Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/ParticipationCertificate/src/check.png" alt=""></td>
+     <!-- <img class="checkimg" src="./Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/ParticipationCertificate/src/check.png" alt="">-->
+    {{check1}}</td>
   </tr>
   <tr>
     <td class="align-left" class="align-top">
       Bearbeitung von empfohlenen <br> Mathematik - Lernmodulen </td>
     <td class="align-center" id="td3">
-      {{ result.learnmodule }} </td>
+      {{resultlearnmodule}} </td>
   </tr>
 </table>
 </div>
@@ -36,21 +39,20 @@
    <td class="align-left" id="td4">
      Aktive Teilnahme an <br> Videokonferenzen </td>
    <td class="align-center" id="td5">
-     <img class="checkimg" src="./Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/ParticipationCertificate/src/check.png" alt="">
-     </td>
+    <!-- <img class="checkimg" src="./Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/ParticipationCertificate/src/check.png" alt="">-->
+     {{check2}}</td>
  </tr>
  <tr>
    <td class="align-left" id="td6">Bearbeitung von Aufgaben zur <br>
      Vertiefung von Inhalten des <br> Studienvorbereitungsprogramms</td>
    <td class="align-center" id="td7">
-     {{ result.recess }}</td>
+     {{resultrecess}}</td>
  </tr>
 </table>
 </div>
-
- <div class="date"> <p> Karlsruhe, den {{ date.get }}</p>  </div>
-<div id="signature"><p> <b> {{ teacher.getFullname }} </b> </p>
-<p> <b> {{ teacher.getFunction }} </b> </p></div>
+ <div class="date"> <p> Karlsruhe, den {{dateget}}</p>  </div>
+<div id="signature"><p> <b> {{nameteacher}} </b> </p>
+<p> <b> ({{functionteacher}}) </b> </p></div>
 
 </div>
 <!-- ENDE SEITE EINS -->
@@ -59,27 +61,14 @@
 <!-- BEGIN SEITE ZWEI -->
 <div class="center">
 <div> <img src="./Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/ParticipationCertificate/src/dhbw2.jpg" alt=""> </div>
-<div> <h1> Erläuterungen zur Bescheinigung </h1> </div>
+<div> <h1 id="header2"> Erläuterungen zur Bescheinigung </h1> </div>
 </div>
 
-<div class="justify"> <p> Das Studienvorbereitungsprogramm mit Schwerpunkt
-  Mathematik auf der Lernplatform studienstart.dhbw.de, richtet sich an
-  Studienanfänger/-innen der Wirtschaftsinformatik der
-DHBW Karlsruhe. Die Teilnehmer/-innen des Programms erhalten die Möglichkeit
-sich bereits vor Studienbeginn, Studientechniken anzueignen sowie das fehlende
-Vorwissen im Fach "Mathematik" aufzuarbeiten.
-Dadurch haben Studierende mehr Zeit ihre Wissenslücken in Mathematik zu
-schliessen und sich mit dem neuen Lernen auseinanderzusetzen. <br> <br>
-
-Ziel des Programms ist es, Studienanfänger/-innen vor Studienbeginn auf das Fach
- Mathematik im Studium vorzubereiten. Neben der Vermittlung von mathematikschen
- Inhalten, fördert der Online-Vorkurs
-überfachliche Kompetenzen wie Zeitmanagement und Lerntechniken sowie die
-Fähigkeit zum Selbststudium <br> </p>
+<div class="justify"> <p id="small"> {{ EXPLANATION }} </p>
 </div>
 
 <p>
-<b>{{ user.getFullname }} hat im Rahmen des Studienvorbereitungsprogramms mit
+<b>{{ username }} hat im Rahmen des Studienvorbereitungsprogramms mit
   <br>Schwerpunkt Mathematik mit folgenden Aufgabestellungen teilgenommen:</b>
 </p>
 
@@ -89,17 +78,17 @@ Fähigkeit zum Selbststudium <br> </p>
   <tr>
     <td id="td8"> Abschluss des Diagnostischer
       Einstiegstest Mathematik</td>
-    <td id="td9"> {{ questions.getCount }} Fragen aus den Themengebieten: <ul>
-      <li> {{ theme.get }}</li>
-      <li> {{ theme.get }}</li>
-      <li> {{ theme.get }}</li>
-      <li> {{ theme.get }}</li>
-      <li> {{ theme.get }}</li>
-      <li> {{ theme.get }}</li>
-      <li> {{ theme.get }}</li>
-      <li> {{ theme.get }}</li>
-      <li> {{ theme.get }}</li>
-      <li> {{ theme.get }}</li>
+    <td id="td9"> 41 Fragen aus den Themengebieten: <ul>
+      <li> Bruchrechnung </li>
+      <li> Potenzen </li>
+      <li> Quadratische Gleichungen </li>
+      <li> Termumformungen </li>
+      <li> Trigonometrische Terme </li>
+      <li> Logarithmen </li>
+      <li> Funktionen und deren Eigenschaften </li>
+      <li> Algebraische Gleichungen höherer Ordnung </li>
+      <li> Analystische Geometrie </li>
+      <li> Vektorrechnung </li>
     </ul></td>
   </tr>
   <tr>
@@ -116,13 +105,13 @@ Fähigkeit zum Selbststudium <br> </p>
 <table id="table4">
   <tr>
     <td id="td10"> Aktive Teilnahme an <br> Videokonferenzen </td>
-    <td id="td11"> Teilnahme an <mark> {{ conferences.participated }} </mark>
+    <td id="td11"> Teilnahme an <mark> {{conferencesparticipated}} </mark>
       von 5 Videokonferenzen</td>
   </tr>
   <tr>
     <td class="align-top"> Bearbeitung von<br> Aufgaben zur <br>
       Vertiefung von <br> Inhalten des <br> Studienvorbereitungs- <br>programms</td>
-    <td> Abgabe von <mark>{{ homework.done }}</mark> von 5 Hausaufgaben</td>
+    <td> Abgabe von <mark>{{homeworkdone}}</mark> von 5 Hausaufgaben</td>
   </tr>
 </table>
 </div>

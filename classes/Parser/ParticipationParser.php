@@ -14,6 +14,6 @@ interface ParticipationParser{
 	 */
 
 
-	public function parse($text, array $replacements = array());
+	public function parse($user_id);
 
 }

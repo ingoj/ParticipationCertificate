@@ -25,14 +25,6 @@ class ilParticipationCertificate extends ActiveRecord{
 	 * @var string
 	 *
 	 * @db_has_field    true
-	 * @db_fieldtype    text
-	 *
-	 */
-
-	/**
-	 * @var string
-	 *
-	 * @db_has_field    true
 	 * @db_fieldtype    date
 	 */
 	protected $dates;
@@ -47,21 +39,35 @@ class ilParticipationCertificate extends ActiveRecord{
 	/**
 	 * @var string
 	 *
-	 * @db_has_field    true
+	 *
+	 * @db_fieldtype    text
+	 * @db_length       1024
+	 */
+	protected $studentsurname;
+	/**
+	 * @var string
+	 *
 	 * @db_fieldtype    text
 	 * @db_is_unique    true
 	 * @db_length       1024
 	 */
-	protected $student;
+	protected $studentlastname;
 	/**
 	 * @var string
 	 *
 	 * @db_has_field    true
 	 * @db_fieldtype    text
-	 * @db_is_unique    true
 	 * @db_length       1024
 	 */
-	protected $teacher;
+	protected $teachername;
+	/**
+	 * @var string
+	 *
+	 * @db_has_field    true
+	 * @db_fieldtype    text
+	 * @db_length       1024
+	 */
+	protected $teacherfunction;
 	/**
 	 * @var string
 	 *
@@ -72,81 +78,38 @@ class ilParticipationCertificate extends ActiveRecord{
 	protected $description;
 	/**
 	 * @var bool
-	 *
 	 * @db_has_field    true
-	 * @db_fieldtype    blob
-	 * check ja/nein
+	 * @db_fieldtype    integer(1)
 	 */
-	protected $result_startexam;
+	protected $checkementoring;
 	/**
 	 * @var string
-	 *
 	 * @db_has_field    true
 	 * @db_fieldtype    text
+	 * @db_length       4000;
+	 */
+	protected $explanation;
+	/**
+	 * @var integer
+	 * @db_has_field    true
+	 * @db_fieldtype    integer
 	 * @db_length       1024
-	 * prozent
 	 */
-	protected $result_learnmodule;
-	/**
-	 * @var bool
-	 *
-	 * @db_has_field true
-	 * @db_fieldtype blob
-	 * check ja/nein
-	 */
-	protected $participation_videoconference;
-	/**
-	 * @var string
-	 *
-	 * @db_has_field    true
-	 * @db_fieldtype    text
-	 * @db_length       1024
-	 * prozent
-	 */
-	protected $result_recess;
-	/**
-	 * @var array
-	 * array von themen
-	 */
-	protected $themes;
-	/**
-	 * @var integer
-	 *
-	 * @db_has_field    true
-	 * @db_fieldtype    integer
-	 */
-	protected $questions_count;
-	/**
-	 * @var string
-	 *
-	 * @db_has_field    true
-	 * @db_fieldtype    text
-	 */
-	protected $modules_done;
-	/**
-	 * @var integer
-	 *
-	 * @db_has_field    true
-	 * @db_fieldtype    integer
-	 */
-	protected $conferences_participated;
-	/**
-	 * @var integer
-	 *
-	 * @db_has_field    true
-	 * @db_fieldtype    integer
-	 */
-	protected $homework_done;
+	protected $group_id;
 
 
-	public static function getInstanceByStudent($student){
-		return static::where(array('student' => $student))->first();
-	}
+
+
+/*
+	public static function getInstanceByStudent($studentSurname){
+		return static::where(array('student' => $studentSurname))->first();
+	}*/
 
 
 	public static function returnDbTableName(){
 		return self::TABLE_NAME;
 	}
+
 
 	/**
 	 * @return int
@@ -167,16 +130,16 @@ class ilParticipationCertificate extends ActiveRecord{
 	/**
 	 * @return string
 	 */
-	public function getDate() {
-		return $this->date;
+	public function getDates() {
+		return $this->dates;
 	}
 
 
 	/**
-	 * @param string $date
+	 * @param string $dates
 	 */
-	public function setDate($date) {
-		$this->date = $date;
+	public function setDates($dates) {
+		$this->dates = $dates;
 	}
 
 
@@ -194,39 +157,6 @@ class ilParticipationCertificate extends ActiveRecord{
 	public function setTitle($title) {
 		$this->title = $title;
 	}
-
-
-	/**
-	 * @return string
-	 */
-	public function getStudent() {
-		return $this->student;
-	}
-
-
-	/**
-	 * @param string $student
-	 */
-	public function setStudent($student) {
-		$this->student = $student;
-	}
-
-
-	/**
-	 * @return string
-	 */
-	public function getTeacher() {
-		return $this->teacher;
-	}
-
-
-	/**
-	 * @param string $teacher
-	 */
-	public function setTeacher($teacher) {
-		$this->teacher = $teacher;
-	}
-
 
 	/**
 	 * @return string
@@ -247,145 +177,114 @@ class ilParticipationCertificate extends ActiveRecord{
 	/**
 	 * @return bool
 	 */
-	public function isResultStartexam() {
-		return $this->result_startexam;
+	public function isCheckeMentoring() {
+		return $this->checkeMentoring;
 	}
 
 
 	/**
-	 * @param bool $result_startexam
+	 * @param bool $checkementoring
 	 */
-	public function setResultStartexam($result_startexam) {
-		$this->result_startexam = $result_startexam;
-	}
-
-
-	/**
-	 * @return string
-	 */
-	public function getResultLearnmodule() {
-		return $this->result_learnmodule;
-	}
-
-
-	/**
-	 * @param string $result_learnmodule
-	 */
-	public function setResultLearnmodule($result_learnmodule) {
-		$this->result_learnmodule = $result_learnmodule;
-	}
-
-
-	/**
-	 * @return bool
-	 */
-	public function isParticipationVideoconference() {
-		return $this->participation_videoconference;
-	}
-
-
-	/**
-	 * @param bool $participation_videoconference
-	 */
-	public function setParticipationVideoconference($participation_videoconference) {
-		$this->participation_videoconference = $participation_videoconference;
+	public function setCheckementoring($checkementoring) {
+		$this->checkementoring = $checkementoring;
 	}
 
 
 	/**
 	 * @return string
 	 */
-	public function getResultRecess() {
-		return $this->result_recess;
+	public function getExplanation() {
+		return $this->explanation;
 	}
 
 
 	/**
-	 * @param string $result_recess
+	 * @param string $explanation
 	 */
-	public function setResultRecess($result_recess) {
-		$this->result_recess = $result_recess;
-	}
-
-
-	/**
-	 * @return array
-	 */
-	public function getThemes() {
-		return $this->themes;
-	}
-
-
-	/**
-	 * @param array $themes
-	 */
-	public function setThemes($themes) {
-		$this->themes = $themes;
-	}
-
-
-	/**
-	 * @return int
-	 */
-	public function getQuestionsCount() {
-		return $this->questions_count;
-	}
-
-
-	/**
-	 * @param int $questions_count
-	 */
-	public function setQuestionsCount($questions_count) {
-		$this->questions_count = $questions_count;
+	public function setExplanation($explanation) {
+		$this->explanation = $explanation;
 	}
 
 
 	/**
 	 * @return string
 	 */
-	public function getModulesDone() {
-		return $this->modules_done;
+	public function getStudentsurname() {
+		return $this->studentsurname;
 	}
 
 
 	/**
-	 * @param string $modules_done
+	 * @param string $studentsurname
 	 */
-	public function setModulesDone($modules_done) {
-		$this->modules_done = $modules_done;
+	public function setStudentsurname($studentsurname) {
+		$this->studentsurname = $studentsurname;
+	}
+
+
+	/**
+	 * @return string
+	 */
+	public function getStudentlastname() {
+		return $this->studentlastname;
+	}
+
+
+	/**
+	 * @param string $studentlastname
+	 */
+	public function setStudentlastname($studentlastname) {
+		$this->studentlastname = $studentlastname;
+	}
+
+
+	/**
+	 * @return string
+	 */
+	public function getTeachername() {
+		return $this->teachername;
+	}
+
+
+	/**
+	 * @param string $teachername
+	 */
+	public function setTeachername($teachername) {
+		$this->teachername = $teachername;
+	}
+
+
+	/**
+	 * @return string
+	 */
+	public function getTeacherfunction() {
+		return $this->teacherfunction;
+	}
+
+
+	/**
+	 * @param string $teacherfunction
+	 */
+	public function setTeacherfunction($teacherfunction) {
+		$this->teacherfunction = $teacherfunction;
 	}
 
 
 	/**
 	 * @return int
 	 */
-	public function getConferencesParticipated() {
-		return $this->conferences_participated;
+	public function getGroupId() {
+		return $this->group_id;
 	}
 
 
 	/**
-	 * @param int $conferences_participated
+	 * @param int $group_id
 	 */
-	public function setConferencesParticipated($conferences_participated) {
-		$this->conferences_participated = $conferences_participated;
+	public function setGroupId($group_id) {
+		$this->group_id = $group_id;
 	}
 
-
-	/**
-	 * @return int
-	 */
-	public function getHomeworkDone() {
-		return $this->homework_done;
-	}
-
-
-	/**
-	 * @param int $homework_done
-	 */
-	public function setHomeworkDone($homework_done) {
-		$this->homework_done = $homework_done;
-	}
 
 
 
