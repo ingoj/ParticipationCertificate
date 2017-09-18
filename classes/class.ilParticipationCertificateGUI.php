@@ -132,8 +132,8 @@ class ilParticipationCertificateGUI {
 
 		$form->setTitle('Konfiguration Teilnahmebescheinigung');
 		$form->setDescription('Folgende Platzhalter sind verfügbar: <br>
-		&lbrace;&lbrace; user.Surname &rbrace;&rbrace;: Vorname <br>
-		&lbrace;&lbrace; user.Name &rbrace;&rbrace;: Nachname <br>
+		&lbrace;&lbrace;username&rbrace;&rbrace;: Anrede Vorname Nachname <br>
+		
 		' );
 
 		$title = new ilTextInputGUI('Titel','title');

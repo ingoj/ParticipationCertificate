@@ -26,22 +26,19 @@ class ilParticipationCertificatePDFGenerator {
 	public $temp;
 
 
-
-
 	public function __construct() {
-		global $tpl, $ilCtrl,$tempFile,$tempCount;
+		global $tpl, $ilCtrl, $tempFile, $tempCount;
 		$this->tpl = $tpl;
 		$this->ctrl = $ilCtrl;
 
-		if($tempCount == 0) {
+		if ($tempCount == 0) {
 			$tempFile = $this->temp = ilUtil::ilTempnam();
-			$tempCount++;
+			$tempCount ++;
 		}
 	}
 
 
 	public function executeCommand() {
-		//$this->tpl->getStandardTemplate();
 		$cmd = $this->ctrl->getCmd();
 		switch ($cmd) {
 			default:
@@ -53,60 +50,50 @@ class ilParticipationCertificatePDFGenerator {
 
 
 	public function generatePDF($rendered) {
-		global $printCount,$tempFile;
-
-
+		global $printCount, $tempFile;
 
 		$parsins = new ilParticipationCertificateTwigParser();
 		$membercount = $parsins->membercount;
-
-
 		$mpdf = new mPDF('', '', '', '', 20, 20, '', '', 0, 0);
-		//$mpdf->SetHeader('');
-		//$mpdf->showImageErrors = true;
-		//$html = file_get_contents($rendered);
 		$css = file_get_contents('./Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/ParticipationCertificate/Templates/Teilnahmebescheinigung.css');
-		$printCount++;
+		$printCount ++;
 
-		if ($membercount == 1){
+		if ($membercount == 1) {
 			$mpdf->WriteHTML($css, 1);
 			$mpdf->WriteHTML($rendered, 2);
-			$mpdf->Output('Teilnahmebescheinigungen'.'.pdf', 'D');
+			$mpdf->Output('Teilnahmebescheinigungen' . '.pdf', 'D');
 			$this->tpl->getStandardTemplate();
 			$this->ctrl->redirectByClass(ilParticipationCertificateGUI::class, ilParticipationCertificateGUI::CMD_DISPLAY);
 		}
-		if($printCount == 1) {
+		if ($printCount == 1) {
 			$mpdf->WriteHTML($css, 1);
 			$mpdf->WriteHTML($rendered, 2);
-			$mpdf->Output($tempFile. '.pdf', 'F');
-		}
-		elseif ($printCount == $membercount){
+			$mpdf->Output($tempFile . '.pdf', 'F');
+		} elseif ($printCount == $membercount) {
 			$mpdf->WriteHTML($css, 1);
 			$mpdf->WriteHTML($rendered, 2);
 			$mpdf->SetImportUse();
-			$page = $mpdf->SetSourceFile($tempFile.'.pdf');
-			for($i = 1; $i <= $page; $i++) {
+			$page = $mpdf->SetSourceFile($tempFile . '.pdf');
+			for ($i = 1; $i <= $page; $i ++) {
 				$mpdf->AddPage();
 				$tplID = $mpdf->ImportPage($i);
 				$mpdf->UseTemplate($tplID);
 			}
-			$mpdf->Output('Teilnahmebescheinigungen'.'.pdf', 'D');
+			$mpdf->Output('Teilnahmebescheinigungen' . '.pdf', 'D');
 			$this->tpl->getStandardTemplate();
 			$this->ctrl->redirectByClass(ilParticipationCertificateGUI::class, ilParticipationCertificateGUI::CMD_DISPLAY);
-		}
-		else{
+		} else {
 			$mpdf->WriteHTML($css, 1);
 			$mpdf->WriteHTML($rendered, 2);
 			$mpdf->SetImportUse();
-			$page = $mpdf->SetSourceFile($tempFile.'.pdf');
-			for($i = 1; $i <= $page; $i++) {
+			$page = $mpdf->SetSourceFile($tempFile . '.pdf');
+			for ($i = 1; $i <= $page; $i ++) {
 				$mpdf->AddPage();
 				$tplID = $mpdf->ImportPage($i);
 				$mpdf->UseTemplate($tplID);
 			}
-			$mpdf->Output($tempFile.'.pdf', 'F');
+			$mpdf->Output($tempFile . '.pdf', 'F');
 		}
 	}
-
-	}
+}
 
