@@ -20,12 +20,24 @@ class ilParticipationCertificatePDFGenerator {
 	 * @var ilCtrl
 	 */
 	protected $ctrl;
+	/**
+	 * @var string
+	 */
+	public $temp;
+
+
+
 
 
 	public function __construct() {
-		global $tpl, $ilCtrl;
+		global $tpl, $ilCtrl,$tempFile,$tempCount;
 		$this->tpl = $tpl;
 		$this->ctrl = $ilCtrl;
+
+		if($tempCount == 0) {
+			$tempFile = $this->temp = ilUtil::ilTempnam();
+			$tempCount++;
+		}
 	}
 
 
@@ -42,11 +54,13 @@ class ilParticipationCertificatePDFGenerator {
 
 
 	public function generatePDF($rendered) {
-		global $printCount,$pdfCount;
+		global $printCount,$pdfCount,$tempFile;
+
 
 
 		$parsins = new ilParticipationCertificateTwigParser();
 		$membercount = $parsins->membercount;
+
 
 		$mpdf = new mPDF('', '', '', '', 20, 20, '', '', 0, 0);
 		//$mpdf->SetHeader('');
@@ -60,19 +74,19 @@ class ilParticipationCertificatePDFGenerator {
 		if($printCount == 1) {
 			$mpdf->WriteHTML($css, 1);
 			$mpdf->WriteHTML($rendered, 2);
-			$mpdf->Output('./Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/ParticipationCertificate/' . $pdfCount . '.pdf', 'F');
+			$mpdf->Output($tempFile. '.pdf', 'F');
 		}
 		elseif ($printCount == $membercount){
 			$mpdf->WriteHTML($css, 1);
 			$mpdf->WriteHTML($rendered, 2);
 			$mpdf->SetImportUse();
-			$page = $mpdf->SetSourceFile('./Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/ParticipationCertificate/'.--$pdfCount.'.pdf');
+			$page = $mpdf->SetSourceFile($tempFile.'.pdf');
 			for($i = 1; $i <= $page; $i++) {
 				$mpdf->AddPage();
 				$tplID = $mpdf->ImportPage($i);
 				$mpdf->UseTemplate($tplID);
 			}
-			$mpdf->Output('./Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/ParticipationCertificate/' . $pdfCount . '.pdf', 'D');
+			$mpdf->Output($tempFile.'.pdf', 'D');
 			$this->tpl->getStandardTemplate();
 			$this->ctrl->redirectByClass(ilParticipationCertificateGUI::class, ilParticipationCertificateGUI::CMD_DISPLAY);
 		}
@@ -80,13 +94,13 @@ class ilParticipationCertificatePDFGenerator {
 			$mpdf->WriteHTML($css, 1);
 			$mpdf->WriteHTML($rendered, 2);
 			$mpdf->SetImportUse();
-			$page = $mpdf->SetSourceFile('./Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/ParticipationCertificate/'.--$pdfCount.'.pdf');
+			$page = $mpdf->SetSourceFile($tempFile.'.pdf');
 			for($i = 1; $i <= $page; $i++) {
 				$mpdf->AddPage();
 				$tplID = $mpdf->ImportPage($i);
 				$mpdf->UseTemplate($tplID);
 			}
-			$mpdf->Output('./Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/ParticipationCertificate/' . $pdfCount . '.pdf', 'F');
+			$mpdf->Output($tempFile.'.pdf', 'F');
 		}
 	}
 
