@@ -136,6 +136,7 @@ class ilParticipationCertificateTwigParser implements ParticipationParser {
 		$this->ctrl = $ilCtrl;
 		$this->db = $ilDB;
 
+
 		//Get Date and format it
 		$this->date = new ilDateTime(time(),IL_CAL_UNIX);
 		$date = explode('-',$this->date->get(IL_CAL_DATE));
@@ -197,7 +198,11 @@ class ilParticipationCertificateTwigParser implements ParticipationParser {
 
 
 	public function parseAll() {
+		if ($this->membercount == 0){
+			ilUtil::sendFailure('In diesem Kurs existieren keine Mitglieder',true);
+			$this->ctrl->redirectByClass(ilParticipationCertificateGUI::class,ilParticipationCertificateGUI::CMD_DISPLAY);
 
+		}
 		foreach ($this->memberids as $learnGroupParticipant) {
 			$this->preparseDesc($learnGroupParticipant);
 			$this->parse($learnGroupParticipant);
