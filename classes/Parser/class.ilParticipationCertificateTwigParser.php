@@ -160,6 +160,7 @@ class ilParticipationCertificateTwigParser implements ParticipationParser {
 		$gui = new ilParticipationCertificateGUI();
 
 		$this->object = ilParticipationCertificate::where([ "group_id" => $gui->groupObjId ])->first();
+		$this->check_ementoring = $this->object->isCheckementoring();
 
 		$this->options = array_merge($this->options, $options);
 		$this->loadTwig();
@@ -238,8 +239,13 @@ class ilParticipationCertificateTwigParser implements ParticipationParser {
 		$twig = new \Twig_Environment($loader, $this->options);
 
 		//loads template for twig
-		$template = $twig->load('Teilnahmebescheinigung.html');
 
+		if ($this->check_ementoring == true) {
+			$template = $twig->load('Teilnahmebescheinigung.html');
+		}
+		else{
+			$template = $twig->load('TemplateWithouteMentoring.html');
+		}
 		//foreach ($this->learnGroupParticipants as $learnGroupParticipant) {
 		$results_lernmodule = $this->all_result_learnmodule[$user_id];
 		if($results_lernmodule['einstiegstest'] == 1){
@@ -267,32 +273,16 @@ class ilParticipationCertificateTwigParser implements ParticipationParser {
 		$firstresult = (int)$results_lernmodule['average_percentage'] .'%';
 
 
-
 		$this->replacePlaceholdersForm();
+
+
 		if ($homework_done['passed'] == NULL){
 			$homework_done['passed'] = '0';
 		}
 		if($vconf['participated'] == NULL){
 			$vconf['participated'] = '0';
 		}
-		/*
-		if ($homework_done == NULL) {
-			$rendered = $template->render(array(
-				'TITLE' => $this->title,
-				'INTRODUCTION' => $this->desc,
-				'check1' => $check1,
-				'check2' => $check2,
-				'EXPLANATION' => $this->explanation,
-				'nameteacher' => $this->nameTeach,
-				'functionteacher' => $this->funcTeach,
-				'dateget' => $date,
-				'username' => $this->getUsername($user_id),
-				'homeworkdone' => $homework_done["passed"],
-				'resultlearnmodule' => '0%',
-				//'conferencesparticipated' => $vconf['participated'],
-				'resultrecess' => $secondresult,
-			));
-		}*/ else {
+
 			$rendered = $template->render(array(
 				'TITLE' => $this->title,
 				'INTRODUCTION' => $this->desc,
@@ -307,12 +297,12 @@ class ilParticipationCertificateTwigParser implements ParticipationParser {
 				'resultlearnmodule' => $firstresult,
 				'conferencesparticipated' => $vconf['participated'],
 				'resultrecess' => $secondresult,
+				'modulesdone' => $secondresult,
 			));
-		}
+
 		$mpdf = new ilParticipationCertificatePDFGenerator();
 		$mpdf->generatePDF($rendered);
-		//return $twig->render($text, $replacements);
-		//}
+
 	}
 
 
@@ -323,6 +313,7 @@ class ilParticipationCertificateTwigParser implements ParticipationParser {
 		$this->nameTeach = $this->object->getTeachername();
 		$this->explanation = $this->object->getExplanation();
 	}
+
 
 
 	public function getLernziele() {
@@ -469,4 +460,6 @@ usr.login
 
 		return $data3;
 	}
+
+
 }

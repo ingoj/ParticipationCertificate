@@ -177,8 +177,8 @@ class ilParticipationCertificate extends ActiveRecord{
 	/**
 	 * @return bool
 	 */
-	public function isCheckeMentoring() {
-		return $this->checkeMentoring;
+	public function isCheckementoring() {
+		return $this->checkementoring;
 	}
 
 
@@ -188,7 +188,6 @@ class ilParticipationCertificate extends ActiveRecord{
 	public function setCheckementoring($checkementoring) {
 		$this->checkementoring = $checkementoring;
 	}
-
 
 	/**
 	 * @return string

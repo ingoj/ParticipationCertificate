@@ -171,7 +171,7 @@ class ilParticipationCertificateGUI {
 			'functionteacher' => $this->object->getTeacherFunction(),
 			'nameteacher' => $this->object->getTeacherName(),
 			'explanation' => $this->object->getExplanation(),
-			'check_ementoring' => $this->object->isCheckeMentoring());
+			'checkementoring' => $this->object->isCheckeMentoring());
 
 		$form->setValuesbyArray($array);
 
