@@ -86,7 +86,7 @@ class ilParticipationCertificatePDFGenerator {
 				$tplID = $mpdf->ImportPage($i);
 				$mpdf->UseTemplate($tplID);
 			}
-			$mpdf->Output($tempFile.'.pdf', 'D');
+			$mpdf->Output('Teilnahmebescheinigungen'.'.pdf', 'D');
 			$this->tpl->getStandardTemplate();
 			$this->ctrl->redirectByClass(ilParticipationCertificateGUI::class, ilParticipationCertificateGUI::CMD_DISPLAY);
 		}
