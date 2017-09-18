@@ -169,10 +169,10 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI {
 
 		$array = array('title' => $this->object->getTitle(),
 			'desc' => $this->object->getDescription(),
-			'function_teacher' => $this->object->getTeacherFunction(),
-			'name_teacher' => $this->object->getTeacherName(),
+			'functionteacher' => $this->object->getTeacherFunction(),
+			'nameteacher' => $this->object->getTeacherName(),
 			'explanation' => $this->object->getExplanation(),
-			'check_ementoring' => $this->object->isCheckeMentoring());
+			'checkementoring' => $this->object->isCheckeMentoring());
 
 		$form->setValuesbyArray($array);
 		/*

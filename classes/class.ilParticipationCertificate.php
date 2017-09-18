@@ -93,7 +93,7 @@ class ilParticipationCertificate extends ActiveRecord{
 	 * @var integer
 	 * @db_has_field    true
 	 * @db_fieldtype    integer
-	 * @db_length       1024
+	 * @db_length       8
 	 */
 	protected $group_id;
 
