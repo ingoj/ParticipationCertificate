@@ -132,7 +132,7 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI {
 		$form->addItem($checkbox_yes);
 
 		$form->addCommandButton(ilParticipationCertificateConfigGUI::CMD_SAVE, 'Save');
-		$form->addCommandButton(ilParticipationCertificatePDFGenerator::CMD_PDF, 'Print PDF');
+		
 
 		return $form;
 	}
