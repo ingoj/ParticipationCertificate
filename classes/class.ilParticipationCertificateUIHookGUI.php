@@ -1,7 +1,7 @@
 <?php
 include_once("./Services/UIComponent/classes/class.ilUIHookPluginGUI.php");
 include_once './Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/ParticipationCertificate/classes/class.ilParticipationCertificateGUI.php';
-
+require_once "./Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/ParticipationCertificate/classes/class.ilParticipationCertificateAccess.php";
 /**
  * Class ilParticipationCertificateUIHookGUI
  *
@@ -30,14 +30,22 @@ class ilParticipationCertificateUIHookGUI extends ilUIHookPluginGUI{
 	 */
 
 	function modifyGUI($a_comp, $a_part, $a_par = array()) {
+
+
+
 		if ($a_part == 'tabs' && $this->checkGroup()){
-			/**
-			 * @var ilTabsGUI $tabs
-			 */
-			$tabs = $a_par["tabs"];
-			$this->ctrl->saveParameterByClass('ilParticipationCertificateGUI','ref_id');
-			$tabs->addTab('certificates', 'Certificates', $this->ctrl->getLinkTargetByClass(array
-			('ilUIPluginRouterGUI', 'ilParticipationCertificateGUI'),ilParticipationCertificateGUI::CMD_DISPLAY));
+
+			$cert_access = new ilParticipationCertificateAccess($_GET['ref_id']);
+
+			if($cert_access->hasCurrentUserPrintAccess()) {
+				/**
+				 * @var ilTabsGUI $tabs
+				 */
+				$tabs = $a_par["tabs"];
+				$this->ctrl->saveParameterByClass('ilParticipationCertificateGUI','ref_id');
+				$tabs->addTab('certificates', 'Certificates', $this->ctrl->getLinkTargetByClass(array
+				('ilUIPluginRouterGUI', 'ilParticipationCertificateGUI'),ilParticipationCertificateGUI::CMD_DISPLAY));
+			}
 		}
 	}
 

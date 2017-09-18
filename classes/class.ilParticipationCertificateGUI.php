@@ -5,6 +5,8 @@ include_once './Modules/Course/classes/class.ilObjCourseGUI.php';
 include_once './Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/ParticipationCertificate/classes/class.ilParticipationCertificateConfigGUI.php';
 include_once './Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/ParticipationCertificate/classes/class.ilParticipationCertificatePDFGenerator.php';
 include_once './Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/ParticipationCertificate/classes/Parser/class.ilParticipationCertificateTwigParser.php';
+require_once "./Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/ParticipationCertificate/classes/class.ilParticipationCertificateAccess.php";
+
 
 /**
  * Class ilParticipationCertificateGUI
@@ -54,7 +56,7 @@ class ilParticipationCertificateGUI {
 
 
 	function __construct() {
-		global $ilCtrl, $tpl, $ilTabs, $objDefinition, $ilToolbar;
+		global $ilCtrl, $tpl, $ilTabs, $objDefinition, $ilToolbar, $lng;
 
 		$this->toolbar = $ilToolbar;
 		$this->ctrl = $ilCtrl;
@@ -63,6 +65,14 @@ class ilParticipationCertificateGUI {
 		$this->objectDefinition = $objDefinition;
 		$this->groupRefId = (int) $_GET['ref_id'];
 		$this->groupObjId = ilObject2::_lookupObjectId($this->groupRefId);
+
+		//Access
+		$cert_access = new ilParticipationCertificateAccess($_GET['ref_id']);
+		if(!$cert_access->hasCurrentUserPrintAccess()) {
+			ilUtil::sendFailure($lng->txt('no_permission'), true);
+			ilUtil::redirect('login.php');
+		}
+
 		$this->object = ilParticipationCertificate::where(['group_id' => $this->groupObjId ])->first();
 		if (!$this->object) {
 			$this->object = ilParticipationCertificate::where([ 'group_id' => 0 ])->first();
