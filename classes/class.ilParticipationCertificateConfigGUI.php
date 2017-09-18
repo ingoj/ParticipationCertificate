@@ -106,13 +106,13 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI {
 	public function initForm(){
 		$form = new ilPropertyFormGUI();
 		$form->setFormAction($this->ctrl->getFormAction($this));
-		$form->setTitle('Configure your ParticipationCertificate PDF');
-		$form->setDescription('The following Placeholders are available: <br>
-		<code> { user.Surname } </code>: Vorname <br>
-		"{ user.Name }": Nachname <br>
+		$form->setTitle('Konfiguration Teilnahmebescheinigung');
+		$form->setDescription('Folgende Platzhalter sind verfügbar: <br>
+		&lbrace;&lbrace; user.Surname &rbrace;&rbrace;: Vorname <br>
+		&lbrace;&lbrace; user.Name &rbrace;&rbrace;: Nachname <br>
 		' );
 
-		$title = new ilTextInputGUI('Title','title');
+		$title = new ilTextInputGUI('Titel','title');
 		$form->addItem($title);
 
 		$introduction = new ilTextAreaInputGUI('Beschreibung','desc');
