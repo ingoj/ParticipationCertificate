@@ -77,7 +77,7 @@ test_act.tries,
 tmp_test_result.points,
 tmp_test_result.maxpoints
 
-FROM ilias.obj_members as memb
+FROM obj_members as memb
 inner join usr_data as usr on usr.usr_id = memb.usr_id
 inner join object_data as obj on obj.obj_id = memb.obj_id and obj.type = 'grp'
 inner join object_reference as grp_ref on grp_ref.obj_id = obj.obj_id

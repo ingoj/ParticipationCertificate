@@ -362,7 +362,7 @@ class ilParticipationCertificateTwigParser implements ParticipationParser {
 		$sql = "SELECT 
 DISTINCT crso.title
 
-FROM ilias.obj_members as memb
+FROM obj_members as memb
 inner join usr_data as usr on usr.usr_id = memb.usr_id
 inner join object_data as obj on obj.obj_id = memb.obj_id and obj.type = 'grp'
 inner join object_reference as grp_ref on grp_ref.obj_id = obj.obj_id
@@ -397,7 +397,7 @@ crso.title as learning_objective_suggestion,
 crsolm_crs.title as learning_objectives_suggestion_crs_title,*/
 avg(crsolm_crs_lp.percentage) as average_percentage
 
-FROM ilias.obj_members as memb
+FROM obj_members as memb
 inner join usr_data as usr on usr.usr_id = memb.usr_id
 inner join object_data as obj on obj.obj_id = memb.obj_id and obj.type = 'grp'
 inner join object_reference as grp_ref on grp_ref.obj_id = obj.obj_id
