@@ -199,7 +199,7 @@ class ilParticipationCertificateTwigParser implements ParticipationParser {
 
 	public function parseAll() {
 		if ($this->membercount == 0){
-			ilUtil::sendFailure('In diesem Kurs existieren keine Mitglieder',true);
+			ilUtil::sendFailure('In dieser Gruppe existieren keine Mitglieder',true);
 			$this->ctrl->redirectByClass(ilParticipationCertificateGUI::class,ilParticipationCertificateGUI::CMD_DISPLAY);
 
 		}
