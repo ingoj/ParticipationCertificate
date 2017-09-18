@@ -120,8 +120,8 @@ class ilParticipationCertificateGUI {
 		$this->tpl->setDescription($this->learnGroup->getDescription());
 		$this->tpl->setTitleIcon(ilObject::_getIcon($this->learnGroup->getId()));
 
-		$this->ctrl->saveParameterByClass('ilObjGroup', 'ref_id');
-		$this->tabs->setBackTarget('Back', $this->ctrl->getLinkTargetByClass('ilRepositoryGUI', 'members'));
+		$this->ctrl->saveParameterByClass('ilRepositoryGUI', 'ref_id');
+		$this->tabs->setBackTarget('Zurück', $this->ctrl->getLinkTargetByClass('ilRepositoryGUI'));
 	}
 
 
@@ -157,7 +157,7 @@ class ilParticipationCertificateGUI {
 		$form->addItem($checkbox_yes);
 
 		$this->ctrl->saveParameterByClass('ilObjGroup', 'ref_id');
-		$form->addCommandButton(ilParticipationCertificateGUI::CMD_SAVE, 'Save');
+		$form->addCommandButton(ilParticipationCertificateGUI::CMD_SAVE, 'Speichern');
 		//$form->addCommandButton(ilParticipationCertificateTwigParser::CMD_PARSE, 'Print PDF');
 
 
@@ -186,7 +186,7 @@ class ilParticipationCertificateGUI {
 		$form->setValuesbyArray($array);
 
 		$b_print = ilLinkButton::getInstance();
-		$b_print->setCaption('Print PDF');
+		$b_print->setCaption('rpc_pdf_generation');
 		$this->ctrl->saveParameterByClass('ilParticipationCertificateTwigParser', 'ref_id');
 		$b_print->setUrl($this->ctrl->getLinkTarget(new ilParticipationCertificateTwigParser(),
 			ilParticipationCertificateTwigParser::CMD_PARSE));

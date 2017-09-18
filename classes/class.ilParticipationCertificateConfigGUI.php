@@ -131,7 +131,7 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI {
 		$checkbox_yes = new ilCheckboxInputGUI('Print eMentoring', 'checkementoring');
 		$form->addItem($checkbox_yes);
 
-		$form->addCommandButton(ilParticipationCertificateConfigGUI::CMD_SAVE, 'Save');
+		$form->addCommandButton(ilParticipationCertificateConfigGUI::CMD_SAVE, 'Speichern');
 		
 
 		return $form;
