@@ -160,7 +160,7 @@ class ilParticipationCertificateTwigParser implements ParticipationParser {
 		$gui = new ilParticipationCertificateGUI();
 
 		$this->object = ilParticipationCertificate::where([ "group_id" => $gui->groupObjId ])->first();
-		$this->check_ementoring = $this->object->isCheckementoring();
+		//$this->check_ementoring = $this->object->isCheckementoring();
 
 		$this->options = array_merge($this->options, $options);
 		$this->loadTwig();
