@@ -70,7 +70,13 @@ class ilParticipationCertificatePDFGenerator {
 		$printCount++;
 		$pdfCount++;
 
-
+		if ($membercount == 1){
+			$mpdf->WriteHTML($css, 1);
+			$mpdf->WriteHTML($rendered, 2);
+			$mpdf->Output('Teilnahmebescheinigungen'.'.pdf', 'D');
+			$this->tpl->getStandardTemplate();
+			$this->ctrl->redirectByClass(ilParticipationCertificateGUI::class, ilParticipationCertificateGUI::CMD_DISPLAY);
+		}
 		if($printCount == 1) {
 			$mpdf->WriteHTML($css, 1);
 			$mpdf->WriteHTML($rendered, 2);
