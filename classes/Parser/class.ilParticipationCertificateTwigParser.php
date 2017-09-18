@@ -132,13 +132,15 @@ class ilParticipationCertificateTwigParser implements ParticipationParser {
 	 * @param array $options
 	 */
 	public function __construct(array $options = array()) {
-		global $ilCtrl, $ilDB;
+		global $ilCtrl, $ilDB,$date;
 		$this->ctrl = $ilCtrl;
 		$this->db = $ilDB;
 
-		$this->date = new ilDateTime();
-		$this->date->get(IL_CAL_DATE);
-		$this->date->__toString();
+		$this->date = new ilDateTime(time(),IL_CAL_UNIX);
+		//$this->date= $this->date->get(IL_CAL_DATE);
+		$date = explode('-',$this->date->get(IL_CAL_DATE));
+		$date = $date[2].'.'.$date[1].'.'.$date[0];
+
 
 		$this->groupRefId = (int)$_GET['ref_id'];
 		$this->groupObjId = ilObject2::_lookupObjectId($this->groupRefId);
@@ -228,6 +230,7 @@ class ilParticipationCertificateTwigParser implements ParticipationParser {
 	 * @return string
 	 */
 	public function parse($user_id) {
+		global $date;
 
 		$this->loadTwig();
 		global $template;
@@ -248,7 +251,7 @@ class ilParticipationCertificateTwigParser implements ParticipationParser {
 
 
 
-
+		//Berechung des zweiten Prozentwertes... Bearbeitung von Aufgaben zur Vertiefung von Inhalten des Studienvo..
 		$homework_done = $this->all_homework_done[$user_id];
 		$vconf = $this->vConf[$user_id];
 		if ($vconf['participated'] >= 1){
@@ -258,8 +261,21 @@ class ilParticipationCertificateTwigParser implements ParticipationParser {
 			$check2 = 'Nein';
 		}
 
+		$secondresult = (((int)$vconf['participated'] + (int) $homework_done['passed']) / 10) * 100 .'%';
+
+
+		$firstresult = (int)$results_lernmodule['average_percentage'] .'%';
+
+
+
 		$this->replacePlaceholdersForm();
-		//TODO Fill Placeholders with Name and etc.
+		if ($homework_done['passed'] == NULL){
+			$homework_done['passed'] = '0';
+		}
+		if($vconf['participated'] == NULL){
+			$vconf['participated'] = '0';
+		}
+		/*
 		if ($homework_done == NULL) {
 			$rendered = $template->render(array(
 				'TITLE' => $this->title,
@@ -269,13 +285,14 @@ class ilParticipationCertificateTwigParser implements ParticipationParser {
 				'EXPLANATION' => $this->explanation,
 				'nameteacher' => $this->nameTeach,
 				'functionteacher' => $this->funcTeach,
-				'dateget' => $this->date,
+				'dateget' => $date,
 				'username' => $this->getUsername($user_id),
-				//'homeworkdone' => $homework_done["passed"],
+				'homeworkdone' => $homework_done["passed"],
 				'resultlearnmodule' => '0%',
 				//'conferencesparticipated' => $vconf['participated'],
+				'resultrecess' => $secondresult,
 			));
-		} else {
+		}*/ else {
 			$rendered = $template->render(array(
 				'TITLE' => $this->title,
 				'INTRODUCTION' => $this->desc,
@@ -284,11 +301,12 @@ class ilParticipationCertificateTwigParser implements ParticipationParser {
 				'EXPLANATION' => $this->explanation,
 				'nameteacher' => $this->nameTeach,
 				'functionteacher' => $this->funcTeach,
-				'dateget' => $this->date,
+				'dateget' => $date,
 				'username' => $this->getUsername($user_id),
 				'homeworkdone' => $homework_done["passed"],
-				'resultlearnmodule' => $results_lernmodule['average_percentage'],
+				'resultlearnmodule' => $firstresult,
 				'conferencesparticipated' => $vconf['participated'],
+				'resultrecess' => $secondresult,
 			));
 		}
 		$mpdf = new ilParticipationCertificatePDFGenerator();
@@ -304,7 +322,6 @@ class ilParticipationCertificateTwigParser implements ParticipationParser {
 		$this->funcTeach = $this->object->getTeacherfunction();
 		$this->nameTeach = $this->object->getTeachername();
 		$this->explanation = $this->object->getExplanation();
-		//TODO Get the values from the SQL queries
 	}
 
 
