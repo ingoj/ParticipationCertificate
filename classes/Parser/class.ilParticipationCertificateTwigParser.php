@@ -132,7 +132,7 @@ class ilParticipationCertificateTwigParser implements ParticipationParser {
 	 * @param array $options
 	 */
 	public function __construct(array $options = array()) {
-		global $ilCtrl, $ilDB,$date;
+		global $ilCtrl, $ilDB;
 		$this->ctrl = $ilCtrl;
 		$this->db = $ilDB;
 
