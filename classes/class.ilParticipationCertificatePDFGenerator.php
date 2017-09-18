@@ -28,7 +28,6 @@ class ilParticipationCertificatePDFGenerator {
 
 
 
-
 	public function __construct() {
 		global $tpl, $ilCtrl,$tempFile,$tempCount;
 		$this->tpl = $tpl;
@@ -54,7 +53,7 @@ class ilParticipationCertificatePDFGenerator {
 
 
 	public function generatePDF($rendered) {
-		global $printCount,$pdfCount,$tempFile;
+		global $printCount,$tempFile;
 
 
 
@@ -68,9 +67,14 @@ class ilParticipationCertificatePDFGenerator {
 		//$html = file_get_contents($rendered);
 		$css = file_get_contents('./Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/ParticipationCertificate/Templates/Teilnahmebescheinigung.css');
 		$printCount++;
-		$pdfCount++;
 
-
+		if ($membercount == 1){
+			$mpdf->WriteHTML($css, 1);
+			$mpdf->WriteHTML($rendered, 2);
+			$mpdf->Output('Teilnahmebescheinigungen'.'.pdf', 'D');
+			$this->tpl->getStandardTemplate();
+			$this->ctrl->redirectByClass(ilParticipationCertificateGUI::class, ilParticipationCertificateGUI::CMD_DISPLAY);
+		}
 		if($printCount == 1) {
 			$mpdf->WriteHTML($css, 1);
 			$mpdf->WriteHTML($rendered, 2);
@@ -103,47 +107,6 @@ class ilParticipationCertificatePDFGenerator {
 			$mpdf->Output($tempFile.'.pdf', 'F');
 		}
 	}
-
-	public function mergePDF($rendered){
-
-		//Functioning save to the server
-		global $printCount,$mpdf;
-		$parsins = new ilParticipationCertificateTwigParser();
-		$membercount = $parsins->membercount;
-
-		$mpdf = new mPDF('', '', '', '', 20, 20, '', '', 0, 0);
-		//$mpdf->SetHeader('');
-		//$mpdf->showImageErrors = true;
-		//$html = file_get_contents($rendered);
-		$css = file_get_contents('./Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/ParticipationCertificate/Templates/Teilnahmebescheinigung.css');
-		$mpdf->WriteHTML($css, 1);
-		$mpdf->WriteHTML($rendered, 2);
-
-		if ($printCount == 0) {
-			$printCount = 1;
-		}
-		if ($printCount == $membercount) {
-			$mpdf->Output('./Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/ParticipationCertificate/' . $printCount . '.pdf', 'F');
-			$this->tpl->getStandardTemplate();
-			$this->ctrl->redirectByClass(ilParticipationCertificateGUI::class, ilParticipationCertificateGUI::CMD_DISPLAY);
-		}
-		else {
-			$mpdf->Output('./Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/ParticipationCertificate/' . $printCount . '.pdf', 'F');
-			$printCount ++;
-		}
-
-
-
-
-
-
-
-
-
-
-
-		}
-
 
 	}
 

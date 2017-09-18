@@ -136,17 +136,17 @@ class ilParticipationCertificateTwigParser implements ParticipationParser {
 		$this->ctrl = $ilCtrl;
 		$this->db = $ilDB;
 
+		//Get Date and format it
 		$this->date = new ilDateTime(time(),IL_CAL_UNIX);
-		//$this->date= $this->date->get(IL_CAL_DATE);
 		$date = explode('-',$this->date->get(IL_CAL_DATE));
 		$date = $date[2].'.'.$date[1].'.'.$date[0];
 
 
 		$this->groupRefId = (int)$_GET['ref_id'];
 		$this->groupObjId = ilObject2::_lookupObjectId($this->groupRefId);
-		//$this->groupObjId = ilObject2::_lookupObjectId($this->groupRefId);
 		$this->learnGroup = ilObjectFactory::getInstanceByRefId($_GET['ref_id']);
 
+		//Fill object with values
 		$this->vConf = $this->getVconf();
 		$this->all_result_learnmodule = $this->getResultMath();
 		$this->theme_get = $this->getLernziele();
