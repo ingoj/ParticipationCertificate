@@ -5,9 +5,6 @@ This plugin adds the user interface for the `ParticipationCertificate` plugin:
 
 
 ## Installation
-
-**Note**: This plugin requires the `ParticipationCertificate` plugin.
-
 Start at your ILIAS root directory
 ```
 mkdir -p Customizing/global/plugins/Services/UIComponent/UserInterfaceHook
