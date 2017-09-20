@@ -149,7 +149,7 @@ class ilParticipationCertificateGUI {
 		$description->setRows(10);
 		$form->addItem($description);
 
-		$description2 = new ilTextAreaInputGUI('Erläuterung zur Bescheinigung zweiter Teil (Dick)','explanationTwo');
+		$description2 = new ilTextAreaInputGUI('Erläuterung zur Bescheinigung zweiter Teil (fett gedruckt)','explanationTwo');
 		$form->addItem($description2);
 
 		$name_teacher = new ilTextInputGUI('Name Aussteller Dokument', 'nameteacher');

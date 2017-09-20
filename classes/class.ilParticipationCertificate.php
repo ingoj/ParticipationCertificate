@@ -120,16 +120,46 @@ class ilParticipationCertificate extends ActiveRecord{
 	}
 
 
-	public function getFilePath(){
-		$path = './Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/ParticipationCertificate/src';
-		return $path;
+	/**
+	/**
+	 * Get a path where the template layout file and static assets are stored
+	 *
+	 * @param string $type
+	 *
+	 * @return string
+	 */
+	public function getTemplatePath($type = 'img') {
+		$path = CLIENT_DATA_DIR . '/dhbw_part_cert';
 
+		switch($type) {
+			case 'img':
+				$path = $path . '/img/';
+				if (!is_dir($path)) {
+					ilUtil::makeDirParents($path);
+				}
+				return $path;
+				break;
+			default:
+				if (!is_dir($path)) {
+					ilUtil::makeDirParents($path);
+				}
+				return $path;
+		}
 	}
 
+
+
+/*
+	public function getFilePath(){
+
+		$path = './Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/ParticipationCertificate/src';
+		return $path;
+	}*/
+
 	public function storePicture($file_data){
-		$file_path = $this->getFilePath();
+		$file_path = $this->getTemplatePath('img');
 		//$suffix = pathinfo($file_data['headerpic'], PATHINFO_EXTENSION);
-		file_put_contents($file_path.'/Picture.jpg',$file_data);
+		file_put_contents($file_path.'picture.jpg',$file_data);
 		//return $file_data['headerpic'];
 	}
 
