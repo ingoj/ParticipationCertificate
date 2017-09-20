@@ -11,6 +11,7 @@ class ilParticipationCertificate extends ActiveRecord{
 	const TABLE_NAME = 'participationcert';
 
 
+
 	/**
 	 * @var int
 	 *
@@ -90,12 +91,20 @@ class ilParticipationCertificate extends ActiveRecord{
 	 */
 	protected $explanation;
 	/**
+	 * @var string
+	 * @db_has_field    true
+	 * @db_fieldtype    text;
+	 * @db_length       4000;
+	 */
+	protected $explanationtwo;
+	/**
 	 * @var integer
 	 * @db_has_field    true
 	 * @db_fieldtype    integer
 	 * @db_length       8
 	 */
 	protected $group_id;
+
 
 
 
@@ -109,6 +118,22 @@ class ilParticipationCertificate extends ActiveRecord{
 	public static function returnDbTableName(){
 		return self::TABLE_NAME;
 	}
+
+
+	public function getFilePath(){
+		$path = './Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/ParticipationCertificate/src';
+		return $path;
+
+	}
+
+	public function storePicture($file_data){
+		$file_path = $this->getFilePath();
+		//$suffix = pathinfo($file_data['headerpic'], PATHINFO_EXTENSION);
+		file_put_contents($file_path.'/Picture.jpg',$file_data);
+		//return $file_data['headerpic'];
+	}
+
+
 
 
 	/**
@@ -283,6 +308,24 @@ class ilParticipationCertificate extends ActiveRecord{
 	public function setGroupId($group_id) {
 		$this->group_id = $group_id;
 	}
+
+
+	/**
+	 * @return string
+	 */
+	public function getExplanationtwo() {
+		return $this->explanationtwo;
+	}
+
+
+	/**
+	 * @param string $explanationtwo
+	 */
+	public function setExplanationtwo($explanationtwo) {
+		$this->explanationtwo = $explanationtwo;
+	}
+
+
 
 
 

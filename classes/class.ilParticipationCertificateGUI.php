@@ -11,6 +11,8 @@ require_once "./Customizing/global/plugins/Services/UIComponent/UserInterfaceHoo
 /**
  * Class ilParticipationCertificateGUI
  *
+ * @author Silas Stulz <sst@studer-raimann.ch>
+ *
  * @ilCtrl_isCalledBy ilParticipationCertificateGUI: ilUIPluginRouterGUI, ilParticipationHookGUI ilParticipationCertificatePDFGenerator
  */
 class ilParticipationCertificateGUI {
@@ -147,6 +149,9 @@ class ilParticipationCertificateGUI {
 		$description->setRows(10);
 		$form->addItem($description);
 
+		$description2 = new ilTextAreaInputGUI('Erläuterung zur Bescheinigung zweiter Teil (Dick)','explanationTwo');
+		$form->addItem($description2);
+
 		$name_teacher = new ilTextInputGUI('Name Aussteller Dokument', 'nameteacher');
 		$form->addItem($name_teacher);
 
@@ -163,16 +168,7 @@ class ilParticipationCertificateGUI {
 
 		return $form;
 	}
-/*
-	public function looper(){
-		global $student;
 
-		foreach ($student as ilGroupParticipants::lookupNumberOfMembers('ref_id'));
-		{
-			$this->ctrl->redirectByClass(ilParticipationCertificateTwigParser::class, ilParticipationCertificateTwigParser::CMD_PARSE);
-		}
-	}
-*/
 
 	public function fillForm(&$form){
 
@@ -181,6 +177,7 @@ class ilParticipationCertificateGUI {
 			'functionteacher' => $this->object->getTeacherFunction(),
 			'nameteacher' => $this->object->getTeacherName(),
 			'explanation' => $this->object->getExplanation(),
+			'explanationTwo' => $this->object->getExplanationtwo(),
 			'checkementoring' => $this->object->isCheckeMentoring());
 
 		$form->setValuesbyArray($array);
@@ -228,6 +225,7 @@ class ilParticipationCertificateGUI {
 		$this->object->setTeacherName($form->getInput('nameteacher'));
 		$this->object->setCheckeMentoring($form->getInput('checkementoring'));
 		$this->object->setExplanation($form->getInput('explanation'));
+		$this->object->setExplanationtwo($form->getInput('explanationTwo'));
 
 		//TODO Get Students who are in the group
 

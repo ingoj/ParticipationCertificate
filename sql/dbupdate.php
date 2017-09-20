@@ -21,3 +21,18 @@
 	require_once './Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/ParticipationCertificate/classes/class.ilParticipationCertificate.php';
 	ilParticipationCertificate::updateDB();
 	?>
+<#5>
+	<?php
+	require_once './Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/ParticipationCertificate/classes/class.ilParticipationCertificate.php';
+	ilParticipationCertificate::updateDB();
+	?>
+<#6>
+	<?php
+	require_once './Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/ParticipationCertificate/classes/class.ilParticipationCertificate.php';
+	ilParticipationCertificate::updateDB();
+	?>
+<#6>
+<?php
+	require_once './Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/ParticipationCertificate/classes/class.ilParticipationCertificate.php';
+	ilParticipationCertificate::updateDB();
+?>

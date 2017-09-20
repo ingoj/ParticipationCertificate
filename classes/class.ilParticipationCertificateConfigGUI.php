@@ -122,6 +122,10 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI {
 		$description->setRows(10);
 		$form->addItem($description);
 
+
+		$description2 = new ilTextAreaInputGUI('Erläuterung zur Bescheinigung zweiter Teil (Dick)','explanationTwo');
+		$form->addItem($description2);
+
 		$name_teacher = new ilTextInputGUI('Name Aussteller Dokument', 'nameteacher');
 		$form->addItem($name_teacher);
 
@@ -131,11 +135,18 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI {
 		$checkbox_yes = new ilCheckboxInputGUI('Print eMentoring', 'checkementoring');
 		$form->addItem($checkbox_yes);
 
+
+		$uploadfield = new ilFileInputGUI('Laden Sie Ihren PDF Header hoch','headerpic');
+
+		$form->addItem($uploadfield);
+
 		$form->addCommandButton(ilParticipationCertificateConfigGUI::CMD_SAVE, 'Speichern');
-		
 
 		return $form;
 	}
+
+
+
 
 	/**
 	 * @return boolean
@@ -149,6 +160,8 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI {
 			return false;
 		}
 
+		$file_data = $form->getInput('headerpic');
+		$this->object->storePicture($file_data);
 		$this->object->setGroupId(0);
 		$this->object->setTitle($form->getInput('title'));
 		$this->object->setDescription($form->getInput('desc'));
@@ -156,6 +169,7 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI {
 		$this->object->setTeacherName($form->getInput('nameteacher'));
 		$this->object->setCheckeMentoring($form->getInput('checkementoring'));
 		$this->object->setExplanation($form->getInput('explanation'));
+		$this->object->setExplanationTwo($form->getInput('explanationTwo'));
 
 		//TODO Get Students who are in the group
 
@@ -171,6 +185,7 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI {
 			'functionteacher' => $this->object->getTeacherFunction(),
 			'nameteacher' => $this->object->getTeacherName(),
 			'explanation' => $this->object->getExplanation(),
+			'explanationTwo' => $this->object->getExplanationTwo(),
 			'checkementoring' => $this->object->isCheckeMentoring());
 
 		$form->setValuesbyArray($array);
@@ -194,6 +209,10 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI {
 		if(!$this->fill()) {
 			return false;
 		}
+
+
+
+
 
 		$this->object->save();
 		$this->ctrl->redirect($this,'configure');

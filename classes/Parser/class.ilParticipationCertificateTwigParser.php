@@ -115,6 +115,10 @@ class ilParticipationCertificateTwigParser implements ParticipationParser {
 	 */
 	public $memberids;
 	/**
+	 * @var
+	 */
+	public $explanationtwo;
+	/**
 	 * @var int
 	 */
 	public $membercount;
@@ -132,7 +136,7 @@ class ilParticipationCertificateTwigParser implements ParticipationParser {
 	 * @param array $options
 	 */
 	public function __construct(array $options = array()) {
-		global $ilCtrl, $ilDB;
+		global $ilCtrl, $ilDB, $date;
 		$this->ctrl = $ilCtrl;
 		$this->db = $ilDB;
 
@@ -205,6 +209,7 @@ class ilParticipationCertificateTwigParser implements ParticipationParser {
 		}
 		foreach ($this->memberids as $learnGroupParticipant) {
 			$this->preparseDesc($learnGroupParticipant);
+			$this->preparseExp($learnGroupParticipant);
 			$this->parse($learnGroupParticipant);
 		}
 	}
@@ -234,12 +239,12 @@ class ilParticipationCertificateTwigParser implements ParticipationParser {
 	}
 
 	public function preparseDesc($user_id){
-		global $resultdescri;
+		global $resultdescri,$template1;
 		$fileDescription =$this->object->getDescription();
 		file_put_contents('./Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/ParticipationCertificate/Templates/description.html',$fileDescription);
 
 		$this->loadTwig();
-		global $template1;
+
 		$loader = new \Twig_Loader_Filesystem('./Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/ParticipationCertificate/Templates/');
 		$twig = new \Twig_Environment($loader, $this->options);
 
@@ -251,7 +256,7 @@ class ilParticipationCertificateTwigParser implements ParticipationParser {
 	public function preparseExp($user_id) {
 		global $resultExp,$template2;
 		$fileExp =$this->object->getExplanation();
-		file_put_contents('./Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/ParticipationCertificate/Templates/description.html',$fileExp);
+		file_put_contents('./Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/ParticipationCertificate/Templates/explanation.html',$fileExp);
 
 
 		$this->loadTwig();
@@ -259,10 +264,28 @@ class ilParticipationCertificateTwigParser implements ParticipationParser {
 		$loader = new \Twig_Loader_Filesystem('./Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/ParticipationCertificate/Templates/');
 		$twig = new \Twig_Environment($loader, $this->options);
 
-		$template1 = $twig->load('explanation.html');
+		$template2 = $twig->load('explanation.html');
 
-		$resultExp = $template1->render(array('username' => $this->getUsername($user_id)));
+		$resultExp = $template2->render(array('username' => $this->getUsername($user_id)));
 	}
+
+
+	public function preparseExptwo($user_id) {
+		global $resultExptwo,$template3;
+		$fileExptwo =$this->object->getExplanationtwo();
+		file_put_contents('./Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/ParticipationCertificate/Templates/explanationtwo.html',$fileExptwo);
+
+
+		$this->loadTwig();
+
+		$loader = new \Twig_Loader_Filesystem('./Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/ParticipationCertificate/Templates/');
+		$twig = new \Twig_Environment($loader, $this->options);
+
+		$template3 = $twig->load('explanationtwo.html');
+
+		$resultExptwo = $template3->render(array('username' => $this->getUsername($user_id)));
+	}
+
 
 
 	/**
@@ -321,7 +344,10 @@ class ilParticipationCertificateTwigParser implements ParticipationParser {
 			$homework_done['passed'] = '0';
 		}
 		if($vconf['participated'] == NULL){
-			$vconf['participated'] = '0';
+			$vconf['participated'] = 'Es wurde nicht an den Videokonoferenzen teilgenommen';
+		}
+		else{
+			$vconf['participated'] = 'Es wurde aktiv an den Videokonferenzen teilgenommen';
 		}
 
 			$rendered = $template->render(array(
@@ -330,11 +356,13 @@ class ilParticipationCertificateTwigParser implements ParticipationParser {
 				'check1' => $check1,
 				'check2' => $check2,
 				'EXPLANATION' => $resultExp,
+				'EXPLANATIONTWO' =>$this->explanationtwo,
 				'nameteacher' => $this->nameTeach,
 				'functionteacher' => $this->funcTeach,
 				'dateget' => $date,
 				//'username' => $this->getUsername($user_id),
 				'homeworkdone' => $homework_done["passed"],
+				'maxhomework' => $homework_done['total'],
 				'resultlearnmodule' => $firstresult,
 				'conferencesparticipated' => $vconf['participated'],
 				'resultrecess' => $secondresult,
@@ -353,6 +381,8 @@ class ilParticipationCertificateTwigParser implements ParticipationParser {
 		$this->funcTeach = $this->object->getTeacherfunction();
 		$this->nameTeach = $this->object->getTeachername();
 		$this->explanation = $this->object->getExplanation();
+		$this->explanationtwo = $this->object->getExplanationtwo();
+
 	}
 
 

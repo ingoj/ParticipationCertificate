@@ -2,7 +2,7 @@
 <body>
 <div class="center">
 
-<div> <img src="./Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/ParticipationCertificate/src/dhbw2.jpg" alt=""> </div>
+<div> <img src="./Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/ParticipationCertificate/src/picture.jpg" alt=""> </div>
 
 <div class="head"> {{ TITLE }} </div>
 
@@ -53,7 +53,7 @@
 </div>
 <!-- BEGIN SEITE ZWEI -->
 <div class="center">
-<div> <img src="./Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/ParticipationCertificate/src/dhbw2.jpg" alt=""> </div>
+<div> <img src="./Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/ParticipationCertificate/src/picture.jpg" alt=""> </div>
 <div> <h1 id="header2"> Erläuterungen zur Bescheinigung </h1> </div>
 </div>
 
@@ -61,8 +61,7 @@
 </div>
 
 <p>
-<b>{{ username }} hat im Rahmen des Studienvorbereitungsprogramms mit
-  <br>Schwerpunkt Mathematik mit folgenden Aufgabestellungen teilgenommen:</b>
+<b> {{EXPLANATIONTWO}} </b>
 </p>
 
 <div>
@@ -98,13 +97,13 @@
 <table id="table4">
   <tr>
     <td id="td10"> Aktive Teilnahme an <br> Videokonferenzen </td>
-    <td id="td11"> Teilnahme an {{conferencesparticipated}}
-      von 5 Videokonferenzen</td>
+    <td id="td11"> {{conferencesparticipated}}
+      </td>
   </tr>
   <tr>
     <td class="align-top"> Bearbeitung von<br> Aufgaben zur <br>
       Vertiefung von <br> Inhalten des <br> Studienvorbereitungs- <br>programms</td>
-    <td> Abgabe von {{homeworkdone}} von 5 Hausaufgaben</td>
+    <td> Abgabe von {{homeworkdone}} von {{maxhomework}} Hausaufgaben</td>
   </tr>
 </table>
 </div>
