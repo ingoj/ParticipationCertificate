@@ -370,6 +370,7 @@ class ilParticipationCertificateTwigParser implements ParticipationParser {
 				'conferencesparticipated' => $vconf['participated'],
 				'resultrecess' => $secondresult,
 				'modulesdone' => $firstresult,
+				'learning_objectives' => $this->theme_get
 			));
 
 		$mpdf = new ilParticipationCertificatePDFGenerator();

@@ -70,18 +70,13 @@
   <tr>
     <td id="td8"> Abschluss des Diagnostischer
       Einstiegstest Mathematik</td>
-    <td id="td9"> 41 Fragen aus den Themengebieten: <ul>
-      <li> Bruchrechnung </li>
-      <li> Potenzen </li>
-      <li> Quadratische Gleichungen </li>
-      <li> Termumformungen </li>
-      <li> Trigonometrische Terme </li>
-      <li> Logarithmen </li>
-      <li> Funktionen und deren Eigenschaften </li>
-      <li> Algebraische Gleichungen höherer Ordnung </li>
-      <li> Analystische Geometrie </li>
-      <li> Vektorrechnung </li>
-    </ul></td>
+    <td id="td9"> 41 Fragen aus den Themengebieten:
+      <ul>
+      {% for key, lo in learning_objectives %}
+        <li>{{lo.title}}</li>
+      {% endfor %}
+      </ul>
+    </td>
   </tr>
   <tr>
     <td class="align-top"> Bearbeitung von empfohlenen
