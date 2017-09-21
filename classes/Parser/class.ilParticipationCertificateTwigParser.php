@@ -441,78 +441,72 @@ where grp_ref.ref_id = " . $this->db->quote($this->groupRefId, "integer") . "
 		$sql = "CREATE Temporary Table tmp_test_result (SELECT max(points) as points, active_fi, maxpoints FROM tst_pass_result group by active_fi, maxpoints)";
 		$this->db->query($sql);
 
-
 		$sql = "DROP TABLE IF Exists lp_percentage";
 		$this->db->query($sql);
-
-		$sql = "CREATE Temporary Table lp_percentage (
-					SELECT 
-						usr.usr_id,
-						usr.firstname,
-						usr.lastname,
-						usr.login,
-						crs_obj.obj_id as crs_obj_id,
-						crs_obj.title as crs_obj_title,
-						obj.title as learning_group_title,
-						tst.submitted as einstiegstest,
-						crso.objective_id as crso_objective_suggestion_id,
-						crso.title as learning_objective_suggestion,
-						crsolm_crs.title as learning_objectives_suggestion_crs_title,
-						crsolm_crs_crso.objective_id as learning_objectives_suggestion_crs_objective_id,
-						crsolm_crs_crso.title as learning_objectives_suggestion_crs_objective,
-						test_act.tries,
-						CASE WHEN
-						round(( tmp_test_result.points/tmp_test_result.maxpoints * 100 ),2) > 0 then
-						round(( tmp_test_result.points/tmp_test_result.maxpoints * 100 ),2)
-						 ELSE 0
-						 END  as lp_percentage
-						
-						FROM obj_members as memb
-						inner join usr_data as usr on usr.usr_id = memb.usr_id
-						inner join object_data as obj on obj.obj_id = memb.obj_id and obj.type = 'grp'
-						inner join object_reference as grp_ref on grp_ref.obj_id = obj.obj_id
-						inner join alo_suggestion as sugg on sugg.user_id = memb.usr_id
-						inner join crs_objectives as crso on crso.objective_id = sugg.objective_id
-						inner join object_data as crs_obj on crs_obj.obj_id = crso.crs_id
-						inner join loc_settings as itest on itest.obj_id = sugg.course_obj_id and itest.itest is not null
-						inner join tst_active as tst on tst.objective_container = sugg.course_obj_id and tst.user_fi = memb.usr_id and tst.submitted = 1
-						inner join crs_objective_lm as crsolm on crsolm.objective_id = crso.objective_id
-						inner join object_reference as crsolm_ref on crsolm_ref.ref_id = crsolm.ref_id
-						inner join container_reference as crsolm_crs_ref on crsolm_crs_ref.obj_id = crsolm_ref.obj_id
-						inner join object_data as crsolm_crs on crsolm_crs.obj_id = crsolm_crs_ref.target_obj_id and crsolm_crs.type = \"crs\"
-						inner join crs_objectives as crsolm_crs_crso on crsolm_crs_crso.crs_id = crsolm_crs.obj_id
-						inner join crs_objective_lm as crsolm_crs_objlm on crsolm_crs_objlm.objective_id = crsolm_crs_crso.objective_id and crsolm_crs_objlm.type = \"tst\"
-						inner join tst_tests as test on test.obj_fi = crsolm_crs_objlm.obj_id
-						left join tst_active as test_act on test_act.test_fi = test.test_id and test_act.user_fi = memb.usr_id
-						left join tmp_test_result on tmp_test_result.active_fi = test_act.active_id 
-						where grp_ref.ref_id = " . $this->db->quote($this->groupRefId, "integer") . ")";
+		$sql = "CREATE Temporary Table lp_percentage (SELECT 
+				sugg.user_id as usr_id,
+				crs_obj.obj_id as crs_obj_id,
+				crs_obj.title as crs_obj_title,
+				tst.submitted as einstiegstest,
+				crso.objective_id as crso_objective_suggestion_id,
+				crso.title as learning_objective_suggestion,
+				crsolm_crs.obj_id as crsolm_obj_id,
+				crsolm_crs.title as learning_objectives_suggestion_crs_title,
+				crsolm_crs_crso.objective_id as learning_objectives_suggestion_crs_objective_id,
+				crsolm_crs_crso.title as learning_objectives_suggestion_crs_objective,
+				test_act.tries,
+				COALESCE(round(( tmp_test_result.maxpoints/tmp_test_result.points * 100 ),2),0) as lp_percentage
+				FROM 
+				object_reference as grp_ref 
+				inner join object_data as grp_obj on grp_obj.obj_id = grp_ref.obj_id
+				inner join obj_members as memb on memb.obj_id =  grp_obj.obj_id
+				inner join alo_suggestion as sugg on sugg.user_id = memb.usr_id
+				inner join crs_objectives as crso on crso.objective_id = sugg.objective_id
+				inner join object_data as crs_obj on crs_obj.obj_id = crso.crs_id
+				inner join loc_settings as itest on itest.obj_id = sugg.course_obj_id and itest.itest is not null
+				inner join tst_active as tst on tst.objective_container = sugg.course_obj_id and tst.user_fi = sugg.user_id and tst.submitted = 1
+				inner join crs_objective_lm as crsolm on crsolm.objective_id = crso.objective_id
+				inner join object_reference as crsolm_ref on crsolm_ref.ref_id = crsolm.ref_id
+				inner join container_reference as crsolm_crs_ref on crsolm_crs_ref.obj_id = crsolm_ref.obj_id
+				inner join object_data as crsolm_crs on crsolm_crs.obj_id = crsolm_crs_ref.target_obj_id and crsolm_crs.type = \"crs\"
+				inner join crs_objectives as crsolm_crs_crso on crsolm_crs_crso.crs_id = crsolm_crs.obj_id
+				inner join loc_tst_assignments as loc_crs_ass on loc_crs_ass.objective_id = crsolm_crs_crso.objective_id
+				inner join object_reference as tst_ref on tst_ref.ref_id = loc_crs_ass.tst_ref_id
+				inner join tst_tests as test on test.obj_fi = tst_ref.obj_id
+				left join tst_active as test_act on test_act.test_fi = test.test_id and test_act.user_fi = sugg.user_id
+				left join tmp_test_result on tmp_test_result.active_fi = test_act.active_id
+				where grp_ref.ref_id = " . $this->db->quote($this->groupRefId, "integer") . ")";
 		$this->db->query($sql);
 
-		$sql = "SELECT 
+
+		$sql = "DROP TABLE IF EXISTS lp_average";
+		$this->db->query($sql);
+
+		$sql = "CREATE Temporary Table lp_average (SELECT 
 				usr_id,
-				firstname,
-				lastname,
-				login,
-				crs_obj_id,
-				crs_obj_title,
-				learning_group_title,
+				einstiegstest,
+				COALESCE(round(avg(average_percentage),2),0) as average_percentage
+				from(
+				select 
+				usr_id,
+				crsolm_obj_id,
 				einstiegstest,
 				avg(lp_percentage) as average_percentage
-				FROM lp_percentage
-				group by usr_id,
-				crs_obj_id,
-				firstname,
-				lastname,
-				login,
-				crs_obj_title,
-				learning_group_title,
-				einstiegstest";
+				from lp_percentage
+				group by 
+				usr_id,
+				einstiegstest,
+				crsolm_obj_id) as av)";
+		$this->db->query($sql);
+
+
+		$sql = "SELECT * from lp_average";
 
 		$results1 = $this->db->query($sql);
 
 		$data1 = [];
 		while ($row = $this->db->fetchAssoc($results1)) {
-			$data1 [$row['usr_id']] = $row;
+			$data1[$row['usr_id']] = $row;
 		}
 
 		return $data1;
