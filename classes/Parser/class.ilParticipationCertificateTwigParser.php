@@ -379,7 +379,7 @@ class ilParticipationCertificateTwigParser implements ParticipationParser {
 				'functionteacher' => $this->funcTeach,
 				'dateget' => $date,
 				'path' => $img_path,
-				//'username' => $this->getUsername($user_id),
+				'username' => $user_id,
 				//'homeworkdone' => $homework_done["passed"],
 				'homeworkdone' => $percent,
 				//'maxhomework' => $homework_done['total'],
