@@ -350,7 +350,7 @@ class ilParticipationCertificateTwigParser implements ParticipationParser {
 
 		$firstresult = number_format($results_lernmodule['average_percentage'], 2) .'%';
 
-
+		$percent = (int)$percent.'%';
 		$this->replacePlaceholdersForm();
 
 
@@ -358,7 +358,7 @@ class ilParticipationCertificateTwigParser implements ParticipationParser {
 			$homework_done['passed'] = '0';
 		}
 		if($vconf['participated'] == NULL){
-			$vconf['participated'] = 'Es wurde nicht an den Videokonoferenzen teilgenommen';
+			$vconf['participated'] = 'Es wurde nicht an den Videokonferenzen teilgenommen';
 		}
 		else{
 			$vconf['participated'] = 'Es wurde aktiv an den Videokonferenzen teilgenommen';
@@ -375,8 +375,9 @@ class ilParticipationCertificateTwigParser implements ParticipationParser {
 				'functionteacher' => $this->funcTeach,
 				'dateget' => $date,
 				//'username' => $this->getUsername($user_id),
-				'homeworkdone' => $homework_done["passed"],
-				'maxhomework' => $homework_done['total'],
+				//'homeworkdone' => $homework_done["passed"],
+				'homeworkdone' => $percent,
+				//'maxhomework' => $homework_done['total'],
 				'resultlearnmodule' => $firstresult,
 				'conferencesparticipated' => $vconf['participated'],
 				'resultrecess' => $secondresult,
