@@ -1,4 +1,5 @@
 <?php
+
 class ilParticipationCertificateAccess {
 
 	/**
@@ -11,14 +12,14 @@ class ilParticipationCertificateAccess {
 		$this->group_ref_id = $group_ref_id;
 	}
 
+
 	public function hasCurrentUserPrintAccess() {
 		global $ilAccess, $ilCtrl, $lng;
 
-		if($ilAccess->checkAccess("write", "", $this->group_ref_id)) {
+		if ($ilAccess->checkAccess("write", "", $this->group_ref_id)) {
 			return true;
 		}
 
 		return false;
 	}
-
 }
