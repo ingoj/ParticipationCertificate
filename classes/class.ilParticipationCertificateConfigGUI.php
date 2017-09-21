@@ -162,14 +162,14 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI {
 		$form->addItem($checkbox_yes);
 
 		$uploadfield = new ilFileInputGUI('Laden Sie Ihren PDF Header hoch','headerpic');
+		$uploadfield->setSuffixes(array('png'));
 		$form->addItem($uploadfield);
+
 
 		$data = $this->dropValues[1];
 		$data1 = $this->dropValues[2];
 		$data2 = $this->dropValues[3];
 		$data3 = $this->dropValues[4];
-		$options = array($data['field_id'].'('.$data['field_name'].')',$data1['field_id'].'('.$data1['field_name'].')',
-			$data2['field_id'].'('.$data2['field_name'].')',$data3['field_id'].'('.$data3['field_name'].')');
 
 		$optionss = [
 			$data['field_id'] => $data['field_name'],
@@ -261,13 +261,6 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI {
 			'gender' => $this->object->getGender());
 
 		$form->setValuesbyArray($array);
-		/*
-		$b_print = ilLinkButton::getInstance();
-		$b_print->setCaption('Print PDF');
-		$b_print->setUrl($this->ctrl->getLinkTarget(new ilParticipationCertificateTwigParser(),
-			ilParticipationCertificateTwigParser::CMD_PARSE));
-		$this->toolbar->addButtonInstance($b_print);*/
-
 	}
 
 

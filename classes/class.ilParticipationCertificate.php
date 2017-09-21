@@ -181,8 +181,8 @@ class ilParticipationCertificate extends ActiveRecord{
 	public function storePicture($file_data){
 		$file_path = $this->getTemplatePath('img');
 		//$suffix = pathinfo($file_data['headerpic'], PATHINFO_EXTENSION);
-		file_put_contents($file_path.'picture.jpg',$file_data);
-		//return $file_data['headerpic'];
+		//file_put_contents($file_path.'picture.jpg',$file_data);
+		ilUtil::moveUploadedFile($file_data['tmp_name'],'',$file_path.'pic.png');
 	}
 
 

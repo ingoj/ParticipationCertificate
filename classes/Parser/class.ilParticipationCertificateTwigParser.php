@@ -350,8 +350,12 @@ class ilParticipationCertificateTwigParser implements ParticipationParser {
 
 		$firstresult = number_format($results_lernmodule['average_percentage'], 2) .'%';
 
-		$percent = (int)$percent.'%';
+		$percent = round($percent,2);
+		$percent = $percent.'%';
 		$this->replacePlaceholdersForm();
+
+
+		$img_path = "/var/iliasdata/ilias/default/dhbw_part_cert/img/pic.png";
 
 
 		if ($homework_done['passed'] == NULL){
@@ -374,6 +378,7 @@ class ilParticipationCertificateTwigParser implements ParticipationParser {
 				'nameteacher' => $this->nameTeach,
 				'functionteacher' => $this->funcTeach,
 				'dateget' => $date,
+				'path' => $img_path,
 				//'username' => $this->getUsername($user_id),
 				//'homeworkdone' => $homework_done["passed"],
 				'homeworkdone' => $percent,
