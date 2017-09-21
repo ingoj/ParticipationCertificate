@@ -58,7 +58,6 @@ class ilParticipationCertificatePDFGenerator {
 		$css = file_get_contents('./Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/ParticipationCertificate/Templates/Teilnahmebescheinigung.css');
 		$printCount ++;
 
-
 		if ($membercount == 1) {
 			$mpdf->WriteHTML($css, 1);
 			$mpdf->WriteHTML($rendered, 2);

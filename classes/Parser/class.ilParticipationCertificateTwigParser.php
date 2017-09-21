@@ -347,14 +347,14 @@ class ilParticipationCertificateTwigParser implements ParticipationParser {
 			$percent = $homework_done["passed"] / $homework_done['total'] * 100;
 		}
 		$secondresult = number_format($percent, 2) .'%';
-
 		$firstresult = number_format($results_lernmodule['average_percentage'], 2) .'%';
+
 
 		$percent = round($percent,2);
 		$percent = $percent.'%';
 		$this->replacePlaceholdersForm();
 
-
+		//path to the header image
 		$img_path = "/var/iliasdata/ilias/default/dhbw_part_cert/img/pic.png";
 
 
