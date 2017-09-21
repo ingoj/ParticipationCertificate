@@ -119,6 +119,10 @@ class ilParticipationCertificateTwigParser implements ParticipationParser {
 	 */
 	public $explanationtwo;
 	/**
+	 * @var ilParticipationCertificateConfigGUI
+	 */
+	public $config;
+	/**
 	 * @var int
 	 */
 	public $membercount;
@@ -156,6 +160,8 @@ class ilParticipationCertificateTwigParser implements ParticipationParser {
 		$this->all_result_learnmodule = $this->getResultMath();
 		$this->theme_get = $this->getLernziele();
 		$this->all_homework_done = $this->getAufgaben();
+
+		$this->config = new ilParticipationCertificateConfigGUI();
 
 		$this->learnGroupParticipants = new ilGroupParticipants($this->groupObjId);
 		$this->membercount = $this->learnGroupParticipants->getCountMembers();
@@ -217,23 +223,28 @@ class ilParticipationCertificateTwigParser implements ParticipationParser {
 
 	public function getUsername($userId) {
 		global $resultsuser;
-		$sql = "SELECT firstname,lastname,gender FROM usr_data WHERE usr_id =" . $this->db->quote($userId, "integer");
+		$sql = "SELECT * FROM udf_text WHERE usr_id =" . $this->db->quote($userId, "integer");
 		$resultsuser = $this->db->query($sql);
 
 		while ($row = $this->db->fetchAssoc($resultsuser)) {
-			$datauser [] = $row;
+			$datauser [$row['field_id']] = $row;
 		}
-		$name = $datauser[0];
-		$lastname = $name['lastname'];
-		$surname = $name['firstname'];
+		$name = $datauser[$this->config->lastname]; //TODO Get the field_id from the dropdown
+		$lastname = $name['value'];
+		$names = $datauser[$this->config->surname];
+		$surname = $names['value'];
 
 		$fullname = $surname . ' ' . $lastname;
-
-		if ($name['gender'] == 'm') {
+		$gender = $datauser[$this->config->gender];
+		if ($gender['value'] == 'Männlich') {
 			$fullername = 'Herr ' . $fullname;
-		} else {
+		} elseif ($gender['gender'] == 'Weiblich') {
 			$fullername = 'Frau ' . $fullname;
 		}
+		else{
+			$fullername = $fullname;
+		}
+
 
 		return $fullername;
 	}
