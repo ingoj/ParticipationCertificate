@@ -65,6 +65,7 @@ class ilParticipationCertificateTwigParser {
 
 		foreach($this->usr_ids as $user_id) {
 
+			$processed_arr_text_values = $arr_text_values;
 			//Preprocess text values
 			foreach($arr_text_values as $key => $value) {
 				$twig = new \Twig_Environment(new \Twig_Loader_String());
@@ -72,9 +73,8 @@ class ilParticipationCertificateTwigParser {
 					array("username" => ($arr_usr_data[$user_id]->getPartCertSalutation() ? $arr_usr_data[$user_id]->getPartCertSalutation().' ':'').$arr_usr_data[$user_id]->getPartCertFirstname().' '.$arr_usr_data[$user_id]->getPartCertLastname(),
 						'date' => $date->get(IL_CAL_FKT_DATE,'d.m.Y'))
 				);
-				$arr_text_values[$key] = $peparsed_value;
+				$processed_arr_text_values[$key] = $peparsed_value;
 			}
-
 
 			//Learning Objective Master Course
 			$arr_usr_lo_master_crs = array();
@@ -104,7 +104,7 @@ class ilParticipationCertificateTwigParser {
 			}
 
 
-			$arr_render = array('text_values' => $arr_text_values,
+			$arr_render = array('text_values' => $processed_arr_text_values,
 								'show_ementoring' => $this->ementor,
 								'arr_lo_master_crs' => $arr_usr_lo_master_crs,
 								'crsitest_itest_submitted' => $initial_test_state,
