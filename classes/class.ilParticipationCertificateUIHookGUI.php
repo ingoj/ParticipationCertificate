@@ -1,6 +1,6 @@
 <?php
-include_once("./Services/UIComponent/classes/class.ilUIHookPluginGUI.php");
-include_once './Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/ParticipationCertificate/classes/class.ilParticipationCertificateGUI.php';
+require_once("./Services/UIComponent/classes/class.ilUIHookPluginGUI.php");
+require_once './Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/ParticipationCertificate/classes/class.ilParticipationCertificateGUI.php';
 require_once "./Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/ParticipationCertificate/classes/class.ilParticipationCertificateAccess.php";
 
 /**

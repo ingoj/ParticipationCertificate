@@ -1,0 +1,116 @@
+<body>
+  <div class="center">
+    <div> <img src={{logo_path}} alt=""></div>
+    <div><h1>{{text_values.page1_title}}</h1></div>
+  </div>
+
+  <div>
+    <p class="p-default">{{text_values.page1_introduction1}}</p>
+    <p class="p-default">{{text_values.page1_introduction2}}</p>
+  </div>
+
+ <div class="table_container">
+  <p class="p-default"><b>{{text_values.page1_box1_title}}</b></p>
+  <table class="table" id="table1">
+    <tr>
+      <td class="td1">{{text_values.page1_box1_row1}}</td>
+      <td class="td2">
+        {% if crsitest_itest_submitted %}
+        Ja
+        {% else %}
+        Nein
+        {% endif %}
+        </td>
+    </tr>
+    <tr>
+      <td class="td1">{{text_values.page1_box1_row2}}</td>
+      <td class="td2">{{learn_sugg_reached_percentage}}%</td>
+    </tr>
+  </table>
+  </div>
+
+{% if show_ementoring %}
+<div class="table_container">
+  <p class="p-default"><b>{{text_values.page1_box2_title}}</b></p>
+  <table class="table" id="table2">
+   <tr>
+     <td class="td1">
+       {{text_values.page1_box2_row2}}
+     </td>
+     <td class="td2">
+       {% if iass_state %}
+       Ja
+       {% else %}
+       Nein
+       {% endif %}
+     </td>
+   </tr>
+   <tr>
+     <td class="td1">{{text_values.page1_box2_row2}}</td>
+     <td class="td2">Abgabe von {{excercise_percentage}}% der Hausaufgaben</td>
+   </tr>
+  </table>
+</div>
+
+{% endif %}
+<div class="date"> <p>{{text_values.page1_location_date}}</p>  </div>
+<div id="signature">
+  <p>{{text_values.page1_issuer_name}}<br/>
+  <b>{{text_values.page1_issuer_title}}</b>
+  </p>
+</div>
+
+<!-- ENDE SEITE EINS -->
+<div class="pagebreak">
+</div>
+<!-- BEGIN SEITE ZWEI -->
+<div class="center">
+  <div> <img src={{logo_path}} alt=""> </div>
+  <div> <h2>{{text_values.page2_title}}</h2> </div>
+</div>
+
+<p class="p-default">{{text_values.page2_introduction1}} </p>
+<p class="p-default">{{text_values.page2_introduction2}}</p>
+<p class="p-default"><b>{{text_values.page2_introduction3}}</b></p>
+
+<div class="table_container">
+  <p><b>{{text_values.page2_box1_title}}</b></p>
+  <table class="table" id="table3">
+  <tr>
+    <td class="td1">{{text_values.page2_box1_row1}}</td>
+    <td class="td2"> 41 Fragen aus den Themengebieten:
+      <ul>
+      {% for key, lo in arr_lo_master_crs %}
+        <li>{{lo.getLoMasterObjectiveTitle}}</li>
+      {% endfor %}
+      </ul>
+    </td>
+  </tr>
+  <tr>
+    <td class="td1">{{text_values.page2_box1_row2}}</td>
+    <td class="td2">{{learn_sugg_reached_percentage}}% der empfohlenen Module wurden bearbeitet </td>
+  </tr>
+  </table>
+</div>
+{% if show_ementoring %}
+<div class="table_container">
+  <p><b>{{text_values.page2_box2_title}}</b></p>
+  <table class="table" id="table4">
+  <tr>
+    <td class="td1">{{text_values.page2_box2_row1}}</td>
+    <td class="td2">
+      {% if iass_state %}
+        Ja
+      {% else %}
+        Nein
+      {% endif %}
+    </td>
+  </tr>
+  <tr>
+    <td class="td1">{{text_values.page2_box2_row1}}</td>
+    <td class="td2">Abgabe von {{excercise_percentage}}% der Hausaufgaben</td>
+  </tr>
+  </table>
+</div>
+{% endif %}
+</body>

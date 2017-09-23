@@ -1,5 +1,5 @@
 <?php
-include_once('./Services/UIComponent/classes/class.ilUserInterfaceHookPlugin.php');
+require_once('./Services/UIComponent/classes/class.ilUserInterfaceHookPlugin.php');
 
 /**
  * Class ilParticipationCertificatePlugin

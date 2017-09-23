@@ -1,11 +1,13 @@
 <?php
-include_once './Services/Form/classes/class.ilPropertyFormGUI.php';
-include_once './Services/Object/classes/class.ilObjectListGUIFactory.php';
-include_once './Modules/Course/classes/class.ilObjCourseGUI.php';
-include_once './Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/ParticipationCertificate/classes/class.ilParticipationCertificateConfigGUI.php';
-include_once './Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/ParticipationCertificate/classes/class.ilParticipationCertificatePDFGenerator.php';
-include_once './Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/ParticipationCertificate/classes/Parser/class.ilParticipationCertificateTwigParser.php';
+//TODO prüfen, ob execute command noch stimmig.
+require_once './Services/Form/classes/class.ilPropertyFormGUI.php';
+require_once './Services/Object/classes/class.ilObjectListGUIFactory.php';
+require_once './Modules/Course/classes/class.ilObjCourseGUI.php';
+require_once './Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/ParticipationCertificate/classes/class.ilParticipationCertificateConfigGUI.php';
+require_once './Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/ParticipationCertificate/classes/Report/class.ilParticipationCertificatePDFGenerator.php';
+require_once './Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/ParticipationCertificate/classes/Report/class.ilParticipationCertificateTwigParser.php';
 require_once "./Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/ParticipationCertificate/classes/class.ilParticipationCertificateAccess.php";
+require_once "./Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/ParticipationCertificate/classes/Report/class.ilParticipationCertificateTwigParser.php";
 
 /**
  * Class ilParticipationCertificateGUI
@@ -41,7 +43,7 @@ class ilParticipationCertificateGUI {
 	 */
 	public $learningGroup;
 	/**
-	 * @var ilParticipationCertificate
+	 * @var ilParticipationCertificateConfig
 	 */
 	public $object;
 	/**
@@ -72,11 +74,7 @@ class ilParticipationCertificateGUI {
 			ilUtil::redirect('login.php');
 		}
 
-		$this->object = ilParticipationCertificate::where([ 'group_id' => $this->groupObjId ])->first();
-		if (!$this->object) {
-			$this->object = ilParticipationCertificate::where([ 'group_id' => 0 ])->first();
-			$this->object->setId(NULL);
-		}
+
 		$this->learnGroup = ilObjectFactory::getInstanceByRefId($_GET['ref_id']);
 		$this->ctrl->saveParameterByClass('ilParticipationCertificateGUI', [ 'ref_id', 'group_id' ]);
 	}
@@ -91,7 +89,7 @@ class ilParticipationCertificateGUI {
 				$ret = $this->ctrl->forwardCommand($ilParticipationCertificatePDFGenerator);
 				break;
 			case 'ilparticipationcertificatetwigparser':
-				$ilParticipationCertificateTwigParser = new ilParticipationCertificateTwigParser();
+				$ilParticipationCertificateTwigParser = new ilParticipationCertificateTwigParser($this->groupRefId);
 				$ret1 = $this->ctrl->forwardCommand($ilParticipationCertificateTwigParser);
 				break;
 			case 'ilparticipationcertificategui':
@@ -108,7 +106,7 @@ class ilParticipationCertificateGUI {
 		$this->initHeader();
 
 		$form = $this->initform();
-		$this->fillForm($form);
+
 		$this->tpl->setContent($form->getHTML());
 		$this->tpl->show();
 	}
@@ -127,36 +125,44 @@ class ilParticipationCertificateGUI {
 	public function initForm() {
 		$form = new ilPropertyFormGUI();
 
+		$b_print = ilLinkButton::getInstance();
+		$b_print->setCaption('Bescheinigung Drucken');
+		$b_print->setUrl($this->ctrl->getLinkTarget($this, 'printPdf'));
+		$this->toolbar->addButtonInstance($b_print);
+
+		$b_print = ilLinkButton::getInstance();
+		$b_print->setCaption('Bescheinigung Drucken (exkl. eMentoring)');
+		$b_print->setUrl($this->ctrl->getLinkTarget($this, 'printPdfWithoutMentoring'));
+		$this->toolbar->addButtonInstance($b_print);
+
+
+		$button = ilLinkButton::getInstance();
+		$button->setCaption('Textwerte für das Formular zurücksetzen');
+		$button->setUrl($this->ctrl->getLinkTarget($this, 'resetCertText'));
+		$this->toolbar->addButtonInstance($button);
+
 		$form->setFormAction($this->ctrl->getFormAction($this));
 
 		$form->setTitle('Konfiguration Teilnahmebescheinigung');
 		$form->setDescription('Folgende Platzhalter sind verfügbar: <br>
 		&lbrace;&lbrace;username&rbrace;&rbrace;: Anrede Vorname Nachname <br>
-		
+		&lbrace;&lbrace;date&rbrace;&rbrace;: Datum
 		');
 
-		$title = new ilTextInputGUI('Titel', 'title');
-		$form->addItem($title);
+		$arr_config = ilParticipationCertificateConfig::where(array("config_type" => ilParticipationCertificateConfig::CONFIG_TYPE_GROUP, "group_ref_id" => $this->groupRefId, "config_value_type" => ilParticipationCertificateConfig::CONFIG_VALUE_TYPE_CERT_TEXT))->orderBy('id')->get();
+		if(count($arr_config) == 0) {
+			$arr_config = ilParticipationCertificateConfig::where(array("config_type" => ilParticipationCertificateConfig::CONFIG_TYPE_GLOBAL, "config_value_type" => ilParticipationCertificateConfig::CONFIG_VALUE_TYPE_CERT_TEXT))->orderBy('id')->get();
+		}
 
-		$introduction = new ilTextAreaInputGUI('Beschreibung', 'desc');
-		$introduction->setRows(10);
-		$form->addItem($introduction);
-
-		$description = new ilTextAreaInputGUI('Erläuterung zur Bescheinigung:', 'explanation');
-		$description->setRows(10);
-		$form->addItem($description);
-
-		$description2 = new ilTextAreaInputGUI('Erläuterung zur Bescheinigung zweiter Teil (fett gedruckt)', 'explanationTwo');
-		$form->addItem($description2);
-
-		$name_teacher = new ilTextInputGUI('Name Aussteller Dokument', 'nameteacher');
-		$form->addItem($name_teacher);
-
-		$function_teacher = new ilTextInputGUI('Funktion Aussteller Dokument', 'functionteacher');
-		$form->addItem($function_teacher);
-
-		$checkbox_yes = new ilCheckboxInputGUI('Print eMentoring', 'checkementoring');
-		$form->addItem($checkbox_yes);
+		foreach($arr_config as $config) {
+			/**
+			 * @var ilParticipationCertificateConfig $config
+			 */
+			$input = new ilTextAreaInputGUI($config->getConfigKey(), $config->getConfigKey());
+			$input->setRows(3);
+			$input->setValue($config->getConfigValue());
+			$form->addItem($input);
+		}
 
 		$this->ctrl->saveParameterByClass('ilObjGroup', 'ref_id');
 		$form->addCommandButton(ilParticipationCertificateGUI::CMD_SAVE, 'Speichern');
@@ -165,68 +171,59 @@ class ilParticipationCertificateGUI {
 	}
 
 
-	public function fillForm(&$form) {
-
-		$array = array(
-			'title' => $this->object->getTitle(),
-			'desc' => $this->object->getDescription(),
-			'functionteacher' => $this->object->getTeacherFunction(),
-			'nameteacher' => $this->object->getTeacherName(),
-			'explanation' => $this->object->getExplanation(),
-			'explanationTwo' => $this->object->getExplanationtwo(),
-			'checkementoring' => $this->object->isCheckeMentoring()
-		);
-
-		$form->setValuesbyArray($array);
-
-		$b_print = ilLinkButton::getInstance();
-		$b_print->setCaption('rpc_pdf_generation');
-		$this->ctrl->saveParameterByClass('ilParticipationCertificateTwigParser', 'ref_id');
-		$b_print->setUrl($this->ctrl->getLinkTarget(new ilParticipationCertificateTwigParser(), ilParticipationCertificateTwigParser::CMD_PARSE));
-		$this->toolbar->addButtonInstance($b_print);
-	}
-
-
 	/**
 	 * @return bool
 	 */
 	public function save() {
-		if (!$this->fill()) {
+
+		$form = $this->initForm();
+
+		if (!$form->checkInput()) {
 			//TODO error message plus redirect
 			return false;
 		}
 
-		$this->object->save();
-		$this->ctrl->redirect($this, 'display');
-
-		//$this->tpl->setContent($form->getHTML());
-		return true;
-	}
-
-
-	/**
-	 * @return boolean
-	 */
-	public function fill() {
-
-		$form = $this->initForm();
-		$form->setValuesByPost();
-
-		if (!$form->checkInput()) {
-			return false;
+		//TODO auslagern nach ilParticipationCertificateConfig
+		//save Text
+		foreach($form->getItems() as $item) {
+			/**
+			 * @var ilParticipationCertificateConfig $config;
+			 */
+			$config = ilParticipationCertificateConfig::where(array('config_key' =>  $item->getPostVar(), 'config_type' => ilParticipationCertificateConfig::CONFIG_TYPE_GROUP, 'config_value_type' => ilParticipationCertificateConfig::CONFIG_VALUE_TYPE_CERT_TEXT))->first();
+			if(!is_object($config)) {
+				$config = new ilParticipationCertificateConfig();
+				$config->setGroupRefId($this->groupRefId);
+				$config->setConfigType(ilParticipationCertificateConfig::CONFIG_TYPE_GROUP);
+				$config->setConfigValueType(ilParticipationCertificateConfig::CONFIG_VALUE_TYPE_CERT_TEXT);
+				$config->setConfigKey( $item->getPostVar());
+			}
+			$config->setConfigValue($form->getInput($item->getPostVar()));
+			$config->store();
 		}
 
-		$this->object->setGroupId($this->groupObjId);
-		$this->object->setTitle($form->getInput('title'));
-		$this->object->setDescription($form->getInput('desc'));
-		$this->object->setTeacherFunction($form->getInput('functionteacher'));
-		$this->object->setTeacherName($form->getInput('nameteacher'));
-		$this->object->setCheckeMentoring($form->getInput('checkementoring'));
-		$this->object->setExplanation($form->getInput('explanation'));
-		$this->object->setExplanationtwo($form->getInput('explanationTwo'));
-
-		//TODO Get Students who are in the group
-
+		$this->ctrl->redirect($this, 'display');
 		return true;
 	}
+
+	public function printPdf() {
+		$twigParser = new ilParticipationCertificateTwigParser($this->groupRefId);
+		$twigParser->parseData();
+	}
+
+	public function printPdfWithoutMentoring() {
+		$twigParser = new ilParticipationCertificateTwigParser($this->groupRefId,array(),false);
+		$twigParser->parseData();
+	}
+
+	public function resetCertText() {
+		global $ilCtrl;
+		$arr_config = ilParticipationCertificateConfig::where(array("config_type" => ilParticipationCertificateConfig::CONFIG_TYPE_GROUP, "group_ref_id" => $this->groupRefId, "config_value_type" => ilParticipationCertificateConfig::CONFIG_VALUE_TYPE_CERT_TEXT))->get();
+		if(count($arr_config)) {
+			foreach($arr_config as $config) {
+				$config->delete();
+			}
+		}
+		$ilCtrl->redirect($this,self::CMD_DISPLAY);
+	}
+
 }
