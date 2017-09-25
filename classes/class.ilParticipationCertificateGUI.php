@@ -119,6 +119,10 @@ class ilParticipationCertificateGUI {
 
 		$this->ctrl->saveParameterByClass('ilRepositoryGUI', 'ref_id');
 		$this->tabs->setBackTarget('Zurück', $this->ctrl->getLinkTargetByClass('ilRepositoryGUI'));
+		//TODO change Link to the Overview
+		$this->tabs->addTab('overview','Übersicht',$this->ctrl->getLinkTargetByClass('ilRepositoryGUI'));
+		$this->tabs->addTab('config','Konfiguration',$this->ctrl->getLinkTargetByClass('ilParticipationCertificateGUI',ilParticipationCertificateGUI::CMD_DISPLAY));
+		$this->tabs->activateTab('config');
 	}
 
 
