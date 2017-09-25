@@ -111,7 +111,7 @@ class ilParticipationCertificateConfig extends ActiveRecord{
 		ilUtil::moveUploadedFile($file_data['tmp_name'],'',$file_path.self::LOGO_FILE_NAME);
 	}
 
-	public function returnPicturePath() {
+	public static function returnPicturePath() {
 		return self::getFileStoragePath('img').self::LOGO_FILE_NAME;
 	}
 

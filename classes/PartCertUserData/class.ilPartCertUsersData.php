@@ -48,7 +48,7 @@ class ilPartCertUsersData {
 		return $select;
 	}
 
-	public function returnSalutation($gender) {
+	public static function returnSalutation($gender) {
 		switch($gender) {
 			case 'Männlich':
 				return "Herr";
