@@ -49,16 +49,16 @@ class ilParticipationCertificatePDFGenerator {
 	}
 
 
-	public function generatePDF($rendered) {
+	public function generatePDF($rendered,$total_users) {
 		global $printCount, $tempFile;
 
-		$parsins = new ilParticipationCertificateTwigParser();
-		$membercount = $parsins->membercount;
+		//$parsins = new ilParticipationCertificateTwigParser();
+
 		$mpdf = new mPDF('', '', '', '', 20, 20, '', '', 0, 0);
-		$css = file_get_contents('./Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/ParticipationCertificate/Templates/Teilnahmebescheinigung.css');
+		$css = file_get_contents('./Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/ParticipationCertificate/templates/report/Teilnahmebescheinigung.css');
 		$printCount ++;
 
-		if ($membercount == 1) {
+		if ($total_users == 1) {
 			$mpdf->WriteHTML($css, 1);
 			$mpdf->WriteHTML($rendered, 2);
 			$mpdf->Output('Teilnahmebescheinigungen' . '.pdf', 'D');
@@ -69,7 +69,7 @@ class ilParticipationCertificatePDFGenerator {
 			$mpdf->WriteHTML($css, 1);
 			$mpdf->WriteHTML($rendered, 2);
 			$mpdf->Output($tempFile . '.pdf', 'F');
-		} elseif ($printCount == $membercount) {
+		} elseif ($printCount == $total_users) {
 			$mpdf->WriteHTML($css, 1);
 			$mpdf->WriteHTML($rendered, 2);
 			$mpdf->SetImportUse();

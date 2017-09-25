@@ -41,7 +41,7 @@ class Twig_Cache_Filesystem implements Twig_CacheInterface
     public function load($key)
     {
         if (file_exists($key)) {
-            @include_once $key;
+            @require_once $key;
         }
     }
 

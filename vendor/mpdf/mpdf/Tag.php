@@ -3080,7 +3080,7 @@ class Tag
 					break;
 				}
 				$this->mpdf->ignorefollowingspaces = false;
-				include_once(_MPDF_PATH . 'graph.php');
+				require_once(_MPDF_PATH . 'graph.php');
 				$this->mpdf->graphs[$gid]['attr'] = $attr;
 
 

@@ -12523,7 +12523,7 @@ class mPDF
 			}
 
 			if (!class_exists('gif', false)) {
-				include_once(_MPDF_PATH . 'classes/gif.php');
+				require_once(_MPDF_PATH . 'classes/gif.php');
 			}
 			$gif = new CGIF();
 
