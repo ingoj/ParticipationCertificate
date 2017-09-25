@@ -14,7 +14,7 @@ require_once './Customizing/global/plugins/Services/UIComponent/UserInterfaceHoo
  *
  * @author            Martin Studer <ms@studer-raimann.ch>
  *
- * @ilCtrl_isCalledBy ilParticipationCertificateTwigParser: ilParticipationCertificateGUI
+ * @ilCtrl_isCalledBy ilParticipationCertificateTwigParser: ilParticipationCertificateGUI, ilParticipationCertificateTableGUI
  */
 class ilParticipationCertificateTwigParser {
 

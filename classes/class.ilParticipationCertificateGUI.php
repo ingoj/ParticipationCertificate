@@ -8,7 +8,7 @@ require_once './Customizing/global/plugins/Services/UIComponent/UserInterfaceHoo
 require_once './Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/ParticipationCertificate/classes/Report/class.ilParticipationCertificateTwigParser.php';
 require_once "./Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/ParticipationCertificate/classes/class.ilParticipationCertificateAccess.php";
 require_once "./Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/ParticipationCertificate/classes/Report/class.ilParticipationCertificateTwigParser.php";
-
+require_once './Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/ParticipationCertificate/classes/Table/class.ilParticipationCertificateTableGUI.php';
 /**
  * Class ilParticipationCertificateGUI
  *
@@ -94,7 +94,11 @@ class ilParticipationCertificateGUI {
 				break;
 			case 'ilparticipationcertificategui':
 				$ilParticipationCertificateGUI = new ilParticipationCertificateGUI();
-
+				break;
+			case 'ilparticipationcertificatetablegui':
+				$ilParticipationCertificateTableGUI = new ilParticipationCertificateTableGUI();
+				$this->ctrl->forwardCommand($ilParticipationCertificateTableGUI);
+				break;
 			default:
 				$this->{$cmd}();
 		}
@@ -118,10 +122,16 @@ class ilParticipationCertificateGUI {
 		$this->tpl->setTitleIcon(ilObject::_getIcon($this->learnGroup->getId()));
 
 		$this->ctrl->saveParameterByClass('ilRepositoryGUI', 'ref_id');
+
 		$this->tabs->setBackTarget('Zurück', $this->ctrl->getLinkTargetByClass('ilRepositoryGUI'));
-		//TODO change Link to the Overview
-		$this->tabs->addTab('overview','Übersicht',$this->ctrl->getLinkTargetByClass('ilRepositoryGUI'));
-		$this->tabs->addTab('config','Konfiguration',$this->ctrl->getLinkTargetByClass('ilParticipationCertificateGUI',ilParticipationCertificateGUI::CMD_DISPLAY));
+
+
+
+		$this->ctrl->saveParameterByClass('ilParticipationCertificateTableGUI', 'ref_id');
+		$this->tabs->addTab('overview', 'Übersicht', $this->ctrl->getLinkTargetByClass(ilParticipationCertificateTableGUI::class,ilParticipationCertificateTableGUI::CMD_CONTENT));
+
+		//$this->tabs->addTab('overview','Übersicht',$this->ctrl->getLinkTargetByClass('ilParticipationCertificateTableGUI',ilParticipationCertificateTableGUI::CMD_CONTENT));
+		$this->tabs->addTab('config', 'Konfigurieren', $this->ctrl->getLinkTargetByClass(ilParticipationCertificateGUI::class,ilParticipationCertificateGUI::CMD_DISPLAY));
 		$this->tabs->activateTab('config');
 	}
 
@@ -129,6 +139,7 @@ class ilParticipationCertificateGUI {
 	public function initForm() {
 		$form = new ilPropertyFormGUI();
 
+		/*
 		$b_print = ilLinkButton::getInstance();
 		$b_print->setCaption('Bescheinigung Drucken');
 		$b_print->setUrl($this->ctrl->getLinkTarget($this, 'printPdf'));
@@ -138,7 +149,7 @@ class ilParticipationCertificateGUI {
 		$b_print->setCaption('Bescheinigung Drucken (exkl. eMentoring)');
 		$b_print->setUrl($this->ctrl->getLinkTarget($this, 'printPdfWithoutMentoring'));
 		$this->toolbar->addButtonInstance($b_print);
-
+		*/
 
 		$button = ilLinkButton::getInstance();
 		$button->setCaption('Textwerte für das Formular zurücksetzen');
@@ -208,7 +219,7 @@ class ilParticipationCertificateGUI {
 		$this->ctrl->redirect($this, 'display');
 		return true;
 	}
-
+	/*
 	public function printPdf() {
 		$twigParser = new ilParticipationCertificateTwigParser($this->groupRefId);
 		$twigParser->parseData();
@@ -218,7 +229,7 @@ class ilParticipationCertificateGUI {
 		$twigParser = new ilParticipationCertificateTwigParser($this->groupRefId,array(),false);
 		$twigParser->parseData();
 	}
-
+	*/
 	public function resetCertText() {
 		global $ilCtrl;
 		$arr_config = ilParticipationCertificateConfig::where(array("config_type" => ilParticipationCertificateConfig::CONFIG_TYPE_GROUP, "group_ref_id" => $this->groupRefId, "config_value_type" => ilParticipationCertificateConfig::CONFIG_VALUE_TYPE_CERT_TEXT))->get();
