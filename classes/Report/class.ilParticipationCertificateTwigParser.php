@@ -62,6 +62,14 @@ class ilParticipationCertificateTwigParser {
 		$part_pdf = new ilParticipationCertificatePDFGenerator();
 
 
+		if(is_file(ilParticipationCertificateConfig::returnPicturePath('absolute',$this->group_ref_id))) {
+			$logo_path = ilParticipationCertificateConfig::returnPicturePath('absolute',$this->group_ref_id);
+		} elseif(is_file(ilParticipationCertificateConfig::returnPicturePath('absolute',0))) {
+			$logo_path = ilParticipationCertificateConfig::returnPicturePath('absolute',0);
+		} else {
+			$logo_path = '';
+		}
+
 
 		foreach($this->usr_ids as $user_id) {
 
@@ -111,7 +119,7 @@ class ilParticipationCertificateTwigParser {
 								'learn_sugg_reached_percentage' => $learn_sugg_reached_percentage,
 								'iass_state' => $iass_state,
 								'excercise_percentage' => $excercise_percentage,
-								'logo_path' => ilParticipationCertificateConfig::returnPicturePath()
+								'logo_path' => $logo_path
 			);
 
 			$part_pdf->generatePDF($this->twig_template->render($arr_render),count($this->usr_ids));
