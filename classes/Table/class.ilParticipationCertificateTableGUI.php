@@ -73,9 +73,10 @@ class ilParticipationCertificateTableGUI {
 		$this->toolbar->addButtonInstance($b_print);
 
 		$this->tpl->getStandardTemplate();
-		$myTable = new ilParticipationCertificateTableGUIConfig($this,ilParticipationCertificateTableGUI::CMD_CONTENT);
 
-		$this->tpl->setContent($myTable->getHTML());
+		$this->initTable();
+
+		$this->tpl->setContent($this->table->getHTML());
 	}
 
 	function initHeader() {
@@ -102,6 +103,34 @@ class ilParticipationCertificateTableGUI {
 		$twigParser = new ilParticipationCertificateTwigParser($this->groupRefId,array(),false);
 		$twigParser->parseData();
 	}
+
+
+	public function applyFilter() {
+		$this->initTable();
+
+		$this->table->writeFilterToSession();
+		$this->table->resetOffset();
+
+		$this->content();
+	}
+
+
+	public function resetFilter() {
+		$this->initTable();
+
+		$this->table->resetOffset();
+		$this->table->resetFilter();
+
+		$this->content();
+	}
+
+	protected function initTable($override = false) {
+
+		$this->table =  new ilParticipationCertificateTableGUIConfig($this,ilParticipationCertificateTableGUI::CMD_CONTENT);
+	}
+
+
+
 
 
 }
