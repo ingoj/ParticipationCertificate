@@ -1,9 +1,10 @@
 <?php
 require_once './Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/ParticipationCertificate/classes/Table/class.ilParticipationCertificateTableGUIConfig.php';
 require_once './Services/UIComponent/AdvancedSelectionList/classes/class.ilAdvancedSelectionListGUI.php';
+require_once './Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/ParticipationCertificate/classes/Table/class.ilParticipationCertificateResultModificationGUI.php';
 /**
  * Class ilParticipationCertificateTableGUI
- * @ilCtrl_isCalledBy ilParticipationCertificateTableGUI: ilParticipationCertificateGUI, ilUIPluginRouterGUI
+ * @ilCtrl_isCalledBy ilParticipationCertificateTableGUI: ilParticipationCertificateGUI, ilUIPluginRouterGUI, ilParticipationCertificateResultModificationGUI
  */
 class ilParticipationCertificateTableGUI {
 
@@ -55,21 +56,29 @@ class ilParticipationCertificateTableGUI {
 
 
 	public function executeCommand(){
-		$this->tpl->getStandardTemplate();
-		$this->initHeader();
 		$nextClass = $this->ctrl->getNextClass();
 		switch($nextClass){
+			case 'ilparticipationcertificateresultmodificationgui':
+				$ilparticipationcertificateresultmodificationgui = new ilParticipationCertificateResultModificationGUI();
+				$ret1 = $this->ctrl->forwardCommand($ilparticipationcertificateresultmodificationgui);
+				break;
 			default:
 				$cmd = $this->ctrl->getCmd(self::CMD_CONTENT);
 				$this->tabs->setTabActive(self::CMD_OVERVIEW);
 				$this->{$cmd}();
 				break;
+			case 'ilparticipationcertificategui':
+				$ilParticipationCertificateGUI = new ilParticipationCertificateGUI();
+				$ret2 = $this->ctrl->forwardCommand($ilParticipationCertificateGUI);
+				$this->tabs->setTabActive(self::CMD_OVERVIEW);
+				break;
 		}
-		$this->tpl->show();
 	}
 
 
 	public function content(){
+		$this->tpl->getStandardTemplate();
+		$this->initHeader();
 		$b_print = ilLinkButton::getInstance();
 		$b_print->setCaption($this->pl->txt('header_btn_print'));
 		$b_print->setUrl($this->ctrl->getLinkTarget($this, $this::CMD_PRINT_PDF));
@@ -85,6 +94,8 @@ class ilParticipationCertificateTableGUI {
 		$this->initTable();
 
 		$this->tpl->setContent($this->table->getHTML());
+		$this->tpl->show();
+
 	}
 
 	function initHeader() {
@@ -99,17 +110,19 @@ class ilParticipationCertificateTableGUI {
 		$this->tabs->addTab('overview', $this->pl->txt('header_overview'), $this->ctrl->getLinkTargetByClass(ilParticipationCertificateTableGUI::class,ilParticipationCertificateTableGUI::CMD_CONTENT));
 
 		$this->tabs->addTab('config', $this->pl->txt('header_config'), $this->ctrl->getLinkTargetByClass(ilParticipationCertificateGUI::class,ilParticipationCertificateGUI::CMD_DISPLAY));
-		$this->tabs->activateTab('config');
+		$this->tabs->activateTab('overview');
 	}
 
 	public function printPdf() {
 		$twigParser = new ilParticipationCertificateTwigParser($this->groupRefId);
-		$twigParser->parseData();
+		$solo = false;
+		$twigParser->parseData($solo, 0);
 	}
 
 	public function printPdfWithoutMentoring() {
 		$twigParser = new ilParticipationCertificateTwigParser($this->groupRefId,array(),false);
-		$twigParser->parseData();
+		$solo = false;
+		$twigParser->parseData($solo,0);
 	}
 
 

@@ -14,7 +14,7 @@ require_once './Customizing/global/plugins/Services/UIComponent/UserInterfaceHoo
  *
  * @author            Silas Stulz <sst@studer-raimann.ch>
  *
- * @ilCtrl_isCalledBy ilParticipationCertificateGUI: ilUIPluginRouterGUI, ilParticipationHookGUI ilParticipationCertificatePDFGenerator
+ * @ilCtrl_isCalledBy ilParticipationCertificateGUI: ilUIPluginRouterGUI, ilParticipationHookGUI, ilParticipationCertificatePDFGenerator, ilParticipationCertificateTableGUI
  */
 class ilParticipationCertificateGUI {
 
@@ -22,6 +22,7 @@ class ilParticipationCertificateGUI {
 	const CMD_SAVE = 'save';
 	const CMD_CANCEL = 'cancel';
 	const CMD_LOOP = 'loop';
+	CONST CMD_CONFIG = 'config';
 	/**
 	 * @var ilTemplate
 	 */

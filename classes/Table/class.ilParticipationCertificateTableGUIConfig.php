@@ -1,6 +1,7 @@
 <?php
 
 require_once './Services/Table/classes/class.ilTable2GUI.php';
+require_once './Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/ParticipationCertificate/classes/Table/class.ilParticipationCertificateResultModificationGUI.php';
 
 /**
  * Class ilParticipationCertificateTableGUI
@@ -9,6 +10,7 @@ require_once './Services/Table/classes/class.ilTable2GUI.php';
  */
 class ilParticipationCertificateTableGUIConfig extends ilTable2GUI {
 
+	CONST IDENTIFIER = 'ilpartusr';
 	/**
 	 * @var ilTabsGUI
 	 */
@@ -101,7 +103,7 @@ class ilParticipationCertificateTableGUIConfig extends ilTable2GUI {
 			'txt' => 'Resultate der qualifizierenden Tests',
 			'default' => true,
 			'width' => 'auto',
-			'sort_field' => 'result_qualifing_tests'
+			'sort_field' => 'results_qualifing_tests'
 		);
 		$cols['result_qualifing_tests'] = array(
 			'txt' => 'Resultat qualifizierende Tests',
@@ -231,14 +233,28 @@ class ilParticipationCertificateTableGUIConfig extends ilTable2GUI {
 				}
 			}
 		}
+		$current_selection_list = new ilAdvancedSelectionListGUI();
+		$current_selection_list->setListTitle($this->pl->txt('list_actions'));
+		$current_selection_list->setId('_actions' . $a_set['usr_id']);
+		$current_selection_list->setUseImages(false);
+		$this->ctrl->setParameterByClass('ilParticipationCertificateTableGUI','usr_id', $a_set['usr_id']);
 
+		$current_selection_list->addItem($this->pl->txt('list_results'),
+			ilParticipationCertificateResultModificationGUI::CMD_DISPLAY,$this->ctrl->getLinkTargetByClass(
+				ilParticipationCertificateResultModificationGUI::class,ilParticipationCertificateResultModificationGUI::CMD_DISPLAY));
+		$current_selection_list->addItem($this->pl->txt('list_print'));
+
+		$this->tpl->setVariable('ACTIONS', $current_selection_list->getHTML());
+
+
+
+		/*
 		$button = ilLinkButton::getInstance();
 		$button->setCaption('Button', false);
 		$button->setUrl($this->ctrl->getLinkTargetByClass(ilParticipationCertificateTableGUI::class, ilParticipationCertificateTableGUI::CMD_CONTENT));
-
 		$this->tpl->setVariable('Aktionen');
-		$button->render();
-		$this->addActionMenu();
+		$button->render();*/
+		//$this->addActionMenu();
 	}
 
 
@@ -267,18 +283,20 @@ class ilParticipationCertificateTableGUIConfig extends ilTable2GUI {
 		$this->setDisableFilterHiding(false);
 	}
 
-
+/*
 	public function addActionMenu() {
 
 
 		$current_selection_list = new ilAdvancedSelectionListGUI();
 		$current_selection_list->setListTitle($this->pl->txt('list_actions'));
-		$current_selection_list->setId('actions');
+		$current_selection_list->setId('_actions');
 		$current_selection_list->setUseImages(false);
 
-		$current_selection_list->addItem($this->pl->txt('list_results'));
-		$current_selection_list->addItem($this->pl->txt('list_print'), ilParticipationCertificateTwigParser::class, $this->ctrl->getLinkTargetByClass(ilParticipationCertificateTwigParser::class));
+		$current_selection_list->addItem($this->pl->txt('list_results'),
+			ilParticipationCertificateResultModificationGUI::CMD_DISPLAY,$this->ctrl->getLinkTargetByClass(
+				ilParticipationCertificateResultModificationGUI::class,ilParticipationCertificateResultModificationGUI::CMD_DISPLAY));
+		$current_selection_list->addItem($this->pl->txt('list_print'));
 
 		$this->tpl->setVariable('ACTIONS', $current_selection_list->getHTML());
-	}
+	}*/
 }
