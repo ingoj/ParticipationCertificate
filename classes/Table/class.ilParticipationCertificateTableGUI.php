@@ -9,6 +9,8 @@ class ilParticipationCertificateTableGUI {
 
 	CONST CMD_CONTENT = 'content';
 	CONST CMD_OVERVIEW = 'overview';
+	CONST CMD_PRINT_PDF = 'printpdf';
+	CONST CMD_PRINT_PDF_WITHOUT_EMENTORING = 'printpdfwithoutementoring';
 	/**
 	 * @var ilTemplate
 	 */
@@ -25,6 +27,10 @@ class ilParticipationCertificateTableGUI {
 	 * @var ilToolbarGUI
 	 */
 	protected $toolbar;
+	/**
+	 * @var ilParticipationCertificatePlugin
+	 */
+	protected $pl;
 
 
 
@@ -38,6 +44,8 @@ class ilParticipationCertificateTableGUI {
 		$this->tabs = $ilTabs;
 		$this->ctrl = $ilCtrl;
 		$this->tpl = $tpl;
+		$this->pl = ilParticipationCertificatePlugin::getInstance();
+
 
 		$this->groupRefId = (int)$_GET['ref_id'];
 		$this->groupObjId = ilObject2::_lookupObjectId($this->groupRefId);
@@ -63,13 +71,13 @@ class ilParticipationCertificateTableGUI {
 
 	public function content(){
 		$b_print = ilLinkButton::getInstance();
-		$b_print->setCaption('Bescheinigung Drucken');
-		$b_print->setUrl($this->ctrl->getLinkTarget($this, 'printPdf'));
+		$b_print->setCaption($this->pl->txt('header_btn_print'));
+		$b_print->setUrl($this->ctrl->getLinkTarget($this, $this::CMD_PRINT_PDF));
 		$this->toolbar->addButtonInstance($b_print);
 
 		$b_print = ilLinkButton::getInstance();
-		$b_print->setCaption('Bescheinigung Drucken (exkl. eMentoring)');
-		$b_print->setUrl($this->ctrl->getLinkTarget($this, 'printPdfWithoutMentoring'));
+		$b_print->setCaption($this->pl->txt('header_btn_print_eMentoring'));
+		$b_print->setUrl($this->ctrl->getLinkTarget($this, $this::CMD_PRINT_PDF_WITHOUT_EMENTORING));
 		$this->toolbar->addButtonInstance($b_print);
 
 		$this->tpl->getStandardTemplate();
@@ -84,13 +92,13 @@ class ilParticipationCertificateTableGUI {
 		$this->tpl->setDescription($this->learnGroup->getDescription());
 		$this->tpl->setTitleIcon(ilObject::_getIcon($this->learnGroup->getId()));
 
-		$this->tabs->setBackTarget('Zurück', $this->ctrl->getLinkTargetByClass('ilRepositoryGUI'));
+		$this->tabs->setBackTarget($this->pl->txt('header_btn_back'), $this->ctrl->getLinkTargetByClass('ilRepositoryGUI'));
 
 		$this->ctrl->saveParameterByClass('ilParticipationCertificateTableGUI', [ 'ref_id', 'group_id' ]);
 		$this->ctrl->saveParameterByClass('ilParticipationCertificateGUI', 'ref_id');
-		$this->tabs->addTab('overview', 'Übersicht', $this->ctrl->getLinkTargetByClass(ilParticipationCertificateTableGUI::class,ilParticipationCertificateTableGUI::CMD_CONTENT));
+		$this->tabs->addTab('overview', $this->pl->txt('header_overview'), $this->ctrl->getLinkTargetByClass(ilParticipationCertificateTableGUI::class,ilParticipationCertificateTableGUI::CMD_CONTENT));
 
-		$this->tabs->addTab('config', 'Konfigurieren', $this->ctrl->getLinkTargetByClass(ilParticipationCertificateGUI::class,ilParticipationCertificateGUI::CMD_DISPLAY));
+		$this->tabs->addTab('config', $this->pl->txt('header_config'), $this->ctrl->getLinkTargetByClass(ilParticipationCertificateGUI::class,ilParticipationCertificateGUI::CMD_DISPLAY));
 		$this->tabs->activateTab('config');
 	}
 

@@ -1,0 +1,20 @@
+tbl_overview_results#:#Übersicht der Resultate
+cols_userid#:#UserID
+cols_firstname#:#Vorname
+cols_lastname#:#Nachname
+cols_initial_test_finished#:#Einstiegstest abgeschlossen
+cols_results_qualifying#:#Resultate der qualifizierenden Tests
+cols_result_qualifying#:#Resultat qualifizierende Tests
+cols_eMentoring_finished#:#Bearbeitung der Aufgaben zu überfachlichen Themen
+cols_eMentoring_homework#:#Anzahl Hausaufgaben abgegeben
+cols_eMentoring_percentage#:#Bearbeitung der aufgaben zu überfachlichen Themen
+cols_actions#:#Aktionen
+list_actions#:#Aktionen
+list_results#:#Resultate bearbeiten
+list_print#:#Drucken
+filter_name#:#Name
+header_config#:#Konfigurieren
+header_overview#:#Übersicht
+header_btn_back#:#Zurück
+header_btn_print #:# Bescheinigung Drucken
+header_btn_print_eMentoring #:# Bescheinigung Drucken (exkl. eMentoring)

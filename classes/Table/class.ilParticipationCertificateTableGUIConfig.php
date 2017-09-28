@@ -59,7 +59,7 @@ class ilParticipationCertificateTableGUIConfig extends ilTable2GUI {
 		$this->usr_ids = $cert_access->getUserIdsOfGroup();
 
 		$this->getEnableHeader();
-		$this->setTitle('Resultate Übersicht');
+		$this->setTitle($this->pl->txt('tbl_overview_results'));
 
 		/*$this->addColumn('UserId',"","10%");
 		$this->addColumn('Name',"","10%");
@@ -98,7 +98,7 @@ class ilParticipationCertificateTableGUIConfig extends ilTable2GUI {
 			'sort_field' => 'initial_test_finished'
 		);
 		$cols['results_qualifing_tests'] = array(
-			'txt' => 'Resultate qualifizierende Tests',
+			'txt' => 'Resultate der qualifizierenden Tests',
 			'default' => true,
 			'width' => 'auto',
 			'sort_field' => 'result_qualifing_tests'
@@ -122,7 +122,7 @@ class ilParticipationCertificateTableGUIConfig extends ilTable2GUI {
 			'sort_field' => 'eMentoring_homework'
 		);
 		$cols['eMentoring_percentage'] = array(
-			'txt' => 'Bearbeitung der Aufgaben zu überfachlichen Themen',
+			'txt' => 'Bearbeitung der aufgaben zu überfachlichen Themen',
 			'default' => true,
 			'width' => 'auto',
 			'sort_field' => 'eMentoring_percentage'
@@ -146,7 +146,7 @@ class ilParticipationCertificateTableGUIConfig extends ilTable2GUI {
 				$this->addColumn($v['txt'], $sort, $v['width']);
 			}
 		}
-		$this->addColumn('Aktionen');
+		$this->addColumn($this->pl->txt('cols_actions'));
 	}
 
 
@@ -189,11 +189,12 @@ class ilParticipationCertificateTableGUIConfig extends ilTable2GUI {
 				}
 			}
 
-			if (is_object($arr_FinalTestsStates[$usr_id][11])) {
+			if (is_array($arr_FinalTestsStates[$usr_id])) {
 
 				foreach ($arr_FinalTestsStates[$usr_id] as $rec) {
 					$rec_array[] = $rec->getLocFtestTestTitle();
 					array_push($rec_array, $rec->getLocftestPercentage());
+					array_push($rec_array, '<br>');
 				}
 				$array_results = $rec_array;
 				$row['results_qualifing_tests'] = $array_results;
@@ -242,7 +243,7 @@ class ilParticipationCertificateTableGUIConfig extends ilTable2GUI {
 
 
 	public function initFilter() {
-		$name = new ilTextInputGUI('Name');
+		$name = new ilTextInputGUI($this->pl->txt('filter_name'));
 		$this->addAndReadFilterItem($name);
 
 		$name->setMaxLength(64);
@@ -252,6 +253,9 @@ class ilParticipationCertificateTableGUIConfig extends ilTable2GUI {
 	}
 
 
+	/**
+	 * @param ilFormPropertyGUI $item
+	 */
 	public function addAndReadFilterItem(ilFormPropertyGUI $item) {
 		$this->addFilterItem($item);
 		$item->readFromSession();
@@ -268,12 +272,12 @@ class ilParticipationCertificateTableGUIConfig extends ilTable2GUI {
 
 
 		$current_selection_list = new ilAdvancedSelectionListGUI();
-		$current_selection_list->setListTitle('Aktionen');
+		$current_selection_list->setListTitle($this->pl->txt('list_actions'));
 		$current_selection_list->setId('actions');
 		$current_selection_list->setUseImages(false);
 
-		$current_selection_list->addItem('Resultate bearbeiten');
-		$current_selection_list->addItem('Drucken', ilParticipationCertificateTwigParser::class, $this->ctrl->getLinkTargetByClass(ilParticipationCertificateTwigParser::class));
+		$current_selection_list->addItem($this->pl->txt('list_results'));
+		$current_selection_list->addItem($this->pl->txt('list_print'), ilParticipationCertificateTwigParser::class, $this->ctrl->getLinkTargetByClass(ilParticipationCertificateTwigParser::class));
 
 		$this->tpl->setVariable('ACTIONS', $current_selection_list->getHTML());
 	}
