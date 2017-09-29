@@ -309,3 +309,4 @@ class ilParticipationCertificateConfig extends ActiveRecord{
 		return $arr_config;
 	}
 }
+?>
