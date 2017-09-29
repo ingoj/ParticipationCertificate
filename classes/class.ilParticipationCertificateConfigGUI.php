@@ -268,3 +268,4 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI {
 		return true;
 	}
 }
+?>
