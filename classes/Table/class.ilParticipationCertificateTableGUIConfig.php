@@ -63,20 +63,12 @@ class ilParticipationCertificateTableGUIConfig extends ilTable2GUI {
 		$this->getEnableHeader();
 		$this->setTitle($this->pl->txt('tbl_overview_results'));
 
-		/*$this->addColumn('UserId',"","10%");
-		$this->addColumn('Name',"","10%");
-		$this->addColumn('Einstiegstest abgeschlossen',"","10%");
-		$this->addColumn('Resultat qualifizierende Tests',"","10%");
-		$this->addColumn('Gesamt-Prozentwert aller Lernziele',"","10%");
-		$this->addColumn('Anzahl Hausaufgaben und Individual Assessments',"","10%");
-		$this->addColumn('Aktionen',"","10%");*/
+
 
 		$this->initFilter();
 
 		$this->addColumns();
 
-		//$this->setExternalSorting(false);
-		//$this->setExternalSegmentation(false);
 
 		$this->parseData();
 	}
@@ -111,7 +103,7 @@ class ilParticipationCertificateTableGUIConfig extends ilTable2GUI {
 			'sort_field' => 'result_qualifing_tests'
 		);
 		$cols['eMentoring_finished'] = array(
-			'txt' => 'Bearbeitung der Aufgaben zu überfachlichen Themen',
+			'txt' => 'Aktive Teilnahme an Videokonferenzen',
 			'default' => true,
 			'width' => 'auto',
 			'sort_field' => 'eMentoring_finished'
@@ -207,11 +199,11 @@ class ilParticipationCertificateTableGUIConfig extends ilTable2GUI {
 			}
 
 			if ($this->filter['firstname'] != false) {
-				if ($row['firstname'] == $this->filter['firstname']) {
+				if (strtolower($row['firstname']) == strtolower($this->filter['firstname'])) {
 					$rows[] = $row;
 				}
 			} elseif ($this->filter['lastname'] != false) {
-				if ($row['lastname'] == $this->filter['lastname']) {
+				if (strtolower($row['lastname']) == strtolower($this->filter['lastname'])) {
 					$rows[] = $row;
 				}
 			} else {
