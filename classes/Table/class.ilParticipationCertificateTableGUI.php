@@ -115,34 +115,41 @@ class ilParticipationCertificateTableGUI {
 
 	public function printPdf() {
 		$twigParser = new ilParticipationCertificateTwigParser($this->groupRefId);
-		$solo = false;
-		$twigParser->parseData($solo, 0);
+		$twigParser->parseData();
 	}
 
 	public function printPdfWithoutMentoring() {
 		$twigParser = new ilParticipationCertificateTwigParser($this->groupRefId,array(),false);
-		$solo = false;
-		$twigParser->parseData($solo,0);
+		$twigParser->parseData();
 	}
 
 
 	public function applyFilter() {
-		$this->initTable();
+		/*$this->initTable();
 
 		$this->table->writeFilterToSession();
 		$this->table->resetOffset();
 
-		$this->content();
+		$this->content();*/
+
+		$table = new ilParticipationCertificateTableGUIConfig($this,self::CMD_CONTENT);
+		$table->writeFilterToSession();
+		$table->resetOffset();
+		$this->ctrl->redirect($this,self::CMD_CONTENT);
 	}
 
 
 	public function resetFilter() {
-		$this->initTable();
+		/*$this->initTable();
 
 		$this->table->resetOffset();
 		$this->table->resetFilter();
 
-		$this->content();
+		$this->content();*/
+		$table = new ilParticipationCertificateTableGUIConfig($this,self::CMD_CONTENT);
+		$table->resetOffset();
+		$table->resetFilter();
+		$this->ctrl->redirect($this,self::CMD_CONTENT);
 	}
 
 	protected function initTable($override = false) {

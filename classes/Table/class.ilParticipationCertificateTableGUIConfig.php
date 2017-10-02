@@ -242,8 +242,8 @@ class ilParticipationCertificateTableGUIConfig extends ilTable2GUI {
 		$current_selection_list->addItem($this->pl->txt('list_results'),
 			ilParticipationCertificateResultModificationGUI::CMD_DISPLAY,$this->ctrl->getLinkTargetByClass(
 				ilParticipationCertificateResultModificationGUI::class,ilParticipationCertificateResultModificationGUI::CMD_DISPLAY));
-		$current_selection_list->addItem($this->pl->txt('list_print'),ilParticipationCertificateResultModificationGUI::CMD_PRINT,$this->ctrl->getLinkTargetByClass(
-			ilParticipationCertificateResultModificationGUI::class,ilParticipationCertificateResultModificationGUI::CMD_PRINT));
+		$current_selection_list->addItem($this->pl->txt('list_print'),ilParticipationCertificateResultModificationGUI::CMD_PRINT_PURE,$this->ctrl->getLinkTargetByClass(
+			ilParticipationCertificateResultModificationGUI::class,ilParticipationCertificateResultModificationGUI::CMD_PRINT_PURE));
 
 		$this->tpl->setVariable('ACTIONS', $current_selection_list->getHTML());
 
@@ -260,13 +260,14 @@ class ilParticipationCertificateTableGUIConfig extends ilTable2GUI {
 
 
 	public function initFilter() {
-		$name = new ilTextInputGUI($this->pl->txt('filter_name'));
+		$name = new ilTextInputGUI($this->pl->txt('filter_name'),'firstname');
 		$this->addAndReadFilterItem($name);
 
 		$name->setMaxLength(64);
 		$name->setSize(20);
 		$name->readFromSession();
-		$this->filter['name'] = $name->getValue();
+
+		$this->filter['firstname'] = $name->getValue();
 	}
 
 
@@ -281,7 +282,7 @@ class ilParticipationCertificateTableGUIConfig extends ilTable2GUI {
 		} else {
 			$this->filter[$item->getPostVar()] = $item->getValue();
 		}
-		$this->setDisableFilterHiding(false);
+		$this->setDisableFilterHiding(true);
 	}
 
 /*

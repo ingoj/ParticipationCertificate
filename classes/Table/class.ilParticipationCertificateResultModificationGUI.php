@@ -14,6 +14,7 @@ class ilParticipationCertificateResultModificationGUI {
 	CONST CMD_DISPLAY = 'display';
 	CONST IDENTIFIER = 'usr_id';
 	CONST CMD_PRINT = 'printpdf';
+	CONST CMD_PRINT_PURE = 'printpdfpure';
 	/**
 	 * @var ilTabsGUI
 	 */
@@ -94,11 +95,6 @@ class ilParticipationCertificateResultModificationGUI {
 		$form = $this->initForm();
 		$this->fillForm($form);
 
-		$b_print = ilLinkButton::getInstance();
-		$b_print->setCaption($this->pl->txt('header_btn_print'));
-		$b_print->setUrl($this->ctrl->getLinkTarget($this, $this::CMD_PRINT));
-		$this->toolbar->addButtonInstance($b_print);
-
 		$this->tpl->setContent($form->getHTML());
 		$this->tpl->show();
 	}
@@ -129,16 +125,16 @@ class ilParticipationCertificateResultModificationGUI {
 		$form->setFormAction($this->ctrl->getFormAction($this));
 		$form->setTitle('Resultate für ' . $nameUser . ' bearbeiten');
 
-		$initialtest = new ilTextAreaInputGUI('Einstiegstest abgeschlossen (Ja/Nein)', 'initial');
+		$initialtest = new ilTextInputGUI('Einstiegstest abgeschlossen (Ja(1)/Nein(0) )', 'initial');
 		$form->addItem($initialtest);
 
-		$resultstests = new ilTextAreaInputGUI('Resultat qualifizierende Tests (Prozentwert)', 'resultstest');
+		$resultstests = new ilTextInputGUI('Resultat qualifizierende Tests (Prozentwert)', 'resultstest');
 		$form->addItem($resultstests);
 
-		$conferences = new ilTextAreaInputGUI('Bearbeitung der Aufgaben zu überfachlichen Themen (Ja/Nein)', 'conf');
+		$conferences = new ilTextInputGUI('Bearbeitung der Aufgaben zu überfachlichen Themen (Ja(1)/Nein(0) )', 'conf');
 		$form->addItem($conferences);
 
-		$homeworks = new ilTextAreaInputGUI('Bearbeitung der aufgaben zu überfachlichen Themen (Prozentwert)', 'homework');
+		$homeworks = new ilTextInputGUI('Bearbeitung der aufgaben zu überfachlichen Themen (Prozentwert)', 'homework');
 		$form->addItem($homeworks);
 
 		$form->addCommandButton(ilParticipationCertificateResultModificationGUI::CMD_PRINT, 'PDF Drucken');
@@ -173,10 +169,29 @@ class ilParticipationCertificateResultModificationGUI {
 
 
 	public function printPDF() {
+		$form = $this->initForm();
+		$form->setValuesByPost();
+		$form->checkInput();
 
+		$array = array($form->getInput('initial'),$form->getInput('resultstest'),$form->getInput('conf'),$form->getInput('homework'));
+		$edited = true;
 		$usr_id = $this->usr_id;
 		$twigParser = new ilParticipationCertificateTwigParser($this->groupRefId);
-		$solo = true;
-		$twigParser->parseData($solo, $usr_id);
+		$twigParser->parseDataSolo($edited,$array,$usr_id);
 	}
+
+	public function printPDFpure() {
+		$form = $this->initForm();
+		$form->setValuesByPost();
+		$form->checkInput();
+
+		$array = array($form->getInput('initial'),$form->getInput('resultstest'),$form->getInput('conf'),$form->getInput('homework'));
+		$edited = false;
+		$usr_id = $this->usr_id;
+		$twigParser = new ilParticipationCertificateTwigParser($this->groupRefId);
+		$twigParser->parseDataSolo($edited,$array,$usr_id);
+	}
+
+
+
 }
