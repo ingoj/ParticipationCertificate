@@ -90,7 +90,6 @@ class ilParticipationCertificateTableGUIConfig extends ilTable2GUI {
 	function getSelectableColumns() {
 
 		$cols = array();
-		$cols['usr_id'] = array( 'txt' => 'UserId', 'default' => true, 'width' => 'auto', 'sort_field' => 'usr_id' );
 		$cols['firstname'] = array( 'txt' => 'Vorname', 'default' => true, 'width' => 'auto', 'sort_field' => 'firstname' );
 		$cols['lastname'] = array( 'txt' => 'Nachname', 'default' => true, 'width' => 'auto', 'sort_field' => 'lastname' );
 		$cols['initial_test_finished'] = array(
@@ -207,22 +206,15 @@ class ilParticipationCertificateTableGUIConfig extends ilTable2GUI {
 				$row['eMentoring_percentage'] = $arr_excercise_states[$usr_id]->getPassedPercentage() . '%';
 			}
 
-			if ($this->filter['usr_id'] != false) {
-				if ($row['usr_id'] == $this->filter['usr_id']) {
-					$rows[] = $row;
-				}
-			}
-			elseif ($this->filter['firstname'] != false) {
+			if ($this->filter['firstname'] != false) {
 				if ($row['firstname'] == $this->filter['firstname']) {
 					$rows[] = $row;
 				}
-			}
-			elseif ($this->filter['lastname'] != false) {
+			} elseif ($this->filter['lastname'] != false) {
 				if ($row['lastname'] == $this->filter['lastname']) {
 					$rows[] = $row;
 				}
-			}
-			else{
+			} else {
 				$rows[] = $row;
 			}
 		}
@@ -273,18 +265,15 @@ class ilParticipationCertificateTableGUIConfig extends ilTable2GUI {
 
 
 	public function initFilter() {
-		$id = new ilTextInputGUI($this->pl->txt('usr_id'), 'usr_id');
 		$firstname = new ilTextInputGUI($this->pl->txt('firstname'), 'firstname');
 		$lastname = new ilTextInputGUI($this->pl->txt('lastname'), 'lastname');
-		$this->addAndReadFilterItem($id);
+
 		$this->addAndReadFilterItem($firstname);
 		$this->addAndReadFilterItem($lastname);
 
-		$id->setMaxLength(64);
-		$id->setSize(20);
-		$id->readFromSession();
+		$firstname->readFromSession();
+		$lastname->readFromSession();
 
-		$this->filter['usr_id'] = $id->getValue();
 		$this->filter['firstname'] = $firstname->getValue();
 		$this->filter['lastname'] = $lastname->getValue();
 	}
