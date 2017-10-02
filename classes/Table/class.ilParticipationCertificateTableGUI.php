@@ -80,12 +80,12 @@ class ilParticipationCertificateTableGUI {
 		$this->tpl->getStandardTemplate();
 		$this->initHeader();
 		$b_print = ilLinkButton::getInstance();
-		$b_print->setCaption($this->pl->txt('header_btn_print'));
+		$b_print->setCaption($this->pl->txt('header_btn_print'), false);
 		$b_print->setUrl($this->ctrl->getLinkTarget($this, $this::CMD_PRINT_PDF));
 		$this->toolbar->addButtonInstance($b_print);
 
 		$b_print = ilLinkButton::getInstance();
-		$b_print->setCaption($this->pl->txt('header_btn_print_eMentoring'));
+		$b_print->setCaption($this->pl->txt('header_btn_print_eMentoring'), false);
 		$b_print->setUrl($this->ctrl->getLinkTarget($this, $this::CMD_PRINT_PDF_WITHOUT_EMENTORING));
 		$this->toolbar->addButtonInstance($b_print);
 
