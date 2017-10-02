@@ -72,6 +72,10 @@ class ilParticipationCertificateTableGUI {
 				$ret2 = $this->ctrl->forwardCommand($ilParticipationCertificateGUI);
 				$this->tabs->setTabActive(self::CMD_OVERVIEW);
 				break;
+			case 'ilparticipationcertificateresultoverviewgui':
+				$ilparticipationcertificateresultoverviewgui = new ilParticipationCertificateResultOverviewGUI();
+				$ret3 = $this->ctrl->forwardCommand($ilparticipationcertificateresultoverviewgui);
+				break;
 		}
 	}
 
@@ -88,8 +92,6 @@ class ilParticipationCertificateTableGUI {
 		$b_print->setCaption($this->pl->txt('header_btn_print_eMentoring'), false);
 		$b_print->setUrl($this->ctrl->getLinkTarget($this, $this::CMD_PRINT_PDF_WITHOUT_EMENTORING));
 		$this->toolbar->addButtonInstance($b_print);
-
-		$this->tpl->getStandardTemplate();
 
 		$this->initTable();
 
