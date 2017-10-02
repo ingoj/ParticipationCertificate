@@ -71,15 +71,6 @@ class ilParticipationCertificateConfig extends ActiveRecord{
 	 * @db_length       1024
 	 */
 	protected $config_value;
-	/**
-	 * @var int
-	 *
-	 * @db_has_field    true
-	 * @db_fieldtype    integer
-	 * @con_is_notnull  true
-	 * @db_length       8
-	 */
-	protected $order_by = 0;
 
 
 	public static function returnDbTableName(){
@@ -87,47 +78,27 @@ class ilParticipationCertificateConfig extends ActiveRecord{
 	}
 
 
-
+	/**
 	/**
 	 * Get a path where the template layout file and static assets are stored
 	 *
 	 * @param string $type
-	 * @param string $path_type  absolute|relative
-	 * @param int $grp_ref_id
-	 * @param bool $create
 	 *
 	 * @return string
 	 */
-	public static function getFileStoragePath($type = 'img',$path_type = "absolute",$grp_ref_id = 0,$create = false) {
-
-
-		switch($path_type) {
-			case "absolute":
-				$path = CLIENT_WEB_DIR . '/dhbw_part_cert';
-				break;
-			case "relative":
-				$path = ilUtil::getWebspaceDir() . '/dhbw_part_cert';
-				break;
-			default:
-				$path = CLIENT_WEB_DIR . '/dhbw_part_cert';
-				break;
-		}
-
-		if($grp_ref_id) {
-			$path =  $path .'/'.$grp_ref_id;
-		}
-
+	public static function getFileStoragePath($type = 'img') {
+		$path = CLIENT_DATA_DIR . '/dhbw_part_cert';
 
 		switch($type) {
 			case 'img':
 				$path = $path . '/img/';
-				if (!is_dir($path) && $create) {
+				if (!is_dir($path)) {
 					ilUtil::makeDirParents($path);
 				}
 				return $path;
 				break;
 			default:
-				if (!is_dir($path) && $create) {
+				if (!is_dir($path)) {
 					ilUtil::makeDirParents($path);
 				}
 				return $path;
@@ -135,25 +106,13 @@ class ilParticipationCertificateConfig extends ActiveRecord{
 	}
 
 
-	public static function storePicture($file_data,$grp_ref_id = 0){
-
-		if(is_file(ilParticipationCertificateConfig::returnPicturePath('absolute',$grp_ref_id))) {
-			unlink(ilParticipationCertificateConfig::returnPicturePath('absolute',$grp_ref_id));
-		}
-
-		$file_path = self::getFileStoragePath('img','absolute',$grp_ref_id,true);
+	public static function storePicture($file_data){
+		$file_path = self::getFileStoragePath('img');
 		ilUtil::moveUploadedFile($file_data['tmp_name'],'',$file_path.self::LOGO_FILE_NAME);
 	}
 
-
-	/**
-	 * @param string $path_type  absolute|relative
-	 * @param int $grp_ref_id
-	 *
-	 * @return string
-	 */
-	public static function returnPicturePath($path_type = 'absolute',$grp_ref_id = 0) {
-		return self::getFileStoragePath('img',$path_type,$grp_ref_id).self::LOGO_FILE_NAME;
+	public static function returnPicturePath() {
+		return self::getFileStoragePath('img').self::LOGO_FILE_NAME;
 	}
 
 
@@ -253,22 +212,6 @@ class ilParticipationCertificateConfig extends ActiveRecord{
 	}
 
 
-	/**
-	 * @return int
-	 */
-	public function getOrderBy() {
-		return $this->order_by;
-	}
-
-
-	/**
-	 * @param int $order
-	 */
-	public function setOrderBy($order_by) {
-		$this->order_by = $order_by;
-	}
-
-
 	public static function returnDefaultValues() {
 		return	array(
 		'page1_title' => 'Teilnahmebescheinigung',
@@ -289,7 +232,6 @@ class ilParticipationCertificateConfig extends ActiveRecord{
 		'page2_introduction3' => '{{username}} hat im Rahmen des Studienvorbereitungsprogramms mit Schwerpunkt Mathematik mit folgenden Aufgabenstellungen teilgenommen:',
 		'page2_box1_title' => 'Studienvorbereitung – Mathematik',
 		'page2_box1_row1' => 'Abschluss Diagnostischer Einstiegstest Mathematik',
-		'page2_box1_row2' => 'Bearbeitung von empfohlenen Mathematik- Lernmodulen',
 		'page2_box2_title' => 'Studienvorbereitung – eMentoring',
 		'page2_box2_row1' => 'Aktive Teilnahme an Videokonferenzen',
 		'page2_box2_row2' => 'Bearbeitung der Aufgaben zu überfachlichen Themen:',
@@ -302,11 +244,10 @@ class ilParticipationCertificateConfig extends ActiveRecord{
 	 * @param $config_type
 	 */
 	public static function returnTextValues($group_ref_id = 0,$config_type = self::CONFIG_TYPE_GLOBAL) {
-		$arr_config = ilParticipationCertificateConfig::where(array("config_type" => $config_type, "group_ref_id" =>$group_ref_id,'config_value_type' => ilParticipationCertificateConfig::CONFIG_VALUE_TYPE_CERT_TEXT ))->orderBy('order_by')->getArray('config_key','config_value');
+		$arr_config = ilParticipationCertificateConfig::where(array("config_type" => $config_type, "group_ref_id" =>$group_ref_id,'config_value_type' => ilParticipationCertificateConfig::CONFIG_VALUE_TYPE_CERT_TEXT ))->orderBy('id')->getArray('config_key','config_value');
 		if(count($arr_config) == 0) {
-			$arr_config = ilParticipationCertificateConfig::where(array("config_type" => ilParticipationCertificateConfig::CONFIG_TYPE_GLOBAL,'config_value_type' => ilParticipationCertificateConfig::CONFIG_VALUE_TYPE_CERT_TEXT))->orderBy('order_by')->getArray('config_key','config_value');
+			$arr_config = ilParticipationCertificateConfig::where(array("config_type" => ilParticipationCertificateConfig::CONFIG_TYPE_GLOBAL,'config_value_type' => ilParticipationCertificateConfig::CONFIG_VALUE_TYPE_CERT_TEXT))->orderBy('id')->getArray('config_key','config_value');
 		}
 		return $arr_config;
 	}
 }
-?>

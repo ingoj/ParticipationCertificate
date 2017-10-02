@@ -11,4 +11,6 @@ $ilias_max_version = '5.2.999';
 //optional, but useful: Add one or more responsible persons and a contact email
 $responsible = 'studer-raimann ag';
 $responsible_mail = 'info@studer-raimann.ch';
+
 ?>
+

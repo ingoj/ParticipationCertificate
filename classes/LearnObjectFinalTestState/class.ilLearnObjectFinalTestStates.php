@@ -46,7 +46,7 @@ class ilLearnObjectFinalTestStates {
 
 		$select = "SELECT 
 					crsolm.objective_id as locftest_master_crs_objective_id,
-					crs_memb.usr_id as locftest_usr_id,
+					test_act.user_fi as locftest_usr_id,
 					crsolm_crs.obj_id as locftest_crs_obj_id,
 					crsolm_crs.title as locftest_crs_title,
 					crsolm_crs_crso.objective_id as locftest_objective_id,
@@ -63,15 +63,15 @@ class ilLearnObjectFinalTestStates {
 					inner join object_reference as crsolm_ref on crsolm_ref.ref_id = crsolm.ref_id
 					inner join container_reference as crsolm_crs_ref on crsolm_crs_ref.obj_id = crsolm_ref.obj_id
 					inner join object_data as crsolm_crs on crsolm_crs.obj_id = crsolm_crs_ref.target_obj_id and crsolm_crs.type = \"crs\"
-					inner join obj_members as crs_memb on ".$ilDB->in('crs_memb.usr_id ', $arr_usr_ids, false, 'integer')." and crs_memb.obj_id = crsolm_crs.obj_id
 					inner join crs_objectives as crsolm_crs_crso on crsolm_crs_crso.crs_id = crsolm_crs.obj_id
 					inner join loc_tst_assignments as loc_crs_ass on loc_crs_ass.objective_id = crsolm_crs_crso.objective_id
 					inner join object_reference as tst_ref on tst_ref.ref_id = loc_crs_ass.tst_ref_id
 					inner join tst_tests as test on test.obj_fi = tst_ref.obj_id
 					inner join object_data as tst_obj on tst_obj.obj_id = test.obj_fi
-					left join tst_active as test_act on test_act.test_fi = test.test_id and test_act.user_fi = crs_memb.usr_id
+					left join tst_active as test_act on test_act.test_fi = test.test_id
 					left join tmp_test_max_result on tmp_test_max_result.active_fi = test_act.active_id
-					group by crs_memb.usr_id,
+					where  ".$ilDB->in('test_act.user_fi', $arr_usr_ids, false, 'integer')."
+					group by test_act.user_fi,
 					crsolm.objective_id,
 					crsolm_crs.obj_id,
 					crsolm_crs_crso.objective_id,

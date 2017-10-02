@@ -43,4 +43,3 @@ class ilParticipationCertificateAccess {
 		return array();
 	}
 }
-?>
