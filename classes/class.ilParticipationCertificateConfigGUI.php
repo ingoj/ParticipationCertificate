@@ -132,18 +132,15 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI {
 		');
 
 
-		foreach(ilParticipationCertificateConfig::where(array( "config_type" => ilParticipationCertificateConfig::CONFIG_TYPE_GLOBAL , "config_value_type" => ilParticipationCertificateConfig::CONFIG_VALUE_TYPE_CERT_TEXT ))->orderBy('order_by')->get() as $config) {
+		foreach(ilParticipationCertificateConfig::where(array( "config_type" => ilParticipationCertificateConfig::CONFIG_TYPE_GLOBAL , "config_value_type" => ilParticipationCertificateConfig::CONFIG_VALUE_TYPE_CERT_TEXT ))->orderBy('id')->get() as $config) {
 			$input = new ilTextAreaInputGUI($config->getConfigKey(), $config->getConfigKey());
 			$input->setRows(3);
 			$input->setValue($config->getConfigValue());
 			$form->addItem($input);
 		}
 
-		$uploadfield = new ilFileInputGUI('Logo', 'headerpic');
+		$uploadfield = new ilFileInputGUI('Laden Sie Ihren PDF Header hoch', 'headerpic');
 		$uploadfield->setSuffixes(array( 'png' ));
-		if(is_file(ilParticipationCertificateConfig::returnPicturePath('absolute',0))) {
-			$uploadfield->setInfo('<img src="'.ilParticipationCertificateConfig::returnPicturePath('relative',0).'" />');
-		}
 		$form->addItem($uploadfield);
 
 
@@ -268,4 +265,3 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI {
 		return true;
 	}
 }
-?>

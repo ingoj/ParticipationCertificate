@@ -42,7 +42,7 @@ class ilLearnObjectSuggReachedPercentages {
 					select 
 					sugg_for_user,
 					locftest_crs_obj_id,
-					COALESCE(round(avg(locftest_percentage),2),0) as average_percentage
+					COALESCE(round(avg(locftest_percentage),0),0) as average_percentage
 					from 
 					(select * from tmp_lo_sugg
 					LEFT JOIN tmp_lo_fin_test on tmp_lo_fin_test.locftest_master_crs_objective_id = tmp_lo_sugg.sugg_objective_id 

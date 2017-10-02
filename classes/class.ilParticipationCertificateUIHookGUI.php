@@ -36,16 +36,9 @@ class ilParticipationCertificateUIHookGUI extends ilUIHookPluginGUI {
 
 		if ($a_part == 'tabs' && $this->checkGroup()) {
 
-			if($this->ctrl->getCmdClass() != 'ilobjgroupgui') {
-				return false;
-			}
-
 			$cert_access = new ilParticipationCertificateAccess($_GET['ref_id']);
 
 			if ($cert_access->hasCurrentUserPrintAccess()) {
-
-
-
 				/**
 				 * @var ilTabsGUI $tabs
 				 */
@@ -74,4 +67,5 @@ class ilParticipationCertificateUIHookGUI extends ilUIHookPluginGUI {
 		return false;
 	}
 }
+
 ?>

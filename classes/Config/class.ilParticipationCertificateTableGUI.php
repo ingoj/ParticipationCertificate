@@ -26,5 +26,7 @@ class ilParticipationCertificteTableGUI extends ilTable2GUI {
 		'name',
 
 	);
+
+
+
 }
-?>
