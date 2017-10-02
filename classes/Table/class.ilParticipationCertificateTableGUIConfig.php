@@ -75,8 +75,8 @@ class ilParticipationCertificateTableGUIConfig extends ilTable2GUI {
 
 		$this->addColumns();
 
-		$this->setExternalSorting(false);
-		$this->setExternalSegmentation(false);
+		//$this->setExternalSorting(false);
+		//$this->setExternalSegmentation(false);
 
 		$this->parseData();
 	}
@@ -207,10 +207,28 @@ class ilParticipationCertificateTableGUIConfig extends ilTable2GUI {
 				$row['eMentoring_percentage'] = $arr_excercise_states[$usr_id]->getPassedPercentage() . '%';
 			}
 
-			$rows[] = $row;
+			if ($this->filter['usr_id'] != false) {
+				if ($row['usr_id'] == $this->filter['usr_id']) {
+					$rows[] = $row;
+				}
+			}
+			elseif ($this->filter['firstname'] != false) {
+				if ($row['firstname'] == $this->filter['firstname']) {
+					$rows[] = $row;
+				}
+			}
+			elseif ($this->filter['lastname'] != false) {
+				if ($row['lastname'] == $this->filter['lastname']) {
+					$rows[] = $row;
+				}
+			}
+			else{
+				$rows[] = $row;
+			}
 		}
-
 		$this->setData($rows);
+
+		return $rows;
 	}
 
 
@@ -237,17 +255,12 @@ class ilParticipationCertificateTableGUIConfig extends ilTable2GUI {
 		$current_selection_list->setListTitle($this->pl->txt('list_actions'));
 		$current_selection_list->setId('_actions' . $a_set['usr_id']);
 		$current_selection_list->setUseImages(false);
-		$this->ctrl->setParameterByClass('ilParticipationCertificateTableGUI','usr_id', $a_set['usr_id']);
+		$this->ctrl->setParameterByClass('ilParticipationCertificateTableGUI', 'usr_id', $a_set['usr_id']);
 
-		$current_selection_list->addItem($this->pl->txt('list_results'),
-			ilParticipationCertificateResultModificationGUI::CMD_DISPLAY,$this->ctrl->getLinkTargetByClass(
-				ilParticipationCertificateResultModificationGUI::class,ilParticipationCertificateResultModificationGUI::CMD_DISPLAY));
-		$current_selection_list->addItem($this->pl->txt('list_print'),ilParticipationCertificateResultModificationGUI::CMD_PRINT_PURE,$this->ctrl->getLinkTargetByClass(
-			ilParticipationCertificateResultModificationGUI::class,ilParticipationCertificateResultModificationGUI::CMD_PRINT_PURE));
+		$current_selection_list->addItem($this->pl->txt('list_results'), ilParticipationCertificateResultModificationGUI::CMD_DISPLAY, $this->ctrl->getLinkTargetByClass(ilParticipationCertificateResultModificationGUI::class, ilParticipationCertificateResultModificationGUI::CMD_DISPLAY));
+		$current_selection_list->addItem($this->pl->txt('list_print'), ilParticipationCertificateResultModificationGUI::CMD_PRINT_PURE, $this->ctrl->getLinkTargetByClass(ilParticipationCertificateResultModificationGUI::class, ilParticipationCertificateResultModificationGUI::CMD_PRINT_PURE));
 
 		$this->tpl->setVariable('ACTIONS', $current_selection_list->getHTML());
-
-
 
 		/*
 		$button = ilLinkButton::getInstance();
@@ -260,45 +273,48 @@ class ilParticipationCertificateTableGUIConfig extends ilTable2GUI {
 
 
 	public function initFilter() {
-		$name = new ilTextInputGUI($this->pl->txt('filter_name'),'firstname');
-		$this->addAndReadFilterItem($name);
+		$id = new ilTextInputGUI($this->pl->txt('usr_id'), 'usr_id');
+		$firstname = new ilTextInputGUI($this->pl->txt('firstname'), 'firstname');
+		$lastname = new ilTextInputGUI($this->pl->txt('lastname'), 'lastname');
+		$this->addAndReadFilterItem($id);
+		$this->addAndReadFilterItem($firstname);
+		$this->addAndReadFilterItem($lastname);
 
-		$name->setMaxLength(64);
-		$name->setSize(20);
-		$name->readFromSession();
+		$id->setMaxLength(64);
+		$id->setSize(20);
+		$id->readFromSession();
 
-		$this->filter['firstname'] = $name->getValue();
+		$this->filter['usr_id'] = $id->getValue();
+		$this->filter['firstname'] = $firstname->getValue();
+		$this->filter['lastname'] = $lastname->getValue();
 	}
 
 
 	/**
-	 * @param ilFormPropertyGUI $item
+	 * @param $item
 	 */
-	public function addAndReadFilterItem(ilFormPropertyGUI $item) {
+	public function addAndReadFilterItem($item) {
 		$this->addFilterItem($item);
 		$item->readFromSession();
-		if ($item instanceof ilCheckboxInputGUI) {
-			$this->filter[$item->getPostVar()] = $item->getChecked();
-		} else {
-			$this->filter[$item->getPostVar()] = $item->getValue();
-		}
+
+		$this->filter[$item->getPostVar()] = $item->getValue();
+
 		$this->setDisableFilterHiding(true);
 	}
+	/*
+		public function addActionMenu() {
 
-/*
-	public function addActionMenu() {
 
+			$current_selection_list = new ilAdvancedSelectionListGUI();
+			$current_selection_list->setListTitle($this->pl->txt('list_actions'));
+			$current_selection_list->setId('_actions');
+			$current_selection_list->setUseImages(false);
 
-		$current_selection_list = new ilAdvancedSelectionListGUI();
-		$current_selection_list->setListTitle($this->pl->txt('list_actions'));
-		$current_selection_list->setId('_actions');
-		$current_selection_list->setUseImages(false);
+			$current_selection_list->addItem($this->pl->txt('list_results'),
+				ilParticipationCertificateResultModificationGUI::CMD_DISPLAY,$this->ctrl->getLinkTargetByClass(
+					ilParticipationCertificateResultModificationGUI::class,ilParticipationCertificateResultModificationGUI::CMD_DISPLAY));
+			$current_selection_list->addItem($this->pl->txt('list_print'));
 
-		$current_selection_list->addItem($this->pl->txt('list_results'),
-			ilParticipationCertificateResultModificationGUI::CMD_DISPLAY,$this->ctrl->getLinkTargetByClass(
-				ilParticipationCertificateResultModificationGUI::class,ilParticipationCertificateResultModificationGUI::CMD_DISPLAY));
-		$current_selection_list->addItem($this->pl->txt('list_print'));
-
-		$this->tpl->setVariable('ACTIONS', $current_selection_list->getHTML());
-	}*/
+			$this->tpl->setVariable('ACTIONS', $current_selection_list->getHTML());
+		}*/
 }

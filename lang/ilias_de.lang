@@ -18,3 +18,6 @@ header_overview#:#Übersicht
 header_btn_back#:#Zurück
 header_btn_print #:# Bescheinigung Drucken
 header_btn_print_eMentoring #:# Bescheinigung Drucken (exkl. eMentoring)
+firstname #:# Vorname
+lastname #:# Nachname
+usr_id #:# UserID
