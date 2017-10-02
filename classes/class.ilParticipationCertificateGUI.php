@@ -165,9 +165,9 @@ class ilParticipationCertificateGUI {
 		&lbrace;&lbrace;date&rbrace;&rbrace;: Datum
 		');
 
-		$arr_config = ilParticipationCertificateConfig::where(array("config_type" => ilParticipationCertificateConfig::CONFIG_TYPE_GROUP, "group_ref_id" => $this->groupRefId, "config_value_type" => ilParticipationCertificateConfig::CONFIG_VALUE_TYPE_CERT_TEXT))->orderBy('id')->get();
+		$arr_config = ilParticipationCertificateConfig::where(array("config_type" => ilParticipationCertificateConfig::CONFIG_TYPE_GROUP, "group_ref_id" => $this->groupRefId, "config_value_type" => ilParticipationCertificateConfig::CONFIG_VALUE_TYPE_CERT_TEXT))->orderBy('order_by')->get();
 		if(count($arr_config) == 0) {
-			$arr_config = ilParticipationCertificateConfig::where(array("config_type" => ilParticipationCertificateConfig::CONFIG_TYPE_GLOBAL, "config_value_type" => ilParticipationCertificateConfig::CONFIG_VALUE_TYPE_CERT_TEXT))->orderBy('id')->get();
+			$arr_config = ilParticipationCertificateConfig::where(array("config_type" => ilParticipationCertificateConfig::CONFIG_TYPE_GLOBAL, "config_value_type" => ilParticipationCertificateConfig::CONFIG_VALUE_TYPE_CERT_TEXT))->orderBy('order_by')->get();
 		}
 
 		foreach($arr_config as $config) {
@@ -179,6 +179,20 @@ class ilParticipationCertificateGUI {
 			$input->setValue($config->getConfigValue());
 			$form->addItem($input);
 		}
+
+		$uploadfield = new ilFileInputGUI('Logo', 'headerpic');
+		$uploadfield->setSuffixes(array( 'png' ));
+
+		if(is_file(ilParticipationCertificateConfig::returnPicturePath('absolute',$this->groupRefId))) {
+			//group specifig
+			$uploadfield->setInfo('<img src="'.ilParticipationCertificateConfig::returnPicturePath('relative',$this->groupRefId).'" />');
+		} elseif(is_file(ilParticipationCertificateConfig::returnPicturePath('absolute',0))) {
+			//global
+			$uploadfield->setInfo('<img src="'.ilParticipationCertificateConfig::returnPicturePath('relative',0).'" />');
+		}
+
+
+		$form->addItem($uploadfield);
 
 		$this->ctrl->saveParameterByClass('ilObjGroup', 'ref_id');
 		$form->addCommandButton(ilParticipationCertificateGUI::CMD_SAVE, 'Speichern');
@@ -201,11 +215,18 @@ class ilParticipationCertificateGUI {
 
 		//TODO auslagern nach ilParticipationCertificateConfig
 		//save Text
+
+		$i = 1;
 		foreach($form->getItems() as $item) {
+			//todo refactor
+			if($item->getPostVar() == 'headerpic') {
+				continue;
+			}
 			/**
 			 * @var ilParticipationCertificateConfig $config;
 			 */
 			$config = ilParticipationCertificateConfig::where(array('config_key' =>  $item->getPostVar(), 'config_type' => ilParticipationCertificateConfig::CONFIG_TYPE_GROUP, 'config_value_type' => ilParticipationCertificateConfig::CONFIG_VALUE_TYPE_CERT_TEXT))->first();
+
 			if(!is_object($config)) {
 				$config = new ilParticipationCertificateConfig();
 				$config->setGroupRefId($this->groupRefId);
@@ -213,8 +234,17 @@ class ilParticipationCertificateGUI {
 				$config->setConfigValueType(ilParticipationCertificateConfig::CONFIG_VALUE_TYPE_CERT_TEXT);
 				$config->setConfigKey( $item->getPostVar());
 			}
+			$config->setOrderBy($i);
 			$config->setConfigValue($form->getInput($item->getPostVar()));
 			$config->store();
+
+			$i = $i+1;
+		}
+
+		//Picture
+		$file_data = $form->getInput('headerpic');
+		if($file_data['tmp_name']) {
+			ilParticipationCertificateConfig::storePicture($file_data,$this->groupRefId);
 		}
 
 		$this->ctrl->redirect($this, 'display');
@@ -239,7 +269,13 @@ class ilParticipationCertificateGUI {
 				$config->delete();
 			}
 		}
+
+		if(is_file(ilParticipationCertificateConfig::returnPicturePath('absolute',$this->groupRefId))) {
+			unlink(ilParticipationCertificateConfig::returnPicturePath('absolute',$this->groupRefId));
+		}
+
 		$ilCtrl->redirect($this,self::CMD_DISPLAY);
 	}
 
 }
+?>

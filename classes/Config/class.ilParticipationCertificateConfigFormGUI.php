@@ -47,3 +47,4 @@ class ilParticipationCertificateConfigFormGUI extends ilPropertyFormGUI {
 	}
 
 }
+?>
