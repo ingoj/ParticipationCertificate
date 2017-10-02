@@ -242,7 +242,8 @@ class ilParticipationCertificateTableGUIConfig extends ilTable2GUI {
 		$current_selection_list->addItem($this->pl->txt('list_results'),
 			ilParticipationCertificateResultModificationGUI::CMD_DISPLAY,$this->ctrl->getLinkTargetByClass(
 				ilParticipationCertificateResultModificationGUI::class,ilParticipationCertificateResultModificationGUI::CMD_DISPLAY));
-		$current_selection_list->addItem($this->pl->txt('list_print'));
+		$current_selection_list->addItem($this->pl->txt('list_print'),ilParticipationCertificateResultModificationGUI::CMD_PRINT,$this->ctrl->getLinkTargetByClass(
+			ilParticipationCertificateResultModificationGUI::class,ilParticipationCertificateResultModificationGUI::CMD_PRINT));
 
 		$this->tpl->setVariable('ACTIONS', $current_selection_list->getHTML());
 
