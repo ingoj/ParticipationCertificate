@@ -107,12 +107,6 @@ class ilParticipationCertificateResultModificationGUI {
 
 		$this->ctrl->saveParameterByClass('ilParticipationCertificateTableGUI', 'ref_id');
 		$this->tabs->setBackTarget('Zurück', $this->ctrl->getLinkTargetByClass(ilParticipationCertificateTableGUI::class, ilParticipationCertificateTableGUI::CMD_CONTENT));
-
-		$this->ctrl->saveParameterByClass('ilParticipationCertificateTableGUI', 'ref_id');
-		$this->tabs->addTab('overview', 'Übersicht', $this->ctrl->getLinkTargetByClass(ilParticipationCertificateTableGUI::class, ilParticipationCertificateTableGUI::CMD_CONTENT));
-
-		$this->tabs->addTab('config', 'Konfigurieren', $this->ctrl->getLinkTargetByClass(ilParticipationCertificateGUI::class, ilParticipationCertificateGUI::CMD_DISPLAY));
-		$this->tabs->activateTab('config,overview');
 	}
 
 
