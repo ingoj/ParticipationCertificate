@@ -5,7 +5,7 @@ class ilLearnObjectFinalTestStates {
 	/**
 	 * @param array $arr_usr_ids
 	 *
-	 * @return ilLearnObjectFinalTestState[]
+	 * @return ilLearnObjectFinalTestState[][]
 	 */
 	public static function getData(array $arr_usr_ids = array()) {
 		global $ilDB;
@@ -27,7 +27,7 @@ class ilLearnObjectFinalTestStates {
 			$locftst_state->setLocftestMaxpoints($row['locftest_maxpoints']);
 			$locftst_state->setLocftestPercentage($row['locftest_percentage']);
 
-			$locftst_data[$row['locftest_usr_id']] = $locftst_state;
+			$locftst_data[$row['locftest_usr_id']][$row['locftest_objective_id']] = $locftst_state;
 		}
 
 		return $locftst_data;
