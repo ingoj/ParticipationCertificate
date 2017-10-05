@@ -11,7 +11,8 @@ class ilParticipationCertificateTableGUI {
 	CONST CMD_CONTENT = 'content';
 	CONST CMD_OVERVIEW = 'overview';
 	CONST CMD_PRINT_PDF = 'printpdf';
-	CONST CMD_PRINT_PDF_WITHOUT_EMENTORING = 'printpdfwithoutementoring';
+	CONST CMD_PRINT_PDF_WITHOUT_EMENTORING = 'printpdfwithoutmentoring';
+	CONST CMD_INIT_TABLE = 'initTable';
 	/**
 	 * @var ilTemplate
 	 */
@@ -46,6 +47,8 @@ class ilParticipationCertificateTableGUI {
 		$this->ctrl = $ilCtrl;
 		$this->tpl = $tpl;
 		$this->pl = ilParticipationCertificatePlugin::getInstance();
+
+		$this->usr_ids;
 
 
 		$this->groupRefId = (int)$_GET['ref_id'];
@@ -123,6 +126,19 @@ class ilParticipationCertificateTableGUI {
 	public function printPdfWithoutMentoring() {
 		$twigParser = new ilParticipationCertificateTwigParser($this->groupRefId,array(),false);
 		$twigParser->parseData();
+	}
+
+	public function printSelected(){
+		if (!isset($_POST['record_ids']) || (isset($_POST['record_ids']) && !count($_POST['record_ids']))) {
+			ilUtil::sendInfo('No Records selected');
+			$this->initTable();
+			return;
+		}
+		$this->usr_ids = ($_POST['record_ids']);
+
+		$twigParser = new ilParticipationCertificateTwigParser($this->groupRefId,array(), false, false);
+		$twigParser->parseDataSelected($this->usr_ids);
+		$this->ctrl->redirect(ilParticipationCertificateTableGUI::class,ilParticipationCertificateTableGUI::CMD_CONTENT);
 	}
 
 

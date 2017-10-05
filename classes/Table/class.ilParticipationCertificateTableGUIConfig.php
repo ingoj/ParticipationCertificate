@@ -11,6 +11,7 @@ require_once './Customizing/global/plugins/Services/UIComponent/UserInterfaceHoo
 class ilParticipationCertificateTableGUIConfig extends ilTable2GUI {
 
 	CONST IDENTIFIER = 'ilpartusr';
+
 	/**
 	 * @var ilTabsGUI
 	 */
@@ -32,6 +33,9 @@ class ilParticipationCertificateTableGUIConfig extends ilTable2GUI {
 	 */
 	protected $filter = array();
 
+	protected $custom_export_formats = array();
+	protected $custom_export_generators = array();
+
 
 	/**
 	 * ilParticipationCertificateTableGUI constructor.
@@ -48,29 +52,29 @@ class ilParticipationCertificateTableGUIConfig extends ilTable2GUI {
 		$this->setPrefix('dhbw_part_cert');
 		$this->setFormName('dhbw_part_cert');
 		$this->setId('dhbw_part_cert');
+		$cert_access = new ilParticipationCertificateAccess(73);
+		$this->usr_ids = $cert_access->getUserIdsOfGroup();
 
 		parent::__construct($a_parent_obj, $a_parent_cmd);
 
 		$this->pl = ilParticipationCertificatePlugin::getInstance();
 
-		$this->setRowTemplate('tpl.default_row.html', $this->pl->getDirectory());
-
-		$this->setFormAction($this->ctrl->getFormAction($a_parent_obj));
-
-		$cert_access = new ilParticipationCertificateAccess(73);
-		$this->usr_ids = $cert_access->getUserIdsOfGroup();
-
 		$this->getEnableHeader();
 		$this->setTitle($this->pl->txt('tbl_overview_results'));
 
-
-
-		$this->initFilter();
+		$this->setExportFormats(array(self::EXPORT_EXCEL, self::EXPORT_CSV));
 
 		$this->addColumns();
+		$this->initFilter();
 
+		$this->setSelectAllCheckbox('record_ids');
+		$this->addMultiCommand('printSelected', 'Print');
+
+		$this->setRowTemplate('tpl.default_row.html', $this->pl->getDirectory());
+		$this->setFormAction($this->ctrl->getFormAction($a_parent_obj));
 
 		$this->parseData();
+
 	}
 
 
@@ -81,7 +85,9 @@ class ilParticipationCertificateTableGUIConfig extends ilTable2GUI {
 	 */
 	function getSelectableColumns() {
 
+
 		$cols = array();
+		$cols['check'] = array( 'txt' => '', 'default' => true, 'width' => 'auto', 'sort_field' => 'firstname' );
 		$cols['firstname'] = array( 'txt' => 'Vorname', 'default' => true, 'width' => 'auto', 'sort_field' => 'firstname' );
 		$cols['lastname'] = array( 'txt' => 'Nachname', 'default' => true, 'width' => 'auto', 'sort_field' => 'lastname' );
 		$cols['initial_test_finished'] = array(
@@ -90,12 +96,12 @@ class ilParticipationCertificateTableGUIConfig extends ilTable2GUI {
 			'width' => 'auto',
 			'sort_field' => 'initial_test_finished'
 		);
-		$cols['results_qualifing_tests'] = array(
+		/*$cols['results_qualifing_tests'] = array(
 			'txt' => 'Resultate der qualifizierenden Tests',
 			'default' => true,
 			'width' => 'auto',
 			'sort_field' => 'results_qualifing_tests'
-		);
+		);*/
 		$cols['result_qualifing_tests'] = array(
 			'txt' => 'Resultat qualifizierende Tests',
 			'default' => true,
@@ -126,9 +132,7 @@ class ilParticipationCertificateTableGUIConfig extends ilTable2GUI {
 
 
 	private function addColumns() {
-		/*if(!$this->getExportMode()) {
-			$this->addColumn('');
-		}*/
+		$this->addColumn('');
 		foreach ($this->getSelectableColumns() as $k => $v) {
 			if ($this->isColumnSelected($k)) {
 				if (isset($v['sort_field'])) {
@@ -140,6 +144,7 @@ class ilParticipationCertificateTableGUIConfig extends ilTable2GUI {
 			}
 		}
 		$this->addColumn($this->pl->txt('cols_actions'));
+
 	}
 
 
@@ -221,6 +226,9 @@ class ilParticipationCertificateTableGUIConfig extends ilTable2GUI {
 	 */
 	public function fillRow($a_set) {
 
+		$this->tpl->setCurrentBlock('record_id');
+		$this->tpl->setVariable('RECORD_ID', $a_set['usr_id']);
+		$this->tpl->parseCurrentBlock();
 
 		foreach ($this->getSelectableColumns() as $k => $v) {
 			if ($this->isColumnSelected($k)) {
@@ -246,14 +254,8 @@ class ilParticipationCertificateTableGUIConfig extends ilTable2GUI {
 		$current_selection_list->addItem($this->pl->txt('list_overview'), ilParticipationCertificateResultOverviewGUI::CMD_DISPLAY, $this->ctrl->getLinkTargetByClass(ilParticipationCertificateResultOverviewGUI::class, ilParticipationCertificateResultOverviewGUI::CMD_DISPLAY));
 
 		$this->tpl->setVariable('ACTIONS', $current_selection_list->getHTML());
-
-		/*
-		$button = ilLinkButton::getInstance();
-		$button->setCaption('Button', false);
-		$button->setUrl($this->ctrl->getLinkTargetByClass(ilParticipationCertificateTableGUI::class, ilParticipationCertificateTableGUI::CMD_CONTENT));
-		$this->tpl->setVariable('Aktionen');
-		$button->render();*/
-		//$this->addActionMenu();
+		$this->tpl->parseCurrentBlock();
+		$this->tpl->setVariable('CHECK_ID', $a_set['check_id']);
 	}
 
 
@@ -283,20 +285,55 @@ class ilParticipationCertificateTableGUIConfig extends ilTable2GUI {
 
 		$this->setDisableFilterHiding(true);
 	}
-	/*
-		public function addActionMenu() {
 
 
-			$current_selection_list = new ilAdvancedSelectionListGUI();
-			$current_selection_list->setListTitle($this->pl->txt('list_actions'));
-			$current_selection_list->setId('_actions');
-			$current_selection_list->setUseImages(false);
+	/**
+	 * @param array $formats
+	 */
+	public function setExportFormats(array $formats) {
+		parent::setExportFormats($formats);
 
-			$current_selection_list->addItem($this->pl->txt('list_results'),
-				ilParticipationCertificateResultModificationGUI::CMD_DISPLAY,$this->ctrl->getLinkTargetByClass(
-					ilParticipationCertificateResultModificationGUI::class,ilParticipationCertificateResultModificationGUI::CMD_DISPLAY));
-			$current_selection_list->addItem($this->pl->txt('list_print'));
+		$custom_fields = array_diff($formats, $this->export_formats);
 
-			$this->tpl->setVariable('ACTIONS', $current_selection_list->getHTML());
-		}*/
+		foreach ($custom_fields as $format_key){
+			if (isset($this->custom_export_formats[$format_key])){
+				$this->export_formats[$format_key] = $this->pl->getPrefix() . '_' - $this->custom_export_formats[$format_key];
+			}
+		}
+	}
+
+	public function exportData($format, $send = false) {
+		if (array_key_exists($format, $this->custom_export_formats)) {
+			if ($this->dataExists()) {
+
+				foreach ($this->custom_export_generators as $export_format => $generator_config) {
+					if ($this->getExportMode() == $export_format) {
+						$generator_config['generator']->generate();
+					}
+				}
+			}
+		} else {
+			parent::exportData($format, $send);
+		}
+	}
+
+
+
+	/**
+	 * @param       $export_format_key
+	 * @param       $custom_export_generators
+	 * @param array $params
+	 */
+	public function addCustomExportGenerator($export_format_key, $custom_export_generators, $params = array()){
+		$this->custom_export_generators[$export_format_key] = array('generator' => $custom_export_generators, 'params' => $params);
+	}
+
+
+	/**
+	 * @param $custom_export_format_key
+	 * @param $custom_export_format_label
+	 */
+	public function addCustomExportFormat($custom_export_format_key, $custom_export_format_label){
+		$this->custom_export_formats[$$custom_export_format_key] = $custom_export_format_label;
+	}
 }

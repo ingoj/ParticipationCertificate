@@ -25,7 +25,7 @@ class ilParticipationCertificateTwigParser {
 	 * @param array $twig_options
 	 * @param bool  $ementor
 	 */
-	public function __construct($group_ref_id = 0, $twig_options = array(), $ementor = true) {
+	public function __construct($group_ref_id = 0, $twig_options = array(), $ementor = true, $footer = false) {
 
 
 		$this->group_ref_id = $group_ref_id;
@@ -38,6 +38,7 @@ class ilParticipationCertificateTwigParser {
 		$twig = new \Twig_Environment($loader, $twig_options);
 
 		$this->ementor = $ementor;
+		$this->footer = $footer;
 
 		$this->twig_template = $twig->load('certificate.html');
 	}
@@ -52,6 +53,7 @@ class ilParticipationCertificateTwigParser {
 		$arr_excercise_states = ilExcerciseStates::getData($this->usr_ids);
 		$arr_iass_states = ilIassStates::getData($this->usr_ids);
 		$arr_learn_reached_percentages = ilLearnObjectSuggReachedPercentages::getData($this->usr_ids);
+
 
 		$date = new ilDate(time(), IL_CAL_UNIX);
 
@@ -104,6 +106,7 @@ class ilParticipationCertificateTwigParser {
 		$arr_render = array(
 			'text_values' => $processed_arr_text_values,
 			'show_ementoring' => $this->ementor,
+			'show_footer' => $this->footer,
 			'arr_lo_master_crs' => $arr_usr_lo_master_crs,
 			'crsitest_itest_submitted' => $initial_test_state,
 			'learn_sugg_reached_percentage' => $learn_sugg_reached_percentage,
@@ -117,7 +120,6 @@ class ilParticipationCertificateTwigParser {
 
 
 	public function parseData() {
-
 		$arr_text_values = ilParticipationCertificateConfig::returnTextValues($this->group_ref_id, ilParticipationCertificateConfig::CONFIG_TYPE_GROUP);
 
 		$arr_usr_data = ilPartCertUsersData::getData($this->usr_ids);
@@ -126,6 +128,7 @@ class ilParticipationCertificateTwigParser {
 		$arr_excercise_states = ilExcerciseStates::getData($this->usr_ids);
 		$arr_iass_states = ilIassStates::getData($this->usr_ids);
 		$arr_learn_reached_percentages = ilLearnObjectSuggReachedPercentages::getData($this->usr_ids);
+
 
 		$date = new ilDate(time(), IL_CAL_UNIX);
 
@@ -175,6 +178,7 @@ class ilParticipationCertificateTwigParser {
 			$arr_render = array(
 				'text_values' => $processed_arr_text_values,
 				'show_ementoring' => $this->ementor,
+				'show_footer' => $this->footer,
 				'arr_lo_master_crs' => $arr_usr_lo_master_crs,
 				'crsitest_itest_submitted' => $initial_test_state,
 				'learn_sugg_reached_percentage' => $learn_sugg_reached_percentage,
@@ -184,6 +188,76 @@ class ilParticipationCertificateTwigParser {
 			);
 
 			$part_pdf->generatePDF($this->twig_template->render($arr_render), count($this->usr_ids));
+		}
+	}
+	public function parseDataSelected($usr_ids) {
+		$arr_text_values = ilParticipationCertificateConfig::returnTextValues($this->group_ref_id, ilParticipationCertificateConfig::CONFIG_TYPE_GROUP);
+
+		$arr_usr_data = ilPartCertUsersData::getData($this->usr_ids);
+		$arr_lo_master_crs = ilLearningObjectivesMasterCrs::getData($this->usr_ids);
+		$arr_initial_test_states = ilCrsInitialTestStates::getData($this->usr_ids);
+		$arr_excercise_states = ilExcerciseStates::getData($this->usr_ids);
+		$arr_iass_states = ilIassStates::getData($this->usr_ids);
+		$arr_learn_reached_percentages = ilLearnObjectSuggReachedPercentages::getData($this->usr_ids);
+
+		$date = new ilDate(time(), IL_CAL_UNIX);
+
+		$part_pdf = new ilParticipationCertificatePDFGenerator();
+
+		foreach ($usr_ids as $usr_id) {
+
+			$processed_arr_text_values = $arr_text_values;
+			//Preprocess text values
+			foreach ($arr_text_values as $key => $value) {
+				$twig = new \Twig_Environment(new \Twig_Loader_String());
+				$peparsed_value = $twig->render($value, array(
+					"username" => ($arr_usr_data[$usr_id]->getPartCertSalutation() ? $arr_usr_data[$usr_id]->getPartCertSalutation() . ' ' : '')
+						. $arr_usr_data[$usr_id]->getPartCertFirstname() . ' ' . $arr_usr_data[$usr_id]->getPartCertLastname(),
+					'date' => $date->get(IL_CAL_FKT_DATE, 'd.m.Y')
+				));
+				$processed_arr_text_values[$key] = $peparsed_value;
+			}
+
+			//Learning Objective Master Course
+			$arr_usr_lo_master_crs = array();
+			if (is_array($arr_lo_master_crs[$usr_id])) {
+				$arr_usr_lo_master_crs = $arr_lo_master_crs[$usr_id];
+			}
+
+			//Initial Test
+			$initial_test_state = 0;
+			if (is_object($arr_initial_test_states[$usr_id])) {
+				$initial_test_state = $arr_initial_test_states[$usr_id]->getCrsitestItestSubmitted();
+			}
+			//Percentage final tests of suggested modules
+			$learn_sugg_reached_percentage = 0;
+			if (is_object($arr_learn_reached_percentages[$usr_id])) {
+				$learn_sugg_reached_percentage = $arr_learn_reached_percentages[$usr_id]->getAveragePercentage();
+			}
+			//Video Conferences
+			$iass_state = 0;
+			if (is_object($arr_iass_states[$usr_id])) {
+				$iass_state = $arr_iass_states[$usr_id]->getPassed();
+			}
+			//Home Work
+			$excercise_percentage = 0;
+			if (is_object($arr_excercise_states[$usr_id])) {
+				$excercise_percentage = $arr_excercise_states[$usr_id]->getPassedPercentage();
+			}
+
+			$arr_render = array(
+				'text_values' => $processed_arr_text_values,
+				'show_ementoring' => $this->ementor,
+				'show_footer' => $this->footer,
+				'arr_lo_master_crs' => $arr_usr_lo_master_crs,
+				'crsitest_itest_submitted' => $initial_test_state,
+				'learn_sugg_reached_percentage' => $learn_sugg_reached_percentage,
+				'iass_state' => $iass_state,
+				'excercise_percentage' => $excercise_percentage,
+				'logo_path' => ilParticipationCertificateConfig::returnPicturePath()
+			);
+
+			$part_pdf->generatePDF($this->twig_template->render($arr_render), count($usr_ids));
 		}
 	}
 

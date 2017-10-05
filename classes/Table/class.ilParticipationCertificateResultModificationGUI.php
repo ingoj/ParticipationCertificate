@@ -170,7 +170,7 @@ class ilParticipationCertificateResultModificationGUI {
 		$array = array($form->getInput('initial'),$form->getInput('resultstest'),$form->getInput('conf'),$form->getInput('homework'));
 		$edited = true;
 		$usr_id = $this->usr_id;
-		$twigParser = new ilParticipationCertificateTwigParser($this->groupRefId);
+		$twigParser = new ilParticipationCertificateTwigParser($this->groupRefId, array(), true,true);
 		$twigParser->parseDataSolo($edited,$array,$usr_id);
 	}
 
@@ -182,7 +182,7 @@ class ilParticipationCertificateResultModificationGUI {
 		$array = array($form->getInput('initial'),$form->getInput('resultstest'),$form->getInput('conf'),$form->getInput('homework'));
 		$edited = false;
 		$usr_id = $this->usr_id;
-		$twigParser = new ilParticipationCertificateTwigParser($this->groupRefId);
+		$twigParser = new ilParticipationCertificateTwigParser($this->groupRefId,array(),true,false);
 		$twigParser->parseDataSolo($edited,$array,$usr_id);
 	}
 

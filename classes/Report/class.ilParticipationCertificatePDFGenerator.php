@@ -64,7 +64,7 @@ class ilParticipationCertificatePDFGenerator {
 			$mpdf->WriteHTML($rendered, 2);
 			$mpdf->Output('Teilnahmebescheinigungen' . '.pdf', 'D');
 			$this->tpl->getStandardTemplate();
-			$this->ctrl->redirectByClass(ilParticipationCertificateGUI::class, ilParticipationCertificateGUI::CMD_DISPLAY);
+			$this->ctrl->redirectByClass(ilParticipationCertificateTableGUI::class, ilParticipationCertificateTableGUI::CMD_INIT_TABLE);
 		}
 		//Checkt ob es der erste Durchlauf ist. Wenn True wird das erste PDF erzeugt und auf dem Server abgelegt.
 		if ($printCount == 1) {
@@ -85,7 +85,7 @@ class ilParticipationCertificatePDFGenerator {
 			}
 			$mpdf->Output('Teilnahmebescheinigungen' . '.pdf', 'D');
 			$this->tpl->getStandardTemplate();
-			$this->ctrl->redirectByClass(ilParticipationCertificateGUI::class, ilParticipationCertificateGUI::CMD_DISPLAY);
+			$this->ctrl->redirectByClass(ilParticipationCertificateTableGUI::class, ilParticipationCertificateTableGUI::CMD_INIT_TABLE);
 		}
 		/*Wenn es nicht der erste oder letzte Durchlauf ist, wird ein neues PDF erzeugt. Die bereits erzeugten PDF auf dem Server
 		 *werden hinten angehängt. Danach wird es wieder auf dem Server gespeichert um im nächsten Durchlauf wieder anzuhängen.

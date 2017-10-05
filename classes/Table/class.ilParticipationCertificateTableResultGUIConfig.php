@@ -55,6 +55,7 @@ class ilParticipationCertificateTableResultGUIConfig extends ilTable2GUI {
 		$this->learnGroup = ilObjectFactory::getInstanceByRefId($_GET['ref_id']);
 		$this->ctrl->saveParameterByClass('ilParticipationCertificateResultModificationGUI', [ 'ref_id', 'group_id' ]);
 
+
 		$this->ctrl->saveParameterByClass('ilParticipationCertificateTableGUI','usr_id');
 		$cert_access = new ilParticipationCertificateAccess($group_ref_id);
 		$this->usr_ids = $cert_access->getUserIdsOfGroup();
@@ -96,44 +97,29 @@ class ilParticipationCertificateTableResultGUIConfig extends ilTable2GUI {
 	 * @return        array    key: column id, val: true/false -> default on/off
 	 */
 	function getSelectableColumns() {
-
 		$cols = array();
-		$cols['initial_test_finished'] = array(
-			'txt' => 'Einstiegstest abgeschlossen',
+
+		$this->finalTestsStates = ilLearnObjectFinalTestStates::getData($this->usr_ids);
+		foreach ($this->finalTestsStates as $finalTestsState) {
+			foreach ($finalTestsState as $final){
+		$cols[$final->getLocftestObjectiveId()] = array(
+			'txt' => $final->getLocftestObjectiveTitle(),
 			'default' => true,
 			'width' => 'auto',
 			'sort_field' => 'initial_test_finished'
 		);
+
+			}
+		}
+
+
 		$cols['results_qualifing_tests'] = array(
 			'txt' => 'Resultate der qualifizierenden Tests',
 			'default' => true,
 			'width' => 'auto',
 			'sort_field' => 'results_qualifing_tests'
 		);
-		$cols['result_qualifing_tests'] = array(
-			'txt' => 'Resultat qualifizierende Tests',
-			'default' => true,
-			'width' => 'auto',
-			'sort_field' => 'result_qualifing_tests'
-		);
-		$cols['eMentoring_finished'] = array(
-			'txt' => 'Aktive Teilnahme an Videokonferenzen',
-			'default' => true,
-			'width' => 'auto',
-			'sort_field' => 'eMentoring_finished'
-		);
-		$cols['eMentoring_homework'] = array(
-			'txt' => 'Anzahl Hausaufgaben abgegeben',
-			'default' => true,
-			'width' => 'auto',
-			'sort_field' => 'eMentoring_homework'
-		);
-		$cols['eMentoring_percentage'] = array(
-			'txt' => 'Bearbeitung der aufgaben zu überfachlichen Themen',
-			'default' => true,
-			'width' => 'auto',
-			'sort_field' => 'eMentoring_percentage'
-		);
+
 
 		return $cols;
 	}
@@ -166,38 +152,28 @@ class ilParticipationCertificateTableResultGUIConfig extends ilTable2GUI {
 		$arr_iass_states = ilIassStates::getData($this->usr_ids);
 		$arr_excercise_states = ilExcerciseStates::getData($this->usr_ids);
 		$arr_FinalTestsStates = ilLearnObjectFinalTestStates::getData($this->usr_ids);
-		$array_obj_ids = ilLearnObjectFinalTestStates::getData($this->usr_ids);
+
+
+
+
+
 
 		$rows = array();
 		$usr_id = $this->usr_id;
+
 			$row = array();
-			$row['usr_id'] = $usr_id;
-			$row['firstname'] = $arr_usr_data[$usr_id]->getPartCertFirstname();
-			$row['lastname'] = $arr_usr_data[$usr_id]->getPartCertLastname();
 
-			if (is_object($arr_initial_test_states[$usr_id])) {
-				$row['initial_test_finished'] = $arr_initial_test_states[$usr_id]->getCrsitestItestSubmitted();
-				if ($row['initial_test_finished'] == 1) {
-					$row['initial_test_finished'] = 'Ja';
-				} else {
-					$row['initial_test_finished'] = 'Nein';
-				}
-			}
-			if (is_object($arr_learn_reached_percentages[$usr_id])) {
-				$row['result_qualifing_tests'] = $arr_learn_reached_percentages[$usr_id]->getAveragePercentage() . '%';
-			}
-			if (is_object($arr_iass_states[$usr_id])) {
-				$row['eMentoring_finished'] = $arr_iass_states[$usr_id]->getPassed();
-
-				if ($row['eMentoring_finished'] == 1) {
-					$row['eMentoring_finished'] = 'Ja';
-				} else {
-					$row['eMentoring_finished'] = 'Nein';
-				}
+		$this->finalTestsStates = ilLearnObjectFinalTestStates::getData($this->usr_ids);
+		foreach ($this->finalTestsStates as $finalTestsState) {
+			foreach ($finalTestsState as $final){
+				$results = array();
+				
+				$results[] = $final->getLocftestTestTitle();
+				array_push($results, $final-> getLocftestPercentage());
+				$row[$final->getLocftestObjectiveId()] = $results;
 			}
 
 			if (is_array($arr_FinalTestsStates[$usr_id])) {
-
 				foreach ($arr_FinalTestsStates[$usr_id] as $rec) {
 					$rec_array[] = $rec->getLocFtestTestTitle();
 					array_push($rec_array, $rec->getLocftestPercentage());
@@ -207,27 +183,17 @@ class ilParticipationCertificateTableResultGUIConfig extends ilTable2GUI {
 				$row['results_qualifing_tests'] = $array_results;
 			}
 
-			if (is_object($arr_iass_states[$usr_id])) {
-				$row['eMentoring_homework'] = $arr_excercise_states[$usr_id]->getPassed();
-				$row['eMentoring_percentage'] = $arr_excercise_states[$usr_id]->getPassedPercentage() . '%';
-			}
 
-			if ($this->filter['firstname'] != false) {
-				if (strtolower($row['firstname']) == strtolower($this->filter['firstname'])) {
-					$rows[] = $row;
-				}
-			} elseif ($this->filter['lastname'] != false) {
-				if (strtolower($row['lastname']) == strtolower($this->filter['lastname'])) {
-					$rows[] = $row;
-				}
-			} else {
+
+
+
 				$rows[] = $row;
-			}
+
 
 		$this->setData($rows);
 
 		return $rows;
-	}
+	}}
 
 
 	/**
@@ -252,6 +218,9 @@ class ilParticipationCertificateTableResultGUIConfig extends ilTable2GUI {
 
 
 
+	}
+
+	public function fillInfos() {
 	}
 
 }
