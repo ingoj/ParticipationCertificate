@@ -151,13 +151,14 @@ class ilParticipationCertificateResultModificationGUI {
 		//TODO catch if there is no object(value)
 		$usr_id = $_GET[self::IDENTIFIER];
 
-		$array = array(
-			'initial' => $this->arr_initial_test_states[$usr_id]->getCrsitestItestSubmitted(),
-			'resultstest' => $this->arr_learn_reached_percentages[$usr_id]->getAveragePercentage(),
-			'conf' => $this->arr_iass_states[$usr_id]->getPassed(),
-			'homework' => $this->arr_excercise_states[$usr_id]->getPassedPercentage()
-		);
-
+		if (is_object($this->arr_initial_test_states[$usr_id])) {
+			$array = array(
+				'initial' => $this->arr_initial_test_states[$usr_id]->getCrsitestItestSubmitted(),
+				'resultstest' => $this->arr_learn_reached_percentages[$usr_id]->getAveragePercentage(),
+				'conf' => $this->arr_iass_states[$usr_id]->getPassed(),
+				'homework' => $this->arr_excercise_states[$usr_id]->getPassedPercentage()
+			);
+		}
 		$form->setValuesbyArray($array);
 	}
 

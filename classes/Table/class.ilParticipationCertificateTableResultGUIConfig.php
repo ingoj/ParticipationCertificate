@@ -3,6 +3,7 @@
 require_once './Services/Table/classes/class.ilTable2GUI.php';
 require_once './Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/ParticipationCertificate/classes/Table/class.ilParticipationCertificateResultModificationGUI.php';
 require_once './Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/ParticipationCertificate/classes/Table/class.ilParticipationCertificateResultOverviewGUI.php';
+
 /**
  * Class ilParticipationCertificateTableGUI
  *
@@ -55,13 +56,11 @@ class ilParticipationCertificateTableResultGUIConfig extends ilTable2GUI {
 		$this->learnGroup = ilObjectFactory::getInstanceByRefId($_GET['ref_id']);
 		$this->ctrl->saveParameterByClass('ilParticipationCertificateResultModificationGUI', [ 'ref_id', 'group_id' ]);
 
-
-		$this->ctrl->saveParameterByClass('ilParticipationCertificateTableGUI','usr_id');
+		$this->ctrl->saveParameterByClass('ilParticipationCertificateTableGUI', 'usr_id');
 		$cert_access = new ilParticipationCertificateAccess($group_ref_id);
 		$this->usr_ids = $cert_access->getUserIdsOfGroup();
 		$usr_id = $_GET[self::IDENTIFIER];
 		$this->usr_id = $usr_id;
-
 
 		$arr_usr_data = ilPartCertUsersData::getData($this->usr_ids);
 		$nameUser = $arr_usr_data[$usr_id]->getPartCertFirstname() . ' ' . $arr_usr_data[$usr_id]->getPartCertLastname();
@@ -80,12 +79,9 @@ class ilParticipationCertificateTableResultGUIConfig extends ilTable2GUI {
 		$this->getEnableHeader();
 		$this->setTitle('Alle Resultate für ' . $nameUser);
 
-
-
 		$this->initFilter();
 
 		$this->addColumns();
-
 
 		$this->parseData();
 	}
@@ -101,17 +97,15 @@ class ilParticipationCertificateTableResultGUIConfig extends ilTable2GUI {
 
 		$this->finalTestsStates = ilLearnObjectFinalTestStates::getData($this->usr_ids);
 		foreach ($this->finalTestsStates as $finalTestsState) {
-			foreach ($finalTestsState as $final){
-		$cols[$final->getLocftestObjectiveId()] = array(
-			'txt' => $final->getLocftestObjectiveTitle(),
-			'default' => true,
-			'width' => 'auto',
-			'sort_field' => 'initial_test_finished'
-		);
-
+			foreach ($finalTestsState as $final) {
+				$cols[$final->getLocftestObjectiveId()] = array(
+					'txt' => $final->getLocftestObjectiveTitle(),
+					'default' => true,
+					'width' => 'auto',
+					'sort_field' => $final->getLocftestObjectiveTitle(),
+				);
 			}
 		}
-
 
 		$cols['results_qualifing_tests'] = array(
 			'txt' => 'Resultate der qualifizierenden Tests',
@@ -120,15 +114,11 @@ class ilParticipationCertificateTableResultGUIConfig extends ilTable2GUI {
 			'sort_field' => 'results_qualifing_tests'
 		);
 
-
 		return $cols;
 	}
 
 
 	private function addColumns() {
-		/*if(!$this->getExportMode()) {
-			$this->addColumn('');
-		}*/
 		foreach ($this->getSelectableColumns() as $k => $v) {
 			if ($this->isColumnSelected($k)) {
 				if (isset($v['sort_field'])) {
@@ -139,37 +129,24 @@ class ilParticipationCertificateTableResultGUIConfig extends ilTable2GUI {
 				$this->addColumn($v['txt'], $sort, $v['width']);
 			}
 		}
-
 	}
 
 
 	public function parseData() {
 
-
-		$arr_usr_data = ilPartCertUsersData::getData($this->usr_ids);
-		$arr_initial_test_states = ilCrsInitialTestStates::getData($this->usr_ids);
-		$arr_learn_reached_percentages = ilLearnObjectSuggReachedPercentages::getData($this->usr_ids);
-		$arr_iass_states = ilIassStates::getData($this->usr_ids);
-		$arr_excercise_states = ilExcerciseStates::getData($this->usr_ids);
 		$arr_FinalTestsStates = ilLearnObjectFinalTestStates::getData($this->usr_ids);
-
-
-
-
-
 
 		$rows = array();
 		$usr_id = $this->usr_id;
 
-			$row = array();
+		$row = array();
 
-		$this->finalTestsStates = ilLearnObjectFinalTestStates::getData($this->usr_ids);
 		foreach ($this->finalTestsStates as $finalTestsState) {
-			foreach ($finalTestsState as $final){
+			foreach ($finalTestsState as $final) {
 				$results = array();
-				
+
 				$results[] = $final->getLocftestTestTitle();
-				array_push($results, $final-> getLocftestPercentage());
+				array_push($results, $final->getLocftestPercentage());
 				$row[$final->getLocftestObjectiveId()] = $results;
 			}
 
@@ -183,17 +160,13 @@ class ilParticipationCertificateTableResultGUIConfig extends ilTable2GUI {
 				$row['results_qualifing_tests'] = $array_results;
 			}
 
+			$rows[] = $row;
 
+			$this->setData($rows);
 
-
-
-				$rows[] = $row;
-
-
-		$this->setData($rows);
-
-		return $rows;
-	}}
+			return $rows;
+		}
+	}
 
 
 	/**
@@ -215,12 +188,9 @@ class ilParticipationCertificateTableResultGUIConfig extends ilTable2GUI {
 				}
 			}
 		}
-
-
-
 	}
+
 
 	public function fillInfos() {
 	}
-
 }
