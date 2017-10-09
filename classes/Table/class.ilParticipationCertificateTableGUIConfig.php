@@ -337,3 +337,4 @@ class ilParticipationCertificateTableGUIConfig extends ilTable2GUI {
 		$this->custom_export_formats[$$custom_export_format_key] = $custom_export_format_label;
 	}
 }
+?>

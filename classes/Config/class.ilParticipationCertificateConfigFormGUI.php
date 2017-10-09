@@ -2,7 +2,6 @@
 require_once './Services/Form/classes/class.ilPropertyFormGUI.php';
 require_once './Services/form/clsses/class.ilMultiSelectInputGUI.php';
 
-
 class ilParticipationCertificateConfigFormGUI extends ilPropertyFormGUI {
 
 	/**
@@ -32,18 +31,15 @@ class ilParticipationCertificateConfigFormGUI extends ilPropertyFormGUI {
 		$this->pl = ilParticipationCertificatePlugin::getInstance();
 		$this->setFormAction($this->ctrl->getFormAction($this->parent_gui));
 		$this->initForm();
-
-
 	}
 
-	protected function initForm(){
+
+	protected function initForm() {
 
 		$this->setTitle('PDF Generator');
 
-
 		$item = new ilTextInputGUI('Name', 'name');
 		$item->setRequired(true);
-
 	}
-
 }
+?>

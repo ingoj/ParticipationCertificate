@@ -114,3 +114,4 @@ class ilParticipationCertificateResultOverviewGUI {
 		$this->table = new ilParticipationCertificateTableResultGUIConfig($this, ilParticipationCertificateResultOverviewGUI::CMD_DISPLAY);
 	}
 }
+?>

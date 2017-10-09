@@ -2,8 +2,10 @@
 require_once './Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/ParticipationCertificate/classes/Table/class.ilParticipationCertificateTableGUIConfig.php';
 require_once './Services/UIComponent/AdvancedSelectionList/classes/class.ilAdvancedSelectionListGUI.php';
 require_once './Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/ParticipationCertificate/classes/Table/class.ilParticipationCertificateResultModificationGUI.php';
+
 /**
  * Class ilParticipationCertificateTableGUI
+ *
  * @ilCtrl_isCalledBy ilParticipationCertificateTableGUI: ilParticipationCertificateGUI, ilUIPluginRouterGUI, ilParticipationCertificateResultModificationGUI
  */
 class ilParticipationCertificateTableGUI {
@@ -35,12 +37,11 @@ class ilParticipationCertificateTableGUI {
 	protected $pl;
 
 
-
 	/**
 	 * ilParticipationCertificateTableGUI constructor.
 	 */
 	public function __construct() {
-	global $ilCtrl, $ilTabs, $tpl,$ilToolbar;
+		global $ilCtrl, $ilTabs, $tpl, $ilToolbar;
 
 		$this->toolbar = $ilToolbar;
 		$this->tabs = $ilTabs;
@@ -50,7 +51,6 @@ class ilParticipationCertificateTableGUI {
 
 		$this->usr_ids;
 
-
 		$this->groupRefId = (int)$_GET['ref_id'];
 		$this->groupObjId = ilObject2::_lookupObjectId($this->groupRefId);
 		$this->learnGroup = ilObjectFactory::getInstanceByRefId($_GET['ref_id']);
@@ -58,9 +58,9 @@ class ilParticipationCertificateTableGUI {
 	}
 
 
-	public function executeCommand(){
+	public function executeCommand() {
 		$nextClass = $this->ctrl->getNextClass();
-		switch($nextClass){
+		switch ($nextClass) {
 			case 'ilparticipationcertificateresultmodificationgui':
 				$ilparticipationcertificateresultmodificationgui = new ilParticipationCertificateResultModificationGUI();
 				$ret1 = $this->ctrl->forwardCommand($ilparticipationcertificateresultmodificationgui);
@@ -83,7 +83,7 @@ class ilParticipationCertificateTableGUI {
 	}
 
 
-	public function content(){
+	public function content() {
 		$this->tpl->getStandardTemplate();
 		$this->initHeader();
 		$b_print = ilLinkButton::getInstance();
@@ -100,8 +100,8 @@ class ilParticipationCertificateTableGUI {
 
 		$this->tpl->setContent($this->table->getHTML());
 		$this->tpl->show();
-
 	}
+
 
 	function initHeader() {
 		$this->tpl->setTitle($this->learnGroup->getTitle());
@@ -112,33 +112,37 @@ class ilParticipationCertificateTableGUI {
 
 		$this->ctrl->saveParameterByClass('ilParticipationCertificateTableGUI', [ 'ref_id', 'group_id' ]);
 		$this->ctrl->saveParameterByClass('ilParticipationCertificateGUI', 'ref_id');
-		$this->tabs->addTab('overview', $this->pl->txt('header_overview'), $this->ctrl->getLinkTargetByClass(ilParticipationCertificateTableGUI::class,ilParticipationCertificateTableGUI::CMD_CONTENT));
+		$this->tabs->addTab('overview', $this->pl->txt('header_overview'), $this->ctrl->getLinkTargetByClass(ilParticipationCertificateTableGUI::class, ilParticipationCertificateTableGUI::CMD_CONTENT));
 
-		$this->tabs->addTab('config', $this->pl->txt('header_config'), $this->ctrl->getLinkTargetByClass(ilParticipationCertificateGUI::class,ilParticipationCertificateGUI::CMD_DISPLAY));
+		$this->tabs->addTab('config', $this->pl->txt('header_config'), $this->ctrl->getLinkTargetByClass(ilParticipationCertificateGUI::class, ilParticipationCertificateGUI::CMD_DISPLAY));
 		$this->tabs->activateTab('overview');
 	}
+
 
 	public function printPdf() {
 		$twigParser = new ilParticipationCertificateTwigParser($this->groupRefId);
 		$twigParser->parseData();
 	}
 
+
 	public function printPdfWithoutMentoring() {
-		$twigParser = new ilParticipationCertificateTwigParser($this->groupRefId,array(),false);
+		$twigParser = new ilParticipationCertificateTwigParser($this->groupRefId, array(), false);
 		$twigParser->parseData();
 	}
 
-	public function printSelected(){
+
+	public function printSelected() {
 		if (!isset($_POST['record_ids']) || (isset($_POST['record_ids']) && !count($_POST['record_ids']))) {
 			ilUtil::sendInfo('No Records selected');
 			$this->initTable();
+
 			return;
 		}
 		$this->usr_ids = ($_POST['record_ids']);
 
-		$twigParser = new ilParticipationCertificateTwigParser($this->groupRefId,array(), false, false);
+		$twigParser = new ilParticipationCertificateTwigParser($this->groupRefId, array(), false, false);
 		$twigParser->parseDataSelected($this->usr_ids);
-		$this->ctrl->redirect(ilParticipationCertificateTableGUI::class,ilParticipationCertificateTableGUI::CMD_CONTENT);
+		$this->ctrl->redirect(ilParticipationCertificateTableGUI::class, ilParticipationCertificateTableGUI::CMD_CONTENT);
 	}
 
 
@@ -150,10 +154,10 @@ class ilParticipationCertificateTableGUI {
 
 		$this->content();*/
 
-		$table = new ilParticipationCertificateTableGUIConfig($this,self::CMD_CONTENT);
+		$table = new ilParticipationCertificateTableGUIConfig($this, self::CMD_CONTENT);
 		$table->writeFilterToSession();
 		$table->resetOffset();
-		$this->ctrl->redirect($this,self::CMD_CONTENT);
+		$this->ctrl->redirect($this, self::CMD_CONTENT);
 	}
 
 
@@ -164,19 +168,16 @@ class ilParticipationCertificateTableGUI {
 		$this->table->resetFilter();
 
 		$this->content();*/
-		$table = new ilParticipationCertificateTableGUIConfig($this,self::CMD_CONTENT);
+		$table = new ilParticipationCertificateTableGUIConfig($this, self::CMD_CONTENT);
 		$table->resetOffset();
 		$table->resetFilter();
-		$this->ctrl->redirect($this,self::CMD_CONTENT);
+		$this->ctrl->redirect($this, self::CMD_CONTENT);
 	}
+
 
 	protected function initTable($override = false) {
 
-		$this->table =  new ilParticipationCertificateTableGUIConfig($this,ilParticipationCertificateTableGUI::CMD_CONTENT);
+		$this->table = new ilParticipationCertificateTableGUIConfig($this, ilParticipationCertificateTableGUI::CMD_CONTENT);
 	}
-
-
-
-
-
 }
+?>

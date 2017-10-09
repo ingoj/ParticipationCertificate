@@ -52,7 +52,7 @@ class ilParticipationCertificateResultModificationGUI {
 		$this->learnGroup = ilObjectFactory::getInstanceByRefId($_GET['ref_id']);
 		$this->ctrl->saveParameterByClass('ilParticipationCertificateResultModificationGUI', [ 'ref_id', 'group_id' ]);
 
-		$this->ctrl->saveParameterByClass('ilParticipationCertificateTableGUI','usr_id');
+		$this->ctrl->saveParameterByClass('ilParticipationCertificateTableGUI', 'usr_id');
 		$cert_access = new ilParticipationCertificateAccess($group_ref_id);
 		$this->usr_ids = $cert_access->getUserIdsOfGroup();
 		$usr_id = $_GET[self::IDENTIFIER];
@@ -168,25 +168,24 @@ class ilParticipationCertificateResultModificationGUI {
 		$form->setValuesByPost();
 		$form->checkInput();
 
-		$array = array($form->getInput('initial'),$form->getInput('resultstest'),$form->getInput('conf'),$form->getInput('homework'));
+		$array = array( $form->getInput('initial'), $form->getInput('resultstest'), $form->getInput('conf'), $form->getInput('homework') );
 		$edited = true;
 		$usr_id = $this->usr_id;
-		$twigParser = new ilParticipationCertificateTwigParser($this->groupRefId, array(), true,true);
-		$twigParser->parseDataSolo($edited,$array,$usr_id);
+		$twigParser = new ilParticipationCertificateTwigParser($this->groupRefId, array(), true, true);
+		$twigParser->parseDataSolo($edited, $array, $usr_id);
 	}
+
 
 	public function printPDFpure() {
 		$form = $this->initForm();
 		$form->setValuesByPost();
 		$form->checkInput();
 
-		$array = array($form->getInput('initial'),$form->getInput('resultstest'),$form->getInput('conf'),$form->getInput('homework'));
+		$array = array( $form->getInput('initial'), $form->getInput('resultstest'), $form->getInput('conf'), $form->getInput('homework') );
 		$edited = false;
 		$usr_id = $this->usr_id;
-		$twigParser = new ilParticipationCertificateTwigParser($this->groupRefId,array(),true,false);
-		$twigParser->parseDataSolo($edited,$array,$usr_id);
+		$twigParser = new ilParticipationCertificateTwigParser($this->groupRefId, array(), true, false);
+		$twigParser->parseDataSolo($edited, $array, $usr_id);
 	}
-
-
-
 }
+?>

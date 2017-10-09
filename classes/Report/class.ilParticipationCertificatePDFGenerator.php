@@ -86,11 +86,9 @@ class ilParticipationCertificatePDFGenerator {
 			$mpdf->Output('Teilnahmebescheinigungen' . '.pdf', 'D');
 			$this->tpl->getStandardTemplate();
 			$this->ctrl->redirectByClass(ilParticipationCertificateTableGUI::class, ilParticipationCertificateTableGUI::CMD_INIT_TABLE);
-		}
-		/*Wenn es nicht der erste oder letzte Durchlauf ist, wird ein neues PDF erzeugt. Die bereits erzeugten PDF auf dem Server
+		} /*Wenn es nicht der erste oder letzte Durchlauf ist, wird ein neues PDF erzeugt. Die bereits erzeugten PDF auf dem Server
 		 *werden hinten angehängt. Danach wird es wieder auf dem Server gespeichert um im nächsten Durchlauf wieder anzuhängen.
-		 */
-		else {
+		 */ else {
 			$mpdf->WriteHTML($css, 1);
 			$mpdf->WriteHTML($rendered, 2);
 			$mpdf->SetImportUse();
@@ -104,4 +102,4 @@ class ilParticipationCertificatePDFGenerator {
 		}
 	}
 }
-
+?>

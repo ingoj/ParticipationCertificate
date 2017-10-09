@@ -194,3 +194,4 @@ class ilParticipationCertificateTableResultGUIConfig extends ilTable2GUI {
 	public function fillInfos() {
 	}
 }
+?>

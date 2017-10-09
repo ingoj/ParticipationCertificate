@@ -1,8 +1,6 @@
 <?php
 
-
 require_once './Services/Table/classes/class.ilTable2GUI.php';
-
 
 class ilParticipationCertificteTableGUI extends ilTable2GUI {
 
@@ -18,15 +16,11 @@ class ilParticipationCertificteTableGUI extends ilTable2GUI {
 	 * @var array
 	 */
 	protected $filter = array();
-
-
 	protected static $available_columns = array(
 		'title',
 		'description',
 		'name',
 
 	);
-
-
-
 }
+?>
