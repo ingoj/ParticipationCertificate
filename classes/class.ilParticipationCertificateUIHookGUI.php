@@ -43,11 +43,11 @@ class ilParticipationCertificateUIHookGUI extends ilUIHookPluginGUI {
 				 * @var ilTabsGUI $tabs
 				 */
 				$tabs = $a_par["tabs"];
-				$this->ctrl->saveParameterByClass('ilParticipationCertificateTableGUI', 'ref_id');
+				$this->ctrl->saveParameterByClass('ilParticipationCertificateResultGUI', 'ref_id');
 				$tabs->addTab('certificates', 'Teilnahmebescheinigungen', $this->ctrl->getLinkTargetByClass(array(
 					'ilUIPluginRouterGUI',
-					'ilParticipationCertificateTableGUI'
-				), ilParticipationCertificateTableGUI::CMD_CONTENT));
+					'ilParticipationCertificateResultGUI'
+				), ilParticipationCertificateResultGUI::CMD_CONTENT));
 			}
 		}
 	}

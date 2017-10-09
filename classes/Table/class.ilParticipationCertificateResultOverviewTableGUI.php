@@ -5,11 +5,11 @@ require_once './Customizing/global/plugins/Services/UIComponent/UserInterfaceHoo
 require_once './Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/ParticipationCertificate/classes/Table/class.ilParticipationCertificateResultOverviewGUI.php';
 
 /**
- * Class ilParticipationCertificateTableGUI
+ * Class ilParticipationCertificateResultGUI
  *
  * @author Silas Stulz <sst@studer-raimann.ch>
  */
-class ilParticipationCertificateTableResultGUIConfig extends ilTable2GUI {
+class ilParticipationCertificateResultOverviewTableGUI extends ilTable2GUI {
 
 	CONST IDENTIFIER = 'usr_id';
 	/**
@@ -21,7 +21,7 @@ class ilParticipationCertificateTableResultGUIConfig extends ilTable2GUI {
 	 */
 	protected $ctrl;
 	/**
-	 * @var ilParticipationCertificateTableGUI
+	 * @var ilParticipationCertificateResultGUI
 	 */
 	protected $parent_obj;
 	/**
@@ -35,9 +35,9 @@ class ilParticipationCertificateTableResultGUIConfig extends ilTable2GUI {
 
 
 	/**
-	 * ilParticipationCertificateTableGUI constructor.
+	 * ilParticipationCertificateResultGUI constructor.
 	 *
-	 * @param ilParticipationCertificateTableGUI $a_parent_obj
+	 * @param ilParticipationCertificateResultGUI $a_parent_obj
 	 * @param string                             $a_parent_cmd
 	 */
 	public function __construct($a_parent_obj, $a_parent_cmd) {
@@ -56,7 +56,7 @@ class ilParticipationCertificateTableResultGUIConfig extends ilTable2GUI {
 		$this->learnGroup = ilObjectFactory::getInstanceByRefId($_GET['ref_id']);
 		$this->ctrl->saveParameterByClass('ilParticipationCertificateResultModificationGUI', [ 'ref_id', 'group_id' ]);
 
-		$this->ctrl->saveParameterByClass('ilParticipationCertificateTableGUI', 'usr_id');
+		$this->ctrl->saveParameterByClass('ilParticipationCertificateResultGUI', 'usr_id');
 		$cert_access = new ilParticipationCertificateAccess($group_ref_id);
 		$this->usr_ids = $cert_access->getUserIdsOfGroup();
 		$usr_id = $_GET[self::IDENTIFIER];

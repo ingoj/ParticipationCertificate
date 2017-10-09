@@ -22,3 +22,4 @@ firstname#:#Vorname
 lastname#:#Nachname
 usr_id#:#UserID
 list_overview#:#Alle Resultate anzeigen
+btn_reset#:#Textwerte für das Formular zurücksetzen
