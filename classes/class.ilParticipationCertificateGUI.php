@@ -70,7 +70,6 @@ class ilParticipationCertificateGUI {
 		$this->tabs = $ilTabs;
 		$this->objectDefinition = $objDefinition;
 		$this->groupRefId = (int)$_GET['ref_id'];
-		$this->groupObjId = ilObject2::_lookupObjectId($this->groupRefId);
 
 		//Access
 		$cert_access = new ilParticipationCertificateAccess($_GET['ref_id']);
@@ -88,6 +87,7 @@ class ilParticipationCertificateGUI {
 	function executeCommand() {
 		$cmd = $this->ctrl->getCmd();
 		$nextClass = $this->ctrl->getNextClass();
+
 		switch ($nextClass) {
 			case 'ilparticipationcertificatepdfgenerator':
 				$ilParticipationCertificatePDFGenerator = new ilParticipationCertificatePDFGenerator();

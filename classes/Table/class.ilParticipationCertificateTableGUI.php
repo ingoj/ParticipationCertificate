@@ -137,7 +137,9 @@ class ilParticipationCertificateTableGUI extends ilTable2GUI {
 				$this->addColumn($v['txt'], $sort, $v['width']);
 			}
 		}
-		$this->addColumn($this->pl->txt('cols_actions'));
+		if(!$this->getExportMode()) {
+			$this->addColumn($this->pl->txt('cols_actions'));
+		}
 
 	}
 
@@ -206,7 +208,7 @@ class ilParticipationCertificateTableGUI extends ilTable2GUI {
 				$row['eMentoring_percentage'] = $arr_excercise_states[$usr_id]->getPassedPercentage() . '%';
 			}
 			else {
-				$row['eMentoring_homework'] = 0 .' ';
+				$row['eMentoring_homework'] = 0;
 				$row['eMentoring_percentage'] = 0 .'%';
 			}
 
@@ -239,15 +241,9 @@ class ilParticipationCertificateTableGUI extends ilTable2GUI {
 
 		foreach ($this->getSelectableColumns() as $k => $v) {
 			if ($this->isColumnSelected($k)) {
-				if ($a_set[$k]) {
 					$this->tpl->setCurrentBlock('td');
 					$this->tpl->setVariable('VALUE', (is_array($a_set[$k]) ? implode(", ", $a_set[$k]) : $a_set[$k]));
 					$this->tpl->parseCurrentBlock();
-				} else {
-					$this->tpl->setCurrentBlock('td');
-					$this->tpl->setVariable('VALUE', '&nbsp;');
-					$this->tpl->parseCurrentBlock();
-				}
 			}
 		}
 		$current_selection_list = new ilAdvancedSelectionListGUI();
@@ -264,6 +260,43 @@ class ilParticipationCertificateTableGUI extends ilTable2GUI {
 		$this->tpl->parseCurrentBlock();
 
 	}
+
+	/**
+	 * @param object $a_worksheet
+	 * @param int    $a_row
+	 * @param array  $a_set
+	 */
+	protected function fillRowExcel(ilExcel $a_excel, &$a_row, $a_set) {
+		$col = 0;
+
+		foreach ($a_set as $key => $value) {
+			if (is_array($value)) {
+				$value = implode(', ', $value);
+			}
+			if ($this->isColumnSelected($key)) {
+				$a_excel->setCell($a_row, $col, strip_tags($value));
+				$col ++;
+			}
+		}
+	}
+
+	/**
+	 * @param object $a_csv
+	 * @param array  $a_set
+	 */
+	protected function fillRowCSV($a_csv, $a_set) {
+		foreach ($a_set as $key => $value) {
+			if (is_array($value)) {
+				$value = implode(', ', $value);
+			}
+			if ($this->isColumnSelected($key)) {
+				$a_csv->addColumn(strip_tags($value));
+			}
+		}
+		$a_csv->addRow();
+	}
+
+
 
 
 	public function initFilter() {

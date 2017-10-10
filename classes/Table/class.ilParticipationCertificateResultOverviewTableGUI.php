@@ -50,19 +50,23 @@ class ilParticipationCertificateResultOverviewTableGUI extends ilTable2GUI {
 		$this->setFormName('dhbw_part_cert_res');
 		$this->setId('dhbw_part_cert_res');
 
-		$this->groupRefId = (int)$_GET['ref_id'];
-		$group_ref_id = $this->groupRefId;
-		$this->groupObjId = ilObject2::_lookupObjectId($this->groupRefId);
-		$this->learnGroup = ilObjectFactory::getInstanceByRefId($_GET['ref_id']);
+
+		$group_ref_id = (int)$_GET['ref_id'];
+
+
 		$this->ctrl->saveParameterByClass('ilParticipationCertificateResultModificationGUI', [ 'ref_id', 'group_id' ]);
 
 		$this->ctrl->saveParameterByClass('ilParticipationCertificateResultGUI', 'usr_id');
+
 		$cert_access = new ilParticipationCertificateAccess($group_ref_id);
-		$this->usr_ids = $cert_access->getUserIdsOfGroup();
+
+		$usr_ids = $cert_access->getUserIdsOfGroup();
+
 		$usr_id = $_GET[self::IDENTIFIER];
 		$this->usr_id = $usr_id;
 
-		$arr_usr_data = ilPartCertUsersData::getData($this->usr_ids);
+		$arr_usr_data = ilPartCertUsersData::getData($usr_ids);
+
 		$nameUser = $arr_usr_data[$usr_id]->getPartCertFirstname() . ' ' . $arr_usr_data[$usr_id]->getPartCertLastname();
 
 		parent::__construct($a_parent_obj, $a_parent_cmd);

@@ -49,17 +49,18 @@ class ilParticipationCertificateResultGUI {
 		$this->tpl = $tpl;
 		$this->pl = ilParticipationCertificatePlugin::getInstance();
 
-		$this->usr_ids;
+		//$this->usr_ids;
 
 		$this->groupRefId = (int)$_GET['ref_id'];
-		$this->groupObjId = ilObject2::_lookupObjectId($this->groupRefId);
 		$this->learnGroup = ilObjectFactory::getInstanceByRefId($_GET['ref_id']);
+
 		$this->ctrl->saveParameterByClass('ilParticipationCertificateResultGUI', [ 'ref_id', 'group_id' ]);
 	}
 
 
 	public function executeCommand() {
 		$nextClass = $this->ctrl->getNextClass();
+
 		switch ($nextClass) {
 			case 'ilparticipationcertificateresultmodificationgui':
 				$ilparticipationcertificateresultmodificationgui = new ilParticipationCertificateResultModificationGUI();
