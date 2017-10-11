@@ -23,3 +23,17 @@ lastname#:#Nachname
 usr_id#:#UserID
 list_overview#:#Alle Resultate anzeigen
 btn_reset#:#Textwerte für das Formular zurücksetzen
+result_for#:#Alle Resultate für
+no_records_selected#:#Keine User ausgewählt
+upload_header #:# Laden Sie Ihren PDF Header hoch
+save#:#Speichern
+udf_gender#:#Benutzerdefiniertes Feld Geschlecht
+udf_lastname#:#Benutzerdefiniertes Feld Nachnamen
+udf_firstname#:#Benutzerdefiniertes Feld Vornamen
+config_plugin#:#Konfiguration Teilnahmebescheinigung
+mod_initial#:#Einstiegstest abgeschlossen (Ja(1)/Nein(0) )
+mod_resultstest#:#Resultat qualifizierende Tests (Prozentwert)
+mod_conf#:#Bearbeitung der Aufgaben zu überfachlichen Themen (Ja(1)/Nein(0) )
+mod_homework#:#Bearbeitung der aufgaben zu überfachlichen Themen (Prozentwert)
+print_pdf#:#PDF Drucken
+plugin#:#Teilnahmebescheinigungen

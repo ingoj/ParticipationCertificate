@@ -1,15 +1,15 @@
 <?php
 
 require_once './Services/Table/classes/class.ilTable2GUI.php';
-require_once './Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/ParticipationCertificate/classes/Table/class.ilParticipationCertificateResultModificationGUI.php';
-require_once './Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/ParticipationCertificate/classes/Table/class.ilParticipationCertificateResultOverviewGUI.php';
+require_once './Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/ParticipationCertificate/classes/class.ilParticipationCertificateResultModificationGUI.php';
+require_once './Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/ParticipationCertificate/classes/SingleResultTable/class.ilParticipationCertificateSingleResultGUI.php';
 
 /**
  * Class ilParticipationCertificateResultGUI
  *
  * @author Silas Stulz <sst@studer-raimann.ch>
  */
-class ilParticipationCertificateResultOverviewTableGUI extends ilTable2GUI {
+class ilParticipationCertificateSingleResultTableGUI extends ilTable2GUI {
 
 	CONST IDENTIFIER = 'usr_id';
 	/**
@@ -60,28 +60,27 @@ class ilParticipationCertificateResultOverviewTableGUI extends ilTable2GUI {
 
 		$cert_access = new ilParticipationCertificateAccess($group_ref_id);
 
-		$usr_ids = $cert_access->getUserIdsOfGroup();
+		$this->usr_ids = $cert_access->getUserIdsOfGroup();
 
 		$usr_id = $_GET[self::IDENTIFIER];
 		$this->usr_id = $usr_id;
 
-		$arr_usr_data = ilPartCertUsersData::getData($usr_ids);
+		$arr_usr_data = ilPartCertUsersData::getData($this->usr_ids);
 
-		$nameUser = $arr_usr_data[$usr_id]->getPartCertFirstname() . ' ' . $arr_usr_data[$usr_id]->getPartCertLastname();
 
 		parent::__construct($a_parent_obj, $a_parent_cmd);
 
+		$this->getEnableHeader();
 		$this->pl = ilParticipationCertificatePlugin::getInstance();
 
 		$this->setRowTemplate('tpl.default_row.html', $this->pl->getDirectory());
-
 		$this->setFormAction($this->ctrl->getFormAction($a_parent_obj));
 
-		$cert_access = new ilParticipationCertificateAccess(73);
+		$cert_access = new ilParticipationCertificateAccess($_GET['ref_id']);
 		$this->usr_ids = $cert_access->getUserIdsOfGroup();
 
-		$this->getEnableHeader();
-		$this->setTitle('Alle Resultate für ' . $nameUser);
+		$nameUser = $arr_usr_data[$usr_id]->getPartCertFirstname() . ' ' . $arr_usr_data[$usr_id]->getPartCertLastname();
+		$this->setTitle($this->pl->txt('result_for ') . $nameUser);
 
 		$this->initFilter();
 
@@ -112,7 +111,7 @@ class ilParticipationCertificateResultOverviewTableGUI extends ilTable2GUI {
 		}
 
 		$cols['results_qualifing_tests'] = array(
-			'txt' => 'Resultate der qualifizierenden Tests',
+			'txt' => $this->pl->txt('cols_results_qualifying'),
 			'default' => true,
 			'width' => 'auto',
 			'sort_field' => 'results_qualifing_tests'

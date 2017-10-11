@@ -14,7 +14,9 @@ require_once './Customizing/global/plugins/Services/UIComponent/UserInterfaceHoo
  *
  * @author            Silas Stulz <sst@studer-raimann.ch>
  *
- * @ilCtrl_isCalledBy ilParticipationCertificateGUI: ilUIPluginRouterGUI, ilParticipationHookGUI, ilParticipationCertificatePDFGenerator, ilParticipationCertificateResultGUI
+ * @ilCtrl_isCalledBy ilParticipationCertificateGUI: ilUIPluginRouterGUI
+ *
+ * @ilCtrl_Calls ilParticipationCertificateGUI: ilParticipationCertificateResultGUI
  */
 class ilParticipationCertificateGUI {
 
@@ -163,7 +165,7 @@ class ilParticipationCertificateGUI {
 
 		$form->setFormAction($this->ctrl->getFormAction($this));
 
-		$form->setTitle('Konfiguration Teilnahmebescheinigung');
+		$form->setTitle($this->pl->txt('config_plugin'));
 		$form->setDescription('Folgende Platzhalter sind verfügbar: <br>
 		&lbrace;&lbrace;username&rbrace;&rbrace;: Anrede Vorname Nachname <br>
 		&lbrace;&lbrace;date&rbrace;&rbrace;: Datum
@@ -185,7 +187,7 @@ class ilParticipationCertificateGUI {
 		}
 
 		$this->ctrl->saveParameterByClass('ilObjGroup', 'ref_id');
-		$form->addCommandButton(ilParticipationCertificateGUI::CMD_SAVE, 'Speichern');
+		$form->addCommandButton(ilParticipationCertificateGUI::CMD_SAVE, $this->pl->txt('save'));
 
 		return $form;
 	}

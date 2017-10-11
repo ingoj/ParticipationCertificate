@@ -12,7 +12,6 @@ require_once './Services/Form/classes/class.ilPropertyFormGUI.php';
  *
  * @author       Silas Stulz <sst@studer-raimann.ch>
  *
- * @ilCtrl_Calls ilParticipationCertificateConfigGUI: ilParticipationCertificatePDFGenerator
  */
 
 
@@ -139,7 +138,7 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI {
 			$form->addItem($input);
 		}
 
-		$uploadfield = new ilFileInputGUI('Laden Sie Ihren PDF Header hoch', 'headerpic');
+		$uploadfield = new ilFileInputGUI($this->pl->txt('upload_header'), 'headerpic');
 		$uploadfield->setSuffixes(array( 'png' ));
 		$form->addItem($uploadfield);
 
@@ -150,7 +149,7 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI {
 		if(is_object($obj_value)) {
 			$value = $obj_value->getConfigValue();
 		}
-		$select = new ilSelectInputGUI('Benutzerdefiniertes Feld Vornamen', 'udf_firstname');
+		$select = new ilSelectInputGUI($this->pl->txt('Benutzerdefiniertes Feld Vornamen'), 'udf_firstname');
 		$select->setOptions($options);
 		$select->setValue($value);
 		$form->addItem($select);
@@ -160,7 +159,7 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI {
 		if(is_object($obj_value)) {
 			$value = $obj_value->getConfigValue();
 		}
-		$select = new ilSelectInputGUI('Benutzerdefiniertes Feld Nachnamen', 'udf_lastname');
+		$select = new ilSelectInputGUI($this->pl->txt('Benutzerdefiniertes Feld Nachnamen'), 'udf_lastname');
 		$select->setOptions($options);
 		$select->setValue($value);
 		$form->addItem($select);
@@ -170,12 +169,12 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI {
 		if(is_object($obj_value)) {
 			$value = $obj_value->getConfigValue();
 		}
-		$select = new ilSelectInputGUI('Benutzerdefiniertes Feld Geschlecht', 'udf_gender');
+		$select = new ilSelectInputGUI($this->pl->txt('Benutzerdefiniertes Feld Geschlecht'), 'udf_gender');
 		$select->setOptions($options);
 		$select->setValue($value);
 		$form->addItem($select);
 
-		$form->addCommandButton(ilParticipationCertificateConfigGUI::CMD_SAVE, 'Speichern');
+		$form->addCommandButton(ilParticipationCertificateConfigGUI::CMD_SAVE, $this->pl->txt('save'));
 
 		return $form;
 	}

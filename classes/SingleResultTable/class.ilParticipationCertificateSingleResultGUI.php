@@ -2,15 +2,15 @@
 
 require_once './Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/ParticipationCertificate/classes/class.ilParticipationCertificateGUI.php';
 require_once './Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/ParticipationCertificate/classes/Table/class.ilParticipationCertificateResultGUI.php';
-require_once './Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/ParticipationCertificate/classes/Table/class.ilParticipationCertificateResultOverviewTableGUI.php';
+require_once './Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/ParticipationCertificate/classes/SingleResultTable/class.ilParticipationCertificateSingleResultTableGUI.php';
 
 /**
- * Class ilParticipationCertificateResultOverviewGUI
+ * Class ilParticipationCertificateSingleResultGUI
  *
  * @author            Silas Stulz <sst@studer-raimann.ch>
- * @ilCtrl_isCalledBy ilParticipationCertificateResultOverviewGUI: ilParticipationCertificateResultGUI, ilUIPluginRouterGUI
+ * @ilCtrl_isCalledBy ilParticipationCertificateSingleResultGUI: ilUIPluginRouterGUI
  */
-class ilParticipationCertificateResultOverviewGUI {
+class ilParticipationCertificateSingleResultGUI {
 
 	CONST CMD_DISPLAY = 'display';
 	CONST IDENTIFIER = 'usr_id';
@@ -44,16 +44,14 @@ class ilParticipationCertificateResultOverviewGUI {
 		$this->tabs = $ilTabs;
 		$this->tpl = $tpl;
 		$this->pl = ilParticipationCertificatePlugin::getInstance();
-
-		$this->groupRefId = (int)$_GET['ref_id'];
-		$group_ref_id = $this->groupRefId;
-		$this->groupObjId = ilObject2::_lookupObjectId($this->groupRefId);
 		$this->learnGroup = ilObjectFactory::getInstanceByRefId($_GET['ref_id']);
-		$this->ctrl->saveParameterByClass('ilParticipationCertificateResultModificationGUI', [ 'ref_id', 'group_id' ]);
 
+		$this->ctrl->saveParameterByClass('ilParticipationCertificateResultModificationGUI', [ 'ref_id', 'group_id' ]);
 		$this->ctrl->saveParameterByClass('ilParticipationCertificateResultGUI', 'usr_id');
-		$cert_access = new ilParticipationCertificateAccess($group_ref_id);
+
+		$cert_access = new ilParticipationCertificateAccess($_GET['ref_id']);
 		$this->usr_ids = $cert_access->getUserIdsOfGroup();
+
 		$usr_id = $_GET[self::IDENTIFIER];
 		$this->usr_id = $usr_id;
 
@@ -70,10 +68,6 @@ class ilParticipationCertificateResultOverviewGUI {
 	public function executeCommand() {
 		$nextClass = $this->ctrl->getNextClass();
 		switch ($nextClass) {
-			default:
-				$cmd = $this->ctrl->getCmd(self::CMD_DISPLAY);
-				$this->{$cmd}();
-				break;
 			case 'ilparticipationcertificateresultegui':
 				$ilParticipationCertificateResultGUI = new ilParticipationCertificateResultGUI();
 				$this->ctrl->forwardCommand($ilParticipationCertificateResultGUI);
@@ -83,8 +77,11 @@ class ilParticipationCertificateResultOverviewGUI {
 				$ret2 = $this->ctrl->forwardCommand($ilParticipationCertificateGUI);
 				$this->tabs->setTabActive(ilParticipationCertificateGUI::CMD_CONFIG);
 				break;
+			default:
+				$cmd = $this->ctrl->getCmd(self::CMD_DISPLAY);
+				$this->{$cmd}();
+				break;
 		}
-		//$this->tpl->show();
 	}
 
 
@@ -105,13 +102,13 @@ class ilParticipationCertificateResultOverviewGUI {
 		$this->tpl->setTitleIcon(ilObject::_getIcon($this->learnGroup->getId()));
 
 		$this->ctrl->saveParameterByClass('ilParticipationCertificateResultGUI', 'ref_id');
-		$this->tabs->setBackTarget('Zurück', $this->ctrl->getLinkTargetByClass(ilParticipationCertificateResultGUI::class, ilParticipationCertificateResultGUI::CMD_CONTENT));
+		$this->tabs->setBackTarget($this->pl->txt('header_btn_back'), $this->ctrl->getLinkTargetByClass(ilParticipationCertificateResultGUI::class, ilParticipationCertificateResultGUI::CMD_CONTENT));
 	}
 
 
 	public function initTable() {
 
-		$this->table = new ilParticipationCertificateResultOverviewTableGUI($this, ilParticipationCertificateResultOverviewGUI::CMD_DISPLAY);
+		$this->table = new ilParticipationCertificateSingleResultTableGUI($this, ilParticipationCertificateSingleResultGUI::CMD_DISPLAY);
 	}
 }
 ?>

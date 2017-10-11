@@ -1,12 +1,15 @@
 <?php
-require_once './Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/ParticipationCertificate/classes/Table/class.ilParticipationCertificateTableGUI.php';
+require_once './Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/ParticipationCertificate/classes/Table/class.ilParticipationCertificateResultTableGUI.php';
 require_once './Services/UIComponent/AdvancedSelectionList/classes/class.ilAdvancedSelectionListGUI.php';
-require_once './Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/ParticipationCertificate/classes/Table/class.ilParticipationCertificateResultModificationGUI.php';
+require_once './Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/ParticipationCertificate/classes/class.ilParticipationCertificateResultModificationGUI.php';
 
 /**
  * Class ilParticipationCertificateResultGUI
  *
- * @ilCtrl_isCalledBy ilParticipationCertificateResultGUI: ilParticipationCertificateGUI, ilUIPluginRouterGUI, ilParticipationCertificateResultModificationGUI
+ * @ilCtrl_isCalledBy ilParticipationCertificateResultGUI: ilUIPluginRouterGUI
+ *
+ * @ilCtrl_Calls ilParticipationCertificateResultGUI: ilParticipationCertificateSingleResultGUI, ilParticipationCertificateGUI, ilParticipationCertificateResultModificationGUI
+ *
  */
 class ilParticipationCertificateResultGUI {
 
@@ -35,6 +38,14 @@ class ilParticipationCertificateResultGUI {
 	 * @var ilParticipationCertificatePlugin
 	 */
 	protected $pl;
+	/**
+	 * @var int
+	 */
+	protected $groupRefId;
+	/**
+	 * @var object
+	 */
+	protected $learnGroup;
 
 
 	/**
@@ -48,12 +59,8 @@ class ilParticipationCertificateResultGUI {
 		$this->ctrl = $ilCtrl;
 		$this->tpl = $tpl;
 		$this->pl = ilParticipationCertificatePlugin::getInstance();
-
-		//$this->usr_ids;
-
 		$this->groupRefId = (int)$_GET['ref_id'];
 		$this->learnGroup = ilObjectFactory::getInstanceByRefId($_GET['ref_id']);
-
 		$this->ctrl->saveParameterByClass('ilParticipationCertificateResultGUI', [ 'ref_id', 'group_id' ]);
 	}
 
@@ -66,19 +73,19 @@ class ilParticipationCertificateResultGUI {
 				$ilparticipationcertificateresultmodificationgui = new ilParticipationCertificateResultModificationGUI();
 				$ret1 = $this->ctrl->forwardCommand($ilparticipationcertificateresultmodificationgui);
 				break;
-			default:
-				$cmd = $this->ctrl->getCmd(self::CMD_CONTENT);
-				$this->tabs->setTabActive(self::CMD_OVERVIEW);
-				$this->{$cmd}();
-				break;
 			case 'ilparticipationcertificategui':
 				$ilParticipationCertificateGUI = new ilParticipationCertificateGUI();
 				$ret2 = $this->ctrl->forwardCommand($ilParticipationCertificateGUI);
 				$this->tabs->setTabActive(self::CMD_OVERVIEW);
 				break;
-			case 'ilparticipationcertificateresultoverviewgui':
-				$ilparticipationcertificateresultoverviewgui = new ilParticipationCertificateResultOverviewGUI();
+			case 'ilparticipationcertificatesingleresultgui':
+				$ilparticipationcertificateresultoverviewgui = new ilParticipationCertificateSingleResultGUI();
 				$ret3 = $this->ctrl->forwardCommand($ilparticipationcertificateresultoverviewgui);
+				break;
+			default:
+				$cmd = $this->ctrl->getCmd(self::CMD_CONTENT);
+				$this->tabs->setTabActive(self::CMD_OVERVIEW);
+				$this->{$cmd}();
 				break;
 		}
 	}
@@ -134,10 +141,9 @@ class ilParticipationCertificateResultGUI {
 
 	public function printSelected() {
 		if (!isset($_POST['record_ids']) || (isset($_POST['record_ids']) && !count($_POST['record_ids']))) {
-			ilUtil::sendInfo('No Records selected');
-			$this->initTable();
+			ilUtil::sendFailure($this->pl->txt('no_records_selected'),true);
+			$this->ctrl->redirect($this, self::CMD_CONTENT);
 
-			return;
 		}
 		$this->usr_ids = ($_POST['record_ids']);
 
@@ -148,14 +154,7 @@ class ilParticipationCertificateResultGUI {
 
 
 	public function applyFilter() {
-		/*$this->initTable();
-
-		$this->table->writeFilterToSession();
-		$this->table->resetOffset();
-
-		$this->content();*/
-
-		$table = new ilParticipationCertificateTableGUI($this, self::CMD_CONTENT);
+		$table = new ilParticipationCertificateResultTableGUI($this, self::CMD_CONTENT);
 		$table->writeFilterToSession();
 		$table->resetOffset();
 		$this->ctrl->redirect($this, self::CMD_CONTENT);
@@ -163,13 +162,7 @@ class ilParticipationCertificateResultGUI {
 
 
 	public function resetFilter() {
-		/*$this->initTable();
-
-		$this->table->resetOffset();
-		$this->table->resetFilter();
-
-		$this->content();*/
-		$table = new ilParticipationCertificateTableGUI($this, self::CMD_CONTENT);
+		$table = new ilParticipationCertificateResultTableGUI($this, self::CMD_CONTENT);
 		$table->resetOffset();
 		$table->resetFilter();
 		$this->ctrl->redirect($this, self::CMD_CONTENT);
@@ -178,7 +171,8 @@ class ilParticipationCertificateResultGUI {
 
 	protected function initTable($override = false) {
 
-		$this->table = new ilParticipationCertificateTableGUI($this, ilParticipationCertificateResultGUI::CMD_CONTENT);
+		$this->table = new ilParticipationCertificateResultTableGUI($this, ilParticipationCertificateResultGUI::CMD_CONTENT);
 	}
 }
+
 ?>

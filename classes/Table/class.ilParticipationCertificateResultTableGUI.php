@@ -1,17 +1,17 @@
 <?php
 
 require_once './Services/Table/classes/class.ilTable2GUI.php';
-require_once './Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/ParticipationCertificate/classes/Table/class.ilParticipationCertificateResultModificationGUI.php';
-require_once './Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/ParticipationCertificate/classes/Table/class.ilParticipationCertificateResultOverviewGUI.php';
+require_once './Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/ParticipationCertificate/classes/class.ilParticipationCertificateResultModificationGUI.php';
+require_once './Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/ParticipationCertificate/classes/SingleResultTable/class.ilParticipationCertificateSingleResultGUI.php';
+
 /**
  * Class ilParticipationCertificateResultGUI
  *
  * @author Silas Stulz <sst@studer-raimann.ch>
  */
-class ilParticipationCertificateTableGUI extends ilTable2GUI {
+class ilParticipationCertificateResultTableGUI extends ilTable2GUI {
 
 	CONST IDENTIFIER = 'ilpartusr';
-
 	/**
 	 * @var ilTabsGUI
 	 */
@@ -32,7 +32,6 @@ class ilParticipationCertificateTableGUI extends ilTable2GUI {
 	 * @var array
 	 */
 	protected $filter = array();
-
 	protected $custom_export_formats = array();
 	protected $custom_export_generators = array();
 
@@ -41,7 +40,7 @@ class ilParticipationCertificateTableGUI extends ilTable2GUI {
 	 * ilParticipationCertificateResultGUI constructor.
 	 *
 	 * @param ilParticipationCertificateResultGUI $a_parent_obj
-	 * @param string                             $a_parent_cmd
+	 * @param string                              $a_parent_cmd
 	 */
 	public function __construct($a_parent_obj, $a_parent_cmd) {
 		global $ilCtrl, $tabs;
@@ -52,6 +51,7 @@ class ilParticipationCertificateTableGUI extends ilTable2GUI {
 		$this->setPrefix('dhbw_part_cert');
 		$this->setFormName('dhbw_part_cert');
 		$this->setId('dhbw_part_cert');
+
 		$cert_access = new ilParticipationCertificateAccess($_GET['ref_id']);
 		$this->usr_ids = $cert_access->getUserIdsOfGroup();
 
@@ -61,20 +61,18 @@ class ilParticipationCertificateTableGUI extends ilTable2GUI {
 
 		$this->getEnableHeader();
 		$this->setTitle($this->pl->txt('tbl_overview_results'));
-
-		$this->setExportFormats(array(self::EXPORT_EXCEL, self::EXPORT_CSV));
+		$this->setExportFormats(array( self::EXPORT_EXCEL, self::EXPORT_CSV ));
 
 		$this->addColumns();
 		$this->initFilter();
 
 		$this->setSelectAllCheckbox('record_ids');
-		$this->addMultiCommand('printSelected', 'Print');
+		$this->addMultiCommand('printSelected', $this->pl->txt('list_print'));
 
 		$this->setRowTemplate('tpl.default_row.html', $this->pl->getDirectory());
 		$this->setFormAction($this->ctrl->getFormAction($a_parent_obj));
 
 		$this->parseData();
-
 	}
 
 
@@ -87,7 +85,7 @@ class ilParticipationCertificateTableGUI extends ilTable2GUI {
 
 
 		$cols = array();
-		$cols['usr_id'] = array( 'txt' => 'usr_id', 'default' => false, 'width' => 'auto', 'sort_field' => 'usr_id' );
+		//$cols['usr_id'] = array( 'txt' => 'usr_id', 'default' => false, 'width' => 'auto', 'sort_field' => 'usr_id' );
 		$cols['firstname'] = array( 'txt' => 'Vorname', 'default' => true, 'width' => 'auto', 'sort_field' => 'firstname' );
 		$cols['lastname'] = array( 'txt' => 'Nachname', 'default' => true, 'width' => 'auto', 'sort_field' => 'lastname' );
 		$cols['initial_test_finished'] = array(
@@ -137,10 +135,9 @@ class ilParticipationCertificateTableGUI extends ilTable2GUI {
 				$this->addColumn($v['txt'], $sort, $v['width']);
 			}
 		}
-		if(!$this->getExportMode()) {
+		if (!$this->getExportMode()) {
 			$this->addColumn($this->pl->txt('cols_actions'));
 		}
-
 	}
 
 
@@ -152,8 +149,6 @@ class ilParticipationCertificateTableGUI extends ilTable2GUI {
 		$arr_learn_reached_percentages = ilLearnObjectSuggReachedPercentages::getData($this->usr_ids);
 		$arr_iass_states = ilIassStates::getData($this->usr_ids);
 		$arr_excercise_states = ilExcerciseStates::getData($this->usr_ids);
-		$arr_FinalTestsStates = ilLearnObjectFinalTestStates::getData($this->usr_ids);
-		$array_obj_ids = ilLearnObjectFinalTestStates::getData($this->usr_ids);
 
 		$rows = array();
 		foreach ($this->usr_ids as $usr_id) {
@@ -169,15 +164,13 @@ class ilParticipationCertificateTableGUI extends ilTable2GUI {
 				} else {
 					$row['initial_test_finished'] = 'Nein';
 				}
-			}
-			else {
+			} else {
 				$row['initial_test_finished'] = 'Nein';
 			}
 			if (is_object($arr_learn_reached_percentages[$usr_id])) {
 				$row['result_qualifing_tests'] = $arr_learn_reached_percentages[$usr_id]->getAveragePercentage() . '%';
-			}
-			else{
-				$row['result_qualifing_tests'] = 0 .'%';
+			} else {
+				$row['result_qualifing_tests'] = 0 . '%';
 			}
 			if (is_object($arr_iass_states[$usr_id])) {
 				$row['eMentoring_finished'] = $arr_iass_states[$usr_id]->getPassed();
@@ -187,29 +180,27 @@ class ilParticipationCertificateTableGUI extends ilTable2GUI {
 				} else {
 					$row['eMentoring_finished'] = 'Nein';
 				}
-			}
-			else{
+			} else {
 				$row['eMentoring_finished'] = 'Nein';
 			}
-/*
-			if (is_array($arr_FinalTestsStates[$usr_id])) {
+			/*
+						if (is_array($arr_FinalTestsStates[$usr_id])) {
 
-				foreach ($arr_FinalTestsStates[$usr_id] as $rec) {
-					$rec_array[] = $rec->getLocFtestTestTitle();
-					array_push($rec_array, $rec->getLocftestPercentage());
-					array_push($rec_array, '<br>');
-				}
-				$array_results = $rec_array;
-				$row['results_qualifing_tests'] = $array_results;
-			}*/
+							foreach ($arr_FinalTestsStates[$usr_id] as $rec) {
+								$rec_array[] = $rec->getLocFtestTestTitle();
+								array_push($rec_array, $rec->getLocftestPercentage());
+								array_push($rec_array, '<br>');
+							}
+							$array_results = $rec_array;
+							$row['results_qualifing_tests'] = $array_results;
+						}*/
 
 			if (is_object($arr_iass_states[$usr_id])) {
 				$row['eMentoring_homework'] = $arr_excercise_states[$usr_id]->getPassed();
 				$row['eMentoring_percentage'] = $arr_excercise_states[$usr_id]->getPassedPercentage() . '%';
-			}
-			else {
+			} else {
 				$row['eMentoring_homework'] = 0;
-				$row['eMentoring_percentage'] = 0 .'%';
+				$row['eMentoring_percentage'] = 0 . '%';
 			}
 
 			if ($this->filter['firstname'] != false) {
@@ -240,10 +231,14 @@ class ilParticipationCertificateTableGUI extends ilTable2GUI {
 		$this->tpl->parseCurrentBlock();
 
 		foreach ($this->getSelectableColumns() as $k => $v) {
-			if ($this->isColumnSelected($k)) {
-					$this->tpl->setCurrentBlock('td');
-					$this->tpl->setVariable('VALUE', (is_array($a_set[$k]) ? implode(", ", $a_set[$k]) : $a_set[$k]));
-					$this->tpl->parseCurrentBlock();
+			if ($a_set[$k]) {
+				$this->tpl->setCurrentBlock('td');
+				$this->tpl->setVariable('VALUE', (is_array($a_set[$k]) ? implode(", ", $a_set[$k]) : $a_set[$k]));
+				$this->tpl->parseCurrentBlock();
+			} else {
+				$this->tpl->setCurrentBlock('td');
+				$this->tpl->setVariable('VALUE', '&nbsp;');
+				$this->tpl->parseCurrentBlock();
 			}
 		}
 		$current_selection_list = new ilAdvancedSelectionListGUI();
@@ -254,12 +249,12 @@ class ilParticipationCertificateTableGUI extends ilTable2GUI {
 
 		$current_selection_list->addItem($this->pl->txt('list_results'), ilParticipationCertificateResultModificationGUI::CMD_DISPLAY, $this->ctrl->getLinkTargetByClass(ilParticipationCertificateResultModificationGUI::class, ilParticipationCertificateResultModificationGUI::CMD_DISPLAY));
 		$current_selection_list->addItem($this->pl->txt('list_print'), ilParticipationCertificateResultModificationGUI::CMD_PRINT_PURE, $this->ctrl->getLinkTargetByClass(ilParticipationCertificateResultModificationGUI::class, ilParticipationCertificateResultModificationGUI::CMD_PRINT_PURE));
-		$current_selection_list->addItem($this->pl->txt('list_overview'), ilParticipationCertificateResultOverviewGUI::CMD_DISPLAY, $this->ctrl->getLinkTargetByClass(ilParticipationCertificateResultOverviewGUI::class, ilParticipationCertificateResultOverviewGUI::CMD_DISPLAY));
+		$current_selection_list->addItem($this->pl->txt('list_overview'), ilParticipationCertificateSingleResultGUI::CMD_DISPLAY, $this->ctrl->getLinkTargetByClass(ilParticipationCertificateSingleResultGUI::class, ilParticipationCertificateSingleResultGUI::CMD_DISPLAY));
 
 		$this->tpl->setVariable('ACTIONS', $current_selection_list->getHTML());
 		$this->tpl->parseCurrentBlock();
-
 	}
+
 
 	/**
 	 * @param object $a_worksheet
@@ -280,6 +275,7 @@ class ilParticipationCertificateTableGUI extends ilTable2GUI {
 		}
 	}
 
+
 	/**
 	 * @param object $a_csv
 	 * @param array  $a_set
@@ -295,8 +291,6 @@ class ilParticipationCertificateTableGUI extends ilTable2GUI {
 		}
 		$a_csv->addRow();
 	}
-
-
 
 
 	public function initFilter() {
@@ -335,12 +329,13 @@ class ilParticipationCertificateTableGUI extends ilTable2GUI {
 
 		$custom_fields = array_diff($formats, $this->export_formats);
 
-		foreach ($custom_fields as $format_key){
-			if (isset($this->custom_export_formats[$format_key])){
+		foreach ($custom_fields as $format_key) {
+			if (isset($this->custom_export_formats[$format_key])) {
 				$this->export_formats[$format_key] = $this->pl->getPrefix() . '_' - $this->custom_export_formats[$format_key];
 			}
 		}
 	}
+
 
 	public function exportData($format, $send = false) {
 		if (array_key_exists($format, $this->custom_export_formats)) {
@@ -358,14 +353,13 @@ class ilParticipationCertificateTableGUI extends ilTable2GUI {
 	}
 
 
-
 	/**
 	 * @param       $export_format_key
 	 * @param       $custom_export_generators
 	 * @param array $params
 	 */
-	public function addCustomExportGenerator($export_format_key, $custom_export_generators, $params = array()){
-		$this->custom_export_generators[$export_format_key] = array('generator' => $custom_export_generators, 'params' => $params);
+	public function addCustomExportGenerator($export_format_key, $custom_export_generators, $params = array()) {
+		$this->custom_export_generators[$export_format_key] = array( 'generator' => $custom_export_generators, 'params' => $params );
 	}
 
 
@@ -373,8 +367,9 @@ class ilParticipationCertificateTableGUI extends ilTable2GUI {
 	 * @param $custom_export_format_key
 	 * @param $custom_export_format_label
 	 */
-	public function addCustomExportFormat($custom_export_format_key, $custom_export_format_label){
+	public function addCustomExportFormat($custom_export_format_key, $custom_export_format_label) {
 		$this->custom_export_formats[$$custom_export_format_key] = $custom_export_format_label;
 	}
 }
+
 ?>
