@@ -7,7 +7,8 @@ require_once './Customizing/global/plugins/Services/UIComponent/UserInterfaceHoo
  * Class ilParticipationCertificateResultModificationGUI
  *
  * @author            Silas Stulz <sst@studer-raimann.ch>
- * @ilCtrl_isCalledBy ilParticipationCertificateResultModificationGUI: ilParticipationCertificateResultGUI, ilUIPluginRouterGUI
+ * @ilCtrl_isCalledBy ilParticipationCertificateResultModificationGUI: ilUIPluginRouterGUI
+ * @ilCtrl_Calls      ilParticipationCertificateResultModificationGUI: ilParticipationCertificateResultGUI
  */
 class ilParticipationCertificateResultModificationGUI {
 
@@ -71,10 +72,6 @@ class ilParticipationCertificateResultModificationGUI {
 	public function executeCommand() {
 		$nextClass = $this->ctrl->getNextClass();
 		switch ($nextClass) {
-			default:
-				$cmd = $this->ctrl->getCmd(self::CMD_DISPLAY);
-				$this->{$cmd}();
-				break;
 			case 'ilparticipationcertificateresultgui':
 				$ilParticipationCertificateresultGUI = new ilParticipationCertificateResultGUI();
 				$this->ctrl->forwardCommand($ilParticipationCertificateresultGUI);
@@ -84,8 +81,11 @@ class ilParticipationCertificateResultModificationGUI {
 				$ret2 = $this->ctrl->forwardCommand($ilParticipationCertificateGUI);
 				$this->tabs->setTabActive(ilParticipationCertificateGUI::CMD_CONFIG);
 				break;
+			default:
+				$cmd = $this->ctrl->getCmd(self::CMD_DISPLAY);
+				$this->{$cmd}();
+				break;
 		}
-		//$this->tpl->show();
 	}
 
 
@@ -119,19 +119,19 @@ class ilParticipationCertificateResultModificationGUI {
 		$form->setFormAction($this->ctrl->getFormAction($this));
 		$form->setTitle('Resultate für ' . $nameUser . ' bearbeiten');
 
-		$initialtest = new ilTextInputGUI('Einstiegstest abgeschlossen (Ja(1)/Nein(0) )', 'initial');
+		$initialtest = new ilTextInputGUI($this->pl->txt('mod_initial'), 'initial');
 		$form->addItem($initialtest);
 
-		$resultstests = new ilTextInputGUI('Resultat qualifizierende Tests (Prozentwert)', 'resultstest');
+		$resultstests = new ilTextInputGUI($this->pl->txt('mod_resultstest'), 'resultstest');
 		$form->addItem($resultstests);
 
-		$conferences = new ilTextInputGUI('Bearbeitung der Aufgaben zu überfachlichen Themen (Ja(1)/Nein(0) )', 'conf');
+		$conferences = new ilTextInputGUI($this->pl->txt('mod_conf'), 'conf');
 		$form->addItem($conferences);
 
-		$homeworks = new ilTextInputGUI('Bearbeitung der aufgaben zu überfachlichen Themen (Prozentwert)', 'homework');
+		$homeworks = new ilTextInputGUI($this->pl->txt('mod_homework'), 'homework');
 		$form->addItem($homeworks);
 
-		$form->addCommandButton(ilParticipationCertificateResultModificationGUI::CMD_PRINT, 'PDF Drucken');
+		$form->addCommandButton(ilParticipationCertificateResultModificationGUI::CMD_PRINT, $this->pl->txt('print_pdf'));
 
 		return $form;
 	}
@@ -151,7 +151,7 @@ class ilParticipationCertificateResultModificationGUI {
 
 		$usr_id = $_GET[self::IDENTIFIER];
 
-		if (is_object($this->arr_initial_test_states[$usr_id])) {
+		if (is_object($this->arr_initial_test_states[$usr_id]) && $this->arr_learn_reached_percentages[$usr_id] && $this->arr_iass_states[$usr_id]&& $this->arr_excercise_states[$usr_id]) {
 			$array = array(
 				'initial' => $this->arr_initial_test_states[$usr_id]->getCrsitestItestSubmitted(),
 				'resultstest' => $this->arr_learn_reached_percentages[$usr_id]->getAveragePercentage(),
@@ -188,4 +188,5 @@ class ilParticipationCertificateResultModificationGUI {
 		$twigParser->parseDataSolo($edited, $array, $usr_id);
 	}
 }
+
 ?>
