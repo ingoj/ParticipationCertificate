@@ -38,54 +38,40 @@ class ilParticipationCertificateSingleResultTableGUI extends ilTable2GUI {
 	 * ilParticipationCertificateResultGUI constructor.
 	 *
 	 * @param ilParticipationCertificateResultGUI $a_parent_obj
-	 * @param string                             $a_parent_cmd
+	 * @param string                              $a_parent_cmd
 	 */
 	public function __construct($a_parent_obj, $a_parent_cmd) {
 		global $ilCtrl, $tabs;
 
 		$this->ctrl = $ilCtrl;
 		$this->tabs = $tabs;
+		$this->pl = ilParticipationCertificatePlugin::getInstance();
 
 		$this->setPrefix('dhbw_part_cert_res');
 		$this->setFormName('dhbw_part_cert_res');
 		$this->setId('dhbw_part_cert_res');
 
-
-		$group_ref_id = (int)$_GET['ref_id'];
-
-
 		$this->ctrl->saveParameterByClass('ilParticipationCertificateResultModificationGUI', [ 'ref_id', 'group_id' ]);
-
 		$this->ctrl->saveParameterByClass('ilParticipationCertificateResultGUI', 'usr_id');
 
-		$cert_access = new ilParticipationCertificateAccess($group_ref_id);
-
+		$cert_access = new ilParticipationCertificateAccess($_GET['ref_id']);
 		$this->usr_ids = $cert_access->getUserIdsOfGroup();
 
 		$usr_id = $_GET[self::IDENTIFIER];
 		$this->usr_id = $usr_id;
 
-		$arr_usr_data = ilPartCertUsersData::getData($this->usr_ids);
-
-
 		parent::__construct($a_parent_obj, $a_parent_cmd);
 
 		$this->getEnableHeader();
-		$this->pl = ilParticipationCertificatePlugin::getInstance();
-
 		$this->setRowTemplate('tpl.default_row.html', $this->pl->getDirectory());
 		$this->setFormAction($this->ctrl->getFormAction($a_parent_obj));
 
-		$cert_access = new ilParticipationCertificateAccess($_GET['ref_id']);
-		$this->usr_ids = $cert_access->getUserIdsOfGroup();
-
+		$arr_usr_data = ilPartCertUsersData::getData($this->usr_ids);
 		$nameUser = $arr_usr_data[$usr_id]->getPartCertFirstname() . ' ' . $arr_usr_data[$usr_id]->getPartCertLastname();
-		$this->setTitle($this->pl->txt('result_for ') . $nameUser);
+		$this->setTitle($this->pl->txt('result_for ') . ' ' . $nameUser);
 
 		$this->initFilter();
-
 		$this->addColumns();
-
 		$this->parseData();
 	}
 
@@ -197,4 +183,5 @@ class ilParticipationCertificateSingleResultTableGUI extends ilTable2GUI {
 	public function fillInfos() {
 	}
 }
+
 ?>

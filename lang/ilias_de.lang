@@ -5,7 +5,7 @@ cols_lastname#:#Nachname
 cols_initial_test_finished#:#Einstiegstest abgeschlossen
 cols_results_qualifying#:#Resultate der qualifizierenden Tests
 cols_result_qualifying#:#Resultat qualifizierende Tests
-cols_eMentoring_finished#:#Bearbeitung der Aufgaben zu überfachlichen Themen
+cols_eMentoring_finished#:#Aktive Teilnahme an Videokonferenzen
 cols_eMentoring_homework#:#Anzahl Hausaufgaben abgegeben
 cols_eMentoring_percentage#:#Bearbeitung der aufgaben zu überfachlichen Themen
 cols_actions#:#Aktion
@@ -36,4 +36,8 @@ mod_resultstest#:#Resultat qualifizierende Tests (Prozentwert)
 mod_conf#:#Bearbeitung der Aufgaben zu überfachlichen Themen (Ja(1)/Nein(0) )
 mod_homework#:#Bearbeitung der aufgaben zu überfachlichen Themen (Prozentwert)
 print_pdf#:#PDF Drucken
+list_print_without#:#Drucken exkl.eMentoring
 plugin#:#Teilnahmebescheinigungen
+success#:#Druck erfolgreich
+successForm#:#Formular erfolgreich zurückgesetzt
+successFormSave#:#Formular erfolgreich gespeichert

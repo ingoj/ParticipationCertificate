@@ -52,7 +52,7 @@ class ilParticipationCertificateResultGUI {
 	 * ilParticipationCertificateResultGUI constructor.
 	 */
 	public function __construct() {
-		global $ilCtrl, $ilTabs, $tpl, $ilToolbar;
+		global $ilCtrl, $ilTabs, $tpl, $ilToolbar, $lng;
 
 		$this->toolbar = $ilToolbar;
 		$this->tabs = $ilTabs;
@@ -61,6 +61,14 @@ class ilParticipationCertificateResultGUI {
 		$this->pl = ilParticipationCertificatePlugin::getInstance();
 		$this->groupRefId = (int)$_GET['ref_id'];
 		$this->learnGroup = ilObjectFactory::getInstanceByRefId($_GET['ref_id']);
+
+		//Access
+		$cert_access = new ilParticipationCertificateAccess($_GET['ref_id']);
+		if (!$cert_access->hasCurrentUserPrintAccess()) {
+			ilUtil::sendFailure($lng->txt('no_permission'), true);
+			ilUtil::redirect('login.php');
+		}
+
 		$this->ctrl->saveParameterByClass('ilParticipationCertificateResultGUI', [ 'ref_id', 'group_id' ]);
 	}
 
@@ -94,6 +102,7 @@ class ilParticipationCertificateResultGUI {
 	public function content() {
 		$this->tpl->getStandardTemplate();
 		$this->initHeader();
+
 		$b_print = ilLinkButton::getInstance();
 		$b_print->setCaption($this->pl->txt('header_btn_print'), false);
 		$b_print->setUrl($this->ctrl->getLinkTarget($this, $this::CMD_PRINT_PDF));
@@ -117,11 +126,10 @@ class ilParticipationCertificateResultGUI {
 		$this->tpl->setTitleIcon(ilObject::_getIcon($this->learnGroup->getId()));
 
 		$this->tabs->setBackTarget($this->pl->txt('header_btn_back'), $this->ctrl->getLinkTargetByClass('ilRepositoryGUI'));
-
 		$this->ctrl->saveParameterByClass('ilParticipationCertificateResultGUI', [ 'ref_id', 'group_id' ]);
 		$this->ctrl->saveParameterByClass('ilParticipationCertificateGUI', 'ref_id');
-		$this->tabs->addTab('overview', $this->pl->txt('header_overview'), $this->ctrl->getLinkTargetByClass(ilParticipationCertificateResultGUI::class, ilParticipationCertificateResultGUI::CMD_CONTENT));
 
+		$this->tabs->addTab('overview', $this->pl->txt('header_overview'), $this->ctrl->getLinkTargetByClass(ilParticipationCertificateResultGUI::class, ilParticipationCertificateResultGUI::CMD_CONTENT));
 		$this->tabs->addTab('config', $this->pl->txt('header_config'), $this->ctrl->getLinkTargetByClass(ilParticipationCertificateGUI::class, ilParticipationCertificateGUI::CMD_DISPLAY));
 		$this->tabs->activateTab('overview');
 	}
@@ -146,9 +154,21 @@ class ilParticipationCertificateResultGUI {
 
 		}
 		$this->usr_ids = ($_POST['record_ids']);
+		$twigParser = new ilParticipationCertificateTwigParser($this->groupRefId, array(), true, false);
+		$twigParser->parseDataSelected($this->usr_ids);
+		$this->ctrl->redirect(ilParticipationCertificateResultGUI::class, ilParticipationCertificateResultGUI::CMD_CONTENT);
+	}
 
+	public function printSelectedWithouteMentoring(){
+		if (!isset($_POST['record_ids']) || (isset($_POST['record_ids']) && !count($_POST['record_ids']))) {
+			ilUtil::sendFailure($this->pl->txt('no_records_selected'),true);
+			$this->ctrl->redirect($this, self::CMD_CONTENT);
+		}
+
+		$this->usr_ids = ($_POST['record_ids']);
 		$twigParser = new ilParticipationCertificateTwigParser($this->groupRefId, array(), false, false);
 		$twigParser->parseDataSelected($this->usr_ids);
+		ilUtil::sendSuccess($this->pl->txt('success'),true);
 		$this->ctrl->redirect(ilParticipationCertificateResultGUI::class, ilParticipationCertificateResultGUI::CMD_CONTENT);
 	}
 
@@ -170,7 +190,6 @@ class ilParticipationCertificateResultGUI {
 
 
 	protected function initTable($override = false) {
-
 		$this->table = new ilParticipationCertificateResultTableGUI($this, ilParticipationCertificateResultGUI::CMD_CONTENT);
 	}
 }

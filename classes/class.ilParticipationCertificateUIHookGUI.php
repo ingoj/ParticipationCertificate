@@ -6,7 +6,7 @@ require_once "./Customizing/global/plugins/Services/UIComponent/UserInterfaceHoo
 /**
  * Class ilParticipationCertificateUIHookGUI
  *
- * @author Silas Stulz <sst@studer-raimann.ch>
+ * @author       Silas Stulz <sst@studer-raimann.ch>
  *
  * @ilCtrl_Calls ilParticipationCertificateUIHookGUI: ilParticipationCertificateGUI
  */
@@ -16,7 +16,6 @@ class ilParticipationCertificateUIHookGUI extends ilUIHookPluginGUI {
 	 * @var ilCtrl
 	 */
 	protected $ctrl;
-
 	/**
 	 * @var ilParticipationCertificatePlugin
 	 */
@@ -75,4 +74,5 @@ class ilParticipationCertificateUIHookGUI extends ilUIHookPluginGUI {
 		return false;
 	}
 }
+
 ?>

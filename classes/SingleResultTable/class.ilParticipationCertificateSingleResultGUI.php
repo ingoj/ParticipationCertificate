@@ -68,15 +68,6 @@ class ilParticipationCertificateSingleResultGUI {
 	public function executeCommand() {
 		$nextClass = $this->ctrl->getNextClass();
 		switch ($nextClass) {
-			case 'ilparticipationcertificateresultegui':
-				$ilParticipationCertificateResultGUI = new ilParticipationCertificateResultGUI();
-				$this->ctrl->forwardCommand($ilParticipationCertificateResultGUI);
-				break;
-			case 'ilparticipationcertificategui':
-				$ilParticipationCertificateGUI = new ilParticipationCertificateGUI();
-				$ret2 = $this->ctrl->forwardCommand($ilParticipationCertificateGUI);
-				$this->tabs->setTabActive(ilParticipationCertificateGUI::CMD_CONFIG);
-				break;
 			default:
 				$cmd = $this->ctrl->getCmd(self::CMD_DISPLAY);
 				$this->{$cmd}();
@@ -111,4 +102,5 @@ class ilParticipationCertificateSingleResultGUI {
 		$this->table = new ilParticipationCertificateSingleResultTableGUI($this, ilParticipationCertificateSingleResultGUI::CMD_DISPLAY);
 	}
 }
+
 ?>

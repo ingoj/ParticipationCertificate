@@ -1,5 +1,4 @@
 <?php
-//TODO prüfen, ob execute command noch stimmig.
 require_once './Services/Form/classes/class.ilPropertyFormGUI.php';
 require_once './Services/Object/classes/class.ilObjectListGUIFactory.php';
 require_once './Modules/Course/classes/class.ilObjCourseGUI.php';
@@ -13,8 +12,6 @@ require_once './Customizing/global/plugins/Services/UIComponent/UserInterfaceHoo
  * Class ilParticipationCertificateGUI
  *
  * @author            Silas Stulz <sst@studer-raimann.ch>
- *
- * @ilCtrl_isCalledBy ilParticipationCertificateGUI: ilUIPluginRouterGUI
  *
  * @ilCtrl_Calls ilParticipationCertificateGUI: ilParticipationCertificateResultGUI
  */
@@ -91,17 +88,6 @@ class ilParticipationCertificateGUI {
 		$nextClass = $this->ctrl->getNextClass();
 
 		switch ($nextClass) {
-			case 'ilparticipationcertificatepdfgenerator':
-				$ilParticipationCertificatePDFGenerator = new ilParticipationCertificatePDFGenerator();
-				$ret = $this->ctrl->forwardCommand($ilParticipationCertificatePDFGenerator);
-				break;
-			case 'ilparticipationcertificatetwigparser':
-				$ilParticipationCertificateTwigParser = new ilParticipationCertificateTwigParser($this->groupRefId);
-				$ret1 = $this->ctrl->forwardCommand($ilParticipationCertificateTwigParser);
-				break;
-			case 'ilparticipationcertificategui':
-				$ilParticipationCertificateGUI = new ilParticipationCertificateGUI();
-				break;
 			case 'ilparticipationcertificateresultgui':
 				$ilParticipationCertificateTableGUI = new ilParticipationCertificateResultGUI();
 				$this->ctrl->forwardCommand($ilParticipationCertificateTableGUI);
@@ -218,11 +204,14 @@ class ilParticipationCertificateGUI {
 				$config->setConfigType(ilParticipationCertificateConfig::CONFIG_TYPE_GROUP);
 				$config->setConfigValueType(ilParticipationCertificateConfig::CONFIG_VALUE_TYPE_CERT_TEXT);
 				$config->setConfigKey( $item->getPostVar());
+				ilUtil::sendFailure($this->pl->txt('failFormSave'),true);
+			}
+			else{
+				ilUtil::sendSuccess($this->pl->txt('successFormSave'),true);
 			}
 			$config->setConfigValue($form->getInput($item->getPostVar()));
 			$config->store();
 		}
-
 		$this->ctrl->redirect($this, 'display');
 		return true;
 	}
@@ -245,6 +234,7 @@ class ilParticipationCertificateGUI {
 				$config->delete();
 			}
 		}
+		ilUtil::sendSuccess($this->pl->txt('successForm'),true);
 		$ilCtrl->redirect($this,self::CMD_DISPLAY);
 	}
 

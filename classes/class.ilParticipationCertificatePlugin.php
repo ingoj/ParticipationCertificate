@@ -28,4 +28,5 @@ class ilParticipationCertificatePlugin extends ilUserInterfaceHookPlugin {
 		return self::$instance;
 	}
 }
+
 ?>

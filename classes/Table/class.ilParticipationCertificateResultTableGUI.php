@@ -47,6 +47,7 @@ class ilParticipationCertificateResultTableGUI extends ilTable2GUI {
 
 		$this->ctrl = $ilCtrl;
 		$this->tabs = $tabs;
+		$this->pl = ilParticipationCertificatePlugin::getInstance();
 
 		$this->setPrefix('dhbw_part_cert');
 		$this->setFormName('dhbw_part_cert');
@@ -57,8 +58,6 @@ class ilParticipationCertificateResultTableGUI extends ilTable2GUI {
 
 		parent::__construct($a_parent_obj, $a_parent_cmd);
 
-		$this->pl = ilParticipationCertificatePlugin::getInstance();
-
 		$this->getEnableHeader();
 		$this->setTitle($this->pl->txt('tbl_overview_results'));
 		$this->setExportFormats(array( self::EXPORT_EXCEL, self::EXPORT_CSV ));
@@ -68,6 +67,7 @@ class ilParticipationCertificateResultTableGUI extends ilTable2GUI {
 
 		$this->setSelectAllCheckbox('record_ids');
 		$this->addMultiCommand('printSelected', $this->pl->txt('list_print'));
+		$this->addMultiCommand('printSelectedWithouteMentoring', $this->pl->txt('list_print_without'));
 
 		$this->setRowTemplate('tpl.default_row.html', $this->pl->getDirectory());
 		$this->setFormAction($this->ctrl->getFormAction($a_parent_obj));
@@ -86,34 +86,40 @@ class ilParticipationCertificateResultTableGUI extends ilTable2GUI {
 
 		$cols = array();
 		//$cols['usr_id'] = array( 'txt' => 'usr_id', 'default' => false, 'width' => 'auto', 'sort_field' => 'usr_id' );
-		$cols['firstname'] = array( 'txt' => 'Vorname', 'default' => true, 'width' => 'auto', 'sort_field' => 'firstname' );
-		$cols['lastname'] = array( 'txt' => 'Nachname', 'default' => true, 'width' => 'auto', 'sort_field' => 'lastname' );
+		$cols['firstname'] = array( 'txt' => $this->pl->txt('cols_firstname'), 'default' => true, 'width' => 'auto', 'sort_field' => 'firstname' );
+		$cols['lastname'] = array( 'txt' => $this->pl->txt('cols_lastname'), 'default' => true, 'width' => 'auto', 'sort_field' => 'lastname' );
 		$cols['initial_test_finished'] = array(
-			'txt' => 'Einstiegstest abgeschlossen',
+			'txt' => $this->pl->txt('cols_initial_test_finished'),
 			'default' => true,
 			'width' => 'auto',
 			'sort_field' => 'initial_test_finished'
 		);
 		$cols['result_qualifing_tests'] = array(
-			'txt' => 'Resultat qualifizierende Tests',
+			'txt' => $this->pl->txt('cols_results_qualifying'),
 			'default' => true,
 			'width' => 'auto',
 			'sort_field' => 'result_qualifing_tests'
 		);
+		$cols['results_qualifing_tests'] = array(
+			'txt' => $this->pl->txt('cols_result_qualifying'),
+			'default' => true,
+			'width' => 'auto',
+			'sort_field' => 'results_qualifing_tests'
+		);
 		$cols['eMentoring_finished'] = array(
-			'txt' => 'Aktive Teilnahme an Videokonferenzen',
+			'txt' => $this->pl->txt('cols_eMentoring_finished'),
 			'default' => true,
 			'width' => 'auto',
 			'sort_field' => 'eMentoring_finished'
 		);
 		$cols['eMentoring_homework'] = array(
-			'txt' => 'Anzahl Hausaufgaben abgegeben',
+			'txt' => $this->pl->txt('cols_eMentoring_homework'),
 			'default' => true,
 			'width' => 'auto',
 			'sort_field' => 'eMentoring_homework'
 		);
 		$cols['eMentoring_percentage'] = array(
-			'txt' => 'Bearbeitung der aufgaben zu überfachlichen Themen',
+			'txt' => $this->pl->txt('cols_eMentoring_percentage'),
 			'default' => true,
 			'width' => 'auto',
 			'sort_field' => 'eMentoring_percentage'
@@ -149,13 +155,23 @@ class ilParticipationCertificateResultTableGUI extends ilTable2GUI {
 		$arr_learn_reached_percentages = ilLearnObjectSuggReachedPercentages::getData($this->usr_ids);
 		$arr_iass_states = ilIassStates::getData($this->usr_ids);
 		$arr_excercise_states = ilExcerciseStates::getData($this->usr_ids);
+		$arr_FinalTestsStates = ilLearnObjectFinalTestStates::getData($this->usr_ids);
 
 		$rows = array();
 		foreach ($this->usr_ids as $usr_id) {
 			$row = array();
 			$row['usr_id'] = $usr_id;
-			$row['firstname'] = $arr_usr_data[$usr_id]->getPartCertFirstname();
-			$row['lastname'] = $arr_usr_data[$usr_id]->getPartCertLastname();
+			if ($row['firstname'] = $arr_usr_data[$usr_id]->getPartCertFirstname() != NULL) {
+				$row['firstname'] = $arr_usr_data[$usr_id]->getPartCertFirstname();
+			} else {
+				$row['firstname'] = '';
+			}
+			if ($row['lastname'] = $arr_usr_data[$usr_id]->getPartCertLastname() != NULL) {
+				$row['lastname'] = $arr_usr_data[$usr_id]->getPartCertLastname();
+			}
+			else{
+				$row['lastname'] = '';
+			}
 
 			if (is_object($arr_initial_test_states[$usr_id])) {
 				$row['initial_test_finished'] = $arr_initial_test_states[$usr_id]->getCrsitestItestSubmitted();
@@ -183,17 +199,21 @@ class ilParticipationCertificateResultTableGUI extends ilTable2GUI {
 			} else {
 				$row['eMentoring_finished'] = 'Nein';
 			}
-			/*
-						if (is_array($arr_FinalTestsStates[$usr_id])) {
 
-							foreach ($arr_FinalTestsStates[$usr_id] as $rec) {
-								$rec_array[] = $rec->getLocFtestTestTitle();
-								array_push($rec_array, $rec->getLocftestPercentage());
-								array_push($rec_array, '<br>');
-							}
-							$array_results = $rec_array;
-							$row['results_qualifing_tests'] = $array_results;
-						}*/
+			if (is_array($arr_FinalTestsStates[$usr_id])) {
+
+				foreach ($arr_FinalTestsStates[$usr_id] as $rec) {
+					$rec_array[] = $rec->getLocFtestTestTitle();
+					array_push($rec_array, $rec->getLocftestPercentage());
+					array_push($rec_array, '<br>');
+				}
+				$array_results = $rec_array;
+				$row['results_qualifing_tests'] = $array_results;
+			}
+
+			else{
+				$row['results_qualifing_tests'] = 'Keine Tests';
+			}
 
 			if (is_object($arr_iass_states[$usr_id])) {
 				$row['eMentoring_homework'] = $arr_excercise_states[$usr_id]->getPassed();
@@ -231,15 +251,9 @@ class ilParticipationCertificateResultTableGUI extends ilTable2GUI {
 		$this->tpl->parseCurrentBlock();
 
 		foreach ($this->getSelectableColumns() as $k => $v) {
-			if ($a_set[$k]) {
-				$this->tpl->setCurrentBlock('td');
-				$this->tpl->setVariable('VALUE', (is_array($a_set[$k]) ? implode(", ", $a_set[$k]) : $a_set[$k]));
-				$this->tpl->parseCurrentBlock();
-			} else {
-				$this->tpl->setCurrentBlock('td');
-				$this->tpl->setVariable('VALUE', '&nbsp;');
-				$this->tpl->parseCurrentBlock();
-			}
+			$this->tpl->setCurrentBlock('td');
+			$this->tpl->setVariable('VALUE', (is_array($a_set[$k]) ? implode(", ", $a_set[$k]) : $a_set[$k]));
+			$this->tpl->parseCurrentBlock();
 		}
 		$current_selection_list = new ilAdvancedSelectionListGUI();
 		$current_selection_list->setListTitle($this->pl->txt('list_actions'));
@@ -247,8 +261,9 @@ class ilParticipationCertificateResultTableGUI extends ilTable2GUI {
 		$current_selection_list->setUseImages(false);
 		$this->ctrl->setParameterByClass('ilParticipationCertificateResultGUI', 'usr_id', $a_set['usr_id']);
 
-		$current_selection_list->addItem($this->pl->txt('list_results'), ilParticipationCertificateResultModificationGUI::CMD_DISPLAY, $this->ctrl->getLinkTargetByClass(ilParticipationCertificateResultModificationGUI::class, ilParticipationCertificateResultModificationGUI::CMD_DISPLAY));
 		$current_selection_list->addItem($this->pl->txt('list_print'), ilParticipationCertificateResultModificationGUI::CMD_PRINT_PURE, $this->ctrl->getLinkTargetByClass(ilParticipationCertificateResultModificationGUI::class, ilParticipationCertificateResultModificationGUI::CMD_PRINT_PURE));
+		$current_selection_list->addItem($this->pl->txt('list_print_without'), ilParticipationCertificateResultModificationGUI::CMD_PRINT_PURE_WITHOUTEMENTORING, $this->ctrl->getLinkTargetByClass(ilParticipationCertificateResultModificationGUI::class, ilParticipationCertificateResultModificationGUI::CMD_PRINT_PURE_WITHOUTEMENTORING));
+		$current_selection_list->addItem($this->pl->txt('list_results'), ilParticipationCertificateResultModificationGUI::CMD_DISPLAY, $this->ctrl->getLinkTargetByClass(ilParticipationCertificateResultModificationGUI::class, ilParticipationCertificateResultModificationGUI::CMD_DISPLAY));
 		$current_selection_list->addItem($this->pl->txt('list_overview'), ilParticipationCertificateSingleResultGUI::CMD_DISPLAY, $this->ctrl->getLinkTargetByClass(ilParticipationCertificateSingleResultGUI::class, ilParticipationCertificateSingleResultGUI::CMD_DISPLAY));
 
 		$this->tpl->setVariable('ACTIONS', $current_selection_list->getHTML());
