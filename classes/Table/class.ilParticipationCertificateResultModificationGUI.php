@@ -126,8 +126,9 @@ class ilParticipationCertificateResultModificationGUI {
 		$form->addItem($homeworks);
 
 		$this->ctrl->setParameterByClass('ilParticipationCertificateResultModificationGUI', 'ementor',true);
-		$form->addCommandButton(ilParticipationCertificateResultModificationGUI::CMD_PRINT, $this->pl->txt('print_pdf'));
-		$this->ctrl->saveParameterByClass('ilParticipationCertificateResultModificationGUI', 'ementor');
+		$form->addCommandButton(ilParticipationCertificateResultModificationGUI::CMD_PRINT, $this->pl->txt('list_print'));
+		$this->ctrl->setParameterByClass('ilParticipationCertificateResultModificationGUI', 'ementor',false);
+		$form->addCommandButton(ilParticipationCertificateResultModificationGUI::CMD_PRINT,$this->pl->txt('list_print_without'));
 		return $form;
 	}
 
@@ -168,10 +169,10 @@ class ilParticipationCertificateResultModificationGUI {
 		$form->checkInput();
 
 		$array = array( $form->getInput('initial'), $form->getInput('resultstest'), $form->getInput('conf'), $form->getInput('homework') );
-
+		$ementor = $_GET['ementor'];
 		$edited = $_GET['edited'];
 		$usr_id = $this->usr_id;
-		$twigParser = new ilParticipationCertificateTwigParser($this->groupRefId, array(), $usr_id,true,$edited,$array);
+		$twigParser = new ilParticipationCertificateTwigParser($this->groupRefId, array(), $usr_id,$ementor,$edited,$array);
 		$twigParser->parseData();
 	}
 }
