@@ -8,7 +8,7 @@ require_once './Customizing/global/plugins/Services/UIComponent/UserInterfaceHoo
  *
  * @ilCtrl_isCalledBy ilParticipationCertificateResultGUI: ilUIPluginRouterGUI
  *
- * @ilCtrl_Calls ilParticipationCertificateResultGUI: ilParticipationCertificateSingleResultGUI, ilParticipationCertificateGUI, ilParticipationCertificateResultModificationGUI
+ * @ilCtrl_Calls      ilParticipationCertificateResultGUI: ilParticipationCertificateSingleResultGUI, ilParticipationCertificateGUI, ilParticipationCertificateResultModificationGUI
  *
  */
 class ilParticipationCertificateResultGUI {
@@ -16,7 +16,6 @@ class ilParticipationCertificateResultGUI {
 	CONST CMD_CONTENT = 'content';
 	CONST CMD_OVERVIEW = 'overview';
 	CONST CMD_PRINT_PDF = 'printpdf';
-	CONST CMD_PRINT_PDF_WITHOUT_EMENTORING = 'printpdfwithoutmentoring';
 	CONST CMD_INIT_TABLE = 'initTable';
 	/**
 	 * @var ilTemplate
@@ -105,12 +104,12 @@ class ilParticipationCertificateResultGUI {
 
 		$b_print = ilLinkButton::getInstance();
 		$b_print->setCaption($this->pl->txt('header_btn_print'), false);
-		$this->ctrl->setParameter( $this,'ementor',true);
+		$this->ctrl->setParameter($this, 'ementor', true);
 		$b_print->setUrl($this->ctrl->getLinkTarget($this, $this::CMD_PRINT_PDF));
 		$this->toolbar->addButtonInstance($b_print);
 
 		$b_print = ilLinkButton::getInstance();
-		$this->ctrl->setParameter( $this,'ementor',false);
+		$this->ctrl->setParameter($this, 'ementor', false);
 		$b_print->setCaption($this->pl->txt('header_btn_print_eMentoring'), false);
 		$b_print->setUrl($this->ctrl->getLinkTarget($this, $this::CMD_PRINT_PDF));
 		$this->toolbar->addButtonInstance($b_print);
@@ -139,34 +138,32 @@ class ilParticipationCertificateResultGUI {
 
 	public function printPdf() {
 		$ementor = $_GET['ementor'];
-		$twigParser = new ilParticipationCertificateTwigParser($this->groupRefId,array(),$ementor,false);
+		$usr_id = $_GET['usr_id'];
+		$twigParser = new ilParticipationCertificateTwigParser($this->groupRefId, array(),$usr_id, $ementor, false);
 		$twigParser->parseData();
 	}
 
 
 	public function printSelected() {
 		if (!isset($_POST['record_ids']) || (isset($_POST['record_ids']) && !count($_POST['record_ids']))) {
-			ilUtil::sendFailure($this->pl->txt('no_records_selected'),true);
+			ilUtil::sendFailure($this->pl->txt('no_records_selected'), true);
 			$this->ctrl->redirect($this, self::CMD_CONTENT);
-
 		}
 		$this->usr_ids = ($_POST['record_ids']);
-		$twigParser = new ilParticipationCertificateTwigParser($this->groupRefId, array(), true, false);
-		$twigParser->parseDataSelected($this->usr_ids);
-		$this->ctrl->redirect(ilParticipationCertificateResultGUI::class, ilParticipationCertificateResultGUI::CMD_CONTENT);
+		$twigParser = new ilParticipationCertificateTwigParser($this->groupRefId, array(), $this->usr_ids, true, false, false);
+		$twigParser->parseData();
 	}
 
-	public function printSelectedWithouteMentoring(){
+
+	public function printSelectedWithouteMentoring() {
 		if (!isset($_POST['record_ids']) || (isset($_POST['record_ids']) && !count($_POST['record_ids']))) {
-			ilUtil::sendFailure($this->pl->txt('no_records_selected'),true);
+			ilUtil::sendFailure($this->pl->txt('no_records_selected'), true);
 			$this->ctrl->redirect($this, self::CMD_CONTENT);
 		}
 
 		$this->usr_ids = ($_POST['record_ids']);
-		$twigParser = new ilParticipationCertificateTwigParser($this->groupRefId, array(), false, false);
-		$twigParser->parseDataSelected($this->usr_ids);
-		ilUtil::sendSuccess($this->pl->txt('success'),true);
-		$this->ctrl->redirect(ilParticipationCertificateResultGUI::class, ilParticipationCertificateResultGUI::CMD_CONTENT);
+		$twigParser = new ilParticipationCertificateTwigParser($this->groupRefId, array(), $this->usr_ids, false, false, false);
+		$twigParser->parseData();
 	}
 
 

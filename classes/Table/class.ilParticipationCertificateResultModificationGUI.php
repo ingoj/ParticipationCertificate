@@ -15,7 +15,6 @@ class ilParticipationCertificateResultModificationGUI {
 	CONST CMD_DISPLAY = 'display';
 	CONST IDENTIFIER = 'usr_id';
 	CONST CMD_PRINT = 'printpdf';
-	CONST CMD_PRINT_PURE = 'printpdfpure';
 	/**
 	 * @var ilTabsGUI
 	 */
@@ -50,6 +49,7 @@ class ilParticipationCertificateResultModificationGUI {
 		$this->groupRefId = (int)$_GET['ref_id'];
 		$this->learnGroup = ilObjectFactory::getInstanceByRefId($_GET['ref_id']);
 		$this->ctrl->saveParameterByClass('ilParticipationCertificateResultModificationGUI', [ 'ref_id', 'group_id' ]);
+		$this->ctrl->saveParameterByClass('ilParticipationCertificateResultModificationGUI', 'ementor');
 		$this->ctrl->saveParameterByClass('ilParticipationCertificateResultGUI', 'usr_id');
 		$cert_access = new ilParticipationCertificateAccess($_GET['ref_id']);
 		$this->usr_ids = $cert_access->getUserIdsOfGroup();
@@ -63,6 +63,8 @@ class ilParticipationCertificateResultModificationGUI {
 		$this->arr_excercise_states = ilExcerciseStates::getData($this->usr_ids);
 		$this->arr_FinalTestsStates = ilLearnObjectFinalTestStates::getData($this->usr_ids);
 		$this->array_obj_ids = ilLearnObjectFinalTestStates::getData($this->usr_ids);
+
+		$this->ctrl->setParameterByClass('ilParticipationCertificateResultModificationGUI', 'edited',true);
 	}
 
 
@@ -123,8 +125,9 @@ class ilParticipationCertificateResultModificationGUI {
 		$homeworks = new ilTextInputGUI($this->pl->txt('mod_homework'), 'homework');
 		$form->addItem($homeworks);
 
+		$this->ctrl->setParameterByClass('ilParticipationCertificateResultModificationGUI', 'ementor',true);
 		$form->addCommandButton(ilParticipationCertificateResultModificationGUI::CMD_PRINT, $this->pl->txt('print_pdf'));
-
+		$this->ctrl->saveParameterByClass('ilParticipationCertificateResultModificationGUI', 'ementor');
 		return $form;
 	}
 
@@ -165,24 +168,11 @@ class ilParticipationCertificateResultModificationGUI {
 		$form->checkInput();
 
 		$array = array( $form->getInput('initial'), $form->getInput('resultstest'), $form->getInput('conf'), $form->getInput('homework') );
-		$edited = true;
+
+		$edited = $_GET['edited'];
 		$usr_id = $this->usr_id;
-		$twigParser = new ilParticipationCertificateTwigParser($this->groupRefId, array(), true, true);
-		$twigParser->parseDataSolo($edited, $array, $usr_id);
-	}
-
-
-	public function printPDFpure() {
-		$form = $this->initForm();
-		$form->setValuesByPost();
-		$form->checkInput();
-
-		$ementor = $_GET['ementor'];
-		$array = array( $form->getInput('initial'), $form->getInput('resultstest'), $form->getInput('conf'), $form->getInput('homework') );
-		$edited = false;
-		$usr_id = $this->usr_id;
-		$twigParser = new ilParticipationCertificateTwigParser($this->groupRefId, array(), $ementor, false);
-		$twigParser->parseDataSolo($edited, $array, $usr_id);
+		$twigParser = new ilParticipationCertificateTwigParser($this->groupRefId, array(), $usr_id,true,$edited,$array);
+		$twigParser->parseData();
 	}
 }
 

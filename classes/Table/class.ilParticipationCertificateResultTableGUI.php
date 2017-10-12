@@ -66,10 +66,8 @@ class ilParticipationCertificateResultTableGUI extends ilTable2GUI {
 		$this->initFilter();
 
 		$this->setSelectAllCheckbox('record_ids');
-		$this->ctrl->setParameterByClass('ilParticipationCertificateResultModificationGUI', 'ementor',true);
 		$this->addMultiCommand('printSelected', $this->pl->txt('list_print'));
-		$this->ctrl->setParameterByClass('ilParticipationCertificateResultModificationGUI', 'ementor',false);
-		$this->addMultiCommand('printSelected', $this->pl->txt('list_print'));
+		$this->addMultiCommand('printSelectedWithouteMentoring', $this->pl->txt('list_print_without'));
 
 		$this->setRowTemplate('tpl.default_row.html', $this->pl->getDirectory());
 		$this->setFormAction($this->ctrl->getFormAction($a_parent_obj));
@@ -263,10 +261,11 @@ class ilParticipationCertificateResultTableGUI extends ilTable2GUI {
 		$current_selection_list->setUseImages(false);
 		$this->ctrl->setParameterByClass('ilParticipationCertificateResultGUI', 'usr_id', $a_set['usr_id']);
 
-		$this->ctrl->setParameterByClass('ilParticipationCertificateResultModificationGUI', 'ementor',true);
-		$current_selection_list->addItem($this->pl->txt('list_print'), ilParticipationCertificateResultModificationGUI::CMD_PRINT_PURE, $this->ctrl->getLinkTargetByClass(ilParticipationCertificateResultModificationGUI::class, ilParticipationCertificateResultModificationGUI::CMD_PRINT_PURE));
-		$this->ctrl->setParameterByClass('ilParticipationCertificateResultModificationGUI', 'ementor',false);
-		$current_selection_list->addItem($this->pl->txt('list_print_without'), ilParticipationCertificateResultModificationGUI::CMD_PRINT_PURE, $this->ctrl->getLinkTargetByClass(ilParticipationCertificateResultModificationGUI::class, ilParticipationCertificateResultModificationGUI::CMD_PRINT_PURE));
+
+		$this->ctrl->setParameterByClass('ilParticipationCertificateResultGUI', 'ementor',true);
+		$current_selection_list->addItem($this->pl->txt('list_print'), ilParticipationCertificateResultGUI::CMD_PRINT_PDF, $this->ctrl->getLinkTargetByClass(ilParticipationCertificateResultGUI::class, ilParticipationCertificateResultGUI::CMD_PRINT_PDF));
+		$this->ctrl->setParameterByClass('ilParticipationCertificateResultGUI', 'ementor',false);
+		$current_selection_list->addItem($this->pl->txt('list_print_without'), ilParticipationCertificateResultGUI::CMD_PRINT_PDF, $this->ctrl->getLinkTargetByClass(ilParticipationCertificateResultGUI::class, ilParticipationCertificateResultGUI::CMD_PRINT_PDF));
 		$current_selection_list->addItem($this->pl->txt('list_results'), ilParticipationCertificateResultModificationGUI::CMD_DISPLAY, $this->ctrl->getLinkTargetByClass(ilParticipationCertificateResultModificationGUI::class, ilParticipationCertificateResultModificationGUI::CMD_DISPLAY));
 		$current_selection_list->addItem($this->pl->txt('list_overview'), ilParticipationCertificateSingleResultGUI::CMD_DISPLAY, $this->ctrl->getLinkTargetByClass(ilParticipationCertificateSingleResultGUI::class, ilParticipationCertificateSingleResultGUI::CMD_DISPLAY));
 
