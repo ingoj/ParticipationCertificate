@@ -68,10 +68,13 @@ class ilParticipationCertificateTwigParser {
 
 		if (count($this->usr_id) == 1) {
 			$usr = $this->usr_id;
-			$this->usr_id = array( $usr );
+			$this->usr_id = array($usr);
 		}
 
 		foreach ($this->usr_id as $usr_id) {
+			if (is_array($usr_id)){
+				$usr_id = $usr_id[0];
+			}
 
 			$processed_arr_text_values = $arr_text_values;
 			//Preprocess text values

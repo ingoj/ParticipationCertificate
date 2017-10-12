@@ -149,8 +149,8 @@ class ilParticipationCertificateResultGUI {
 			ilUtil::sendFailure($this->pl->txt('no_records_selected'), true);
 			$this->ctrl->redirect($this, self::CMD_CONTENT);
 		}
-		$this->usr_ids = ($_POST['record_ids']);
-		$twigParser = new ilParticipationCertificateTwigParser($this->groupRefId, array(), $this->usr_ids, true, false, false);
+		$usr_id = $_POST['record_ids'];
+		$twigParser = new ilParticipationCertificateTwigParser($this->groupRefId, array(), $usr_id, true, false, false);
 		$twigParser->parseData();
 	}
 
@@ -161,8 +161,8 @@ class ilParticipationCertificateResultGUI {
 			$this->ctrl->redirect($this, self::CMD_CONTENT);
 		}
 
-		$this->usr_ids = ($_POST['record_ids']);
-		$twigParser = new ilParticipationCertificateTwigParser($this->groupRefId, array(), $this->usr_ids, false, false, false);
+		$usr_id = $_POST['record_ids'];
+		$twigParser = new ilParticipationCertificateTwigParser($this->groupRefId, array(), $usr_id, false, false, false);
 		$twigParser->parseData();
 	}
 
