@@ -1,7 +1,7 @@
 <?php
 require_once './Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/ParticipationCertificate/classes/Table/class.ilParticipationCertificateResultTableGUI.php';
 require_once './Services/UIComponent/AdvancedSelectionList/classes/class.ilAdvancedSelectionListGUI.php';
-require_once './Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/ParticipationCertificate/classes/class.ilParticipationCertificateResultModificationGUI.php';
+require_once './Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/ParticipationCertificate/classes/Table/class.ilParticipationCertificateResultModificationGUI.php';
 
 /**
  * Class ilParticipationCertificateResultGUI
@@ -105,12 +105,14 @@ class ilParticipationCertificateResultGUI {
 
 		$b_print = ilLinkButton::getInstance();
 		$b_print->setCaption($this->pl->txt('header_btn_print'), false);
+		$this->ctrl->setParameter( $this,'ementor',true);
 		$b_print->setUrl($this->ctrl->getLinkTarget($this, $this::CMD_PRINT_PDF));
 		$this->toolbar->addButtonInstance($b_print);
 
 		$b_print = ilLinkButton::getInstance();
+		$this->ctrl->setParameter( $this,'ementor',false);
 		$b_print->setCaption($this->pl->txt('header_btn_print_eMentoring'), false);
-		$b_print->setUrl($this->ctrl->getLinkTarget($this, $this::CMD_PRINT_PDF_WITHOUT_EMENTORING));
+		$b_print->setUrl($this->ctrl->getLinkTarget($this, $this::CMD_PRINT_PDF));
 		$this->toolbar->addButtonInstance($b_print);
 
 		$this->initTable();
@@ -136,13 +138,8 @@ class ilParticipationCertificateResultGUI {
 
 
 	public function printPdf() {
-		$twigParser = new ilParticipationCertificateTwigParser($this->groupRefId);
-		$twigParser->parseData();
-	}
-
-
-	public function printPdfWithoutMentoring() {
-		$twigParser = new ilParticipationCertificateTwigParser($this->groupRefId, array(), false);
+		$ementor = $_GET['ementor'];
+		$twigParser = new ilParticipationCertificateTwigParser($this->groupRefId,array(),$ementor,false);
 		$twigParser->parseData();
 	}
 

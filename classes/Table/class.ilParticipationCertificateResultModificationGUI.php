@@ -16,7 +16,6 @@ class ilParticipationCertificateResultModificationGUI {
 	CONST IDENTIFIER = 'usr_id';
 	CONST CMD_PRINT = 'printpdf';
 	CONST CMD_PRINT_PURE = 'printpdfpure';
-	CONST CMD_PRINT_PURE_WITHOUTEMENTORING = 'printpdfpurewithoutementoring';
 	/**
 	 * @var ilTabsGUI
 	 */
@@ -99,7 +98,7 @@ class ilParticipationCertificateResultModificationGUI {
 		$this->tpl->setTitleIcon(ilObject::_getIcon($this->learnGroup->getId()));
 
 		$this->ctrl->saveParameterByClass('ilParticipationCertificateResultGUI', 'ref_id');
-		$this->tabs->setBackTarget($this->pl->txt('header_btn_back'), $this->ctrl->getLinkTargetByClass(ilParticipationCertificateResultGUI::class, ilParticipationCertificateResultGUI::CMD_CONTENT));
+		$this->tabs->setBackTarget($this->pl->txt('header_btn_back'), $this->ctrl->getLinkTargetByClass(array('ilUIPluginRouterGUI', ilParticipationCertificateResultGUI::class), ilParticipationCertificateResultGUI::CMD_CONTENT));
 	}
 
 
@@ -178,23 +177,11 @@ class ilParticipationCertificateResultModificationGUI {
 		$form->setValuesByPost();
 		$form->checkInput();
 
+		$ementor = $_GET['ementor'];
 		$array = array( $form->getInput('initial'), $form->getInput('resultstest'), $form->getInput('conf'), $form->getInput('homework') );
 		$edited = false;
 		$usr_id = $this->usr_id;
-		$twigParser = new ilParticipationCertificateTwigParser($this->groupRefId, array(), true, false);
-		$twigParser->parseDataSolo($edited, $array, $usr_id);
-	}
-
-
-	public function printPDFpureWithouteMentoring() {
-		$form = $this->initForm();
-		$form->setValuesByPost();
-		$form->checkInput();
-
-		$array = array( $form->getInput('initial'), $form->getInput('resultstest'), $form->getInput('conf'), $form->getInput('homework') );
-		$edited = false;
-		$usr_id = $this->usr_id;
-		$twigParser = new ilParticipationCertificateTwigParser($this->groupRefId, array(), false, false);
+		$twigParser = new ilParticipationCertificateTwigParser($this->groupRefId, array(), $ementor, false);
 		$twigParser->parseDataSolo($edited, $array, $usr_id);
 	}
 }

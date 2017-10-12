@@ -36,7 +36,6 @@ class ilParticipationCertificateTwigParser {
 		$this->loadTwig();
 		$loader = new \Twig_Loader_Filesystem('./Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/ParticipationCertificate/templates/report/');
 		$twig = new \Twig_Environment($loader, $twig_options);
-
 		$this->ementor = $ementor;
 		$this->footer = $footer;
 
