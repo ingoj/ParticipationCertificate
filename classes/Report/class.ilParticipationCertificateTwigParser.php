@@ -24,6 +24,9 @@ class ilParticipationCertificateTwigParser {
 	 * @param int   $group_ref_id
 	 * @param array $twig_options
 	 * @param bool  $ementor
+	 * @param int $usr_id
+	 * @param bool $edited
+	 * @param array $array
 	 */
 	public function __construct($group_ref_id = 0, $twig_options = array(), $usr_id, $ementor = true, $edited = false, $array = NULL) {
 
@@ -33,20 +36,25 @@ class ilParticipationCertificateTwigParser {
 		$cert_access = new ilParticipationCertificateAccess($group_ref_id);
 
 		$this->usr_ids = $cert_access->getUserIdsOfGroup();
+
 		$this->usr_id = $usr_id;
+		//wenn keine $usr_id übegeben wird, werden alle in der Gruppe gedruckt
 		if ($usr_id == NULL) {
 			$this->usr_id = $this->usr_ids;
 		}
-
-		$this->loadTwig();
-		$loader = new \Twig_Loader_Filesystem('./Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/ParticipationCertificate/templates/report/');
-		$twig = new \Twig_Environment($loader, $twig_options);
 		$this->ementor = $ementor;
+		//wenn die Resultate bearbeitet wurden wird automatisch der footer auf true gesetzt
 		if ($edited == true) {
 			$this->footer = true;
 		}
 		$this->edited = $edited;
+		//$array sind die abgeänderten werte
 		$this->array = $array;
+
+		$this->loadTwig();
+		$loader = new \Twig_Loader_Filesystem('./Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/ParticipationCertificate/templates/report/');
+		$twig = new \Twig_Environment($loader, $twig_options);
+
 
 		$this->twig_template = $twig->load('certificate.html');
 	}
@@ -66,12 +74,14 @@ class ilParticipationCertificateTwigParser {
 
 		$part_pdf = new ilParticipationCertificatePDFGenerator();
 
+		//quickfix, wenn nur ein User $this->usr_id ist kein array -> foreach kann also nicht gebraucht werden. Jetzt wird ein array erstellt auch wenn nur ein user
 		if (count($this->usr_id) == 1) {
 			$usr = $this->usr_id;
 			$this->usr_id = array($usr);
 		}
 
 		foreach ($this->usr_id as $usr_id) {
+			//quickfix, wenn man user auswählt kann es sein, das $usr_id ein array bleibt. Das führt weiter unten zum crash. So wird das array aufgelöst.
 			if (is_array($usr_id)){
 				$usr_id = $usr_id[0];
 			}
