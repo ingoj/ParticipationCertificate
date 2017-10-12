@@ -65,6 +65,7 @@ class ilParticipationCertificateResultModificationGUI {
 		$this->array_obj_ids = ilLearnObjectFinalTestStates::getData($this->usr_ids);
 
 		$this->ctrl->setParameterByClass('ilParticipationCertificateResultModificationGUI', 'edited',true);
+		$this->ctrl->setParameterByClass('ilParticipationCertificateResultModificationGUI', 'ementor',true);
 	}
 
 
@@ -125,10 +126,8 @@ class ilParticipationCertificateResultModificationGUI {
 		$homeworks = new ilTextInputGUI($this->pl->txt('mod_homework'), 'homework');
 		$form->addItem($homeworks);
 
-		$this->ctrl->setParameterByClass('ilParticipationCertificateResultModificationGUI', 'ementor',true);
+
 		$form->addCommandButton(ilParticipationCertificateResultModificationGUI::CMD_PRINT, $this->pl->txt('list_print'));
-		$this->ctrl->setParameterByClass('ilParticipationCertificateResultModificationGUI', 'ementor',false);
-		$form->addCommandButton(ilParticipationCertificateResultModificationGUI::CMD_PRINT,$this->pl->txt('list_print_without'));
 		return $form;
 	}
 
