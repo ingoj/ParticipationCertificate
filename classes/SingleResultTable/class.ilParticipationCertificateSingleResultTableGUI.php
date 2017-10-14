@@ -139,7 +139,7 @@ class ilParticipationCertificateSingleResultTableGUI extends ilTable2GUI {
 			 */
 
 
-			$rec_array[$usr_id][$rec->getLocftestCrsObjId()][] = $rec->getLocftestTestTitle().'<br/>'.$rec->getLocftestPercentage().'<br/>';
+			$rec_array[$usr_id][$rec->getLocftestCrsObjId()][] = $rec->getLocftestTestTitle().'<br/>'.round($rec->getLocftestPercentage(),0).'%<br/>';
 		}
 
 

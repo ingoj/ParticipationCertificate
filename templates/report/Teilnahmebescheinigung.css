@@ -4,6 +4,14 @@ body{
     margin-right: 10%;
 }
 
+.page_container {
+  padding-top: 80px;
+  margin-left: 20px;
+  margin-right: 20px;
+  margin-bottom:  80px;
+}
+
+
 head {
   display: none;
 }
