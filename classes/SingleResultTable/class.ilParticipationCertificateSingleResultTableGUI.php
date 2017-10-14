@@ -85,24 +85,22 @@ class ilParticipationCertificateSingleResultTableGUI extends ilTable2GUI {
 		$cols = array();
 
 		$finalTestsStates = ilLearnObjectFinalTestStates::getData($this->usr_ids);
-		foreach ($finalTestsStates[$this->usr_id] as $finalTestsState) {
 
-			/**
-			 * @var ilLearnObjectFinalTestState $finalTestsState
-			 */
-			$cols[$finalTestsState->getLocftestCrsObjId()] = array(
-				'txt' => $finalTestsState->getLocftestCrsTitle(),
-				'default' => true,
-				'width' => 'auto',
-			);
+		if(count($finalTestsStates[$this->usr_id] )) {
+			foreach ($finalTestsStates[$this->usr_id] as $finalTestsState) {
+
+				/**
+				 * @var ilLearnObjectFinalTestState $finalTestsState
+				 */
+				$cols[$finalTestsState->getLocftestCrsObjId()] = array(
+					'txt' => $finalTestsState->getLocftestCrsTitle(),
+					'default' => true,
+					'width' => 'auto',
+				);
+			}
 		}
 
-		/*$cols['results_qualifing_tests'] = array(
-			'txt' => $this->pl->txt('cols_results_qualifying'),
-			'default' => true,
-			'width' => 'auto',
-			'sort_field' => 'results_qualifing_tests'
-		);*/
+
 
 		return $cols;
 	}
@@ -131,54 +129,19 @@ class ilParticipationCertificateSingleResultTableGUI extends ilTable2GUI {
 
 		$rec_array = array();
 
-
-
-		foreach ($arr_FinalTestsStates[$usr_id] as $rec) {
-			/**
-			 * @var ilLearnObjectFinalTestOfSuggState $rec
-			 */
-
-
-			$rec_array[$usr_id][$rec->getLocftestCrsObjId()][] = $rec->getLocftestTestTitle().'<br/>'.round($rec->getLocftestPercentage(),0).'%<br/>';
+		if(count($arr_FinalTestsStates[$usr_id])) {
+			foreach ($arr_FinalTestsStates[$usr_id] as $rec) {
+				/**
+				 * @var ilLearnObjectFinalTestOfSuggState $rec
+				 */
+				$rec_array[$usr_id][$rec->getLocftestCrsObjId()][] = $rec->getLocftestTestTitle() . '<br/>' . round($rec->getLocftestPercentage(), 0)
+					. '%<br/>';
+			}
 		}
 
 
 
 		$this->setData($rec_array);
-
-
-
-		/*print_r($arr_FinalTestsStates);
-
-		foreach ($this->finalTestsStates as $finalTestsState) {
-			/*foreach ($finalTestsState as $final) {
-				$results = array();
-
-				$results[] = $final->getLocftestTestTitle();
-				array_push($results, $final->getLocftestPercentage());
-				$row[$final->getLocftestObjectiveId()] = $results;
-			}
-
-			if (is_array($arr_FinalTestsStates[$usr_id])) {
-				foreach ($arr_FinalTestsStates[$usr_id] as $rec) {
-					$rec_array[] = $rec->getLocFtestTestTitle();
-					array_push($rec_array, $rec->getLocftestPercentage());
-					array_push($rec_array, '<br>');
-				}
-				$array_results = $rec_array;
-				$row['results_qualifing_tests'] = $array_results;
-			}*/
-
-			//$row[]
-
-
-
-
-
-
-
-			//return $rows;
-		//}
 	}
 
 
