@@ -147,16 +147,24 @@ class ilParticipationCertificateResultModificationGUI {
 		$usr_id = $_GET[self::IDENTIFIER];
 
 		if (is_object($this->arr_initial_test_states[$usr_id])) {
-			$array = array( 'initial' => $this->arr_initial_test_states[$usr_id]->getCrsitestItestSubmitted() );
+			$array['initial'] =  $this->arr_initial_test_states[$usr_id]->getCrsitestItestSubmitted();
+		} else {
+			$array['initial'] = 0;
 		}
 		if (is_object($this->arr_learn_reached_percentages[$usr_id])) {
 			$array['resultstest'] = $this->arr_learn_reached_percentages[$usr_id]->getAveragePercentage();
+		} else {
+			$array['resultstest'] = 0;
 		}
 		if (is_object($this->arr_iass_states[$usr_id])) {
 			$array['conf'] = $this->arr_iass_states[$usr_id]->getPassed();
+		} else {
+			$array['conf'] = 0;
 		}
 		if (is_object($this->arr_excercise_states[$usr_id])) {
 			$array['homework'] = $this->arr_excercise_states[$usr_id]->getPassedPercentage();
+		} else {
+			$array['homework'] = 0;
 		}
 		$form->setValuesbyArray($array);
 	}

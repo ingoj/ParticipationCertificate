@@ -234,7 +234,7 @@ class ilParticipationCertificateConfig extends ActiveRecord {
 			'page2_box2_title' => 'Studienvorbereitung – eMentoring',
 			'page2_box2_row1' => 'Aktive Teilnahme an Videokonferenzen',
 			'page2_box2_row2' => 'Bearbeitung der Aufgaben zu überfachlichen Themen:',
-			'footer_config' => 'Die Werte dieser Bescheinigung wurden manuell gesetzt',
+			'footer_config' => 'Die Resultate dieser Bescheinigung wurden manuell berechnet.',
 		);
 	}
 

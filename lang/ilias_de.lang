@@ -3,14 +3,14 @@ cols_userid#:#UserID
 cols_firstname#:#Vorname
 cols_lastname#:#Nachname
 cols_initial_test_finished#:#Einstiegstest abgeschlossen
-cols_results_qualifying#:#Resultate der qualifizierenden Tests
-cols_result_qualifying#:#Resultat qualifizierende Tests
+cols_results_qualifying#:#Bearbeitung der empfohlenen Mathematik-Lernmodulen
+cols_result_qualifying#:#Resultate der durchgeführten Tests der empfohlenen Mathematik-Lernmodulen
 cols_eMentoring_finished#:#Aktive Teilnahme an Videokonferenzen
-cols_eMentoring_homework#:#Anzahl Hausaufgaben abgegeben
-cols_eMentoring_percentage#:#Bearbeitung der aufgaben zu überfachlichen Themen
+cols_eMentoring_homework#:#Bearbeitung der Aufgaben zu überfachlichen Themen (Anzahl)
+cols_eMentoring_percentage#:#Bearbeitung der Aufgaben zu überfachlichen Themen in Prozent
 cols_actions#:#Aktion
 list_actions#:#Aktionen
-list_results#:#Resultate bearbeiten
+list_results#:#Resultate für den Druck anpassen
 list_print#:#Drucken
 filter_name#:#Name
 header_config#:#Konfigurieren

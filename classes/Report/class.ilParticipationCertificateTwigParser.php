@@ -97,6 +97,7 @@ class ilParticipationCertificateTwigParser {
 				));
 				$processed_arr_text_values[$key] = $peparsed_value;
 			}
+
 			//Learning Objective Master Course
 			$arr_usr_lo_master_crs = array();
 			if (is_array($arr_lo_master_crs[$usr_id])) {

@@ -3,6 +3,8 @@
 require_once './Services/Table/classes/class.ilTable2GUI.php';
 require_once './Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/ParticipationCertificate/classes/Table/class.ilParticipationCertificateResultModificationGUI.php';
 require_once './Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/ParticipationCertificate/classes/SingleResultTable/class.ilParticipationCertificateSingleResultGUI.php';
+require_once './Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/ParticipationCertificate/classes/LearnObjectFinalTestStateOfSugg/class.ilLearnObjectFinalTestOfSuggStates.php';
+
 
 /**
  * Class ilParticipationCertificateResultGUI
@@ -155,7 +157,8 @@ class ilParticipationCertificateResultTableGUI extends ilTable2GUI {
 		$arr_learn_reached_percentages = ilLearnObjectSuggReachedPercentages::getData($this->usr_ids);
 		$arr_iass_states = ilIassStates::getData($this->usr_ids);
 		$arr_excercise_states = ilExcerciseStates::getData($this->usr_ids);
-		$arr_FinalTestsStates = ilLearnObjectFinalTestStates::getData($this->usr_ids);
+		$arr_FinalTestsStates = ilLearnObjectFinalTestOfSuggStates::getData($this->usr_ids);
+
 
 		$rows = array();
 		foreach ($this->usr_ids as $usr_id) {
@@ -188,6 +191,23 @@ class ilParticipationCertificateResultTableGUI extends ilTable2GUI {
 			} else {
 				$row['result_qualifing_tests'] = 0 . '%';
 			}
+
+
+			if (is_array($arr_FinalTestsStates[$usr_id])) {
+
+				foreach ($arr_FinalTestsStates[$usr_id] as $rec) {
+					/**
+					 * @var ilLearnObjectFinalTestOfSuggState $rec
+					 */
+					$rec_array[] = $rec->getLocftestObjectiveTitle().'<br/>'.$rec->getLocftestTestTitle().'<br/>'.round($rec->getLocftestPercentage(),0). '%<br/>';
+				}
+				$array_results = $rec_array;
+				$row['results_qualifing_tests'] = $array_results;
+			}
+			else{
+				$row['results_qualifing_tests'] = 'Keine Tests';
+			}
+
 			if (is_object($arr_iass_states[$usr_id])) {
 				$row['eMentoring_finished'] = $arr_iass_states[$usr_id]->getPassed();
 
@@ -200,22 +220,7 @@ class ilParticipationCertificateResultTableGUI extends ilTable2GUI {
 				$row['eMentoring_finished'] = 'Nein';
 			}
 
-			if (is_array($arr_FinalTestsStates[$usr_id])) {
-
-				foreach ($arr_FinalTestsStates[$usr_id] as $rec) {
-					$rec_array[] = $rec->getLocFtestTestTitle();
-					array_push($rec_array, $rec->getLocftestPercentage());
-					array_push($rec_array, '<br>');
-				}
-				$array_results = $rec_array;
-				$row['results_qualifing_tests'] = $array_results;
-			}
-
-			else{
-				$row['results_qualifing_tests'] = 'Keine Tests';
-			}
-
-			if (is_object($arr_iass_states[$usr_id])) {
+			if (is_object($arr_excercise_states[$usr_id])) {
 				$row['eMentoring_homework'] = $arr_excercise_states[$usr_id]->getPassed();
 				$row['eMentoring_percentage'] = $arr_excercise_states[$usr_id]->getPassedPercentage() . '%';
 			} else {
@@ -251,9 +256,11 @@ class ilParticipationCertificateResultTableGUI extends ilTable2GUI {
 		$this->tpl->parseCurrentBlock();
 
 		foreach ($this->getSelectableColumns() as $k => $v) {
-			$this->tpl->setCurrentBlock('td');
-			$this->tpl->setVariable('VALUE', (is_array($a_set[$k]) ? implode(", ", $a_set[$k]) : $a_set[$k]));
-			$this->tpl->parseCurrentBlock();
+			if($this->isColumnSelected($k)) {
+				$this->tpl->setCurrentBlock('td');
+				$this->tpl->setVariable('VALUE', (is_array($a_set[$k]) ? implode("<br/>", $a_set[$k]) : $a_set[$k]));
+				$this->tpl->parseCurrentBlock();
+			}
 		}
 		$current_selection_list = new ilAdvancedSelectionListGUI();
 		$current_selection_list->setListTitle($this->pl->txt('list_actions'));

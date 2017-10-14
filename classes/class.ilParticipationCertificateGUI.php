@@ -205,13 +205,10 @@ class ilParticipationCertificateGUI {
 				$config->setConfigType(ilParticipationCertificateConfig::CONFIG_TYPE_GROUP);
 				$config->setConfigValueType(ilParticipationCertificateConfig::CONFIG_VALUE_TYPE_CERT_TEXT);
 				$config->setConfigKey( $item->getPostVar());
-				ilUtil::sendFailure($this->pl->txt('failFormSave'),true);
-			}
-			else{
-				ilUtil::sendSuccess($this->pl->txt('successFormSave'),true);
 			}
 			$config->setConfigValue($form->getInput($item->getPostVar()));
 			$config->store();
+			ilUtil::sendSuccess($this->pl->txt('successFormSave'),true);
 		}
 		$this->ctrl->redirect($this, 'display');
 		return true;
