@@ -89,7 +89,7 @@ $i = 1;
 foreach(ilParticipationCertificateConfig::returnDefaultValues() as $key => $value) {
 $config = ilParticipationCertificateConfig::where(array('config_key' =>  $key, 'config_type' => ilParticipationCertificateConfig::CONFIG_TYPE_GLOBAL, 'config_value_type' => ilParticipationCertificateConfig::CONFIG_VALUE_TYPE_CERT_TEXT))->first();
 
-	if(is_object($config)) {
+	if(!is_object($config)) {
 		/**
 		 * @var ilParticipationCertificateConfig $config
 		 */

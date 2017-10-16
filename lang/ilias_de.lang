@@ -3,8 +3,8 @@ cols_userid#:#UserID
 cols_firstname#:#Vorname
 cols_lastname#:#Nachname
 cols_initial_test_finished#:#Einstiegstest abgeschlossen
-cols_results_qualifying#:#Bearbeitung der empfohlenen Mathematik-Lernmodulen
-cols_result_qualifying#:#Resultate der durchgeführten Tests der empfohlenen Mathematik-Lernmodulen
+cols_results_qualifying#:#Bearbeitung der empfohlenen Mathematik-Lernmodule
+cols_result_qualifying#:#Resultate der durchgeführten Tests der empfohlenen Mathematik-Lernmodule
 cols_eMentoring_finished#:#Aktive Teilnahme an Videokonferenzen
 cols_eMentoring_homework#:#Bearbeitung der Aufgaben zu überfachlichen Themen (Anzahl)
 cols_eMentoring_percentage#:#Bearbeitung der Aufgaben zu überfachlichen Themen in Prozent
@@ -34,7 +34,7 @@ config_plugin#:#Konfiguration Teilnahmebescheinigung
 mod_initial#:#Einstiegstest abgeschlossen (Ja(1)/Nein(0) )
 mod_resultstest#:#Resultat qualifizierende Tests (Prozentwert)
 mod_conf#:#Bearbeitung der Aufgaben zu überfachlichen Themen (Ja(1)/Nein(0) )
-mod_homework#:#Bearbeitung der aufgaben zu überfachlichen Themen (Prozentwert)
+mod_homework#:#Bearbeitung der Aufgaben zu überfachlichen Themen (Prozentwert)
 print_pdf#:#PDF Drucken
 list_print_without#:#Drucken exkl.eMentoring
 plugin#:#Teilnahmebescheinigungen
