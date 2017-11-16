@@ -104,7 +104,7 @@ class ilParticipationCertificateResultTableGUI extends ilTable2GUI {
 		);
 		$cols['results_qualifing_tests'] = array(
 			'txt' => $this->pl->txt('cols_result_qualifying'),
-			'default' => true,
+			'default' => false,
 			'width' => 'auto',
 			'sort_field' => 'results_qualifing_tests'
 		);
@@ -132,7 +132,7 @@ class ilParticipationCertificateResultTableGUI extends ilTable2GUI {
 
 
 	private function addColumns() {
-		$this->addColumn('');
+		$this->addColumn('','','',true);
 		foreach ($this->getSelectableColumns() as $k => $v) {
 			if ($this->isColumnSelected($k)) {
 				if (isset($v['sort_field'])) {
