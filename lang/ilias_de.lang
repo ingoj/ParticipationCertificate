@@ -1,0 +1,43 @@
+tbl_overview_results#:#Übersicht der Resultate
+cols_userid#:#UserID
+cols_firstname#:#Vorname
+cols_lastname#:#Nachname
+cols_initial_test_finished#:#Einstiegstest abgeschlossen
+cols_results_qualifying#:#Bearbeitung der empfohlenen Mathematik-Lernmodule
+cols_result_qualifying#:#Resultate der durchgeführten Tests der empfohlenen Mathematik-Lernmodule
+cols_eMentoring_finished#:#Aktive Teilnahme an Videokonferenzen
+cols_eMentoring_homework#:#Bearbeitung der Aufgaben zu überfachlichen Themen (Anzahl)
+cols_eMentoring_percentage#:#Bearbeitung der Aufgaben zu überfachlichen Themen in Prozent
+cols_actions#:#Aktion
+list_actions#:#Aktionen
+list_results#:#Resultate für den Druck anpassen
+list_print#:#Drucken
+filter_name#:#Name
+header_config#:#Konfigurieren
+header_overview#:#Übersicht
+header_btn_back#:#Zurück
+header_btn_print#:#Bescheinigung Drucken
+header_btn_print_eMentoring#:#Bescheinigung Drucken (exkl. eMentoring)
+firstname#:#Vorname
+lastname#:#Nachname
+usr_id#:#UserID
+list_overview#:#Alle Resultate anzeigen
+btn_reset#:#Textwerte für das Formular zurücksetzen
+result_for#:#Alle Resultate für
+no_records_selected#:#Keine User ausgewählt
+upload_header #:# Laden Sie Ihren PDF Header hoch
+save#:#Speichern
+udf_gender#:#Benutzerdefiniertes Feld Geschlecht
+udf_lastname#:#Benutzerdefiniertes Feld Nachnamen
+udf_firstname#:#Benutzerdefiniertes Feld Vornamen
+config_plugin#:#Konfiguration Teilnahmebescheinigung
+mod_initial#:#Einstiegstest abgeschlossen (Ja(1)/Nein(0) )
+mod_resultstest#:#Resultat qualifizierende Tests (Prozentwert)
+mod_conf#:#Bearbeitung der Aufgaben zu überfachlichen Themen (Ja(1)/Nein(0) )
+mod_homework#:#Bearbeitung der Aufgaben zu überfachlichen Themen (Prozentwert)
+print_pdf#:#PDF Drucken
+list_print_without#:#Drucken exkl.eMentoring
+plugin#:#Teilnahmebescheinigungen
+success#:#Druck erfolgreich
+successForm#:#Formular erfolgreich zurückgesetzt
+successFormSave#:#Formular erfolgreich gespeichert

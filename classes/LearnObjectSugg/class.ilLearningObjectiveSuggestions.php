@@ -1,5 +1,6 @@
 <?php
 require_once "class.ilLearningObjectiveSuggestion.php";
+require_once './Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/ParticipationCertificate/classes/LearnObjectMasterCrs/class.ilLearningObjectivesMasterCrs.php';
 
 class ilLearningObjectiveSuggestions {
 
