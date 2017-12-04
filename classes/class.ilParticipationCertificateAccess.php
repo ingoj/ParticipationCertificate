@@ -22,9 +22,29 @@ class ilParticipationCertificateAccess {
 
 		return false;
 	}
+	public function hasCurrentUserReadAccess(){
+		global $ilAccess;
+
+		if($ilAccess->checkAccess("read","",$this->group_ref_id)){
+			return true;
+		}
+		return false;
+	}
+
+	public function hasCurrentUserSpecialAccess(){
+		global $ilAccess,$ilUser;
+
+		if($ilAccess->checkAccess("read_learning_progress","",$this->group_ref_id)){
+			return true;
+		}
+		return false;
+	}
+
+
 
 	public function getUserIdsOfGroup() {
-		if($this->hasCurrentUserPrintAccess()) {
+		global $ilUser;
+		if($this->hasCurrentUserPrintAccess() || $this->hasCurrentUserSpecialAccess()) {
 			global $ilDB;
 
 			$select = "select obj_members.usr_id from obj_members
@@ -39,8 +59,17 @@ class ilParticipationCertificateAccess {
 			}
 			return $usr_data;
 		}
+		elseif ($this->hasCurrentUserReadAccess())
+		{
+			$usr_data = array();
+			$usr_data[] = $ilUser->getId();
+			return $usr_data;
+		}
+
+
 
 		return array();
 	}
+
 }
 ?>

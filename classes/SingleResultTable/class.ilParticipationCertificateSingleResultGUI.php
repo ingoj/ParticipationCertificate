@@ -46,8 +46,9 @@ class ilParticipationCertificateSingleResultGUI {
 		$this->pl = ilParticipationCertificatePlugin::getInstance();
 		$this->learnGroup = ilObjectFactory::getInstanceByRefId($_GET['ref_id']);
 
+		$this->ctrl->saveParameterByClass('ilParticipationCertificateUIHookGUI', [ 'ref_id', 'group_id' ]);
 		$this->ctrl->saveParameterByClass('ilParticipationCertificateResultModificationGUI', [ 'ref_id', 'group_id' ]);
-		$this->ctrl->saveParameterByClass('ilParticipationCertificateResultGUI', 'usr_id');
+		$this->ctrl->saveParameterByClass('ilParticipationCertificateUIHookGUI', 'usr_id');
 
 		$cert_access = new ilParticipationCertificateAccess($_GET['ref_id']);
 		$this->usr_ids = $cert_access->getUserIdsOfGroup();
@@ -91,7 +92,6 @@ class ilParticipationCertificateSingleResultGUI {
 		$this->tpl->setTitle($this->learnGroup->getTitle());
 		$this->tpl->setDescription($this->learnGroup->getDescription());
 		$this->tpl->setTitleIcon(ilObject::_getIcon($this->learnGroup->getId()));
-
 		$this->ctrl->saveParameterByClass('ilParticipationCertificateResultGUI', 'ref_id');
 		$this->tabs->setBackTarget($this->pl->txt('header_btn_back'), $this->ctrl->getLinkTargetByClass(ilParticipationCertificateResultGUI::class, ilParticipationCertificateResultGUI::CMD_CONTENT));
 	}

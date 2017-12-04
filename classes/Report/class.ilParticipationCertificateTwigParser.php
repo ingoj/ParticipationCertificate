@@ -62,6 +62,7 @@ class ilParticipationCertificateTwigParser {
 
 	public function parseData() {
 		$arr_text_values = ilParticipationCertificateConfig::returnTextValues($this->group_ref_id, ilParticipationCertificateConfig::CONFIG_TYPE_GROUP);
+		$arr_percent_value = ilParticipationCertificateConfig::returnStandardValue($this->group_ref_id, ilParticipationCertificateConfig::CONFIG_TYPE_GROUP);
 
 		$arr_usr_data = ilPartCertUsersData::getData($this->usr_ids);
 		$arr_lo_master_crs = ilLearningObjectivesMasterCrs::getData($this->usr_ids);
@@ -130,8 +131,12 @@ class ilParticipationCertificateTwigParser {
 				}
 				//Video Conferences
 				$iass_state = 0;
+				$iass_state1 = 0;
+				$iass_state2 = 0;
 				if (is_object($arr_iass_states[$usr_id])) {
-					$iass_state = $arr_iass_states[$usr_id]->getPassed();
+					$iass_state1 = $arr_iass_states[$usr_id]->getPassed();
+					$iass_state2 = $arr_iass_states[$usr_id]->getTotal();
+					$iass_state = (100/$iass_state2)*$iass_state1;
 				}
 				//Home Work
 				$excercise_percentage = 0;
@@ -148,8 +153,11 @@ class ilParticipationCertificateTwigParser {
 				'crsitest_itest_submitted' => $initial_test_state,
 				'learn_sugg_reached_percentage' => $learn_sugg_reached_percentage,
 				'iass_state' => $iass_state,
+				'iass_state1' => $iass_state1,
+				'iass_state2' => $iass_state2,
 				'excercise_percentage' => $excercise_percentage,
-				'logo_path' => $logo_path
+				'logo_path' => $logo_path,
+				'standard_value' => $arr_percent_value->getConfigValue()
 			);
 
 			$part_pdf->generatePDF($this->twig_template->render($arr_render), count($this->usr_id));

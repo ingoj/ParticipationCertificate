@@ -40,7 +40,7 @@
        {{text_values.page1_box2_row1}}
      </td>
      <td class="td2">
-       {% if iass_state %}
+       {% if iass_state >= standard_value %}
        Ja
        {% else %}
        Nein
@@ -103,11 +103,7 @@
   <tr>
     <td class="td1">{{text_values.page2_box2_row1}}</td>
     <td class="td2">
-      {% if iass_state %}
-        Ja
-      {% else %}
-        Nein
-      {% endif %}
+   {{iass_state2}}/{{iass_state1}}
     </td>
   </tr>
   <tr>

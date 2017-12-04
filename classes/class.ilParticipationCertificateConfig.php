@@ -293,6 +293,7 @@ class ilParticipationCertificateConfig extends ActiveRecord{
 			'page2_box2_title' => 'Studienvorbereitung – eMentoring',
 			'page2_box2_row1' => 'Aktive Teilnahme an Videokonferenzen',
 			'page2_box2_row2' => 'Bearbeitung der Aufgaben zu überfachlichen Themen:',
+			'percent_value' => '50',
 		);
 	}
 
@@ -306,6 +307,11 @@ class ilParticipationCertificateConfig extends ActiveRecord{
 		if(count($arr_config) == 0) {
 			$arr_config = ilParticipationCertificateConfig::where(array("config_type" => ilParticipationCertificateConfig::CONFIG_TYPE_GLOBAL,'config_value_type' => ilParticipationCertificateConfig::CONFIG_VALUE_TYPE_CERT_TEXT))->orderBy('order_by')->getArray('config_key','config_value');
 		}
+		return $arr_config;
+	}
+
+	public static function returnStandardValue($group_ref_id = 0, $config_type = self::CONFIG_TYPE_GLOBAL){
+		$arr_config = ilParticipationCertificateConfig::where(array("config_type" => $config_type, "group_ref_id" => $group_ref_id, "config_value_type" => ilParticipationCertificateConfig::CONFIG_VALUE_TYPE_OTHER, 'config_key' => 'percent_value'))->first();
 		return $arr_config;
 	}
 }

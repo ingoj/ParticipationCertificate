@@ -45,6 +45,10 @@ class ilParticipationCertificateResultGUI {
 	 * @var object
 	 */
 	protected $learnGroup;
+	/**
+	 * @var ilParticipationCertificateAccess
+	 */
+	protected $cert_access;
 
 
 	/**
@@ -61,12 +65,12 @@ class ilParticipationCertificateResultGUI {
 		$this->groupRefId = (int)$_GET['ref_id'];
 		$this->learnGroup = ilObjectFactory::getInstanceByRefId($_GET['ref_id']);
 
-		//Access
+		/*Access
 		$cert_access = new ilParticipationCertificateAccess($_GET['ref_id']);
 		if (!$cert_access->hasCurrentUserPrintAccess()) {
 			ilUtil::sendFailure($lng->txt('no_permission'), true);
 			ilUtil::redirect('login.php');
-		}
+		}*/
 
 		$this->ctrl->saveParameterByClass('ilParticipationCertificateResultGUI', [ 'ref_id', 'group_id' ]);
 	}
@@ -102,17 +106,21 @@ class ilParticipationCertificateResultGUI {
 		$this->tpl->getStandardTemplate();
 		$this->initHeader();
 
-		$b_print = ilLinkButton::getInstance();
-		$b_print->setCaption($this->pl->txt('header_btn_print'), false);
-		$this->ctrl->setParameter($this, 'ementor', true);
-		$b_print->setUrl($this->ctrl->getLinkTarget($this, $this::CMD_PRINT_PDF));
-		$this->toolbar->addButtonInstance($b_print);
+		$cert_access = new ilParticipationCertificateAccess($_GET['ref_id']);
 
-		$b_print = ilLinkButton::getInstance();
-		$this->ctrl->setParameter($this, 'ementor', false);
-		$b_print->setCaption($this->pl->txt('header_btn_print_eMentoring'), false);
-		$b_print->setUrl($this->ctrl->getLinkTarget($this, $this::CMD_PRINT_PDF));
-		$this->toolbar->addButtonInstance($b_print);
+		if($cert_access->hasCurrentUserPrintAccess()) {
+			$b_print = ilLinkButton::getInstance();
+			$b_print->setCaption($this->pl->txt('header_btn_print'), false);
+			$this->ctrl->setParameter($this, 'ementor', true);
+			$b_print->setUrl($this->ctrl->getLinkTarget($this, $this::CMD_PRINT_PDF));
+			$this->toolbar->addButtonInstance($b_print);
+
+			$b_print = ilLinkButton::getInstance();
+			$this->ctrl->setParameter($this, 'ementor', false);
+			$b_print->setCaption($this->pl->txt('header_btn_print_eMentoring'), false);
+			$b_print->setUrl($this->ctrl->getLinkTarget($this, $this::CMD_PRINT_PDF));
+			$this->toolbar->addButtonInstance($b_print);
+		}
 
 		$this->initTable();
 
@@ -132,39 +140,66 @@ class ilParticipationCertificateResultGUI {
 		$this->ctrl->saveParameterByClass('ilParticipationCertificateGUI', 'ref_id');
 
 		$this->tabs->addTab('overview', $this->pl->txt('header_overview'), $this->ctrl->getLinkTargetByClass(ilParticipationCertificateResultGUI::class, ilParticipationCertificateResultGUI::CMD_CONTENT));
-		$this->tabs->addTab('config', $this->pl->txt('header_config'), $this->ctrl->getLinkTargetByClass(ilParticipationCertificateGUI::class, ilParticipationCertificateGUI::CMD_DISPLAY));
+		$cert_access = new ilParticipationCertificateAccess($_GET['ref_id']);
+		if($cert_access->hasCurrentUserPrintAccess()) {
+			$this->tabs->addTab('config', $this->pl->txt('header_config'), $this->ctrl->getLinkTargetByClass(ilParticipationCertificateGUI::class, ilParticipationCertificateGUI::CMD_DISPLAY));
+		}
 		$this->tabs->activateTab('overview');
 	}
 
 
 	public function printPdf() {
-		$ementor = $_GET['ementor'];
-		$usr_id = $_GET['usr_id'];
-		$twigParser = new ilParticipationCertificateTwigParser($this->groupRefId, array(),$usr_id, $ementor, false);
-		$twigParser->parseData();
+		global $lng;
+		$cert_access = new ilParticipationCertificateAccess($_GET['ref_id']);
+		if($cert_access->hasCurrentUserPrintAccess()) {
+			$ementor = $_GET['ementor'];
+			$usr_id = $_GET['usr_id'];
+			$twigParser = new ilParticipationCertificateTwigParser($this->groupRefId, array(), $usr_id, $ementor, false);
+			$twigParser->parseData();
+		}
+		else{
+			ilUtil::sendFailure($lng->txt('no_permission'), true);
+			ilUtil::redirect('login.php');
+		}
 	}
 
 
 	public function printSelected() {
-		if (!isset($_POST['record_ids']) || (isset($_POST['record_ids']) && !count($_POST['record_ids']))) {
-			ilUtil::sendFailure($this->pl->txt('no_records_selected'), true);
-			$this->ctrl->redirect($this, self::CMD_CONTENT);
+		global $lng;
+		$cert_access = new ilParticipationCertificateAccess($_GET['ref_id']);
+		if($cert_access->hasCurrentUserPrintAccess()) {
+			if (!isset($_POST['record_ids']) || (isset($_POST['record_ids']) && !count($_POST['record_ids']))) {
+				ilUtil::sendFailure($this->pl->txt('no_records_selected'), true);
+				$this->ctrl->redirect($this, self::CMD_CONTENT);
+			}
+			$usr_id = $_POST['record_ids'];
+			$twigParser = new ilParticipationCertificateTwigParser($this->groupRefId, array(), $usr_id, true, false, false);
+			$twigParser->parseData();
 		}
-		$usr_id = $_POST['record_ids'];
-		$twigParser = new ilParticipationCertificateTwigParser($this->groupRefId, array(), $usr_id, true, false, false);
-		$twigParser->parseData();
+		else{
+			ilUtil::sendFailure($lng->txt('no_permission'), true);
+			ilUtil::redirect('login.php');
+		}
 	}
 
 
 	public function printSelectedWithouteMentoring() {
-		if (!isset($_POST['record_ids']) || (isset($_POST['record_ids']) && !count($_POST['record_ids']))) {
-			ilUtil::sendFailure($this->pl->txt('no_records_selected'), true);
-			$this->ctrl->redirect($this, self::CMD_CONTENT);
-		}
+		global $lng;
+		$cert_access = new ilParticipationCertificateAccess($_GET['ref_id']);
+		if($cert_access->hasCurrentUserPrintAccess()) {
+			if (!isset($_POST['record_ids']) || (isset($_POST['record_ids']) && !count($_POST['record_ids']))) {
+				ilUtil::sendFailure($this->pl->txt('no_records_selected'), true);
+				$this->ctrl->redirect($this, self::CMD_CONTENT);
+			}
 
-		$usr_id = $_POST['record_ids'];
-		$twigParser = new ilParticipationCertificateTwigParser($this->groupRefId, array(), $usr_id, false, false, false);
-		$twigParser->parseData();
+			$usr_id = $_POST['record_ids'];
+			$twigParser = new ilParticipationCertificateTwigParser($this->groupRefId, array(), $usr_id, false, false, false);
+			$twigParser->parseData();
+		}
+		else{
+			ilUtil::sendFailure($lng->txt('no_permission'), true);
+			ilUtil::redirect('login.php');
+		}
 	}
 
 
