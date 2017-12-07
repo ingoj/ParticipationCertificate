@@ -188,6 +188,15 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI {
 		$percent->setValue($value);
 		$form->addItem($percent);
 
+		$obj_value = ilParticipationCertificateConfig::where(array( "config_type" => ilParticipationCertificateConfig::CONFIG_TYPE_GLOBAL , "config_value_type" => ilParticipationCertificateConfig::CONFIG_VALUE_TYPE_OTHER, "config_key" =>  "color"))->first();
+		$value = 0;
+		if(is_object($obj_value)) {
+			$value = $obj_value->getConfigValue();
+		}
+		$color = new ilColorPickerInputGUI('Color','color');
+		$color->setValue($value);
+		$form->addItem($color);
+
 		$form->addCommandButton(ilParticipationCertificateConfigGUI::CMD_SAVE, 'Speichern');
 
 		return $form;
@@ -275,6 +284,20 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI {
 		$config->setGroupRefId(0);
 		$config->setConfigType(ilParticipationCertificateConfig::CONFIG_TYPE_GLOBAL);
 		$config->store();
+
+
+		$config = ilParticipationCertificateConfig::where(array('config_key' =>  'color', 'config_type' => ilParticipationCertificateConfig::CONFIG_TYPE_GLOBAL, 'config_value_type' => ilParticipationCertificateConfig::CONFIG_VALUE_TYPE_OTHER))->first();
+		if(!is_object($config)) {
+			$config = new ilParticipationCertificateConfig();
+		}
+
+		$config->setConfigValue($form->getInput('color'));
+		$config->setConfigValueType(ilParticipationCertificateConfig::CONFIG_VALUE_TYPE_OTHER);
+		$config->setConfigKey('color');
+		$config->setGroupRefId(0);
+		$config->setConfigType(ilParticipationCertificateConfig::CONFIG_TYPE_GLOBAL);
+		$config->store();
+
 
 
 		//Picture

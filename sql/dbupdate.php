@@ -113,6 +113,9 @@ if(!is_object($config)) {
 	$part_conf->store();
 }
 ?>
+<#16>
+<?php
+?>
 <#17>
 <?php
 require_once 'Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/ParticipationCertificate/classes/class.ilParticipationCertificateConfig.php';

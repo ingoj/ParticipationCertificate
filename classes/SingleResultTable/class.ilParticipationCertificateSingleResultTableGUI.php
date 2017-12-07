@@ -3,6 +3,8 @@
 require_once './Services/Table/classes/class.ilTable2GUI.php';
 require_once './Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/ParticipationCertificate/classes/Table/class.ilParticipationCertificateResultModificationGUI.php';
 require_once './Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/ParticipationCertificate/classes/SingleResultTable/class.ilParticipationCertificateSingleResultGUI.php';
+require_once './Customizing/global/plugins/Services/Cron/CronHook/LearningObjectiveSuggestions/src/Score/LearningObjectiveScores.php';
+require_once './Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/ParticipationCertificate/classes/getFineWeights/class.getFineWeights.php';
 
 /**
  * Class ilParticipationCertificateResultGUI
@@ -32,6 +34,10 @@ class ilParticipationCertificateSingleResultTableGUI extends ilTable2GUI {
 	 * @var array
 	 */
 	protected $filter = array();
+	/**
+	 * @var
+	 */
+	protected $usr_id;
 
 
 	/**
@@ -69,6 +75,7 @@ class ilParticipationCertificateSingleResultTableGUI extends ilTable2GUI {
 		$arr_usr_data = ilPartCertUsersData::getData($this->usr_ids);
 		$nameUser = $arr_usr_data[$usr_id]->getPartCertFirstname() . ' ' . $arr_usr_data[$usr_id]->getPartCertLastname();
 		$this->setTitle($this->pl->txt('result_for ') . ' ' . $nameUser);
+		$this->sortColumns();
 
 		$this->initFilter();
 		$this->addColumns();
@@ -85,24 +92,59 @@ class ilParticipationCertificateSingleResultTableGUI extends ilTable2GUI {
 		$cols = array();
 
 		$finalTestsStates = ilLearnObjectFinalTestStates::getData($this->usr_ids);
+		$sorted = $this->sortColumns();
 
-		if(count($finalTestsStates[$this->usr_id] )) {
-			foreach ($finalTestsStates[$this->usr_id] as $finalTestsState) {
-
-				/**
-				 * @var ilLearnObjectFinalTestState $finalTestsState
-				 */
-				$cols[$finalTestsState->getLocftestCrsObjId()] = array(
-					'txt' => $finalTestsState->getLocftestCrsTitle(),
-					'default' => true,
-					'width' => 'auto',
-				);
+		if (count($finalTestsStates[$this->usr_id])) {
+			while (count($sorted)) {
+				foreach ($finalTestsStates[$this->usr_id] as $finalTestsState) {
+					if ($finalTestsState->getLocftestCrsTitle() == key($sorted)) {
+						/**
+						 * @var ilLearnObjectFinalTestState $finalTestsState
+						 */
+						$cols[$finalTestsState->getLocftestCrsObjId()] = array(
+							'txt' => $finalTestsState->getLocftestCrsTitle(),
+							'default' => true,
+							'width' => 'auto',
+						);
+						unset($sorted[key($sorted)]);
+					}
+				}
 			}
 		}
 
-
-
 		return $cols;
+	}
+
+
+	function sortColumns() {
+		//First sort scores
+		$scores = LearningObjectiveScores::getData($this->usr_id);
+		//if the scores are equal, sort because of the weight value
+		$weights = getFineWeights::getData();
+		$newWeights = (array) $weights;
+
+		$i = 0;
+		//associate the weight with the corresponding obj
+		while(count($newWeights)) {
+			foreach ($scores as $score) {
+				$number = str_split($score->getObjectiveId());
+				if ($number[1] == $i) {
+					$sorting[$score->getTitle()] = [
+						'score' => $score->getScore(),
+						'obj_id' => $score->getObjectiveId(),
+						'weight' => $newWeights['weight_fine_'.$score->getObjectiveId()]
+					];
+					unset($newWeights['weight_fine_' . $score->getObjectiveId()]);
+					$i++;
+				}
+			}
+		}
+		foreach ($sorting as $key => $item) {
+			$scored[$key] = $item['score'];
+			$weighting[$key] = $item['weight'];
+		}
+		array_multisort($scored, SORT_DESC, $weighting, SORT_DESC,$sorting);
+		return $sorting;
 	}
 
 
@@ -129,7 +171,7 @@ class ilParticipationCertificateSingleResultTableGUI extends ilTable2GUI {
 
 		$rec_array = array();
 
-		if(count($arr_FinalTestsStates[$usr_id])) {
+		if (count($arr_FinalTestsStates[$usr_id])) {
 			foreach ($arr_FinalTestsStates[$usr_id] as $rec) {
 				/**
 				 * @var ilLearnObjectFinalTestOfSuggState $rec
@@ -138,8 +180,6 @@ class ilParticipationCertificateSingleResultTableGUI extends ilTable2GUI {
 					. '%<br/>';
 			}
 		}
-
-
 
 		$this->setData($rec_array);
 	}
