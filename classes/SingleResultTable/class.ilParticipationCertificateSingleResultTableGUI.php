@@ -6,6 +6,7 @@ require_once './Customizing/global/plugins/Services/UIComponent/UserInterfaceHoo
 require_once './Customizing/global/plugins/Services/Cron/CronHook/LearningObjectiveSuggestions/src/Score/LearningObjectiveScores.php';
 require_once './Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/ParticipationCertificate/classes/getFineWeights/class.getFineWeights.php';
 require_once './Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/ParticipationCertificate/classes/TestMark/class.TestMarks.php';
+require_once './Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/ParticipationCertificate/classes/Learningsugg/class.getLearnSuggs.php';
 
 /**
  * Class ilParticipationCertificateResultGUI
@@ -61,6 +62,10 @@ class ilParticipationCertificateSingleResultTableGUI extends ilTable2GUI {
 		$this->tabs = $tabs;
 		$this->pl = ilParticipationCertificatePlugin::getInstance();
 
+		$config = ilParticipationCertificateConfig::where(array('config_key' =>  'color', 'config_type' => ilParticipationCertificateConfig::CONFIG_TYPE_GLOBAL, 'config_value_type' => ilParticipationCertificateConfig::CONFIG_VALUE_TYPE_OTHER))->first();
+		$this->color = $config->getConfigValue();
+
+
 		$this->setPrefix('dhbw_part_cert_res');
 		$this->setFormName('dhbw_part_cert_res');
 		$this->setId('dhbw_part_cert_res');
@@ -73,6 +78,9 @@ class ilParticipationCertificateSingleResultTableGUI extends ilTable2GUI {
 
 		$usr_id = $_GET[self::IDENTIFIER];
 		$this->usr_id = $usr_id;
+
+		$this->sugg = getLearnSuggs::getData($usr_id);
+
 
 		parent::__construct($a_parent_obj, $a_parent_cmd);
 
@@ -109,6 +117,7 @@ class ilParticipationCertificateSingleResultTableGUI extends ilTable2GUI {
 						 */
 						$cols[$finalTestsState->getLocftestCrsObjId()] = array(
 							'txt' => $finalTestsState->getLocftestCrsTitle(),
+							'obj_id' => $sorted[key($sorted)]['obj_id'],
 							'default' => true,
 							'width' => 'auto',
 						);
@@ -235,14 +244,10 @@ class ilParticipationCertificateSingleResultTableGUI extends ilTable2GUI {
 				$current_percent = 0;
 				$required_percent = 0;
 		}
-
-
 		//required to dodge bug in ilContainerObjectiveGUI::renderProgressBar
 		if ($required_percent == 0) {
 			$required_percent = 0.1;
 		}
-
-
 
 		if($points >= $required_amount_of_points) {
 			$css_class = self::SUCCESSFUL_PROGRESS_CSS_CLASS;
@@ -252,7 +257,6 @@ class ilParticipationCertificateSingleResultTableGUI extends ilTable2GUI {
 		}
 
 		require_once("Services/Container/classes/class.ilContainerObjectiveGUI.php");
-
 		return ilContainerObjectiveGUI::renderProgressBar($current_percent, $required_percent, $css_class, '', NULL, $tooltip_id, '');
 	}
 
@@ -261,16 +265,19 @@ class ilParticipationCertificateSingleResultTableGUI extends ilTable2GUI {
 	 * @param array $a_set
 	 */
 	public function fillRow($a_set) {
-		$this->marks;
 		foreach ($this->getSelectableColumns() as $k => $v) {
 			if ($this->isColumnSelected($k)) {
 				if ($a_set[$k]) {
 					$this->tpl->setCurrentBlock('td');
 					if (is_array($a_set[$k])) {
-						$this->tpl->setVariable('BAR', $this->buildProgressBar(explode('%',$a_set[$k][0]),$a_set[$k][1]));
+						$this->tpl->setVariable('COURSE', $this->buildProgressBar(explode('%',$a_set[$k][0]),$a_set[$k][1]));
 					}
 					else {
 						$this->tpl->setVariable('COURSE', $a_set[$k]);
+
+					}
+					if ($this->searchForId($v['obj_id'], $this->sugg)) {
+						$this->tpl->setVariable('COLOR', $this->color);
 					}
 					$this->tpl->parseCurrentBlock();
 				} else {
@@ -280,6 +287,14 @@ class ilParticipationCertificateSingleResultTableGUI extends ilTable2GUI {
 				}
 			}
 		}
+	}
+	function searchForId($id, $array) {
+		foreach ($array as $key => $val) {
+			if ($val->getSuggObjectiveId() === $id) {
+				return true;
+			}
+		}
+		return false;
 	}
 }
 ?>
