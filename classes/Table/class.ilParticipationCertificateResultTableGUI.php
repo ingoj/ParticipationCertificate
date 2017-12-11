@@ -244,7 +244,6 @@ class ilParticipationCertificateResultTableGUI extends ilTable2GUI {
 			}
 		}
 		$this->setData($rows);
-
 		return $rows;
 	}
 

@@ -1,0 +1,22 @@
+table{
+	background-color:#FF00FF;
+	color: red;
+}
+tbody{
+	background-color:#FF00FF;
+	color: red;
+}
+thead{
+	background-color:#FF00FF;
+	color: red;
+}
+.tblrow1{
+	background-color:#FF00FF;
+	color: red;
+}
+td.std.small{
+	background-color:#FF00FF;
+}
+tr th {
+	background-color:#FF00FF;
+}

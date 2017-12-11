@@ -72,5 +72,4 @@ class ilParticipationCertificateUIHookGUI extends ilUIHookPluginGUI {
 		return false;
 	}
 }
-
 ?>

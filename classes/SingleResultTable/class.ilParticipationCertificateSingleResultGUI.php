@@ -79,6 +79,7 @@ class ilParticipationCertificateSingleResultGUI {
 
 	public function display() {
 		$this->tpl->getStandardTemplate();
+		$this->tpl->addCss('./Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/ParticipationCertificate/Templates/css/table.css');
 		$this->initHeader();
 
 		$this->initTable();
@@ -97,10 +98,9 @@ class ilParticipationCertificateSingleResultGUI {
 	}
 
 
-	public function initTable() {
+	public function initTable($override = false) {
 
 		$this->table = new ilParticipationCertificateSingleResultTableGUI($this, ilParticipationCertificateSingleResultGUI::CMD_DISPLAY);
 	}
 }
-
 ?>
