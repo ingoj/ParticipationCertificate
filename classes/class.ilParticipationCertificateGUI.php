@@ -177,9 +177,10 @@ class ilParticipationCertificateGUI {
 		if($arr_config_value == NULL) {
 			$arr_config_value = ilParticipationCertificateConfig::where(array("config_type" => ilParticipationCertificateConfig::CONFIG_TYPE_GLOBAL, "group_ref_id" => 0, "config_value_type" => ilParticipationCertificateConfig::CONFIG_VALUE_TYPE_OTHER,'config_key' =>  'percent_value'))->first();
 		}
+		/*
 		$percent = new ilNumberInputGUI('Schwellenwert für Videokonferenz (Prozent)','percent_value');
 		$percent->setValue($arr_config_value->getConfigValue());
-		$form->addItem($percent);
+		$form->addItem($percent);*/
 
 		$this->ctrl->saveParameterByClass('ilObjGroup', 'ref_id');
 		$form->addCommandButton(ilParticipationCertificateGUI::CMD_SAVE, $this->pl->txt('save'));
@@ -223,6 +224,7 @@ class ilParticipationCertificateGUI {
 				$config->store();
 			}
 		}
+
 		$config_value = ilParticipationCertificateConfig::where(array("config_type" => ilParticipationCertificateConfig::CONFIG_TYPE_GROUP, "group_ref_id" => $this->groupRefId, "config_value_type" => ilParticipationCertificateConfig::CONFIG_VALUE_TYPE_OTHER,'config_key'=>'percent_value'))->first();
 		if(!is_object($config_value)){
 			$config_value = new ilParticipationCertificateConfig();

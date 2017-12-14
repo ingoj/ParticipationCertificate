@@ -43,17 +43,30 @@ class ilParticipationCertificateUIHookGUI extends ilUIHookPluginGUI {
 
 		if ($a_part == 'tabs' && $this->checkGroup()) {
 
-			//$cert_access = new ilParticipationCertificateAccess($_GET['ref_id']);
+			$cert_access = new ilParticipationCertificateAccess($_GET['ref_id']);
 
-			/**
-			 * @var ilTabsGUI $tabs
-			 */
-			$tabs = $a_par["tabs"];
-			$this->ctrl->saveParameterByClass('ilParticipationCertificateResultGUI', 'ref_id');
-			$tabs->addTab('certificates', $this->pl->txt('plugin'), $this->ctrl->getLinkTargetByClass(array(
-				'ilUIPluginRouterGUI',
-				'ilParticipationCertificateResultGUI'
-			), ilParticipationCertificateResultGUI::CMD_CONTENT));
+			if ($cert_access->hasCurrentUserPrintAccess()) {
+				/**
+				 * @var ilTabsGUI $tabs
+				 */
+				$tabs = $a_par["tabs"];
+				$this->ctrl->saveParameterByClass('ilParticipationCertificateResultGUI', 'ref_id');
+				$tabs->addTab('certificates', $this->pl->txt('plugin'), $this->ctrl->getLinkTargetByClass(array(
+					'ilUIPluginRouterGUI',
+					'ilParticipationCertificateResultGUI'
+				), ilParticipationCertificateResultGUI::CMD_CONTENT));
+			}
+			else{
+				/**
+				 * @var ilTabsGUI $tabs
+				 */
+				$tabs = $a_par["tabs"];
+				$this->ctrl->saveParameterByClass('ilParticipationCertificateResultGUI', 'ref_id');
+				$tabs->addTab('certificates', $this->pl->txt('pluginreader'), $this->ctrl->getLinkTargetByClass(array(
+					'ilUIPluginRouterGUI',
+					'ilParticipationCertificateResultGUI'
+				), ilParticipationCertificateResultGUI::CMD_CONTENT));
+			}
 		}
 	}
 

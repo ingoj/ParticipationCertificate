@@ -62,9 +62,12 @@ class ilParticipationCertificateSingleResultTableGUI extends ilTable2GUI {
 		$this->tabs = $tabs;
 		$this->pl = ilParticipationCertificatePlugin::getInstance();
 
-		$config = ilParticipationCertificateConfig::where(array('config_key' =>  'color', 'config_type' => ilParticipationCertificateConfig::CONFIG_TYPE_GLOBAL, 'config_value_type' => ilParticipationCertificateConfig::CONFIG_VALUE_TYPE_OTHER))->first();
+		$config = ilParticipationCertificateConfig::where(array(
+			'config_key' => 'color',
+			'config_type' => ilParticipationCertificateConfig::CONFIG_TYPE_GLOBAL,
+			'config_value_type' => ilParticipationCertificateConfig::CONFIG_VALUE_TYPE_OTHER
+		))->first();
 		$this->color = $config->getConfigValue();
-
 
 		$this->setPrefix('dhbw_part_cert_res');
 		$this->setFormName('dhbw_part_cert_res');
@@ -80,7 +83,6 @@ class ilParticipationCertificateSingleResultTableGUI extends ilTable2GUI {
 		$this->usr_id = $usr_id;
 
 		$this->sugg = getLearnSuggs::getData($usr_id);
-
 
 		parent::__construct($a_parent_obj, $a_parent_cmd);
 
@@ -190,15 +192,15 @@ class ilParticipationCertificateSingleResultTableGUI extends ilTable2GUI {
 		if (count($arr_FinalTestsStates[$usr_id])) {
 			foreach ($arr_FinalTestsStates[$usr_id] as $rec) {
 				if ($rec->getLocftestCrsObjId()) {
-					$strng = explode(':',$rec->getLocftestTestTitle());
-					$string = $strng[0]."<br>".$strng[1];
+					$strng = explode(':', $rec->getLocftestTestTitle());
+					$string = $strng[0] . "<br>" . $strng[1];
 					$rec_array[$rec->getLocftestCrsObjId()][] = $string;
 				}
+				//create two arrays, one for the mark when a test is fulfilled and one for the scores.
 				$marks [$rec->getLocftestCrsObjId()][] = $rec->getLocftestTestRefId();
-				$this->marks = $marks;
-				$scores[$rec->getLocftestCrsObjId()][] = [$rec->getLocftestPercentage() . '%',$rec->getLocftestTestRefId()];
-
+				$scores[$rec->getLocftestCrsObjId()][] = [ $rec->getLocftestPercentage() . '%', $rec->getLocftestTestRefId() ];
 			}
+			//merge the score array and the array with the test titles
 			foreach ($rec_array as $key => $item) {
 				$v = 0;
 				for ($k = 0; $k <= count($item); $k ++) {
@@ -216,11 +218,12 @@ class ilParticipationCertificateSingleResultTableGUI extends ilTable2GUI {
 		}
 		ksort($new_rec_array);
 		$this->setData($new_rec_array);
+
 		return $new_rec_array;
 	}
 
 
-	protected function buildProgressBar($points,$test_obj) {
+	protected function buildProgressBar($points, $test_obj) {
 
 		$mark = TestMarks::getData($test_obj);
 
@@ -229,8 +232,7 @@ class ilParticipationCertificateSingleResultTableGUI extends ilTable2GUI {
 
 		if (is_object($mark)) {
 			$required_amount_of_points = $mark->getMinimumlvl();
-		}
-		else{
+		} else {
 			$required_amount_of_points = 50;
 		}
 		$maximum_possible_amount_of_points = 100;
@@ -239,24 +241,23 @@ class ilParticipationCertificateSingleResultTableGUI extends ilTable2GUI {
 		if ($maximum_possible_amount_of_points > 0) {
 			$current_percent = (int)($current_amount_of_points * 100 / $maximum_possible_amount_of_points);
 			$required_percent = (int)($required_amount_of_points * 100 / $maximum_possible_amount_of_points);
-		}
-			else {
-				$current_percent = 0;
-				$required_percent = 0;
+		} else {
+			$current_percent = 0;
+			$required_percent = 0;
 		}
 		//required to dodge bug in ilContainerObjectiveGUI::renderProgressBar
 		if ($required_percent == 0) {
 			$required_percent = 0.1;
 		}
 
-		if($points >= $required_amount_of_points) {
+		if ($points >= $required_amount_of_points) {
 			$css_class = self::SUCCESSFUL_PROGRESS_CSS_CLASS;
-		}
-		else {
-			$css_class = self::FAILED_PROGRESS_CSS_CLASS;
+		} else {
+			$css_class = self::NON_SUCCESSFUL_PROGRESS_CSS_CLASS;
 		}
 
 		require_once("Services/Container/classes/class.ilContainerObjectiveGUI.php");
+
 		return ilContainerObjectiveGUI::renderProgressBar($current_percent, $required_percent, $css_class, '', NULL, $tooltip_id, '');
 	}
 
@@ -270,11 +271,9 @@ class ilParticipationCertificateSingleResultTableGUI extends ilTable2GUI {
 				if ($a_set[$k]) {
 					$this->tpl->setCurrentBlock('td');
 					if (is_array($a_set[$k])) {
-						$this->tpl->setVariable('COURSE', $this->buildProgressBar(explode('%',$a_set[$k][0]),$a_set[$k][1]));
-					}
-					else {
+						$this->tpl->setVariable('COURSE', $this->buildProgressBar(explode('%', $a_set[$k][0]), $a_set[$k][1]));
+					} else {
 						$this->tpl->setVariable('COURSE', $a_set[$k]);
-
 					}
 					if ($this->searchForId($v['obj_id'], $this->sugg)) {
 						$this->tpl->setVariable('COLOR', $this->color);
@@ -288,13 +287,17 @@ class ilParticipationCertificateSingleResultTableGUI extends ilTable2GUI {
 			}
 		}
 	}
+
+
 	function searchForId($id, $array) {
 		foreach ($array as $key => $val) {
 			if ($val->getSuggObjectiveId() === $id) {
 				return true;
 			}
 		}
+
 		return false;
 	}
 }
+
 ?>
