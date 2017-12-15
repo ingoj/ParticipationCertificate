@@ -73,6 +73,10 @@ class ilParticipationCertificateSingleResultTableGUI extends ilTable2GUI {
 		$this->setFormName('dhbw_part_cert_res');
 		$this->setId('dhbw_part_cert_res');
 
+		$this->setLimit(0);
+		$this->setShowRowsSelector(false);
+
+
 		$this->ctrl->saveParameterByClass('ilParticipationCertificateResultModificationGUI', [ 'ref_id', 'group_id' ]);
 		$this->ctrl->saveParameterByClass('ilParticipationCertificateResultGUI', 'usr_id');
 
@@ -108,6 +112,7 @@ class ilParticipationCertificateSingleResultTableGUI extends ilTable2GUI {
 		$cols = array();
 
 		$finalTestsStates = ilLearnObjectFinalTestStates::getData($this->usr_ids);
+
 		$sorted = $this->sortColumns();
 
 		if (count($finalTestsStates[$this->usr_id])) {
@@ -141,27 +146,32 @@ class ilParticipationCertificateSingleResultTableGUI extends ilTable2GUI {
 		$newWeights = (array)$weights;
 
 		$i = 0;
-		//associate the weight with the corresponding obj
-		while (count($newWeights)) {
-			foreach ($scores as $score) {
-				$number = str_split($score->getObjectiveId());
-				if ($number[1] == $i) {
-					$sorting[$score->getTitle()] = [
-						'score' => $score->getScore(),
-						'obj_id' => $score->getObjectiveId(),
-						'weight' => $newWeights['weight_fine_' . $score->getObjectiveId()]
-					];
-					unset($newWeights['weight_fine_' . $score->getObjectiveId()]);
-					$i ++;
+
+		$sorting = array();
+		if(count($scores)) {
+			//associate the weight with the corresponding obj
+			while (count($newWeights)) {
+				foreach ($scores as $score) {
+					$number = str_split($score->getObjectiveId());
+					if ($number[1] == $i) {
+						$sorting[$score->getTitle()] = [
+							'score' => $score->getScore(),
+							'obj_id' => $score->getObjectiveId(),
+							'weight' => $newWeights['weight_fine_' . $score->getObjectiveId()]
+						];
+						unset($newWeights['weight_fine_' . $score->getObjectiveId()]);
+						$i ++;
+					}
 				}
 			}
+			//sort the array first for the score. Second argument is the weight.
+			foreach ($sorting as $key => $item) {
+				$scored[$key] = $item['score'];
+				$weighting[$key] = $item['weight'];
+			}
+			array_multisort($scored, SORT_DESC, $weighting, SORT_DESC, $sorting);
 		}
-		//sort the array first for the score. Second argument is the weight.
-		foreach ($sorting as $key => $item) {
-			$scored[$key] = $item['score'];
-			$weighting[$key] = $item['weight'];
-		}
-		array_multisort($scored, SORT_DESC, $weighting, SORT_DESC, $sorting);
+
 
 		return $sorting;
 	}
@@ -188,6 +198,7 @@ class ilParticipationCertificateSingleResultTableGUI extends ilTable2GUI {
 		$usr_id = $this->usr_id;
 
 		$rec_array = array();
+		$new_rec_array = array();
 
 		if (count($arr_FinalTestsStates[$usr_id])) {
 			foreach ($arr_FinalTestsStates[$usr_id] as $rec) {
@@ -215,8 +226,10 @@ class ilParticipationCertificateSingleResultTableGUI extends ilTable2GUI {
 					$v = $v + 2;
 				}
 			}
+
+			ksort($new_rec_array);
 		}
-		ksort($new_rec_array);
+
 		$this->setData($new_rec_array);
 
 		return $new_rec_array;
