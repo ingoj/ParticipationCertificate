@@ -197,6 +197,15 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI {
 		$color->setValue($value);
 		$form->addItem($color);
 
+		$obj_value = ilParticipationCertificateConfig::where(array( "config_type" => ilParticipationCertificateConfig::CONFIG_TYPE_GLOBAL , "config_value_type" => ilParticipationCertificateConfig::CONFIG_VALUE_TYPE_OTHER, "config_key" =>  "keyword"))->first();
+		$value = 0;
+		if(is_object($obj_value)) {
+			$value = $obj_value->getConfigValue();
+		}
+		$keyword = new ilTextInputGUI('Keyword','keyword');
+		$keyword->setValue($value);
+		$form->addItem($keyword);
+
 		$form->addCommandButton(ilParticipationCertificateConfigGUI::CMD_SAVE, 'Speichern');
 
 		return $form;
@@ -298,6 +307,17 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI {
 		$config->setConfigType(ilParticipationCertificateConfig::CONFIG_TYPE_GLOBAL);
 		$config->store();
 
+
+		$config = ilParticipationCertificateConfig::where(array('config_key' => 'keyword', 'config_type' => ilParticipationCertificateConfig::CONFIG_TYPE_GLOBAL,'config_value_type' => ilParticipationCertificateConfig::CONFIG_VALUE_TYPE_OTHER))->first();
+		if (!is_object($config)){
+			$config = new ilParticipationCertificateConfig();
+		}
+		$config->setConfigValue($form->getInput('keyword'));
+		$config->setConfigValueType(ilParticipationCertificateConfig::CONFIG_VALUE_TYPE_OTHER);
+		$config->setConfigKey('keyword');
+		$config->setGroupRefId(0);
+		$config->setConfigType(ilParticipationCertificateConfig::CONFIG_TYPE_GLOBAL);
+		$config->store();
 
 
 		//Picture
