@@ -144,4 +144,3 @@ $part_conf->setGroupRefId(0);
 $part_conf->store();
 }
 ?>
-

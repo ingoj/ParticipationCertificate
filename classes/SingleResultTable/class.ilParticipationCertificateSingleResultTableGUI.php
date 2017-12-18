@@ -237,7 +237,7 @@ class ilParticipationCertificateSingleResultTableGUI extends ilTable2GUI {
 
 
 	protected function buildProgressBar($points, $test_obj) {
-
+		//Holt von allen Tests das minimum um zu bestehen
 		$mark = TestMarks::getData($test_obj);
 
 		$points = $points[0];
