@@ -130,4 +130,18 @@ $part_conf->setGroupRefId(0);
 $part_conf->store();
 }
 ?>
+<#18>
+<?php
+require_once 'Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/ParticipationCertificate/classes/class.ilParticipationCertificateConfig.php';
+$config = ilParticipationCertificateConfig::where(array('config_key' =>  'keyword', 'config_type' => ilParticipationCertificateConfig::CONFIG_TYPE_GLOBAL, 'config_value_type' => ilParticipationCertificateConfig::CONFIG_VALUE_TYPE_OTHER))->first();
+if(!is_object($config)) {
+$part_conf = new ilParticipationCertificateConfig();
+$part_conf->setConfigType(ilParticipationCertificateConfig::CONFIG_TYPE_GLOBAL);
+$part_conf->setConfigValueType(ilParticipationCertificateConfig::CONFIG_VALUE_TYPE_OTHER);
+$part_conf->setConfigKey('keyword');
+$part_conf->setConfigValue("Lerngruppe");
+$part_conf->setGroupRefId(0);
+$part_conf->store();
+}
+?>
 

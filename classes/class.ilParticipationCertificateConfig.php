@@ -294,6 +294,7 @@ class ilParticipationCertificateConfig extends ActiveRecord{
 			'page2_box2_row1' => 'Aktive Teilnahme an Videokonferenzen',
 			'page2_box2_row2' => 'Bearbeitung der Aufgaben zu überfachlichen Themen:',
 			'percent_value' => '50',
+			'keyword' => 'Lerngruppe',
 		);
 	}
 
