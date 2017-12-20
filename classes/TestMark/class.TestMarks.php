@@ -31,7 +31,9 @@ class TestMarks {
 	protected static function getSQL($test_obj) {
 		global $ilDB;
 
-		$select = "SELECT * FROM tst_mark WHERE passed = 1 AND test_fi =".$ilDB->quote($test_obj, "integer");
+		$select = "Select passed, mark_id,minimum_level from tst_tests 
+					inner join tst_mark on tst_tests.test_id = tst_mark.test_fi
+ 				WHERE passed = 1 AND obj_fi =".$ilDB->quote($test_obj, "integer");
 
 		return $select;
 	}

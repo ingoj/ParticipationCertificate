@@ -145,34 +145,20 @@ class ilParticipationCertificateSingleResultTableGUI extends ilTable2GUI {
 		$weights = getFineWeights::getData();
 		$newWeights = (array)$weights;
 
-		$i = 0;
-
 		$sorting = array();
-		if(count($scores)) {
-			//associate the weight with the corresponding obj
-			while (count($newWeights)) {
-				foreach ($scores as $score) {
-					$number = str_split($score->getObjectiveId());
-					if ($number[1] == $i) {
-						$sorting[$score->getTitle()] = [
-							'score' => $score->getScore(),
-							'obj_id' => $score->getObjectiveId(),
-							'weight' => $newWeights['weight_fine_' . $score->getObjectiveId()]
-						];
-						unset($newWeights['weight_fine_' . $score->getObjectiveId()]);
-						$i ++;
-					}
-				}
-			}
-			//sort the array first for the score. Second argument is the weight.
-			foreach ($sorting as $key => $item) {
-				$scored[$key] = $item['score'];
-				$weighting[$key] = $item['weight'];
-			}
-			array_multisort($scored, SORT_DESC, $weighting, SORT_DESC, $sorting);
+
+		foreach ($scores as $score) {
+			$sorting[$score->getTitle()] = ['score' => $score->getScore(),
+											'obj_id' => $score->getObjectiveId(),
+											'weight' => $newWeights['weight_fine_'.$score->getObjectiveId()]];
 		}
 
-
+		//sort the array first for the score. Second argument is the weight.
+		foreach ($sorting as $key => $item) {
+			$scored[$key] = $item['score'];
+			$weighting[$key] = $item['weight'];
+		}
+		array_multisort($scored, SORT_DESC, $weighting, SORT_DESC, $sorting);
 		return $sorting;
 	}
 
@@ -209,7 +195,7 @@ class ilParticipationCertificateSingleResultTableGUI extends ilTable2GUI {
 				}
 				//create two arrays, one for the mark when a test is fulfilled and one for the scores.
 				$marks [$rec->getLocftestCrsObjId()][] = $rec->getLocftestTestRefId();
-				$scores[$rec->getLocftestCrsObjId()][] = [ $rec->getLocftestPercentage() . '%', $rec->getLocftestTestRefId(), $rec->getLocftestTries() ];
+				$scores[$rec->getLocftestCrsObjId()][] = [ $rec->getLocftestPercentage() . '%', $rec->getLocftestTestObjId(), $rec->getLocftestTries() ];
 			}
 			//merge the score array and the array with the test titles
 			foreach ($rec_array as $key => $item) {
@@ -317,5 +303,4 @@ class ilParticipationCertificateSingleResultTableGUI extends ilTable2GUI {
 		return false;
 	}
 }
-
 ?>
