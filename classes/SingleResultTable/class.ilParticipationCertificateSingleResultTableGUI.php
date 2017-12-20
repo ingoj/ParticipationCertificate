@@ -209,7 +209,7 @@ class ilParticipationCertificateSingleResultTableGUI extends ilTable2GUI {
 				}
 				//create two arrays, one for the mark when a test is fulfilled and one for the scores.
 				$marks [$rec->getLocftestCrsObjId()][] = $rec->getLocftestTestRefId();
-				$scores[$rec->getLocftestCrsObjId()][] = [ $rec->getLocftestPercentage() . '%', $rec->getLocftestTestRefId() ];
+				$scores[$rec->getLocftestCrsObjId()][] = [ $rec->getLocftestPercentage() . '%', $rec->getLocftestTestRefId(), $rec->getLocftestTries() ];
 			}
 			//merge the score array and the array with the test titles
 			foreach ($rec_array as $key => $item) {
@@ -236,7 +236,7 @@ class ilParticipationCertificateSingleResultTableGUI extends ilTable2GUI {
 	}
 
 
-	protected function buildProgressBar($points, $test_obj) {
+	protected function buildProgressBar($points, $test_obj,$tries) {
 		//Holt von allen Tests das minimum um zu bestehen
 		$mark = TestMarks::getData($test_obj);
 
@@ -265,8 +265,13 @@ class ilParticipationCertificateSingleResultTableGUI extends ilTable2GUI {
 
 		if ($points >= $required_amount_of_points) {
 			$css_class = self::SUCCESSFUL_PROGRESS_CSS_CLASS;
-		} else {
+		}
+		elseif($tries == NULL)
+		{
 			$css_class = self::NON_SUCCESSFUL_PROGRESS_CSS_CLASS;
+		}
+		else {
+			$css_class = self::FAILED_PROGRESS_CSS_CLASS;
 		}
 
 		require_once("Services/Container/classes/class.ilContainerObjectiveGUI.php");
@@ -284,7 +289,7 @@ class ilParticipationCertificateSingleResultTableGUI extends ilTable2GUI {
 				if ($a_set[$k]) {
 					$this->tpl->setCurrentBlock('td');
 					if (is_array($a_set[$k])) {
-						$this->tpl->setVariable('COURSE', $this->buildProgressBar(explode('%', $a_set[$k][0]), $a_set[$k][1]));
+						$this->tpl->setVariable('COURSE', $this->buildProgressBar(explode('%', $a_set[$k][0]), $a_set[$k][1],$a_set[$k][2]));
 					} else {
 						$this->tpl->setVariable('COURSE', $a_set[$k]);
 					}

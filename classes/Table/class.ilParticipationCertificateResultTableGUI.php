@@ -159,6 +159,7 @@ class ilParticipationCertificateResultTableGUI extends ilTable2GUI {
 		$arr_initial_test_states = ilCrsInitialTestStates::getData($this->usr_ids);
 		$arr_learn_reached_percentages = ilLearnObjectSuggReachedPercentages::getData($this->usr_ids);
 		$arr_iass_states = ilIassStates::getData($this->usr_ids);
+		$arr_new_iass_states = ilIassStatesMulti::getData($this->usr_ids);
 		$arr_excercise_states = ilExcerciseStates::getData($this->usr_ids);
 		$arr_FinalTestsStates = ilLearnObjectFinalTestOfSuggStates::getData($this->usr_ids);
 
@@ -211,6 +212,19 @@ class ilParticipationCertificateResultTableGUI extends ilTable2GUI {
 				$row['results_qualifing_tests'] = 'Keine Tests';
 			}
 
+			$countPassed = 0;
+			$countTests = 0;
+			if (is_array($arr_new_iass_states[$usr_id])){
+				foreach ($arr_new_iass_states[$usr_id] as $item){
+					$countPassed = $countPassed + $item->getPassed();
+					$countTests = $countTests + $item->getTotal();
+				}
+				$row['eMentoring_finished'] = $countPassed . "/" .  $countTests;
+			}
+			else {
+				$row['eMentoring_finished'] = "0/0";
+			}
+			/*
 			if (is_object($arr_iass_states[$usr_id])) {
 				$row['eMentoring_finished'] = $arr_iass_states[$usr_id]->getPassed();
 
@@ -222,7 +236,7 @@ class ilParticipationCertificateResultTableGUI extends ilTable2GUI {
 			} else {
 				$row['eMentoring_finished'] = 'Nein';
 			}
-
+*/
 			if (is_object($arr_excercise_states[$usr_id])) {
 				$row['eMentoring_homework'] = $arr_excercise_states[$usr_id]->getPassed();
 				$row['eMentoring_percentage'] = $arr_excercise_states[$usr_id]->getPassedPercentage() . '%';
