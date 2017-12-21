@@ -3,10 +3,10 @@
 require_once './Services/Table/classes/class.ilTable2GUI.php';
 require_once './Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/ParticipationCertificate/classes/Table/class.ilParticipationCertificateResultModificationGUI.php';
 require_once './Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/ParticipationCertificate/classes/SingleResultTable/class.ilParticipationCertificateSingleResultGUI.php';
-require_once './Customizing/global/plugins/Services/Cron/CronHook/LearningObjectiveSuggestions/src/Score/LearningObjectiveScores.php';
 require_once './Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/ParticipationCertificate/classes/getFineWeights/class.getFineWeights.php';
 require_once './Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/ParticipationCertificate/classes/TestMark/class.TestMarks.php';
 require_once './Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/ParticipationCertificate/classes/Learningsugg/class.getLearnSuggs.php';
+require_once './Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/ParticipationCertificate/classes/Score/NewLearningObjectiveScores.php';
 
 /**
  * Class ilParticipationCertificateResultGUI
@@ -140,7 +140,7 @@ class ilParticipationCertificateSingleResultTableGUI extends ilTable2GUI {
 
 	function sortColumns() {
 		//First sort scores
-		$scores = LearningObjectiveScores::getData($this->usr_id);
+		$scores = NewLearningObjectiveScores::getData($this->usr_id);
 		//if the scores are equal, sort because of the weight value
 		$weights = getFineWeights::getData();
 		$newWeights = (array)$weights;
