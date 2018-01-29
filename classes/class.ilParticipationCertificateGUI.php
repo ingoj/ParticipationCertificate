@@ -173,6 +173,15 @@ class ilParticipationCertificateGUI {
 			$form->addItem($input);
 		}
 
+		$arr_config_value = ilParticipationCertificateConfig::where(array("config_type" => ilParticipationCertificateConfig::CONFIG_TYPE_GROUP, "group_ref_id" => $this->groupRefId, "config_value_type" => ilParticipationCertificateConfig::CONFIG_VALUE_TYPE_OTHER,'config_key'=>'percent_value'))->first();
+		if($arr_config_value == NULL) {
+			$arr_config_value = ilParticipationCertificateConfig::where(array("config_type" => ilParticipationCertificateConfig::CONFIG_TYPE_GLOBAL, "group_ref_id" => 0, "config_value_type" => ilParticipationCertificateConfig::CONFIG_VALUE_TYPE_OTHER,'config_key' =>  'percent_value'))->first();
+		}
+		/*
+		$percent = new ilNumberInputGUI('Schwellenwert für Videokonferenz (Prozent)','percent_value');
+		$percent->setValue($arr_config_value->getConfigValue());
+		$form->addItem($percent);*/
+
 		$this->ctrl->saveParameterByClass('ilObjGroup', 'ref_id');
 		$form->addCommandButton(ilParticipationCertificateGUI::CMD_SAVE, $this->pl->txt('save'));
 
@@ -195,21 +204,42 @@ class ilParticipationCertificateGUI {
 		//TODO auslagern nach ilParticipationCertificateConfig
 		//save Text
 		foreach($form->getItems() as $item) {
-			/**
-			 * @var ilParticipationCertificateConfig $config;
-			 */
-			$config = ilParticipationCertificateConfig::where(array('config_key' =>  $item->getPostVar(), 'config_type' => ilParticipationCertificateConfig::CONFIG_TYPE_GROUP, 'config_value_type' => ilParticipationCertificateConfig::CONFIG_VALUE_TYPE_CERT_TEXT))->first();
-			if(!is_object($config)) {
-				$config = new ilParticipationCertificateConfig();
-				$config->setGroupRefId($this->groupRefId);
-				$config->setConfigType(ilParticipationCertificateConfig::CONFIG_TYPE_GROUP);
-				$config->setConfigValueType(ilParticipationCertificateConfig::CONFIG_VALUE_TYPE_CERT_TEXT);
-				$config->setConfigKey( $item->getPostVar());
+			if (!$item->getPostVar() == 'percent_value') {
+				/**
+				 * @var ilParticipationCertificateConfig $config ;
+				 */
+				$config = ilParticipationCertificateConfig::where(array(
+					'config_key' => $item->getPostVar(),
+					'config_type' => ilParticipationCertificateConfig::CONFIG_TYPE_GROUP,
+					'config_value_type' => ilParticipationCertificateConfig::CONFIG_VALUE_TYPE_CERT_TEXT
+				))->first();
+				if (!is_object($config)) {
+					$config = new ilParticipationCertificateConfig();
+					$config->setGroupRefId($this->groupRefId);
+					$config->setConfigType(ilParticipationCertificateConfig::CONFIG_TYPE_GROUP);
+					$config->setConfigValueType(ilParticipationCertificateConfig::CONFIG_VALUE_TYPE_CERT_TEXT);
+					$config->setConfigKey($item->getPostVar());
+				}
+				$config->setConfigValue($form->getInput($item->getPostVar()));
+				$config->store();
 			}
-			$config->setConfigValue($form->getInput($item->getPostVar()));
-			$config->store();
-			ilUtil::sendSuccess($this->pl->txt('successFormSave'),true);
 		}
+
+		$config_value = ilParticipationCertificateConfig::where(array("config_type" => ilParticipationCertificateConfig::CONFIG_TYPE_GROUP, "group_ref_id" => $this->groupRefId, "config_value_type" => ilParticipationCertificateConfig::CONFIG_VALUE_TYPE_OTHER,'config_key'=>'percent_value'))->first();
+		if(!is_object($config_value)){
+			$config_value = new ilParticipationCertificateConfig();
+			$config_value->setGroupRefId($this->groupRefId);
+			$config_value->setConfigType(ilParticipationCertificateConfig::CONFIG_TYPE_GROUP);
+			$config_value->setConfigValueType(ilParticipationCertificateConfig::CONFIG_VALUE_TYPE_OTHER);
+			$config_value->setConfigKey('percent_value');
+		}
+		$config_value->setConfigValue($form->getInput('percent_value'));
+		$config_value->store();
+		ilUtil::sendSuccess($this->pl->txt('successFormSave'),true);
+
+
+
+
 		$this->ctrl->redirect($this, 'display');
 		return true;
 	}

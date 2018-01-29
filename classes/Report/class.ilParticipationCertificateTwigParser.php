@@ -8,6 +8,7 @@ require_once './Customizing/global/plugins/Services/UIComponent/UserInterfaceHoo
 require_once './Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/ParticipationCertificate/classes/LearnObjectSuggReachedPercentage/class.ilLearnObjectSuggReachedPercentages.php';
 require_once './Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/ParticipationCertificate/classes/LearnObjectMasterCrs/class.ilLearningObjectivesMasterCrs.php';
 require_once './Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/ParticipationCertificate/classes/PartCertUserData/class.ilPartCertUsersData.php';
+require_once './Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/ParticipationCertificate/classes/IassStateMulti/class.ilIassStatesMulti.php';
 
 /**
  * Class ilParticipationCertificateTwigParser
@@ -62,6 +63,9 @@ class ilParticipationCertificateTwigParser {
 
 	public function parseData() {
 		$arr_text_values = ilParticipationCertificateConfig::returnTextValues($this->group_ref_id, ilParticipationCertificateConfig::CONFIG_TYPE_GROUP);
+		$arr_percent_value = ilParticipationCertificateConfig::returnStandardValue();
+
+		$arr_iass_multi = ilIassStatesMulti::getData($this->usr_ids);
 
 		$arr_usr_data = ilPartCertUsersData::getData($this->usr_ids);
 		$arr_lo_master_crs = ilLearningObjectivesMasterCrs::getData($this->usr_ids);
@@ -128,11 +132,25 @@ class ilParticipationCertificateTwigParser {
 				if (is_object($arr_learn_reached_percentages[$usr_id])) {
 					$learn_sugg_reached_percentage = $arr_learn_reached_percentages[$usr_id]->getAveragePercentage();
 				}
-				//Video Conferences
+				/*Video Conferences
 				$iass_state = 0;
+				$iass_state1 = 0;
+				$iass_state2 = 0;
 				if (is_object($arr_iass_states[$usr_id])) {
-					$iass_state = $arr_iass_states[$usr_id]->getPassed();
+					$iass_state1 = $arr_iass_states[$usr_id]->getPassed();
+					$iass_state2 = $arr_iass_states[$usr_id]->getTotal();
+					$iass_state = (100/$iass_state2)*$iass_state1;
+				}*/
+				$iass_state = 0;
+				$iass_state1 = 0;
+				$iass_state2 = 0;
+			if(is_array($arr_iass_multi[$usr_id])) {
+				foreach ($arr_iass_multi[$usr_id] as $multis) {
+					$iass_state1 = $iass_state1 + $multis->getPassed();
+					$iass_state2 = $iass_state2 + $multis->getTotal();
 				}
+				$iass_state = (100/$iass_state2)*$iass_state1;
+			}
 				//Home Work
 				$excercise_percentage = 0;
 				if (is_object($arr_excercise_states[$usr_id])) {
@@ -148,8 +166,11 @@ class ilParticipationCertificateTwigParser {
 				'crsitest_itest_submitted' => $initial_test_state,
 				'learn_sugg_reached_percentage' => $learn_sugg_reached_percentage,
 				'iass_state' => $iass_state,
+				'iass_state1' => $iass_state1,
+				'iass_state2' => $iass_state2,
 				'excercise_percentage' => $excercise_percentage,
-				'logo_path' => $logo_path
+				'logo_path' => $logo_path,
+				'standard_value' => $arr_percent_value->getConfigValue()
 			);
 
 			$part_pdf->generatePDF($this->twig_template->render($arr_render), count($this->usr_id));
