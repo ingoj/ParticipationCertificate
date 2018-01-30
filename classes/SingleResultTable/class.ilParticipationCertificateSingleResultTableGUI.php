@@ -154,6 +154,8 @@ class ilParticipationCertificateSingleResultTableGUI extends ilTable2GUI {
 		}
 
 		//sort the array first for the score. Second argument is the weight.
+		$scored = array();
+		$weighting = array();
 		foreach ($sorting as $key => $item) {
 			$scored[$key] = $item['score'];
 			$weighting[$key] = $item['weight'];
