@@ -288,6 +288,9 @@ class ilParticipationCertificateSingleResultTableGUI extends ilTable2GUI {
 				} else {
 					$this->tpl->setCurrentBlock('td');
 					$this->tpl->setVariable('COURSE', '&nbsp;');
+					if ($this->searchForId($v['obj_id'], $this->sugg)) {
+						$this->tpl->setVariable('COLOR', $this->color);
+					}
 					$this->tpl->parseCurrentBlock();
 				}
 			}
