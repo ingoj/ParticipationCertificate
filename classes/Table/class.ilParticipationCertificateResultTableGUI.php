@@ -65,13 +65,13 @@ class ilParticipationCertificateResultTableGUI extends ilTable2GUI {
 		$this->addColumns();
 		$this->setExportFormats(array( self::EXPORT_EXCEL, self::EXPORT_CSV ));
 
+		$this->initFilter();
+		$this->setSelectAllCheckbox('record_ids');
 		if($cert_access->hasCurrentUserPrintAccess()) {
-			$this->initFilter();
-			$this->setSelectAllCheckbox('record_ids');
 			$this->addMultiCommand('printSelected', $this->pl->txt('list_print'));
 			$this->addMultiCommand('printSelectedWithouteMentoring', $this->pl->txt('list_print_without'));
-			$this->addMultiCommand(ilParticipationCertificateMultipleResultGUI::CMD_SHOW_ALL_RESULTS, $this->pl->txt('list_overview'));
 		}
+			$this->addMultiCommand(ilParticipationCertificateMultipleResultGUI::CMD_SHOW_ALL_RESULTS, $this->pl->txt('list_overview'));
 		$this->setRowTemplate('tpl.default_row.html', $this->pl->getDirectory());
 		$this->setFormAction($this->ctrl->getFormAction($a_parent_obj));
 
@@ -267,12 +267,9 @@ class ilParticipationCertificateResultTableGUI extends ilTable2GUI {
 	 * @param array $a_set
 	 */
 	public function fillRow($a_set) {
-		$cert_access = new ilParticipationCertificateAccess($_GET['ref_id']);
-		if ($cert_access->hasCurrentUserPrintAccess()) {
-			$this->tpl->setCurrentBlock('record_id');
-			$this->tpl->setVariable('RECORD_ID', $a_set['usr_id']);
-			$this->tpl->parseCurrentBlock();
-		}
+		$this->tpl->setCurrentBlock('record_id');
+		$this->tpl->setVariable('RECORD_ID', $a_set['usr_id']);
+		$this->tpl->parseCurrentBlock();
 
 		foreach ($this->getSelectableColumns() as $k => $v) {
 			if($this->isColumnSelected($k)) {
