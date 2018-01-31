@@ -65,13 +65,13 @@ class ilParticipationCertificateResultTableGUI extends ilTable2GUI {
 		$this->addColumns();
 		$this->setExportFormats(array( self::EXPORT_EXCEL, self::EXPORT_CSV ));
 
+		$this->initFilter();
+		$this->setSelectAllCheckbox('record_ids');
 		if($cert_access->hasCurrentUserPrintAccess()) {
-			$this->initFilter();
-			$this->setSelectAllCheckbox('record_ids');
 			$this->addMultiCommand('printSelected', $this->pl->txt('list_print'));
 			$this->addMultiCommand('printSelectedWithouteMentoring', $this->pl->txt('list_print_without'));
-			$this->addMultiCommand(ilParticipationCertificateMultipleResultGUI::CMD_SHOW_ALL_RESULTS, $this->pl->txt('list_overview'));
 		}
+			$this->addMultiCommand(ilParticipationCertificateMultipleResultGUI::CMD_SHOW_ALL_RESULTS, $this->pl->txt('list_overview'));
 		$this->setRowTemplate('tpl.default_row.html', $this->pl->getDirectory());
 		$this->setFormAction($this->ctrl->getFormAction($a_parent_obj));
 
