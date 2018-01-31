@@ -96,7 +96,14 @@ class ilParticipationCertificateResultGUI {
 			default:
 				$cmd = $this->ctrl->getCmd(self::CMD_CONTENT);
 				$this->tabs->setTabActive(self::CMD_OVERVIEW);
-				$this->{$cmd}();
+				switch ($cmd) {
+					case ilParticipationCertificateMultipleResultGUI::CMD_SHOW_ALL_RESULTS:
+						$this->ctrl->forwardCommand(new ilParticipationCertificateMultipleResultGUI());
+						break;
+					default:
+						$this->{$cmd}();
+						break;
+				}
 				break;
 		}
 	}

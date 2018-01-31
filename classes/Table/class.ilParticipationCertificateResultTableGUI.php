@@ -4,7 +4,7 @@ require_once './Services/Table/classes/class.ilTable2GUI.php';
 require_once './Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/ParticipationCertificate/classes/Table/class.ilParticipationCertificateResultModificationGUI.php';
 require_once './Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/ParticipationCertificate/classes/SingleResultTable/class.ilParticipationCertificateSingleResultGUI.php';
 require_once './Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/ParticipationCertificate/classes/LearnObjectFinalTestStateOfSugg/class.ilLearnObjectFinalTestOfSuggStates.php';
-
+require_once 'Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/ParticipationCertificate/classes/MultipleResultTable/class.ilParticipationCertificateMultipleResultGUI.php';
 
 /**
  * Class ilParticipationCertificateResultGUI
@@ -70,6 +70,7 @@ class ilParticipationCertificateResultTableGUI extends ilTable2GUI {
 			$this->setSelectAllCheckbox('record_ids');
 			$this->addMultiCommand('printSelected', $this->pl->txt('list_print'));
 			$this->addMultiCommand('printSelectedWithouteMentoring', $this->pl->txt('list_print_without'));
+			$this->addMultiCommand(ilParticipationCertificateMultipleResultGUI::CMD_SHOW_ALL_RESULTS, $this->pl->txt('list_overview'));
 		}
 		$this->setRowTemplate('tpl.default_row.html', $this->pl->getDirectory());
 		$this->setFormAction($this->ctrl->getFormAction($a_parent_obj));

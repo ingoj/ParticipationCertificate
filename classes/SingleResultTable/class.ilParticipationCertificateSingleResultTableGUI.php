@@ -54,8 +54,9 @@ class ilParticipationCertificateSingleResultTableGUI extends ilTable2GUI {
 	 *
 	 * @param ilParticipationCertificateResultGUI $a_parent_obj
 	 * @param string                              $a_parent_cmd
+	 * @param int                                 $usr_id
 	 */
-	public function __construct($a_parent_obj, $a_parent_cmd) {
+	public function __construct($a_parent_obj, $a_parent_cmd, $usr_id) {
 		global $ilCtrl, $tabs;
 
 		$this->ctrl = $ilCtrl;
@@ -83,7 +84,6 @@ class ilParticipationCertificateSingleResultTableGUI extends ilTable2GUI {
 		$cert_access = new ilParticipationCertificateAccess($_GET['ref_id']);
 		$this->usr_ids = $cert_access->getUserIdsOfGroup();
 
-		$usr_id = $_GET[self::IDENTIFIER];
 		$this->usr_id = $usr_id;
 
 		$this->sugg = getLearnSuggs::getData($usr_id);
