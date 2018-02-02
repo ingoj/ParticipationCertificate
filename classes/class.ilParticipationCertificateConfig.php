@@ -1,20 +1,90 @@
 <?php
+
 /**
  * Class ilParticipationCertificate
  *
  * @author Silas Stulz <sst@studer-raimann.ch>
  */
-class ilParticipationCertificateConfig extends ActiveRecord{
+class ilParticipationCertificateConfig extends ActiveRecord {
 
 	const TABLE_NAME = 'dhbw_part_cert_conf';
-
 	const LOGO_FILE_NAME = "pic.png";
-
 	const CONFIG_TYPE_GLOBAL = 1;
 	const CONFIG_TYPE_GROUP = 2;
-
+	const CONFIG_TYPE_OTHER = 3;
 	const CONFIG_VALUE_TYPE_CERT_TEXT = 1;
 	const CONFIG_VALUE_TYPE_OTHER = 2;
+
+
+	/**
+	 * @param string      $config_key
+	 * @param int         $group_ref_id
+	 * @param int         $config_type
+	 * @param int         $config_value_type
+	 * @param string|null $default
+	 *
+	 * @return string|null
+	 */
+	static function getConfig($config_key, $group_ref_id = 0, $config_type = self::CONFIG_TYPE_OTHER, $config_value_type = self::CONFIG_VALUE_TYPE_OTHER, $default = NULL) {
+		/**
+		 * @var ilParticipationCertificateConfig|null $config
+		 */
+
+		$config = self::where([
+			"config_key" => $config_key,
+			"config_type" => $config_type,
+			"config_value_type" => $config_value_type,
+			"group_ref_id" => $group_ref_id
+		])->first();
+
+		if ($config !== NULL) {
+			return $config->getConfigValue();
+		} else {
+			return $default;
+		}
+	}
+
+
+	/**
+	 * @param string      $config_key
+	 * @param string|null $config_value
+	 * @param int         $group_ref_id
+	 * @param int         $config_type
+	 * @param int         $config_value_type
+	 * @param int         $group_ref_id
+	 */
+	static function setConfig($config_key, $config_value, $group_ref_id = 0, $config_type = self::CONFIG_TYPE_OTHER, $config_value_type = self::CONFIG_VALUE_TYPE_OTHER) {
+		/**
+		 * @var ilParticipationCertificateConfig|null $config
+		 */
+
+		$config = self::where([
+			"config_key" => $config_key,
+			"config_type" => $config_type,
+			"config_value_type" => $config_value_type,
+			"group_ref_id" => $group_ref_id
+		])->first();
+
+		if ($config !== NULL) {
+			$config->setConfigValue($config_value);
+
+			$config->update();
+		} else {
+			$config = new self();
+
+			$config->setConfigKey($config_key);
+
+			$config->setConfigValue($config_value);
+
+			$config->setConfigType($config_type);
+
+			$config->setConfigValueType($config_value_type);
+
+			$config->setGroupRefId($group_ref_id);
+
+			$config->create();
+		}
+	}
 
 
 	/**
@@ -82,26 +152,25 @@ class ilParticipationCertificateConfig extends ActiveRecord{
 	protected $order_by = 0;
 
 
-	public static function returnDbTableName(){
+	public static function returnDbTableName() {
 		return self::TABLE_NAME;
 	}
-
 
 
 	/**
 	 * Get a path where the template layout file and static assets are stored
 	 *
 	 * @param string $type
-	 * @param string $path_type  absolute|relative
-	 * @param int $grp_ref_id
-	 * @param bool $create
+	 * @param string $path_type absolute|relative
+	 * @param int    $grp_ref_id
+	 * @param bool   $create
 	 *
 	 * @return string
 	 */
-	public static function getFileStoragePath($type = 'img',$path_type = "absolute",$grp_ref_id = 0,$create = false) {
+	public static function getFileStoragePath($type = 'img', $path_type = "absolute", $grp_ref_id = 0, $create = false) {
 
 
-		switch($path_type) {
+		switch ($path_type) {
 			case "absolute":
 				$path = CLIENT_WEB_DIR . '/dhbw_part_cert';
 				break;
@@ -113,47 +182,48 @@ class ilParticipationCertificateConfig extends ActiveRecord{
 				break;
 		}
 
-		if($grp_ref_id) {
-			$path =  $path .'/'.$grp_ref_id;
+		if ($grp_ref_id) {
+			$path = $path . '/' . $grp_ref_id;
 		}
 
-
-		switch($type) {
+		switch ($type) {
 			case 'img':
 				$path = $path . '/img/';
 				if (!is_dir($path) && $create) {
 					ilUtil::makeDirParents($path);
 				}
+
 				return $path;
 				break;
 			default:
 				if (!is_dir($path) && $create) {
 					ilUtil::makeDirParents($path);
 				}
+
 				return $path;
 		}
 	}
 
 
-	public static function storePicture($file_data,$grp_ref_id = 0){
+	public static function storePicture($file_data, $grp_ref_id = 0) {
 
-		if(is_file(ilParticipationCertificateConfig::returnPicturePath('absolute',$grp_ref_id))) {
-			unlink(ilParticipationCertificateConfig::returnPicturePath('absolute',$grp_ref_id));
+		if (is_file(ilParticipationCertificateConfig::returnPicturePath('absolute', $grp_ref_id))) {
+			unlink(ilParticipationCertificateConfig::returnPicturePath('absolute', $grp_ref_id));
 		}
 
-		$file_path = self::getFileStoragePath('img','absolute',$grp_ref_id,true);
-		ilUtil::moveUploadedFile($file_data['tmp_name'],'',$file_path.self::LOGO_FILE_NAME);
+		$file_path = self::getFileStoragePath('img', 'absolute', $grp_ref_id, true);
+		ilUtil::moveUploadedFile($file_data['tmp_name'], '', $file_path . self::LOGO_FILE_NAME);
 	}
 
 
 	/**
-	 * @param string $path_type  absolute|relative
-	 * @param int $grp_ref_id
+	 * @param string $path_type absolute|relative
+	 * @param int    $grp_ref_id
 	 *
 	 * @return string
 	 */
-	public static function returnPicturePath($path_type = 'absolute',$grp_ref_id = 0) {
-		return self::getFileStoragePath('img',$path_type,$grp_ref_id).self::LOGO_FILE_NAME;
+	public static function returnPicturePath($path_type = 'absolute', $grp_ref_id = 0) {
+		return self::getFileStoragePath('img', $path_type, $grp_ref_id) . self::LOGO_FILE_NAME;
 	}
 
 
@@ -270,7 +340,7 @@ class ilParticipationCertificateConfig extends ActiveRecord{
 
 
 	public static function returnDefaultValues() {
-		return	array(
+		return array(
 			'page1_title' => 'Teilnahmebescheinigung',
 			'page1_introduction1' => '{{username}}, hat am Studienvorbereitungsprogramm mit Schwerpunkt „Mathematik“ auf der Lernplattform studienvorbereitung.dhbw.de teilgenommen.',
 			'page1_introduction2' => 'Die Teilnahme vor Studienbeginn an der DHBW Karlsruhe umfasste:',
@@ -295,6 +365,8 @@ class ilParticipationCertificateConfig extends ActiveRecord{
 			'page2_box2_row2' => 'Bearbeitung der Aufgaben zu überfachlichen Themen:',
 			'percent_value' => '50',
 			'keyword' => 'Lerngruppe',
+			'perdiod_start' => NULL,
+			'perdiod_end' => NULL
 		);
 	}
 
@@ -303,17 +375,33 @@ class ilParticipationCertificateConfig extends ActiveRecord{
 	 * @param group_ref_id $
 	 * @param $config_type
 	 */
-	public static function returnTextValues($group_ref_id = 0,$config_type = self::CONFIG_TYPE_GLOBAL) {
-		$arr_config = ilParticipationCertificateConfig::where(array("config_type" => $config_type, "group_ref_id" =>$group_ref_id,'config_value_type' => ilParticipationCertificateConfig::CONFIG_VALUE_TYPE_CERT_TEXT ))->orderBy('order_by')->getArray('config_key','config_value');
-		if(count($arr_config) == 0) {
-			$arr_config = ilParticipationCertificateConfig::where(array("config_type" => ilParticipationCertificateConfig::CONFIG_TYPE_GLOBAL,'config_value_type' => ilParticipationCertificateConfig::CONFIG_VALUE_TYPE_CERT_TEXT))->orderBy('order_by')->getArray('config_key','config_value');
+	public static function returnTextValues($group_ref_id = 0, $config_type = self::CONFIG_TYPE_GLOBAL) {
+		$arr_config = ilParticipationCertificateConfig::where(array(
+			"config_type" => $config_type,
+			"group_ref_id" => $group_ref_id,
+			'config_value_type' => ilParticipationCertificateConfig::CONFIG_VALUE_TYPE_CERT_TEXT
+		))->orderBy('order_by')->getArray('config_key', 'config_value');
+		if (count($arr_config) == 0) {
+			$arr_config = ilParticipationCertificateConfig::where(array(
+				"config_type" => ilParticipationCertificateConfig::CONFIG_TYPE_GLOBAL,
+				'config_value_type' => ilParticipationCertificateConfig::CONFIG_VALUE_TYPE_CERT_TEXT
+			))->orderBy('order_by')->getArray('config_key', 'config_value');
 		}
+
 		return $arr_config;
 	}
 
-	public static function returnStandardValue($group_ref_id = 0, $config_type = self::CONFIG_TYPE_GLOBAL){
-		$arr_config = ilParticipationCertificateConfig::where(array("config_type" => $config_type, "group_ref_id" => $group_ref_id, "config_value_type" => ilParticipationCertificateConfig::CONFIG_VALUE_TYPE_OTHER, 'config_key' => 'percent_value'))->first();
+
+	public static function returnStandardValue($group_ref_id = 0, $config_type = self::CONFIG_TYPE_GLOBAL) {
+		$arr_config = ilParticipationCertificateConfig::where(array(
+			"config_type" => $config_type,
+			"group_ref_id" => $group_ref_id,
+			"config_value_type" => ilParticipationCertificateConfig::CONFIG_VALUE_TYPE_OTHER,
+			'config_key' => 'percent_value'
+		))->first();
+
 		return $arr_config;
 	}
 }
+
 ?>

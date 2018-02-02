@@ -149,7 +149,7 @@ class ilParticipationCertificateResultGUI {
 		$this->tabs->addTab('overview', $this->pl->txt('header_overview'), $this->ctrl->getLinkTargetByClass(ilParticipationCertificateResultGUI::class, ilParticipationCertificateResultGUI::CMD_CONTENT));
 		$cert_access = new ilParticipationCertificateAccess($_GET['ref_id']);
 		if($cert_access->hasCurrentUserPrintAccess()) {
-			$this->tabs->addTab('config', $this->pl->txt('header_config'), $this->ctrl->getLinkTargetByClass(ilParticipationCertificateGUI::class, ilParticipationCertificateGUI::CMD_DISPLAY));
+			$this->tabs->addTab('config', $this->pl->txt('header_config'), $this->ctrl->getLinkTargetByClass(ilParticipationCertificateGUI::class, ilParticipationCertificateGUI::CMD_CONFIG));
 		}
 		$this->tabs->activateTab('overview');
 	}
