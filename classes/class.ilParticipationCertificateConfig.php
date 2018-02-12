@@ -205,14 +205,14 @@ class ilParticipationCertificateConfig extends ActiveRecord {
 	}
 
 
-	public static function storePicture($file_data, $grp_ref_id = 0) {
+	public static function storePicture($file_data, $grp_ref_id = 0, $file_name) {
 
-		if (is_file(ilParticipationCertificateConfig::returnPicturePath('absolute', $grp_ref_id))) {
-			unlink(ilParticipationCertificateConfig::returnPicturePath('absolute', $grp_ref_id));
+		if (is_file(ilParticipationCertificateConfig::returnPicturePath('absolute', $grp_ref_id, $file_name))) {
+			unlink(ilParticipationCertificateConfig::returnPicturePath('absolute', $grp_ref_id, $file_name));
 		}
 
 		$file_path = self::getFileStoragePath('img', 'absolute', $grp_ref_id, true);
-		ilUtil::moveUploadedFile($file_data['tmp_name'], '', $file_path . self::LOGO_FILE_NAME);
+		ilUtil::moveUploadedFile($file_data['tmp_name'], '', $file_path . $file_name);
 	}
 
 
@@ -222,8 +222,8 @@ class ilParticipationCertificateConfig extends ActiveRecord {
 	 *
 	 * @return string
 	 */
-	public static function returnPicturePath($path_type = 'absolute', $grp_ref_id = 0) {
-		return self::getFileStoragePath('img', $path_type, $grp_ref_id) . self::LOGO_FILE_NAME;
+	public static function returnPicturePath($path_type = 'absolute', $grp_ref_id = 0, $file_name) {
+		return self::getFileStoragePath('img', $path_type, $grp_ref_id) . $file_name;
 	}
 
 
@@ -353,6 +353,8 @@ class ilParticipationCertificateConfig extends ActiveRecord {
 			'page1_location_date' => 'Karlsruhe, den {{date}}',
 			'page1_issuer_name' => 'Max Mustermann',
 			'page1_issuer_title' => '(Education Support Center)',
+			'page1_issuer_signature' => '',
+			'page1_disclaimer' => '',
 			'page2_title' => 'Erläuterungen zur Bescheinigung',
 			'page2_introduction1' => 'Das  Studienvorbereitungsprogramm  mit  Schwerpunkt  Mathematik  auf  der  Lernplattform studienstart.dhbw.de,  richtet  sich  an  Studienanfänger/-innen der  Wirtschaftsinformatik  der DHBW Karlsruhe. Die Teilnehmer/-innen des Programms erhalten die Möglichkeit sich bereits vor  Studienbeginn,  Studientechniken anzueignen  sowie  das  fehlende  Vorwissen  im  Fach  „Mathematik“  aufzuarbeiten.  Dadurch  haben Studierende  mehr  Zeit  ihre  Wissenslücken  in  Mathematik zu schließen und sich mit dem neuen Lernen auseinanderzusetzen.',
 			'page2_introduction2' => 'Ziel des Programms ist es,  Studienanfänger/-innen vor Studienbeginn auf das Fach Mathematik im Studium vorzubereiten. Neben der Vermittlung von mathematischen Inhalten, fördert der Online-Vorkurs  überfachliche  Kompetenzen  wie  Zeitmanagement  und  Lerntechniken  sowie  die Fähigkeit zum Selbststudium.',

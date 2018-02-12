@@ -144,3 +144,31 @@ $part_conf->setGroupRefId(0);
 $part_conf->store();
 }
 ?>
+<#19>
+<?php
+require_once 'Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/ParticipationCertificate/classes/class.ilParticipationCertificateConfig.php';
+$config = ilParticipationCertificateConfig::where(array('config_key' =>  'page1_issuer_signature', 'config_type' => ilParticipationCertificateConfig::CONFIG_TYPE_GLOBAL, 'config_value_type' => ilParticipationCertificateConfig::CONFIG_VALUE_TYPE_OTHER))->first();
+if(!is_object($config)) {
+	$part_conf = new ilParticipationCertificateConfig();
+	$part_conf->setConfigType(ilParticipationCertificateConfig::CONFIG_TYPE_GLOBAL);
+	$part_conf->setConfigValueType(ilParticipationCertificateConfig::CONFIG_VALUE_TYPE_OTHER);
+	$part_conf->setConfigKey('page1_issuer_signature');
+	$part_conf->setConfigValue("");
+	$part_conf->setGroupRefId(0);
+	$part_conf->store();
+}
+?>
+<#20>
+<?php
+require_once 'Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/ParticipationCertificate/classes/class.ilParticipationCertificateConfig.php';
+$config = ilParticipationCertificateConfig::where(array('config_key' =>  'page1_disclaimer', 'config_type' => ilParticipationCertificateConfig::CONFIG_TYPE_GLOBAL, 'config_value_type' => ilParticipationCertificateConfig::CONFIG_VALUE_TYPE_OTHER))->first();
+if(!is_object($config)) {
+	$part_conf = new ilParticipationCertificateConfig();
+	$part_conf->setConfigType(ilParticipationCertificateConfig::CONFIG_TYPE_GLOBAL);
+	$part_conf->setConfigValueType(ilParticipationCertificateConfig::CONFIG_VALUE_TYPE_CERT_TEXT);
+	$part_conf->setConfigKey('page1_disclaimer');
+	$part_conf->setConfigValue("");
+	$part_conf->setGroupRefId(0);
+	$part_conf->store();
+}
+?>

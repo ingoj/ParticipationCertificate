@@ -220,9 +220,25 @@ class ilParticipationCertificateGUI {
 			/**
 			 * @var ilParticipationCertificateConfig $config
 			 */
-			$input = new ilTextAreaInputGUI($config->getConfigKey(), $config->getConfigKey());
-			$input->setRows(3);
-			$input->setValue($config->getConfigValue());
+			switch ($config->getConfigKey()) {
+				case "page1_issuer_signature":
+					$input = new ilFileInputGUI($config->getConfigKey(), $config->getConfigKey());
+					$input->setSuffixes(array( 'png' ));
+					if (is_file(ilParticipationCertificateConfig::returnPicturePath('absolute', $this->groupRefId, $config->getConfigKey()
+						. ".png"))) {
+						$input->setInfo('<img src="'
+							. ilParticipationCertificateConfig::returnPicturePath('relative', $this->groupRefId, $config->getConfigKey() . ".png")
+							. '" />');
+					}
+					break;
+
+				default:
+					$input = new ilTextAreaInputGUI($config->getConfigKey(), $config->getConfigKey());
+					$input->setRows(3);
+					$input->setValue($config->getConfigValue());
+					break;
+			}
+
 			$form->addItem($input);
 		}
 
@@ -305,7 +321,22 @@ class ilParticipationCertificateGUI {
 					$config->setConfigValueType(ilParticipationCertificateConfig::CONFIG_VALUE_TYPE_CERT_TEXT);
 					$config->setConfigKey($item->getPostVar());
 				}
-				$config->setConfigValue($form->getInput($item->getPostVar()));
+
+				$input = $form->getInput($item->getPostVar());
+
+				switch ($config->getConfigKey()) {
+					case "page1_issuer_signature":
+						if ($input['tmp_name']) {
+							ilParticipationCertificateConfig::storePicture($input, $this->groupRefId, $config->getConfigKey() . ".png");
+						}
+						$input = "";
+						break;
+
+					default:
+						break;
+				}
+
+				$config->setConfigValue($input);
 				$config->store();
 			}
 		}
