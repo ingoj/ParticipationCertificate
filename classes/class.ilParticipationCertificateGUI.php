@@ -288,12 +288,13 @@ class ilParticipationCertificateGUI {
 		//TODO auslagern nach ilParticipationCertificateConfig
 		//save Text
 		foreach ($form->getItems() as $item) {
-			if (!$item->getPostVar() == 'percent_value') {
+			if ($item->getPostVar() != 'percent_value') {
 				/**
 				 * @var ilParticipationCertificateConfig $config ;
 				 */
 				$config = ilParticipationCertificateConfig::where(array(
 					'config_key' => $item->getPostVar(),
+					"group_ref_id" => $this->groupRefId,
 					'config_type' => ilParticipationCertificateConfig::CONFIG_TYPE_GROUP,
 					'config_value_type' => ilParticipationCertificateConfig::CONFIG_VALUE_TYPE_CERT_TEXT
 				))->first();
