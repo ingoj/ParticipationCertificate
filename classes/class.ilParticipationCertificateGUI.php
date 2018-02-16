@@ -232,7 +232,7 @@ class ilParticipationCertificateGUI {
 			$form->addItem($input);
 		}
 
-		$arr_config_value = ilParticipationCertificateConfig::where(array(
+		/*$arr_config_value = ilParticipationCertificateConfig::where(array(
 			"config_type" => ilParticipationCertificateConfig::CONFIG_TYPE_GROUP,
 			"group_ref_id" => $this->groupRefId,
 			"config_value_type" => ilParticipationCertificateConfig::CONFIG_VALUE_TYPE_OTHER,
@@ -246,7 +246,6 @@ class ilParticipationCertificateGUI {
 				'config_key' => 'percent_value'
 			))->first();
 		}
-		/*
 		$percent = new ilNumberInputGUI('Schwellenwert für Videokonferenz (Prozent)','percent_value');
 		$percent->setValue($arr_config_value->getConfigValue());
 		$form->addItem($percent);*/
