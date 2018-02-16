@@ -214,14 +214,25 @@ class ilParticipationCertificateConfig extends ActiveRecord {
 	 */
 	public static function storePicture(array $file_data, $grp_ref_id = 0, $file_name) {
 
-		if (is_file(ilParticipationCertificateConfig::returnPicturePath('absolute', $grp_ref_id, $file_name))) {
-			unlink(ilParticipationCertificateConfig::returnPicturePath('absolute', $grp_ref_id, $file_name));
-		}
+		self::deletePicture($grp_ref_id, $file_name);
 
 		$file_path = self::getFileStoragePath('img', 'absolute', $grp_ref_id, true);
 		ilUtil::moveUploadedFile($file_data['tmp_name'], '', $file_path . $file_name);
 
 		return self::returnPicturePath("relative", $grp_ref_id, $file_name);
+	}
+
+
+	/**
+	 * @param int    $grp_ref_id
+	 * @param string $file_name
+	 */
+	public static function deletePicture($grp_ref_id = 0, $file_name) {
+		$file_path = self::returnPicturePath('absolute', $grp_ref_id, $file_name);
+
+		if (is_file($file_path)) {
+			unlink($file_path);
+		}
 	}
 
 

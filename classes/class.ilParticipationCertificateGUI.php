@@ -408,6 +408,18 @@ class ilParticipationCertificateGUI {
 		))->get();
 		if (count($arr_config)) {
 			foreach ($arr_config as $config) {
+				/**
+				 * @var ilParticipationCertificateConfig $config
+				 */
+				switch ($config->getConfigKey()) {
+					case "page1_issuer_signature":
+						ilParticipationCertificateConfig::deletePicture($config->getGroupRefId(), $config->getConfigKey() . ".png");
+						break;
+
+					default:
+						break;
+				}
+
 				$config->delete();
 			}
 		}
