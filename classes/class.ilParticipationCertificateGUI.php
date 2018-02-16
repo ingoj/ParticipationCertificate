@@ -212,6 +212,7 @@ class ilParticipationCertificateGUI {
 		if (count($arr_config) == 0) {
 			$arr_config = ilParticipationCertificateConfig::where(array(
 				"config_type" => ilParticipationCertificateConfig::CONFIG_TYPE_GLOBAL,
+				"group_ref_id" => 0,
 				"config_value_type" => ilParticipationCertificateConfig::CONFIG_VALUE_TYPE_CERT_TEXT
 			))->orderBy('id')->get();
 		}

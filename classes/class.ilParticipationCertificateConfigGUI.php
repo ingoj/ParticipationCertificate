@@ -129,7 +129,8 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI {
 
 		foreach (ilParticipationCertificateConfig::where(array(
 			"config_type" => ilParticipationCertificateConfig::CONFIG_TYPE_GLOBAL,
-			"config_value_type" => ilParticipationCertificateConfig::CONFIG_VALUE_TYPE_CERT_TEXT
+			"config_value_type" => ilParticipationCertificateConfig::CONFIG_VALUE_TYPE_CERT_TEXT,
+			"group_ref_id" => 0
 		))->orderBy('order_by')->get() as $config) {
 			/**
 			 * @var ilParticipationCertificateConfig $config
@@ -161,7 +162,8 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI {
 		$obj_value = ilParticipationCertificateConfig::where(array(
 			"config_type" => ilParticipationCertificateConfig::CONFIG_TYPE_GLOBAL,
 			"config_value_type" => ilParticipationCertificateConfig::CONFIG_VALUE_TYPE_OTHER,
-			"config_key" => "udf_firstname"
+			"config_key" => "udf_firstname",
+			"group_ref_id" => 0
 		))->first();
 		$value = 0;
 		if (is_object($obj_value)) {
@@ -175,7 +177,8 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI {
 		$obj_value = ilParticipationCertificateConfig::where(array(
 			"config_type" => ilParticipationCertificateConfig::CONFIG_TYPE_GLOBAL,
 			"config_value_type" => ilParticipationCertificateConfig::CONFIG_VALUE_TYPE_OTHER,
-			"config_key" => "udf_lastname"
+			"config_key" => "udf_lastname",
+			"group_ref_id" => 0
 		))->first();
 		$value = 0;
 		if (is_object($obj_value)) {
@@ -189,7 +192,8 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI {
 		$obj_value = ilParticipationCertificateConfig::where(array(
 			"config_type" => ilParticipationCertificateConfig::CONFIG_TYPE_GLOBAL,
 			"config_value_type" => ilParticipationCertificateConfig::CONFIG_VALUE_TYPE_OTHER,
-			"config_key" => "udf_gender"
+			"config_key" => "udf_gender",
+			"group_ref_id" => 0
 		))->first();
 		$value = 0;
 		if (is_object($obj_value)) {
@@ -203,7 +207,8 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI {
 		$obj_value = ilParticipationCertificateConfig::where(array(
 			"config_type" => ilParticipationCertificateConfig::CONFIG_TYPE_GLOBAL,
 			"config_value_type" => ilParticipationCertificateConfig::CONFIG_VALUE_TYPE_OTHER,
-			"config_key" => "percent_value"
+			"config_key" => "percent_value",
+			"group_ref_id" => 0
 		))->first();
 		$value = 0;
 		if (is_object($obj_value)) {
@@ -217,7 +222,8 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI {
 		$obj_value = ilParticipationCertificateConfig::where(array(
 			"config_type" => ilParticipationCertificateConfig::CONFIG_TYPE_GLOBAL,
 			"config_value_type" => ilParticipationCertificateConfig::CONFIG_VALUE_TYPE_OTHER,
-			"config_key" => "color"
+			"config_key" => "color",
+			"group_ref_id" => 0
 		))->first();
 		$value = 0;
 		if (is_object($obj_value)) {
@@ -230,7 +236,8 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI {
 		$obj_value = ilParticipationCertificateConfig::where(array(
 			"config_type" => ilParticipationCertificateConfig::CONFIG_TYPE_GLOBAL,
 			"config_value_type" => ilParticipationCertificateConfig::CONFIG_VALUE_TYPE_OTHER,
-			"config_key" => "keyword"
+			"config_key" => "keyword",
+			"group_ref_id" => 0
 		))->first();
 		$value = 0;
 		if (is_object($obj_value)) {
@@ -280,7 +287,8 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI {
 			$config = ilParticipationCertificateConfig::where(array(
 				'config_key' => $item->getPostVar(),
 				'config_type' => ilParticipationCertificateConfig::CONFIG_TYPE_GLOBAL,
-				'config_value_type' => ilParticipationCertificateConfig::CONFIG_VALUE_TYPE_CERT_TEXT
+				'config_value_type' => ilParticipationCertificateConfig::CONFIG_VALUE_TYPE_CERT_TEXT,
+				"group_ref_id" => 0
 			))->first();
 			if (is_object($config)) {
 				$input = $form->getInput($item->getPostVar());
@@ -294,7 +302,8 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI {
 		$config = ilParticipationCertificateConfig::where(array(
 			'config_key' => 'udf_firstname',
 			'config_type' => ilParticipationCertificateConfig::CONFIG_TYPE_GLOBAL,
-			'config_value_type' => ilParticipationCertificateConfig::CONFIG_VALUE_TYPE_OTHER
+			'config_value_type' => ilParticipationCertificateConfig::CONFIG_VALUE_TYPE_OTHER,
+			"group_ref_id" => 0
 		))->first();
 		if (!is_object($config)) {
 			$config = new ilParticipationCertificateConfig();
@@ -309,7 +318,8 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI {
 		$config = ilParticipationCertificateConfig::where(array(
 			'config_key' => 'udf_lastname',
 			'config_type' => ilParticipationCertificateConfig::CONFIG_TYPE_GLOBAL,
-			'config_value_type' => ilParticipationCertificateConfig::CONFIG_VALUE_TYPE_OTHER
+			'config_value_type' => ilParticipationCertificateConfig::CONFIG_VALUE_TYPE_OTHER,
+			"group_ref_id" => 0
 		))->first();
 		if (!is_object($config)) {
 			$config = new ilParticipationCertificateConfig();
@@ -324,7 +334,8 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI {
 		$config = ilParticipationCertificateConfig::where(array(
 			'config_key' => 'udf_gender',
 			'config_type' => ilParticipationCertificateConfig::CONFIG_TYPE_GLOBAL,
-			'config_value_type' => ilParticipationCertificateConfig::CONFIG_VALUE_TYPE_OTHER
+			'config_value_type' => ilParticipationCertificateConfig::CONFIG_VALUE_TYPE_OTHER,
+			"group_ref_id" => 0
 		))->first();
 		if (!is_object($config)) {
 			$config = new ilParticipationCertificateConfig();
@@ -339,7 +350,8 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI {
 		$config = ilParticipationCertificateConfig::where(array(
 			'config_key' => 'percent_value',
 			'config_type' => ilParticipationCertificateConfig::CONFIG_TYPE_GLOBAL,
-			'config_value_type' => ilParticipationCertificateConfig::CONFIG_VALUE_TYPE_OTHER
+			'config_value_type' => ilParticipationCertificateConfig::CONFIG_VALUE_TYPE_OTHER,
+			"group_ref_id" => 0
 		))->first();
 		if (!is_object($config)) {
 			$config = new ilParticipationCertificateConfig();
@@ -354,7 +366,8 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI {
 		$config = ilParticipationCertificateConfig::where(array(
 			'config_key' => 'color',
 			'config_type' => ilParticipationCertificateConfig::CONFIG_TYPE_GLOBAL,
-			'config_value_type' => ilParticipationCertificateConfig::CONFIG_VALUE_TYPE_OTHER
+			'config_value_type' => ilParticipationCertificateConfig::CONFIG_VALUE_TYPE_OTHER,
+			"group_ref_id" => 0
 		))->first();
 		if (!is_object($config)) {
 			$config = new ilParticipationCertificateConfig();
@@ -370,7 +383,8 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI {
 		$config = ilParticipationCertificateConfig::where(array(
 			'config_key' => 'keyword',
 			'config_type' => ilParticipationCertificateConfig::CONFIG_TYPE_GLOBAL,
-			'config_value_type' => ilParticipationCertificateConfig::CONFIG_VALUE_TYPE_OTHER
+			'config_value_type' => ilParticipationCertificateConfig::CONFIG_VALUE_TYPE_OTHER,
+			"group_ref_id" => 0
 		))->first();
 		if (!is_object($config)) {
 			$config = new ilParticipationCertificateConfig();

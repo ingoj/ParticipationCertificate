@@ -395,7 +395,8 @@ class ilParticipationCertificateConfig extends ActiveRecord {
 		if (count($arr_config) == 0) {
 			$arr_config = ilParticipationCertificateConfig::where(array(
 				"config_type" => ilParticipationCertificateConfig::CONFIG_TYPE_GLOBAL,
-				'config_value_type' => ilParticipationCertificateConfig::CONFIG_VALUE_TYPE_CERT_TEXT
+				'config_value_type' => ilParticipationCertificateConfig::CONFIG_VALUE_TYPE_CERT_TEXT,
+				"group_ref_id" => 0
 			))->orderBy('order_by')->getArray('config_key', 'config_value');
 		}
 

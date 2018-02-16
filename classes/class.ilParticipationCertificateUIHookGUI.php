@@ -28,7 +28,7 @@ class ilParticipationCertificateUIHookGUI extends ilUIHookPluginGUI {
 		$this->pl = ilParticipationCertificatePlugin::getInstance();
 		$this->groupRefId = (int)$_GET['ref_id'];
 
-		if($this->groupRefId ==! 0 && $this->groupRefId ==! NULL) {
+		if ($this->groupRefId == !0 && $this->groupRefId == !NULL) {
 			$this->learnGroup = ilObjectFactory::getInstanceByRefId($this->groupRefId);
 			$this->learnGroupTitle = $this->learnGroup->getTitle();
 		}
@@ -36,11 +36,10 @@ class ilParticipationCertificateUIHookGUI extends ilUIHookPluginGUI {
 		$config = ilParticipationCertificateConfig::where(array(
 			'config_key' => 'keyword',
 			'config_type' => ilParticipationCertificateConfig::CONFIG_TYPE_GLOBAL,
-			'config_value_type' => ilParticipationCertificateConfig::CONFIG_VALUE_TYPE_OTHER
+			'config_value_type' => ilParticipationCertificateConfig::CONFIG_VALUE_TYPE_OTHER,
+			"group_ref_id" => 0
 		))->first();
 		$this->keyword = $config->getConfigValue();
-
-
 	}
 
 
@@ -56,7 +55,6 @@ class ilParticipationCertificateUIHookGUI extends ilUIHookPluginGUI {
 	function modifyGUI($a_comp, $a_part, $a_par = array()) {
 		global $ilUser;
 
-
 		if ($a_part == 'tabs' && $this->checkGroup()) {
 
 			$cert_access = new ilParticipationCertificateAccess($_GET['ref_id']);
@@ -71,8 +69,7 @@ class ilParticipationCertificateUIHookGUI extends ilUIHookPluginGUI {
 					'ilUIPluginRouterGUI',
 					'ilParticipationCertificateResultGUI'
 				), ilParticipationCertificateResultGUI::CMD_CONTENT));
-			}
-			else{
+			} else {
 				/**
 				 * @var ilTabsGUI $tabs
 				 */
@@ -94,7 +91,7 @@ class ilParticipationCertificateUIHookGUI extends ilUIHookPluginGUI {
 	function checkGroup() {
 		foreach ($this->ctrl->getCallHistory() as $GUIClassesArray) {
 			if ($GUIClassesArray['class'] == 'ilObjGroupGUI') {
-				if(stripos($this->learnGroupTitle,$this->keyword) !== false) {
+				if (stripos($this->learnGroupTitle, $this->keyword) !== false) {
 					return true;
 				}
 			}
@@ -103,4 +100,5 @@ class ilParticipationCertificateUIHookGUI extends ilUIHookPluginGUI {
 		return false;
 	}
 }
+
 ?>

@@ -66,7 +66,8 @@ class ilParticipationCertificateSingleResultTableGUI extends ilTable2GUI {
 		$config = ilParticipationCertificateConfig::where(array(
 			'config_key' => 'color',
 			'config_type' => ilParticipationCertificateConfig::CONFIG_TYPE_GLOBAL,
-			'config_value_type' => ilParticipationCertificateConfig::CONFIG_VALUE_TYPE_OTHER
+			'config_value_type' => ilParticipationCertificateConfig::CONFIG_VALUE_TYPE_OTHER,
+			"group_ref_id" => 0
 		))->first();
 		$this->color = $config->getConfigValue();
 
