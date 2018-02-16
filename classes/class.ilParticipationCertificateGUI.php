@@ -22,13 +22,15 @@ class ilParticipationCertificateGUI {
 	const CMD_SAVE = 'save';
 	const CMD_CANCEL = 'cancel';
 	const CMD_LOOP = 'loop';
-	CONST CMD_CONFIG = 'config';
+	const CMD_CONFIG = 'config';
 	const CMD_PERIOD = 'period';
 	const CMD_PERIOD_SAVE = 'savePeriod';
 	const CMD_SELF_PRINT = 'selfPrint';
 	const CMD_SELF_PRINT_SAVE = 'saveSelfPrint';
 	const CMD_DISPLAY = 'display';
 	const CMD_RESET_CERT_TEXT = 'resetCertText';
+	/*const CMD_PRINT_PDF = 'printPdf';
+	const CMD_PRINT_PDF_WITHOUT_MENTORING = 'printPdfWithoutMentoring';*/
 	const TAB_CONFIG = 'config';
 	const TAB_CONFIG_DISPLAY = 'config_display';
 	const TAB_CONFIG_PERIOD = 'config_period';
@@ -113,6 +115,8 @@ class ilParticipationCertificateGUI {
 					case self::CMD_PERIOD_SAVE:
 					case self::CMD_SELF_PRINT:
 					case self::CMD_SELF_PRINT_SAVE:
+						/*case self::CMD_PRINT_PDF:
+						case self::CMD_PRINT_PDF_WITHOUT_MENTORING:*/
 						$this->{$cmd}();
 						break;
 					default:
@@ -174,12 +178,12 @@ class ilParticipationCertificateGUI {
 		/*
 		$b_print = ilLinkButton::getInstance();
 		$b_print->setCaption($this->pl->txt('header_btn_print'), false);
-		$b_print->setUrl($this->ctrl->getLinkTarget($this, ilParticipationCertificateResultGUI::CMD_PRINT_PDF));
+		$b_print->setUrl($this->ctrl->getLinkTarget($this, self::CMD_PRINT_PDF));
 		$this->toolbar->addButtonInstance($b_print);
 
 		$b_print = ilLinkButton::getInstance();
 		$b_print->setCaption($this->pl->txt('header_btn_print_eMentoring'), false);
-		$b_print->setUrl($this->ctrl->getLinkTarget($this, 'printPdfWithoutMentoring'));
+		$b_print->setUrl($this->ctrl->getLinkTarget($this, self::CMD_PRINT_PDF_WITHOUT_MENTORING));
 		$this->toolbar->addButtonInstance($b_print);
 		*/
 
@@ -340,7 +344,7 @@ class ilParticipationCertificateGUI {
 
 
 	/*
-	public function printpdf() {
+	public function printPdf() {
 		$twigParser = new ilParticipationCertificateTwigParser($this->groupRefId);
 		$twigParser->parseData();
 	}
@@ -350,6 +354,7 @@ class ilParticipationCertificateGUI {
 		$twigParser->parseData();
 	}
 	*/
+
 	public function resetCertText() {
 		global $ilCtrl;
 		$arr_config = ilParticipationCertificateConfig::where(array(
