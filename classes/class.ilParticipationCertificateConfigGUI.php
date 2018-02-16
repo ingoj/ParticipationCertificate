@@ -138,6 +138,7 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI {
 			switch ($config->getConfigKey()) {
 				case "page1_issuer_signature":
 					// Skip
+					$input = NULL;
 					break;
 
 				default:
@@ -147,7 +148,9 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI {
 					break;
 			}
 
-			$form->addItem($input);
+			if ($input !== NULL) {
+				$form->addItem($input);
+			}
 		}
 
 		$uploadfield = new ilFileInputGUI('Logo', 'headerpic');

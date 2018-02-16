@@ -377,7 +377,8 @@ class ilParticipationCertificateConfig extends ActiveRecord {
 			'percent_value' => '50',
 			'keyword' => 'Lerngruppe',
 			'perdiod_start' => NULL,
-			'perdiod_end' => NULL
+			'perdiod_end' => NULL,
+			'footer_config' => 'Die Resultate dieser Bescheinigung wurden manuell berechnet.'
 		);
 	}
 
