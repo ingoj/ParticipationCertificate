@@ -387,9 +387,12 @@ class ilParticipationCertificateConfig extends ActiveRecord {
 			'page2_box2_row2' => 'Bearbeitung der Aufgaben zu überfachlichen Themen:',
 			'percent_value' => '50',
 			'keyword' => 'Lerngruppe',
-			'perdiod_start' => NULL,
-			'perdiod_end' => NULL,
-			'footer_config' => 'Die Resultate dieser Bescheinigung wurden manuell berechnet.'
+			'period_start' => NULL,
+			'period_end' => NULL,
+			'footer_config' => 'Die Resultate dieser Bescheinigung wurden manuell berechnet.',
+			'self_print_enable' => false,
+			'self_print_start' => NULL,
+			'self_print_end' => NULL
 		);
 	}
 

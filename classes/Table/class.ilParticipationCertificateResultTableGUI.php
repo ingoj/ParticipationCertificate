@@ -73,8 +73,8 @@ class ilParticipationCertificateResultTableGUI extends ilTable2GUI {
 		$this->initFilter();
 		$this->setSelectAllCheckbox('record_ids');
 		if ($cert_access->hasCurrentUserPrintAccess()) {
-			$this->addMultiCommand('printSelected', $this->pl->txt('list_print'));
-			$this->addMultiCommand('printSelectedWithouteMentoring', $this->pl->txt('list_print_without'));
+			$this->addMultiCommand(ilParticipationCertificateResultGUI::CMD_PRINT_SELECTED, $this->pl->txt('list_print'));
+			$this->addMultiCommand(ilParticipationCertificateResultGUI::CMD_PRINT_SELECTED_WITHOUTE_MENTORING, $this->pl->txt('list_print_without'));
 		}
 		$this->addMultiCommand(ilParticipationCertificateMultipleResultGUI::CMD_SHOW_ALL_RESULTS, $this->pl->txt('list_overview'));
 		$this->setRowTemplate('tpl.default_row.html', $this->pl->getDirectory());
@@ -139,7 +139,7 @@ class ilParticipationCertificateResultTableGUI extends ilTable2GUI {
 
 	private function addColumns() {
 		$cert_access = new ilParticipationCertificateAccess($_GET['ref_id']);
-		if ($cert_access->hasCurrentUserPrintAccess()) {
+		if ($cert_access->hasCurrentUserWriteAccess()) {
 			$this->addColumn('', '', '', true);
 		}
 		foreach ($this->getSelectableColumns() as $k => $v) {

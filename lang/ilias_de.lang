@@ -43,3 +43,5 @@ successForm#:#Formular erfolgreich zurückgesetzt
 successFormSave#:#Formular erfolgreich gespeichert
 pluginreader#:#Resultate Studienvorbereitung
 period#:#Zeitraum
+period_self_print#:#Zeitraum Selbstausdruck konfigurieren
+enable_self_print#:#Selbstausdruck aktivieren

@@ -25,11 +25,14 @@ class ilParticipationCertificateGUI {
 	CONST CMD_CONFIG = 'config';
 	const CMD_PERIOD = 'period';
 	const CMD_PERIOD_SAVE = 'savePeriod';
+	const CMD_SELF_PRINT = 'selfPrint';
+	const CMD_SELF_PRINT_SAVE = 'saveSelfPrint';
 	const CMD_DISPLAY = 'display';
 	const CMD_RESET_CERT_TEXT = 'resetCertText';
 	const TAB_CONFIG = 'config';
 	const TAB_CONFIG_DISPLAY = 'config_display';
 	const TAB_CONFIG_PERIOD = 'config_period';
+	const TAB_CONFIG_SELF_PRINT = 'config_self_print';
 	/**
 	 * @var ilTemplate
 	 */
@@ -79,14 +82,14 @@ class ilParticipationCertificateGUI {
 		$this->groupRefId = (int)$_GET['ref_id'];
 
 		//Access
-		$cert_access = new ilParticipationCertificateAccess($_GET['ref_id']);
-		if (!$cert_access->hasCurrentUserPrintAccess()) {
+		$cert_access = new ilParticipationCertificateAccess($this->groupRefId);
+		if (!$cert_access->hasCurrentUserWriteAccess()) {
 			ilUtil::sendFailure($lng->txt('no_permission'), true);
 			ilUtil::redirect('login.php');
 		}
 
 		$this->pl = ilParticipationCertificatePlugin::getInstance();
-		$this->learnGroup = ilObjectFactory::getInstanceByRefId($_GET['ref_id']);
+		$this->learnGroup = ilObjectFactory::getInstanceByRefId($this->groupRefId);
 		$this->ctrl->saveParameterByClass('ilParticipationCertificateGUI', [ 'ref_id', 'group_id' ]);
 	}
 
@@ -108,6 +111,8 @@ class ilParticipationCertificateGUI {
 					case self::CMD_RESET_CERT_TEXT:
 					case self::CMD_SAVE:
 					case self::CMD_PERIOD_SAVE:
+					case self::CMD_SELF_PRINT:
+					case self::CMD_SELF_PRINT_SAVE:
 						$this->{$cmd}();
 						break;
 					default:
@@ -130,13 +135,13 @@ class ilParticipationCertificateGUI {
 
 		$this->ctrl->saveParameterByClass('ilRepositoryGUI', 'ref_id');
 
-		$this->ctrl->setParameterByClass('ilrepositorygui', 'ref_id', (int)$_GET['ref_id']);
+		$this->ctrl->setParameterByClass('ilrepositorygui', 'ref_id', $this->groupRefId);
 		$this->tabs->setBackTarget($this->pl->txt('header_btn_back'), $this->ctrl->getLinkTargetByClass(array( 'ilrepositorygui', 'ilobjgroupgui' )));
 
 		$this->ctrl->saveParameterByClass('ilParticipationCertificateResultGUI', 'ref_id');
-		$this->tabs->addTab('overview', $this->pl->txt('header_overview'), $this->ctrl->getLinkTargetByClass(ilParticipationCertificateResultGUI::class, ilParticipationCertificateResultGUI::CMD_CONTENT));
+		$this->tabs->addTab(ilParticipationCertificateResultGUI::CMD_OVERVIEW, $this->pl->txt('header_overview'), $this->ctrl->getLinkTargetByClass(ilParticipationCertificateResultGUI::class, ilParticipationCertificateResultGUI::CMD_CONTENT));
 
-		//$this->tabs->addTab('overview',$this->pl->txt('header_overview'),$this->ctrl->getLinkTargetByClass('ilParticipationCertificateResultGUI',ilParticipationCertificateResultGUI::CMD_CONTENT));
+		//$this->tabs->addTab(ilParticipationCertificateResultGUI::CMD_OVERVIEW,$this->pl->txt('header_overview'),$this->ctrl->getLinkTargetByClass('ilParticipationCertificateResultGUI',ilParticipationCertificateResultGUI::CMD_CONTENT));
 		$this->tabs->addTab(self::TAB_CONFIG, $this->pl->txt('header_config'), $this->ctrl->getLinkTargetByClass(self::class, self::CMD_CONFIG));
 		$this->tabs->activateTab(self::TAB_CONFIG);
 	}
@@ -144,21 +149,8 @@ class ilParticipationCertificateGUI {
 
 	protected function initConfTabs() {
 		$this->tabs->addSubTab(self::TAB_CONFIG_PERIOD, $this->pl->txt('period'), $this->ctrl->getLinkTarget($this, self::CMD_PERIOD));
+		$this->tabs->addSubTab(self::TAB_CONFIG_SELF_PRINT, $this->pl->txt('period_self_print'), $this->ctrl->getLinkTarget($this, self::CMD_SELF_PRINT));
 		$this->tabs->addSubTab(self::TAB_CONFIG_DISPLAY, $this->pl->txt('plugin'), $this->ctrl->getLinkTarget($this, self::CMD_DISPLAY));
-	}
-
-
-	protected function period() {
-		$this->tpl->getStandardTemplate();
-		$this->initHeader();
-
-		$this->initConfTabs();
-		$this->tabs->activateSubTab(self::TAB_CONFIG_PERIOD);
-
-		$form = $this->initPeriodForm();
-
-		$this->tpl->setContent($form->getHTML());
-		$this->tpl->show();
 	}
 
 
@@ -182,7 +174,7 @@ class ilParticipationCertificateGUI {
 		/*
 		$b_print = ilLinkButton::getInstance();
 		$b_print->setCaption($this->pl->txt('header_btn_print'), false);
-		$b_print->setUrl($this->ctrl->getLinkTarget($this, 'printPdf'));
+		$b_print->setUrl($this->ctrl->getLinkTarget($this, ilParticipationCertificateResultGUI::CMD_PRINT_PDF));
 		$this->toolbar->addButtonInstance($b_print);
 
 		$b_print = ilLinkButton::getInstance();
@@ -261,27 +253,6 @@ class ilParticipationCertificateGUI {
 
 		$this->ctrl->saveParameterByClass('ilObjGroup', 'ref_id');
 		$form->addCommandButton(self::CMD_SAVE, $this->pl->txt('save'));
-
-		return $form;
-	}
-
-
-	/**
-	 * @return ilPropertyFormGUI
-	 */
-	protected function initPeriodForm() {
-		$form = new ilPropertyFormGUI();
-
-		$form->setFormAction($this->ctrl->getFormAction($this));
-
-		$form->setTitle($this->pl->txt('period'));
-
-		$period = new ilDateDurationInputGUI($this->pl->txt('period'), 'period');
-		$period->setStart(new ilDateTime(ilParticipationCertificateConfig::getConfig('period_start', $this->groupRefId), IL_CAL_DATE));
-		$period->setEnd(new ilDateTime(ilParticipationCertificateConfig::getConfig('period_end', $this->groupRefId), IL_CAL_DATE));
-		$form->addItem($period);
-
-		$form->addCommandButton(self::CMD_PERIOD_SAVE, $this->pl->txt('save'));
 
 		return $form;
 	}
@@ -369,27 +340,8 @@ class ilParticipationCertificateGUI {
 	}
 
 
-	protected function savePeriod() {
-		$form = $this->initPeriodForm();
-
-		if (!$form->checkInput()) {
-			//TODO error message plus redirect
-			return;
-		}
-
-		$period = $form->getInput('period');
-
-		ilParticipationCertificateConfig::setConfig('period_start', $period['start'], $this->groupRefId);
-		ilParticipationCertificateConfig::setConfig('period_end', $period['end'], $this->groupRefId);
-
-		ilUtil::sendSuccess($this->pl->txt('successFormSave'), true);
-
-		$this->ctrl->redirect($this, self::CMD_PERIOD);
-	}
-
-
 	/*
-	public function printPdf() {
+	public function printpdf() {
 		$twigParser = new ilParticipationCertificateTwigParser($this->groupRefId);
 		$twigParser->parseData();
 	}
@@ -425,6 +377,119 @@ class ilParticipationCertificateGUI {
 		}
 		ilUtil::sendSuccess($this->pl->txt('successForm'), true);
 		$ilCtrl->redirect($this, self::CMD_DISPLAY);
+	}
+
+
+	protected function period() {
+		$this->tpl->getStandardTemplate();
+		$this->initHeader();
+
+		$this->initConfTabs();
+		$this->tabs->activateSubTab(self::TAB_CONFIG_PERIOD);
+
+		$form = $this->initPeriodForm();
+
+		$this->tpl->setContent($form->getHTML());
+		$this->tpl->show();
+	}
+
+
+	/**
+	 * @return ilPropertyFormGUI
+	 */
+	protected function initPeriodForm() {
+		$form = new ilPropertyFormGUI();
+
+		$form->setFormAction($this->ctrl->getFormAction($this));
+
+		$form->setTitle($this->pl->txt('period'));
+
+		$period = new ilDateDurationInputGUI($this->pl->txt('period'), 'period');
+		$period->setStart(new ilDateTime(ilParticipationCertificateConfig::getConfig('period_start', $this->groupRefId), IL_CAL_DATE));
+		$period->setEnd(new ilDateTime(ilParticipationCertificateConfig::getConfig('period_end', $this->groupRefId), IL_CAL_DATE));
+		$form->addItem($period);
+
+		$form->addCommandButton(self::CMD_PERIOD_SAVE, $this->pl->txt('save'));
+
+		return $form;
+	}
+
+
+	protected function savePeriod() {
+		$form = $this->initPeriodForm();
+
+		if (!$form->checkInput()) {
+			//TODO error message plus redirect
+			return;
+		}
+
+		$period = $form->getInput('period');
+		ilParticipationCertificateConfig::setConfig('period_start', $period['start'], $this->groupRefId);
+		ilParticipationCertificateConfig::setConfig('period_end', $period['end'], $this->groupRefId);
+
+		ilUtil::sendSuccess($this->pl->txt('successFormSave'), true);
+
+		$this->ctrl->redirect($this, self::CMD_PERIOD);
+	}
+
+
+	protected function selfPrint() {
+		$this->tpl->getStandardTemplate();
+		$this->initHeader();
+
+		$this->initConfTabs();
+		$this->tabs->activateSubTab(self::TAB_CONFIG_SELF_PRINT);
+
+		$form = $this->initSelfPrintForm();
+
+		$this->tpl->setContent($form->getHTML());
+		$this->tpl->show();
+	}
+
+
+	/**
+	 * @return ilPropertyFormGUI
+	 */
+	protected function initSelfPrintForm() {
+		$form = new ilPropertyFormGUI();
+
+		$form->setFormAction($this->ctrl->getFormAction($this));
+
+		$form->setTitle($this->pl->txt('period_self_print'));
+
+		$enable = new ilCheckboxInputGUI($this->pl->txt('enable_self_print'), 'enable_self_print');
+		$enable->setChecked(boolval(ilParticipationCertificateConfig::getConfig('self_print_enable', $this->groupRefId)));
+		$form->addItem($enable);
+
+		$period = new ilDateDurationInputGUI($this->pl->txt('period'), 'period_self_print');
+		$period->setStart(new ilDateTime(ilParticipationCertificateConfig::getConfig('self_print_start', $this->groupRefId), IL_CAL_DATE));
+		$period->setEnd(new ilDateTime(ilParticipationCertificateConfig::getConfig('self_print_end', $this->groupRefId), IL_CAL_DATE));
+		$enable->addSubItem($period);
+
+		$form->addCommandButton(self::CMD_SELF_PRINT_SAVE, $this->pl->txt('save'));
+
+		return $form;
+	}
+
+
+	protected function saveSelfPrint() {
+		$form = $this->initSelfPrintForm();
+
+		if (!$form->checkInput()) {
+			//TODO error message plus redirect
+			return;
+		}
+
+		$enable = boolval($form->getInput("enable_self_print"));
+		ilParticipationCertificateConfig::setConfig('enable_self_print', $enable, $this->groupRefId);
+
+		$period = $form->getInput('period_self_print');
+		ilParticipationCertificateConfig::setConfig('self_print_start', $period['start'], $this->groupRefId);
+		ilParticipationCertificateConfig::setConfig('self_print_end', $period['end'], $this->groupRefId);
+
+		ilUtil::sendSuccess($this->pl->txt('successFormSave'), true);
+
+		$this->ctrl->redirect($this, self::CMD_SELF_PRINT);
 	}
 }
 
