@@ -224,11 +224,8 @@ class ilParticipationCertificateGUI {
 				case "page1_issuer_signature":
 					$input = new ilFileInputGUI($config->getConfigKey(), $config->getConfigKey());
 					$input->setSuffixes(array( 'png' ));
-					if (is_file(ilParticipationCertificateConfig::returnPicturePath('absolute', $this->groupRefId, $config->getConfigKey()
-						. ".png"))) {
-						$input->setInfo('<img src="'
-							. ilParticipationCertificateConfig::returnPicturePath('relative', $this->groupRefId, $config->getConfigKey() . ".png")
-							. '" />');
+					if (!empty($config->getConfigValue())) {
+						$input->setInfo('<img src="' . $config->getConfigValue() . '" />');
 					}
 					break;
 
@@ -304,10 +301,11 @@ class ilParticipationCertificateGUI {
 		//TODO auslagern nach ilParticipationCertificateConfig
 		//save Text
 		foreach ($form->getItems() as $item) {
+			/**
+			 * @var ilFormPropertyGUI                $item
+			 * @var ilParticipationCertificateConfig $config
+			 */
 			if ($item->getPostVar() != 'percent_value') {
-				/**
-				 * @var ilParticipationCertificateConfig $config ;
-				 */
 				$config = ilParticipationCertificateConfig::where(array(
 					'config_key' => $item->getPostVar(),
 					"group_ref_id" => $this->groupRefId,
@@ -320,6 +318,7 @@ class ilParticipationCertificateGUI {
 					$config->setConfigType(ilParticipationCertificateConfig::CONFIG_TYPE_GROUP);
 					$config->setConfigValueType(ilParticipationCertificateConfig::CONFIG_VALUE_TYPE_CERT_TEXT);
 					$config->setConfigKey($item->getPostVar());
+					$config->setConfigValue("");
 				}
 
 				$input = $form->getInput($item->getPostVar());
@@ -327,9 +326,14 @@ class ilParticipationCertificateGUI {
 				switch ($config->getConfigKey()) {
 					case "page1_issuer_signature":
 						if ($input['tmp_name']) {
-							ilParticipationCertificateConfig::storePicture($input, $this->groupRefId, $config->getConfigKey() . ".png");
+							/**
+							 * @var array $input
+							 */
+							$input = ilParticipationCertificateConfig::storePicture($input, $this->groupRefId, $config->getConfigKey() . ".png");
+						} else {
+							// Previous upload
+							$input = $config->getConfigValue();
 						}
-						$input = "";
 						break;
 
 					default:

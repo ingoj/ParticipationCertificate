@@ -136,12 +136,7 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI {
 			 */
 			switch ($config->getConfigKey()) {
 				case "page1_issuer_signature":
-					$input = new ilFileInputGUI($config->getConfigKey(), $config->getConfigKey());
-					$input->setSuffixes(array( 'png' ));
-					if (is_file(ilParticipationCertificateConfig::returnPicturePath('absolute', 0, $config->getConfigKey() . ".png"))) {
-						$input->setInfo('<img src="' . ilParticipationCertificateConfig::returnPicturePath('relative', 0, $config->getConfigKey()
-								. ".png") . '" />');
-					}
+					// Skip
 					break;
 
 				default:
@@ -279,6 +274,7 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI {
 		//save Text
 		foreach ($form->getItems() as $item) {
 			/**
+			 * @var ilFormPropertyGUI                $item
 			 * @var ilParticipationCertificateConfig $config
 			 */
 			$config = ilParticipationCertificateConfig::where(array(
@@ -288,18 +284,6 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI {
 			))->first();
 			if (is_object($config)) {
 				$input = $form->getInput($item->getPostVar());
-
-				switch ($config->getConfigKey()) {
-					case "page1_issuer_signature":
-						if ($input['tmp_name']) {
-							ilParticipationCertificateConfig::storePicture($input, 0, $config->getConfigKey() . ".png");
-						}
-						$input = "";
-						break;
-
-					default:
-						break;
-				}
 
 				$config->setConfigValue($input);
 				$config->store();
