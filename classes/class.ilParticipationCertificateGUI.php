@@ -462,7 +462,7 @@ class ilParticipationCertificateGUI {
 		$form->setTitle($this->pl->txt('period_self_print'));
 
 		$enable = new ilCheckboxInputGUI($this->pl->txt('enable_self_print'), 'enable_self_print');
-		$enable->setChecked(boolval(ilParticipationCertificateConfig::getConfig('self_print_enable', $this->groupRefId)));
+		$enable->setChecked(boolval(ilParticipationCertificateConfig::getConfig('enable_self_print', $this->groupRefId)));
 		$form->addItem($enable);
 
 		$period = new ilDateDurationInputGUI($this->pl->txt('period'), 'period_self_print');
