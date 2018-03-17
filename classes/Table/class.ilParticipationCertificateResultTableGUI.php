@@ -301,7 +301,7 @@ class ilParticipationCertificateResultTableGUI extends ilTable2GUI {
 					// <100%
 					if ($current <= $end) {
 						// End not reached
-						if ($a_perc_result >= ($a_perc_limit - 10) && $a_perc_result <= ($a_perc_limit + 10)) {
+						if ($a_perc_result >= ($a_perc_limit - 10)) {
 							// In time (+/-10%)
 							$css_class = self::ORANGE_PROGRESS;
 						} else {
