@@ -25,8 +25,8 @@ class ilParticipationCertificateTwigParser {
 	 * @param int   $group_ref_id
 	 * @param array $twig_options
 	 * @param bool  $ementor
-	 * @param int $usr_id
-	 * @param bool $edited
+	 * @param int   $usr_id
+	 * @param bool  $edited
 	 * @param array $array
 	 */
 	public function __construct($group_ref_id = 0, $twig_options = array(), $usr_id, $ementor = true, $edited = false, $array = NULL) {
@@ -56,7 +56,6 @@ class ilParticipationCertificateTwigParser {
 		$loader = new \Twig_Loader_Filesystem('./Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/ParticipationCertificate/templates/report/');
 		$twig = new \Twig_Environment($loader, $twig_options);
 
-
 		$this->twig_template = $twig->load('certificate.html');
 	}
 
@@ -78,10 +77,10 @@ class ilParticipationCertificateTwigParser {
 
 		$part_pdf = new ilParticipationCertificatePDFGenerator();
 
-		if(is_file(ilParticipationCertificateConfig::returnPicturePath('absolute',$this->group_ref_id))) {
-			$logo_path = ilParticipationCertificateConfig::returnPicturePath('absolute',$this->group_ref_id);
-		} elseif(is_file(ilParticipationCertificateConfig::returnPicturePath('absolute',0))) {
-			$logo_path = ilParticipationCertificateConfig::returnPicturePath('absolute',0);
+		if (is_file(ilParticipationCertificateConfig::returnPicturePath('absolute', $this->group_ref_id, ilParticipationCertificateConfig::LOGO_FILE_NAME))) {
+			$logo_path = ilParticipationCertificateConfig::returnPicturePath('absolute', $this->group_ref_id, ilParticipationCertificateConfig::LOGO_FILE_NAME);
+		} elseif (is_file(ilParticipationCertificateConfig::returnPicturePath('absolute', 0, ilParticipationCertificateConfig::LOGO_FILE_NAME))) {
+			$logo_path = ilParticipationCertificateConfig::returnPicturePath('absolute', 0, ilParticipationCertificateConfig::LOGO_FILE_NAME);
 		} else {
 			$logo_path = '';
 		}
@@ -89,12 +88,12 @@ class ilParticipationCertificateTwigParser {
 		//quickfix, wenn nur ein User $this->usr_id ist kein array -> foreach kann also nicht gebraucht werden. Jetzt wird ein array erstellt auch wenn nur ein user
 		if (count($this->usr_id) == 1) {
 			$usr = $this->usr_id;
-			$this->usr_id = array($usr);
+			$this->usr_id = array( $usr );
 		}
 
 		foreach ($this->usr_id as $usr_id) {
 			//quickfix, wenn man user auswählt kann es sein, das $usr_id ein array bleibt. Das führt weiter unten zum crash. So wird das array aufgelöst.
-			if (is_array($usr_id)){
+			if (is_array($usr_id)) {
 				$usr_id = $usr_id[0];
 			}
 
@@ -144,13 +143,13 @@ class ilParticipationCertificateTwigParser {
 				$iass_state = 0;
 				$iass_state1 = 0;
 				$iass_state2 = 0;
-			if(is_array($arr_iass_multi[$usr_id])) {
-				foreach ($arr_iass_multi[$usr_id] as $multis) {
-					$iass_state1 = $iass_state1 + $multis->getPassed();
-					$iass_state2 = $iass_state2 + $multis->getTotal();
+				if (is_array($arr_iass_multi[$usr_id])) {
+					foreach ($arr_iass_multi[$usr_id] as $multis) {
+						$iass_state1 = $iass_state1 + $multis->getPassed();
+						$iass_state2 = $iass_state2 + $multis->getTotal();
+					}
+					$iass_state = (100 / $iass_state2) * $iass_state1;
 				}
-				$iass_state = (100/$iass_state2)*$iass_state1;
-			}
 				//Home Work
 				$excercise_percentage = 0;
 				if (is_object($arr_excercise_states[$usr_id])) {

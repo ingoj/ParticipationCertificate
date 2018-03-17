@@ -100,7 +100,7 @@ class ilParticipationCertificateSingleResultGUI {
 
 	public function initTable($override = false) {
 
-		$this->table = new ilParticipationCertificateSingleResultTableGUI($this, ilParticipationCertificateSingleResultGUI::CMD_DISPLAY);
+		$this->table = new ilParticipationCertificateSingleResultTableGUI($this, ilParticipationCertificateSingleResultGUI::CMD_DISPLAY, $_GET[ilParticipationCertificateSingleResultGUI::IDENTIFIER]);
 	}
 }
 ?>

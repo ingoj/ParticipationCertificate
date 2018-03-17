@@ -14,7 +14,6 @@ class ilParticipationCertificateResultModificationGUI {
 
 	CONST CMD_DISPLAY = 'display';
 	CONST IDENTIFIER = 'usr_id';
-	CONST CMD_PRINT = 'printpdf';
 	/**
 	 * @var ilTabsGUI
 	 */
@@ -64,8 +63,8 @@ class ilParticipationCertificateResultModificationGUI {
 		$this->arr_FinalTestsStates = ilLearnObjectFinalTestStates::getData($this->usr_ids);
 		$this->array_obj_ids = ilLearnObjectFinalTestStates::getData($this->usr_ids);
 
-		$this->ctrl->setParameterByClass('ilParticipationCertificateResultModificationGUI', 'edited',true);
-		$this->ctrl->setParameterByClass('ilParticipationCertificateResultModificationGUI', 'ementor',true);
+		$this->ctrl->setParameterByClass('ilParticipationCertificateResultModificationGUI', 'edited', true);
+		$this->ctrl->setParameterByClass('ilParticipationCertificateResultModificationGUI', 'ementor', true);
 	}
 
 
@@ -101,7 +100,10 @@ class ilParticipationCertificateResultModificationGUI {
 		$this->tpl->setTitleIcon(ilObject::_getIcon($this->learnGroup->getId()));
 
 		$this->ctrl->saveParameterByClass('ilParticipationCertificateResultGUI', 'ref_id');
-		$this->tabs->setBackTarget($this->pl->txt('header_btn_back'), $this->ctrl->getLinkTargetByClass(array('ilUIPluginRouterGUI', ilParticipationCertificateResultGUI::class), ilParticipationCertificateResultGUI::CMD_CONTENT));
+		$this->tabs->setBackTarget($this->pl->txt('header_btn_back'), $this->ctrl->getLinkTargetByClass(array(
+			'ilUIPluginRouterGUI',
+			ilParticipationCertificateResultGUI::class
+		), ilParticipationCertificateResultGUI::CMD_CONTENT));
 	}
 
 
@@ -126,8 +128,8 @@ class ilParticipationCertificateResultModificationGUI {
 		$homeworks = new ilTextInputGUI($this->pl->txt('mod_homework'), 'homework');
 		$form->addItem($homeworks);
 
+		$form->addCommandButton(ilParticipationCertificateResultGUI::CMD_PRINT_PDF, $this->pl->txt('list_print'));
 
-		$form->addCommandButton(ilParticipationCertificateResultModificationGUI::CMD_PRINT, $this->pl->txt('list_print'));
 		return $form;
 	}
 
@@ -147,7 +149,7 @@ class ilParticipationCertificateResultModificationGUI {
 		$usr_id = $_GET[self::IDENTIFIER];
 
 		if (is_object($this->arr_initial_test_states[$usr_id])) {
-			$array['initial'] =  $this->arr_initial_test_states[$usr_id]->getCrsitestItestSubmitted();
+			$array['initial'] = $this->arr_initial_test_states[$usr_id]->getCrsitestItestSubmitted();
 		} else {
 			$array['initial'] = 0;
 		}
@@ -179,7 +181,7 @@ class ilParticipationCertificateResultModificationGUI {
 		$ementor = $_GET['ementor'];
 		$edited = $_GET['edited'];
 		$usr_id = $this->usr_id;
-		$twigParser = new ilParticipationCertificateTwigParser($this->groupRefId, array(), $usr_id,$ementor,$edited,$array);
+		$twigParser = new ilParticipationCertificateTwigParser($this->groupRefId, array(), $usr_id, $ementor, $edited, $array);
 		$twigParser->parseData();
 	}
 }

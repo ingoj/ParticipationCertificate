@@ -4,7 +4,8 @@ require_once './Services/Table/classes/class.ilTable2GUI.php';
 require_once './Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/ParticipationCertificate/classes/Table/class.ilParticipationCertificateResultModificationGUI.php';
 require_once './Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/ParticipationCertificate/classes/SingleResultTable/class.ilParticipationCertificateSingleResultGUI.php';
 require_once './Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/ParticipationCertificate/classes/LearnObjectFinalTestStateOfSugg/class.ilLearnObjectFinalTestOfSuggStates.php';
-
+require_once 'Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/ParticipationCertificate/classes/MultipleResultTable/class.ilParticipationCertificateMultipleResultGUI.php';
+require_once 'Services/Container/classes/class.ilContainerObjectiveGUI.php';
 
 /**
  * Class ilParticipationCertificateResultGUI
@@ -14,6 +15,10 @@ require_once './Customizing/global/plugins/Services/UIComponent/UserInterfaceHoo
 class ilParticipationCertificateResultTableGUI extends ilTable2GUI {
 
 	CONST IDENTIFIER = 'ilpartusr';
+	const GREEN_PROGRESS = "ilCourseObjectiveProgressBarCompleted";
+	const ORANGE_PROGRESS = "progress-bar-warning";
+	const RED_PROGRESS = "ilCourseObjectiveProgressBarFailed";
+	const NO_PROGRESS = "ilCourseObjectiveProgressBarNeutral";
 	/**
 	 * @var ilTabsGUI
 	 */
@@ -65,12 +70,13 @@ class ilParticipationCertificateResultTableGUI extends ilTable2GUI {
 		$this->addColumns();
 		$this->setExportFormats(array( self::EXPORT_EXCEL, self::EXPORT_CSV ));
 
-		if($cert_access->hasCurrentUserPrintAccess()) {
-			$this->initFilter();
-			$this->setSelectAllCheckbox('record_ids');
-			$this->addMultiCommand('printSelected', $this->pl->txt('list_print'));
-			$this->addMultiCommand('printSelectedWithouteMentoring', $this->pl->txt('list_print_without'));
+		$this->initFilter();
+		$this->setSelectAllCheckbox('record_ids');
+		if ($cert_access->hasCurrentUserPrintAccess()) {
+			$this->addMultiCommand(ilParticipationCertificateResultGUI::CMD_PRINT_SELECTED, $this->pl->txt('list_print'));
+			$this->addMultiCommand(ilParticipationCertificateResultGUI::CMD_PRINT_SELECTED_WITHOUTE_MENTORING, $this->pl->txt('list_print_without'));
 		}
+		$this->addMultiCommand(ilParticipationCertificateMultipleResultGUI::CMD_SHOW_ALL_RESULTS, $this->pl->txt('list_overview'));
 		$this->setRowTemplate('tpl.default_row.html', $this->pl->getDirectory());
 		$this->setFormAction($this->ctrl->getFormAction($a_parent_obj));
 
@@ -133,7 +139,7 @@ class ilParticipationCertificateResultTableGUI extends ilTable2GUI {
 
 	private function addColumns() {
 		$cert_access = new ilParticipationCertificateAccess($_GET['ref_id']);
-		if ($cert_access->hasCurrentUserPrintAccess()) {
+		if ($cert_access->hasCurrentUserWriteAccess()) {
 			$this->addColumn('', '', '', true);
 		}
 		foreach ($this->getSelectableColumns() as $k => $v) {
@@ -163,7 +169,6 @@ class ilParticipationCertificateResultTableGUI extends ilTable2GUI {
 		$arr_excercise_states = ilExcerciseStates::getData($this->usr_ids);
 		$arr_FinalTestsStates = ilLearnObjectFinalTestOfSuggStates::getData($this->usr_ids);
 
-
 		$rows = array();
 		foreach ($this->usr_ids as $usr_id) {
 			$row = array();
@@ -175,8 +180,7 @@ class ilParticipationCertificateResultTableGUI extends ilTable2GUI {
 			}
 			if ($row['lastname'] = $arr_usr_data[$usr_id]->getPartCertLastname() != NULL) {
 				$row['lastname'] = $arr_usr_data[$usr_id]->getPartCertLastname();
-			}
-			else{
+			} else {
 				$row['lastname'] = '';
 			}
 
@@ -191,11 +195,12 @@ class ilParticipationCertificateResultTableGUI extends ilTable2GUI {
 				$row['initial_test_finished'] = 'Nein';
 			}
 			if (is_object($arr_learn_reached_percentages[$usr_id])) {
-				$row['result_qualifing_tests'] = $arr_learn_reached_percentages[$usr_id]->getAveragePercentage() . '%';
+				//$row['result_qualifing_tests'] = $arr_learn_reached_percentages[$usr_id]->getAveragePercentage() . '%';
+				$row['result_qualifing_tests'] = $this->buildProgressBar($arr_learn_reached_percentages[$usr_id]->getAveragePercentage());
 			} else {
-				$row['result_qualifing_tests'] = 0 . '%';
+				//$row['result_qualifing_tests'] = 0 . '%';
+				$row['result_qualifing_tests'] = $this->buildProgressBar(0);
 			}
-
 
 			if (is_array($arr_FinalTestsStates[$usr_id])) {
 
@@ -203,25 +208,24 @@ class ilParticipationCertificateResultTableGUI extends ilTable2GUI {
 					/**
 					 * @var ilLearnObjectFinalTestOfSuggState $rec
 					 */
-					$rec_array[] = $rec->getLocftestObjectiveTitle().'<br/>'.$rec->getLocftestTestTitle().'<br/>'.round($rec->getLocftestPercentage(),0). '%<br/>';
+					$rec_array[] = $rec->getLocftestObjectiveTitle() . '<br/>' . $rec->getLocftestTestTitle() . '<br/>'
+						. round($rec->getLocftestPercentage(), 0) . '%<br/>';
 				}
 				$array_results = $rec_array;
 				$row['results_qualifing_tests'] = $array_results;
-			}
-			else{
+			} else {
 				$row['results_qualifing_tests'] = 'Keine Tests';
 			}
 
 			$countPassed = 0;
 			$countTests = 0;
-			if (is_array($arr_new_iass_states[$usr_id])){
-				foreach ($arr_new_iass_states[$usr_id] as $item){
+			if (is_array($arr_new_iass_states[$usr_id])) {
+				foreach ($arr_new_iass_states[$usr_id] as $item) {
 					$countPassed = $countPassed + $item->getPassed();
 					$countTests = $countTests + $item->getTotal();
 				}
-				$row['eMentoring_finished'] = $countPassed . "/" .  $countTests;
-			}
-			else {
+				$row['eMentoring_finished'] = $countPassed . "/" . $countTests;
+			} else {
 				$row['eMentoring_finished'] = "0/0";
 			}
 			/*
@@ -239,10 +243,12 @@ class ilParticipationCertificateResultTableGUI extends ilTable2GUI {
 */
 			if (is_object($arr_excercise_states[$usr_id])) {
 				$row['eMentoring_homework'] = $arr_excercise_states[$usr_id]->getPassed();
-				$row['eMentoring_percentage'] = $arr_excercise_states[$usr_id]->getPassedPercentage() . '%';
+				//$row['eMentoring_percentage'] = $arr_excercise_states[$usr_id]->getPassedPercentage() . '%';
+				$row['eMentoring_percentage'] = $this->buildProgressBar($arr_excercise_states[$usr_id]->getPassedPercentage());
 			} else {
 				$row['eMentoring_homework'] = 0;
-				$row['eMentoring_percentage'] = 0 . '%';
+				//$row['eMentoring_percentage'] = 0 . '%';
+				$row['eMentoring_percentage'] = $this->buildProgressBar(0);
 			}
 
 			if ($this->filter['firstname'] != false) {
@@ -258,7 +264,73 @@ class ilParticipationCertificateResultTableGUI extends ilTable2GUI {
 			}
 		}
 		$this->setData($rows);
+
 		return $rows;
+	}
+
+
+	/**
+	 * @param int $a_perc_result
+	 *
+	 * @return string
+	 */
+	protected function buildProgressBar($a_perc_result) {
+		$groupRefId = filter_input(INPUT_GET, 'ref_id');
+
+		$start = ilParticipationCertificateConfig::getConfig('period_start', $groupRefId);
+		$end = ilParticipationCertificateConfig::getConfig('period_end', $groupRefId);
+
+		if ($start !== NULL && $end !== NULL) {
+			// Period set
+			$current = new DateTime();
+			$start = new DateTime($start);
+			$end = new DateTime($end);
+
+			if ($current >= $start) {
+				// Started
+				$rest_days = $end->diff($current)->days;
+				//$total_days = $end->diff($start)->days;
+				//$past_days = ($total_days - $rest_days);
+
+				$a_perc_limit = (100 / max($rest_days, 1));
+
+				if ($a_perc_result >= 100) {
+					// 100% reached
+					$css_class = self::GREEN_PROGRESS;
+				} else {
+					// <100%
+					if ($current <= $end) {
+						// End not reached
+						if ($a_perc_result >= ($a_perc_limit - 10) && $a_perc_result <= ($a_perc_limit + 10)) {
+							// In time (+/-10%)
+							$css_class = self::ORANGE_PROGRESS;
+						} else {
+							// Not in time
+							$css_class = self::RED_PROGRESS;
+						}
+					} else {
+						// End reached
+						$css_class = self::RED_PROGRESS;
+					}
+				}
+			} else {
+				// Not started
+				$css_class = self::NO_PROGRESS;
+			}
+		} else {
+			// No period set
+			$a_perc_limit = NULL;
+
+			if ($a_perc_result >= 100) {
+				// 100% reached
+				$css_class = self::GREEN_PROGRESS;
+			} else {
+				// <100%
+				$css_class = self::RED_PROGRESS;
+			}
+		}
+
+		return ilContainerObjectiveGUI::renderProgressBar($a_perc_result, $a_perc_limit, $css_class);
 	}
 
 
@@ -266,15 +338,12 @@ class ilParticipationCertificateResultTableGUI extends ilTable2GUI {
 	 * @param array $a_set
 	 */
 	public function fillRow($a_set) {
-		$cert_access = new ilParticipationCertificateAccess($_GET['ref_id']);
-		if ($cert_access->hasCurrentUserPrintAccess()) {
-			$this->tpl->setCurrentBlock('record_id');
-			$this->tpl->setVariable('RECORD_ID', $a_set['usr_id']);
-			$this->tpl->parseCurrentBlock();
-		}
+		$this->tpl->setCurrentBlock('record_id');
+		$this->tpl->setVariable('RECORD_ID', $a_set['usr_id']);
+		$this->tpl->parseCurrentBlock();
 
 		foreach ($this->getSelectableColumns() as $k => $v) {
-			if($this->isColumnSelected($k)) {
+			if ($this->isColumnSelected($k)) {
 				$this->tpl->setCurrentBlock('td');
 				$this->tpl->setVariable('VALUE', (is_array($a_set[$k]) ? implode("<br/>", $a_set[$k]) : $a_set[$k]));
 				$this->tpl->parseCurrentBlock();
@@ -294,8 +363,7 @@ class ilParticipationCertificateResultTableGUI extends ilTable2GUI {
 			$current_selection_list->addItem($this->pl->txt('list_print_without'), ilParticipationCertificateResultGUI::CMD_PRINT_PDF, $this->ctrl->getLinkTargetByClass(ilParticipationCertificateResultGUI::class, ilParticipationCertificateResultGUI::CMD_PRINT_PDF));
 			$current_selection_list->addItem($this->pl->txt('list_results'), ilParticipationCertificateResultModificationGUI::CMD_DISPLAY, $this->ctrl->getLinkTargetByClass(ilParticipationCertificateResultModificationGUI::class, ilParticipationCertificateResultModificationGUI::CMD_DISPLAY));
 		}
-			$current_selection_list->addItem($this->pl->txt('list_overview'), ilParticipationCertificateSingleResultGUI::CMD_DISPLAY, $this->ctrl->getLinkTargetByClass(ilParticipationCertificateSingleResultGUI::class, ilParticipationCertificateSingleResultGUI::CMD_DISPLAY));
-
+		$current_selection_list->addItem($this->pl->txt('list_overview'), ilParticipationCertificateSingleResultGUI::CMD_DISPLAY, $this->ctrl->getLinkTargetByClass(ilParticipationCertificateSingleResultGUI::class, ilParticipationCertificateSingleResultGUI::CMD_DISPLAY));
 
 		$this->tpl->setVariable('ACTIONS', $current_selection_list->getHTML());
 		$this->tpl->parseCurrentBlock();

@@ -54,8 +54,9 @@ class ilParticipationCertificateSingleResultTableGUI extends ilTable2GUI {
 	 *
 	 * @param ilParticipationCertificateResultGUI $a_parent_obj
 	 * @param string                              $a_parent_cmd
+	 * @param int                                 $usr_id
 	 */
-	public function __construct($a_parent_obj, $a_parent_cmd) {
+	public function __construct($a_parent_obj, $a_parent_cmd, $usr_id) {
 		global $ilCtrl, $tabs;
 
 		$this->ctrl = $ilCtrl;
@@ -65,7 +66,8 @@ class ilParticipationCertificateSingleResultTableGUI extends ilTable2GUI {
 		$config = ilParticipationCertificateConfig::where(array(
 			'config_key' => 'color',
 			'config_type' => ilParticipationCertificateConfig::CONFIG_TYPE_GLOBAL,
-			'config_value_type' => ilParticipationCertificateConfig::CONFIG_VALUE_TYPE_OTHER
+			'config_value_type' => ilParticipationCertificateConfig::CONFIG_VALUE_TYPE_OTHER,
+			"group_ref_id" => 0
 		))->first();
 		$this->color = $config->getConfigValue();
 
@@ -83,7 +85,6 @@ class ilParticipationCertificateSingleResultTableGUI extends ilTable2GUI {
 		$cert_access = new ilParticipationCertificateAccess($_GET['ref_id']);
 		$this->usr_ids = $cert_access->getUserIdsOfGroup();
 
-		$usr_id = $_GET[self::IDENTIFIER];
 		$this->usr_id = $usr_id;
 
 		$this->sugg = getLearnSuggs::getData($usr_id);
@@ -154,6 +155,8 @@ class ilParticipationCertificateSingleResultTableGUI extends ilTable2GUI {
 		}
 
 		//sort the array first for the score. Second argument is the weight.
+		$scored = array();
+		$weighting = array();
 		foreach ($sorting as $key => $item) {
 			$scored[$key] = $item['score'];
 			$weighting[$key] = $item['weight'];
@@ -286,6 +289,9 @@ class ilParticipationCertificateSingleResultTableGUI extends ilTable2GUI {
 				} else {
 					$this->tpl->setCurrentBlock('td');
 					$this->tpl->setVariable('COURSE', '&nbsp;');
+					if ($this->searchForId($v['obj_id'], $this->sugg)) {
+						$this->tpl->setVariable('COLOR', $this->color);
+					}
 					$this->tpl->parseCurrentBlock();
 				}
 			}
