@@ -151,7 +151,7 @@ $config = ilParticipationCertificateConfig::where(array('config_key' =>  'page1_
 if(!is_object($config)) {
 	$part_conf = new ilParticipationCertificateConfig();
 	$part_conf->setConfigType(ilParticipationCertificateConfig::CONFIG_TYPE_GLOBAL);
-	$part_conf->setConfigValueType(ilParticipationCertificateConfig::CONFIG_VALUE_TYPE_OTHER);
+	$part_conf->setConfigValueType(ilParticipationCertificateConfig::CONFIG_VALUE_TYPE_CERT_TEXT);
 	$part_conf->setConfigKey('page1_issuer_signature');
 	$part_conf->setConfigValue("");
 	$part_conf->setGroupRefId(0);
@@ -170,5 +170,15 @@ if(!is_object($config)) {
 	$part_conf->setConfigValue("");
 	$part_conf->setGroupRefId(0);
 	$part_conf->store();
+}
+?>
+<#21>
+<?php
+require_once 'Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/ParticipationCertificate/classes/class.ilParticipationCertificateConfig.php';
+$configs = ilParticipationCertificateConfig::where(array('config_key' =>  'page1_issuer_signature', 'config_value_type' => ilParticipationCertificateConfig::CONFIG_VALUE_TYPE_OTHER))->get();
+
+foreach($configs as $config) {
+	$config->setConfigValueType(ilParticipationCertificateConfig::CONFIG_VALUE_TYPE_CERT_TEXT);
+	$config->update();
 }
 ?>
