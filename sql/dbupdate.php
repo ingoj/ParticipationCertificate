@@ -239,3 +239,26 @@ if(!is_object($config)) {
 	$part_conf->store();
 }
 ?>
+<#24>
+<?php
+require_once "Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/ParticipationCertificate/vendor/autoload.php";
+
+global $DIC;
+$ilDB = $DIC->database();
+$result = $ilDB->query('SELECT DISTINCT group_ref_id FROM ' . ilParticipationCertificateConfig::TABLE_NAME . ' WHERE group_ref_id != 0');
+while ($row = $this->db->fetchAssoc($result)) {
+	$group_ref_id = $row["group_ref_id"];
+	foreach (ilParticipationCertificateConfig::returnDefaultValues() as $key => $value) {
+		$config = ilParticipationCertificateConfig::where(array('config_key' =>  $key, 'config_type' => ilParticipationCertificateConfig::CONFIG_TYPE_GROUP, 'config_value_type' => ilParticipationCertificateConfig::CONFIG_VALUE_TYPE_CERT_TEXT, "group_ref_id" => $group_ref_id))->first();
+		if(!is_object($config)) {
+			$config = new ilParticipationCertificateConfig();
+			$config->setConfigType(ilParticipationCertificateConfig::CONFIG_TYPE_GROUP);
+			$config->setConfigValueType(ilParticipationCertificateConfig::CONFIG_VALUE_TYPE_CERT_TEXT);
+			$config->setConfigKey($key);
+			$config->setConfigValue($value);
+			$config->setGroupRefId($group_ref_id);
+			$config->store();
+		}
+	}
+}
+?>
