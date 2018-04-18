@@ -1,5 +1,5 @@
 <?php
-require_once 'class.ilLearnObjectFinalTestOfSuggState.php';
+
 class ilLearnObjectFinalTestOfSuggStates {
 
 	/**
@@ -8,8 +8,8 @@ class ilLearnObjectFinalTestOfSuggStates {
 	 * @return ilLearnObjectFinalTestOfSuggState[][]
 	 */
 	public static function getData(array $arr_usr_ids = array()) {
-		global $ilDB;
-
+		global $DIC;
+		$ilDB = $DIC->database();
 		$result = $ilDB->query(self::getSQL($arr_usr_ids));
 		$locftst_data = array();
 		while ($row = $ilDB->fetchAssoc($result)) {
@@ -40,9 +40,6 @@ class ilLearnObjectFinalTestOfSuggStates {
 	 * @return string
 	 */
 	protected static function getSQL(array $arr_usr_ids = array()) {
-		global $ilDB;
-
-
 		ilLearningObjectiveSuggestions::createTemporaryTableLearnObjectSugg($arr_usr_ids, 'tmp_lo_sugg');
 		ilLearnObjectFinalTestStates::createTemporaryTableLearnObjectFinalTest($arr_usr_ids, 'tmp_lo_fin_test');
 
@@ -72,4 +69,5 @@ class ilLearnObjectFinalTestOfSuggStates {
 		return $select;
 	}
 }
+
 ?>

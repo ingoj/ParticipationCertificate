@@ -1,7 +1,4 @@
 <?php
-require_once './Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/ParticipationCertificate/classes/Table/class.ilParticipationCertificateResultTableGUI.php';
-require_once './Services/UIComponent/AdvancedSelectionList/classes/class.ilAdvancedSelectionListGUI.php';
-require_once './Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/ParticipationCertificate/classes/Table/class.ilParticipationCertificateResultModificationGUI.php';
 
 /**
  * Class ilParticipationCertificateResultGUI
@@ -44,28 +41,33 @@ class ilParticipationCertificateResultGUI {
 	 */
 	protected $groupRefId;
 	/**
-	 * @var object
+	 * @var
 	 */
 	protected $learnGroup;
 	/**
 	 * @var ilParticipationCertificateAccess
 	 */
 	protected $cert_access;
+	/**
+	 * @var ilLanguage
+	 */
+	protected $lng;
 
 
 	/**
 	 * ilParticipationCertificateResultGUI constructor.
 	 */
 	public function __construct() {
-		global $ilCtrl, $ilTabs, $tpl, $ilToolbar, $lng;
+		global $DIC;
 
-		$this->toolbar = $ilToolbar;
-		$this->tabs = $ilTabs;
-		$this->ctrl = $ilCtrl;
-		$this->tpl = $tpl;
+		$this->toolbar = $DIC->toolbar();
+		$this->tabs = $DIC->tabs();
+		$this->ctrl = $DIC->ctrl();
+		$this->tpl = $DIC->ui()->mainTemplate();
 		$this->pl = ilParticipationCertificatePlugin::getInstance();
 		$this->groupRefId = (int)$_GET['ref_id'];
 		$this->learnGroup = ilObjectFactory::getInstanceByRefId($_GET['ref_id']);
+		$this->lng = $DIC->language();
 
 		/*Access
 		$cert_access = new ilParticipationCertificateAccess($_GET['ref_id']);
@@ -74,7 +76,7 @@ class ilParticipationCertificateResultGUI {
 			ilUtil::redirect('login.php');
 		}*/
 
-		$this->ctrl->saveParameterByClass('ilParticipationCertificateResultGUI', [ 'ref_id', 'group_id' ]);
+		$this->ctrl->saveParameterByClass(ilParticipationCertificateResultGUI::class, [ 'ref_id', 'group_id' ]);
 	}
 
 
@@ -82,22 +84,22 @@ class ilParticipationCertificateResultGUI {
 		$nextClass = $this->ctrl->getNextClass();
 
 		switch ($nextClass) {
-			case 'ilparticipationcertificateresultmodificationgui':
+			case strtolower(ilParticipationCertificateResultModificationGUI::class):
 				$ilparticipationcertificateresultmodificationgui = new ilParticipationCertificateResultModificationGUI();
 				$ret1 = $this->ctrl->forwardCommand($ilparticipationcertificateresultmodificationgui);
 				break;
-			case 'ilparticipationcertificategui':
+			case strtolower(ilParticipationCertificateGUI::class):
 				$ilParticipationCertificateGUI = new ilParticipationCertificateGUI();
 				$ret2 = $this->ctrl->forwardCommand($ilParticipationCertificateGUI);
-				$this->tabs->setTabActive(self::CMD_OVERVIEW);
+				$this->tabs->activateTab(self::CMD_OVERVIEW);
 				break;
-			case 'ilparticipationcertificatesingleresultgui':
+			case strtolower(ilParticipationCertificateResultGUI::class):
 				$ilparticipationcertificateresultoverviewgui = new ilParticipationCertificateSingleResultGUI();
 				$ret3 = $this->ctrl->forwardCommand($ilparticipationcertificateresultoverviewgui);
 				break;
 			default:
 				$cmd = $this->ctrl->getCmd(self::CMD_CONTENT);
-				$this->tabs->setTabActive(self::CMD_OVERVIEW);
+				$this->tabs->activateTab(self::CMD_OVERVIEW);
 				switch ($cmd) {
 					case ilParticipationCertificateMultipleResultGUI::CMD_SHOW_ALL_RESULTS:
 						$this->ctrl->forwardCommand(new ilParticipationCertificateMultipleResultGUI());
@@ -148,10 +150,13 @@ class ilParticipationCertificateResultGUI {
 		$this->tpl->setDescription($this->learnGroup->getDescription());
 		$this->tpl->setTitleIcon(ilObject::_getIcon($this->learnGroup->getId()));
 
-		$this->ctrl->setParameterByClass('ilrepositorygui', 'ref_id', (int)$_GET['ref_id']);
-		$this->tabs->setBackTarget($this->pl->txt('header_btn_back'), $this->ctrl->getLinkTargetByClass(array( 'ilrepositorygui', 'ilobjgroupgui' )));
-		$this->ctrl->saveParameterByClass('ilParticipationCertificateResultGUI', [ 'ref_id', 'group_id' ]);
-		$this->ctrl->saveParameterByClass('ilParticipationCertificateGUI', 'ref_id');
+		$this->ctrl->setParameterByClass(ilRepositoryGUI::class, 'ref_id', (int)$_GET['ref_id']);
+		$this->tabs->setBackTarget($this->pl->txt('header_btn_back'), $this->ctrl->getLinkTargetByClass(array(
+			ilRepositoryGUI::class,
+			ilObjGroupGUI::class
+		)));
+		$this->ctrl->saveParameterByClass(ilParticipationCertificateResultGUI::class, [ 'ref_id', 'group_id' ]);
+		$this->ctrl->saveParameterByClass(ilParticipationCertificateGUI::class, 'ref_id');
 
 		$this->tabs->addTab(self::CMD_OVERVIEW, $this->pl->txt('header_overview'), $this->ctrl->getLinkTargetByClass(self::class, self::CMD_CONTENT));
 		$cert_access = new ilParticipationCertificateAccess($_GET['ref_id']);
@@ -163,7 +168,6 @@ class ilParticipationCertificateResultGUI {
 
 
 	public function printPdf() {
-		global $lng;
 		$cert_access = new ilParticipationCertificateAccess($_GET['ref_id']);
 		if ($cert_access->hasCurrentUserPrintAccess()) {
 			$ementor = $_GET['ementor'];
@@ -171,14 +175,13 @@ class ilParticipationCertificateResultGUI {
 			$twigParser = new ilParticipationCertificateTwigParser($this->groupRefId, array(), $usr_id, $ementor, false);
 			$twigParser->parseData();
 		} else {
-			ilUtil::sendFailure($lng->txt('no_permission'), true);
+			ilUtil::sendFailure($this->lng->txt('no_permission'), true);
 			ilUtil::redirect('login.php');
 		}
 	}
 
 
 	public function printSelected() {
-		global $lng;
 		$cert_access = new ilParticipationCertificateAccess($_GET['ref_id']);
 		if ($cert_access->hasCurrentUserPrintAccess()) {
 			if (!isset($_POST['record_ids']) || (isset($_POST['record_ids']) && !count($_POST['record_ids']))) {
@@ -189,14 +192,13 @@ class ilParticipationCertificateResultGUI {
 			$twigParser = new ilParticipationCertificateTwigParser($this->groupRefId, array(), $usr_id, true, false, false);
 			$twigParser->parseData();
 		} else {
-			ilUtil::sendFailure($lng->txt('no_permission'), true);
+			ilUtil::sendFailure($this->lng->txt('no_permission'), true);
 			ilUtil::redirect('login.php');
 		}
 	}
 
 
 	public function printSelectedWithouteMentoring() {
-		global $lng;
 		$cert_access = new ilParticipationCertificateAccess($_GET['ref_id']);
 		if ($cert_access->hasCurrentUserPrintAccess()) {
 			if (!isset($_POST['record_ids']) || (isset($_POST['record_ids']) && !count($_POST['record_ids']))) {
@@ -208,7 +210,7 @@ class ilParticipationCertificateResultGUI {
 			$twigParser = new ilParticipationCertificateTwigParser($this->groupRefId, array(), $usr_id, false, false, false);
 			$twigParser->parseData();
 		} else {
-			ilUtil::sendFailure($lng->txt('no_permission'), true);
+			ilUtil::sendFailure($this->lng->txt('no_permission'), true);
 			ilUtil::redirect('login.php');
 		}
 	}

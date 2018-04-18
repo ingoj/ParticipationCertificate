@@ -1,5 +1,5 @@
 <?php
-require_once 'class.ilLearnObjectFinalTestState.php';
+
 class ilLearnObjectFinalTestStates {
 
 	/**
@@ -8,8 +8,8 @@ class ilLearnObjectFinalTestStates {
 	 * @return ilLearnObjectFinalTestState[][]
 	 */
 	public static function getData(array $arr_usr_ids = array()) {
-		global $ilDB;
-
+		global $DIC;
+		$ilDB = $DIC->database();
 		$result = $ilDB->query(self::getSQL($arr_usr_ids));
 		$locftst_data = array();
 		while ($row = $ilDB->fetchAssoc($result)) {
@@ -40,8 +40,8 @@ class ilLearnObjectFinalTestStates {
 	 * @return string
 	 */
 	protected static function getSQL(array $arr_usr_ids = array()) {
-		global $ilDB;
-
+		global $DIC;
+		$ilDB = $DIC->database();
 		self::createTemporaryTableTestMaxResult();
 
 		$select = "SELECT 
@@ -62,13 +62,13 @@ class ilLearnObjectFinalTestStates {
 					crs_objective_lm as crsolm
 					inner join object_reference as crsolm_ref on crsolm_ref.ref_id = crsolm.ref_id
 					inner join container_reference as crsolm_crs_ref on crsolm_crs_ref.obj_id = crsolm_ref.obj_id
-					inner join object_data as crsolm_crs on crsolm_crs.obj_id = crsolm_crs_ref.target_obj_id and crsolm_crs.type = \"crs\"
-					inner join obj_members as crs_memb on ".$ilDB->in('crs_memb.usr_id ', $arr_usr_ids, false, 'integer')." and crs_memb.obj_id = crsolm_crs.obj_id
+					inner join " . usrdefObj::TABLE_NAME . " as crsolm_crs on crsolm_crs.obj_id = crsolm_crs_ref.target_obj_id and crsolm_crs.type = \"crs\"
+					inner join obj_members as crs_memb on " . $ilDB->in('crs_memb.usr_id ', $arr_usr_ids, false, 'integer') . " and crs_memb.obj_id = crsolm_crs.obj_id
 					inner join crs_objectives as crsolm_crs_crso on crsolm_crs_crso.crs_id = crsolm_crs.obj_id
 					inner join loc_tst_assignments as loc_crs_ass on loc_crs_ass.objective_id = crsolm_crs_crso.objective_id
 					inner join object_reference as tst_ref on tst_ref.ref_id = loc_crs_ass.tst_ref_id
 					inner join tst_tests as test on test.obj_fi = tst_ref.obj_id
-					inner join object_data as tst_obj on tst_obj.obj_id = test.obj_fi
+					inner join " . usrdefObj::TABLE_NAME . " as tst_obj on tst_obj.obj_id = test.obj_fi
 					left join tst_active as test_act on test_act.test_fi = test.test_id and test_act.user_fi = crs_memb.usr_id
 					left join tmp_test_max_result on tmp_test_max_result.active_fi = test_act.active_id
 					group by crs_memb.usr_id,
@@ -92,8 +92,8 @@ class ilLearnObjectFinalTestStates {
 	 * @param string $table_name
 	 */
 	protected static function createTemporaryTableTestMaxResult($table_name = 'tmp_test_max_result') {
-		global $ilDB;
-
+		global $DIC;
+		$ilDB = $DIC->database();
 		$sql = "DROP TABLE IF Exists $table_name";
 		$ilDB->query($sql);
 
@@ -106,15 +106,16 @@ class ilLearnObjectFinalTestStates {
 	 * @param array  $arr_usr_ids
 	 * @param string $table_name
 	 */
-	public static function createTemporaryTableLearnObjectFinalTest(array $arr_usr_ids = array(),$table_name = 'tmp_lo_fin_test') {
-		global $ilDB;
-
+	public static function createTemporaryTableLearnObjectFinalTest(array $arr_usr_ids = array(), $table_name = 'tmp_lo_fin_test') {
+		global $DIC;
+		$ilDB = $DIC->database();
 		$sql = "DROP TABLE IF Exists $table_name";
 		$ilDB->query($sql);
 
-		$sql = "CREATE Temporary Table $table_name (".self::getSql($arr_usr_ids).")";
+		$sql = "CREATE Temporary Table $table_name (" . self::getSql($arr_usr_ids) . ")";
 
 		$ilDB->query($sql);
 	}
 }
+
 ?>

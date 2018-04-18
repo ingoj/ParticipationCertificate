@@ -1,14 +1,4 @@
 <?php
-require_once './Modules/Group/classes/class.ilGroupParticipants.php';
-require_once './Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/ParticipationCertificate/classes/CrsInitialTestState/class.ilCrsInitialTestStates.php';
-require_once './Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/ParticipationCertificate/classes/LearnObjectSugg/class.ilLearningObjectiveSuggestions.php';
-require_once './Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/ParticipationCertificate/classes/ExerciseState/class.ilExcerciseStates.php';
-require_once './Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/ParticipationCertificate/classes/IassState/class.ilIassStates.php';
-require_once './Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/ParticipationCertificate/classes/LearnObjectFinalTestState/class.ilLearnObjectFinalTestStates.php';
-require_once './Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/ParticipationCertificate/classes/LearnObjectSuggReachedPercentage/class.ilLearnObjectSuggReachedPercentages.php';
-require_once './Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/ParticipationCertificate/classes/LearnObjectMasterCrs/class.ilLearningObjectivesMasterCrs.php';
-require_once './Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/ParticipationCertificate/classes/PartCertUserData/class.ilPartCertUsersData.php';
-require_once './Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/ParticipationCertificate/classes/IassStateMulti/class.ilIassStatesMulti.php';
 
 /**
  * Class ilParticipationCertificateTwigParser
@@ -18,6 +8,44 @@ require_once './Customizing/global/plugins/Services/UIComponent/UserInterfaceHoo
  * @ilCtrl_isCalledBy ilParticipationCertificateTwigParser: ilParticipationCertificateGUI, ilParticipationCertificateResultGUI
  */
 class ilParticipationCertificateTwigParser {
+
+	/**
+	 * @var ilParticipationCertificatePlugin
+	 */
+	protected $pl;
+	/**
+	 * @var int
+	 */
+	protected $group_ref_id;
+	/**
+	 * @var array
+	 */
+	protected $usr_ids;
+	/**
+	 * @var array
+	 */
+	protected $usr_id;
+	/**
+	 * @var bool
+	 */
+	protected $ementor;
+	/**
+	 * @var bool
+	 */
+	protected $footer;
+	/**
+	 * @var bool
+	 */
+	protected $edited;
+	/**
+	 * @var array
+	 */
+	protected $array;
+	/**
+	 * @var Twig_TemplateWrapper
+	 */
+	protected $twig_template;
+
 
 	/**
 	 * ilParticipationCertificateTwigParser constructor.
@@ -30,7 +58,7 @@ class ilParticipationCertificateTwigParser {
 	 * @param array $array
 	 */
 	public function __construct($group_ref_id = 0, $twig_options = array(), $usr_id, $ementor = true, $edited = false, $array = NULL) {
-
+		$this->pl = ilParticipationCertificatePlugin::getInstance();
 
 		$this->group_ref_id = $group_ref_id;
 
@@ -53,7 +81,7 @@ class ilParticipationCertificateTwigParser {
 		$this->array = $array;
 
 		$this->loadTwig();
-		$loader = new \Twig_Loader_Filesystem('./Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/ParticipationCertificate/templates/report/');
+		$loader = new \Twig_Loader_Filesystem($this->pl->getDirectory() . '/templates/report/');
 		$twig = new \Twig_Environment($loader, $twig_options);
 
 		$this->twig_template = $twig->load('certificate.html');
@@ -183,7 +211,6 @@ class ilParticipationCertificateTwigParser {
 	protected function loadTwig() {
 		static $loaded = false;
 		if (!$loaded) {
-			require_once(dirname(dirname(dirname(__FILE__))) . '/vendor/twig/twig/lib/Twig/Autoloader.php');
 			Twig_Autoloader::register();
 			$loaded = true;
 		}

@@ -1,11 +1,8 @@
 <?php
+
+require_once __DIR__ . "/../vendor/autoload.php";
+
 //TODO Refactoring - find a better way to save and display the form
-require_once('./Services/UIComponent/classes/class.ilUserInterfaceHookPlugin.php');
-require_once("./Services/Component/classes/class.ilPluginConfigGUI.php");
-require_once './Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/ParticipationCertificate/classes/Report/class.ilParticipationCertificatePDFGenerator.php';
-require_once('./Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/ParticipationCertificate/classes/class.ilParticipationCertificatePlugin.php');
-require_once('./Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/ParticipationCertificate/classes/class.ilParticipationCertificateConfig.php');
-require_once './Services/Form/classes/class.ilPropertyFormGUI.php';
 
 /**
  * Class ilParticipationCertificateConfigGUI
@@ -78,13 +75,13 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI {
 	 *
 	 */
 	public function __construct() {
-		global $tpl, $ilCtrl, $ilTabs, $ilToolbar, $ilDB;
+		global $DIC;
 
-		$this->tpl = $tpl;
-		$this->db = $ilDB;
-		$this->ctrl = $ilCtrl;
-		$this->tabs = $ilTabs;
-		$this->ilToolbar = $ilToolbar;
+		$this->tpl = $DIC->ui()->mainTemplate();
+		$this->db = $DIC->database();
+		$this->ctrl = $DIC->ctrl();
+		$this->tabs = $DIC->tabs();
+		$this->ilToolbar = $DIC->toolbar();
 
 		$this->pl = ilParticipationCertificatePlugin::getInstance();
 	}
@@ -93,9 +90,9 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI {
 	function performCommand($cmd) {
 		switch ($cmd) {
 			default:
-			case 'configure':
-			case 'save':
-			case 'cancel':
+			case self::CMD_CONFIGURE:
+			case self::CMD_SAVE:
+			case self::CMD_CANCEL:
 				$this->$cmd();
 				break;
 		}
@@ -121,11 +118,11 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI {
 	public function initForm() {
 		$form = new ilPropertyFormGUI();
 		$form->setFormAction($this->ctrl->getFormAction($this));
-		$form->setTitle('Konfiguration Teilnahmebescheinigung');
-		$form->setDescription('Folgende Platzhalter sind verfügbar: <br>
+		$form->setTitle($this->pl->txt('config_plugin'));
+		$form->setDescription($this->pl->txt("placeholders") . ' <br>
 		&lbrace;&lbrace;username&rbrace;&rbrace;: Anrede Vorname Nachname <br>
 		&lbrace;&lbrace;date&rbrace;&rbrace;: Datum
-		');
+		'); // TODO lang
 
 		foreach (ilParticipationCertificateConfig::where(array(
 			"config_type" => ilParticipationCertificateConfig::CONFIG_TYPE_GLOBAL,
@@ -153,7 +150,7 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI {
 			}
 		}
 
-		$uploadfield = new ilFileInputGUI('Logo', 'headerpic');
+		$uploadfield = new ilFileInputGUI($this->pl->txt("logo"), 'headerpic');
 		$uploadfield->setSuffixes(array( 'png' ));
 		if (is_file(ilParticipationCertificateConfig::returnPicturePath('absolute', 0, ilParticipationCertificateConfig::LOGO_FILE_NAME))) {
 			$uploadfield->setInfo('<img src="'
@@ -172,7 +169,7 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI {
 		if (is_object($obj_value)) {
 			$value = $obj_value->getConfigValue();
 		}
-		$select = new ilSelectInputGUI('Benutzerdefiniertes Feld Vornamen', 'udf_firstname');
+		$select = new ilSelectInputGUI($this->pl->txt("udf_firstname"), 'udf_firstname');
 		$select->setOptions($options);
 		$select->setValue($value);
 		$form->addItem($select);
@@ -187,7 +184,7 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI {
 		if (is_object($obj_value)) {
 			$value = $obj_value->getConfigValue();
 		}
-		$select = new ilSelectInputGUI('Benutzerdefiniertes Feld Nachnamen', 'udf_lastname');
+		$select = new ilSelectInputGUI($this->pl->txt("udf_lastname"), 'udf_lastname');
 		$select->setOptions($options);
 		$select->setValue($value);
 		$form->addItem($select);
@@ -202,7 +199,7 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI {
 		if (is_object($obj_value)) {
 			$value = $obj_value->getConfigValue();
 		}
-		$select = new ilSelectInputGUI('Benutzerdefiniertes Feld Geschlecht', 'udf_gender');
+		$select = new ilSelectInputGUI($this->pl->txt("udf_gender"), 'udf_gender');
 		$select->setOptions($options);
 		$select->setValue($value);
 		$form->addItem($select);
@@ -217,7 +214,7 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI {
 		if (is_object($obj_value)) {
 			$value = $obj_value->getConfigValue();
 		}
-		$percent = new ilNumberInputGUI('Schwellenwert Videokonferenzen (Prozent)', 'percent_value');
+		$percent = new ilNumberInputGUI($this->pl->txt("udf_percent_value"));
 		$percent->checkInput();
 		$percent->setValue($value);
 		$form->addItem($percent);
@@ -232,7 +229,7 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI {
 		if (is_object($obj_value)) {
 			$value = $obj_value->getConfigValue();
 		}
-		$color = new ilColorPickerInputGUI('Color', 'color');
+		$color = new ilColorPickerInputGUI($this->pl->txt("color"), 'color');
 		$color->setValue($value);
 		$form->addItem($color);
 
@@ -246,11 +243,11 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI {
 		if (is_object($obj_value)) {
 			$value = $obj_value->getConfigValue();
 		}
-		$keyword = new ilTextInputGUI('Keyword', 'keyword');
+		$keyword = new ilTextInputGUI($this->pl->txt("keyword"), 'keyword');
 		$keyword->setValue($value);
 		$form->addItem($keyword);
 
-		$form->addCommandButton(ilParticipationCertificateConfigGUI::CMD_SAVE, 'Speichern');
+		$form->addCommandButton(ilParticipationCertificateConfigGUI::CMD_SAVE, $this->pl->txt("save"));
 
 		return $form;
 	}
@@ -405,7 +402,7 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI {
 			ilParticipationCertificateConfig::storePicture($file_data, 0, ilParticipationCertificateConfig::LOGO_FILE_NAME);
 		}
 
-		$this->ctrl->redirect($this, 'configure');
+		$this->ctrl->redirect($this, self::CMD_CONFIGURE);
 
 		return true;
 	}

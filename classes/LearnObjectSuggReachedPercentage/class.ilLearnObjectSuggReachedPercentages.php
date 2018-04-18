@@ -1,5 +1,5 @@
 <?php
-require_once "class.ilLearnObjectSuggReachedPercentage.php";
+
 class ilLearnObjectSuggReachedPercentages {
 
 	/**
@@ -8,8 +8,8 @@ class ilLearnObjectSuggReachedPercentages {
 	 * @return ilLearnObjectSuggReachedPercentage[]
 	 */
 	public static function getData(array $arr_usr_ids = array()) {
-		global $ilDB;
-
+		global $DIC;
+		$ilDB = $DIC->database();
 		$result = $ilDB->query(self::getSQL($arr_usr_ids));
 		$reached_percentage_data = array();
 		while ($row = $ilDB->fetchAssoc($result)) {
@@ -30,8 +30,6 @@ class ilLearnObjectSuggReachedPercentages {
 	 * @return string
 	 */
 	protected static function getSQL(array $arr_usr_ids = array()) {
-		global $ilDB;
-
 		ilLearningObjectiveSuggestions::createTemporaryTableLearnObjectSugg($arr_usr_ids, 'tmp_lo_sugg');
 		ilLearnObjectFinalTestStates::createTemporaryTableLearnObjectFinalTest($arr_usr_ids, 'tmp_lo_fin_test');
 
@@ -51,4 +49,5 @@ class ilLearnObjectSuggReachedPercentages {
 		return $select;
 	}
 }
+
 ?>

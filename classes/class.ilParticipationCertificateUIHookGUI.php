@@ -1,7 +1,6 @@
 <?php
-require_once("./Services/UIComponent/classes/class.ilUIHookPluginGUI.php");
-require_once './Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/ParticipationCertificate/classes/class.ilParticipationCertificateGUI.php';
-require_once "./Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/ParticipationCertificate/classes/class.ilParticipationCertificateAccess.php";
+
+require_once __DIR__ . "/../vendor/autoload.php";
 
 /**
  * Class ilParticipationCertificateUIHookGUI
@@ -12,6 +11,7 @@ require_once "./Customizing/global/plugins/Services/UIComponent/UserInterfaceHoo
  */
 class ilParticipationCertificateUIHookGUI extends ilUIHookPluginGUI {
 
+	const TAB_CERTIFICATES = "certificates";
 	/**
 	 * @var ilCtrl
 	 */
@@ -20,11 +20,27 @@ class ilParticipationCertificateUIHookGUI extends ilUIHookPluginGUI {
 	 * @var ilParticipationCertificatePlugin
 	 */
 	protected $pl;
+	/**
+	 * @var int
+	 */
+	protected $groupRefId;
+	/**
+	 * @var
+	 */
+	protected $learnGroup;
+	/**
+	 * @var string
+	 */
+	protected $learnGroupTitle;
+	/**
+	 * @var string
+	 */
+	protected $keyword;
 
 
 	public function __construct() {
-		global $ilCtrl;
-		$this->ctrl = $ilCtrl;
+		global $DIC;
+		$this->ctrl = $DIC->ctrl();
 		$this->pl = ilParticipationCertificatePlugin::getInstance();
 		$this->groupRefId = (int)$_GET['ref_id'];
 
@@ -33,13 +49,17 @@ class ilParticipationCertificateUIHookGUI extends ilUIHookPluginGUI {
 			$this->learnGroupTitle = $this->learnGroup->getTitle();
 		}
 
-		$config = ilParticipationCertificateConfig::where(array(
-			'config_key' => 'keyword',
-			'config_type' => ilParticipationCertificateConfig::CONFIG_TYPE_GLOBAL,
-			'config_value_type' => ilParticipationCertificateConfig::CONFIG_VALUE_TYPE_OTHER,
-			"group_ref_id" => 0
-		))->first();
-		$this->keyword = $config->getConfigValue();
+		try {
+			$config = ilParticipationCertificateConfig::where(array(
+				'config_key' => 'keyword',
+				'config_type' => ilParticipationCertificateConfig::CONFIG_TYPE_GLOBAL,
+				'config_value_type' => ilParticipationCertificateConfig::CONFIG_VALUE_TYPE_OTHER,
+				"group_ref_id" => 0
+			))->first();
+			$this->keyword = $config->getConfigValue();
+		} catch (Exception $ex) {
+			// Fix uninstall (Table not found)
+		}
 	}
 
 
@@ -53,8 +73,6 @@ class ilParticipationCertificateUIHookGUI extends ilUIHookPluginGUI {
 	 */
 
 	function modifyGUI($a_comp, $a_part, $a_par = array()) {
-		global $ilUser;
-
 		if ($a_part == 'tabs' && $this->checkGroup()) {
 
 			$cert_access = new ilParticipationCertificateAccess($_GET['ref_id']);
@@ -64,20 +82,20 @@ class ilParticipationCertificateUIHookGUI extends ilUIHookPluginGUI {
 				 * @var ilTabsGUI $tabs
 				 */
 				$tabs = $a_par["tabs"];
-				$this->ctrl->saveParameterByClass('ilParticipationCertificateResultGUI', 'ref_id');
-				$tabs->addTab('certificates', $this->pl->txt('plugin'), $this->ctrl->getLinkTargetByClass(array(
-					'ilUIPluginRouterGUI',
-					'ilParticipationCertificateResultGUI'
+				$this->ctrl->saveParameterByClass(ilParticipationCertificateResultGUI::class, 'ref_id');
+				$tabs->addTab(self::TAB_CERTIFICATES, $this->pl->txt('plugin'), $this->ctrl->getLinkTargetByClass(array(
+					ilUIPluginRouterGUI::class,
+					ilParticipationCertificateResultGUI::class
 				), ilParticipationCertificateResultGUI::CMD_CONTENT));
 			} else {
 				/**
 				 * @var ilTabsGUI $tabs
 				 */
 				$tabs = $a_par["tabs"];
-				$this->ctrl->saveParameterByClass('ilParticipationCertificateResultGUI', 'ref_id');
-				$tabs->addTab('certificates', $this->pl->txt('pluginreader'), $this->ctrl->getLinkTargetByClass(array(
-					'ilUIPluginRouterGUI',
-					'ilParticipationCertificateResultGUI'
+				$this->ctrl->saveParameterByClass(ilParticipationCertificateResultGUI::class, 'ref_id');
+				$tabs->addTab(self::TAB_CERTIFICATES, $this->pl->txt('pluginreader'), $this->ctrl->getLinkTargetByClass(array(
+					ilUIPluginRouterGUI::class,
+					ilParticipationCertificateResultGUI::class
 				), ilParticipationCertificateResultGUI::CMD_CONTENT));
 			}
 		}
@@ -90,7 +108,7 @@ class ilParticipationCertificateUIHookGUI extends ilUIHookPluginGUI {
 	 */
 	function checkGroup() {
 		foreach ($this->ctrl->getCallHistory() as $GUIClassesArray) {
-			if ($GUIClassesArray['class'] == 'ilObjGroupGUI') {
+			if ($GUIClassesArray['class'] == ilObjGroupGUI::class) {
 				if (stripos($this->learnGroupTitle, $this->keyword) !== false) {
 					return true;
 				}

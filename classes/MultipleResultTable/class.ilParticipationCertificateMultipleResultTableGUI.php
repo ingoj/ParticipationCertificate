@@ -1,10 +1,7 @@
 <?php
-require_once './Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/ParticipationCertificate/classes/SingleResultTable/class.ilParticipationCertificateSingleResultTableGUI.php';
 
 /**
  * Class ilParticipationCertificateMultipleResultTableGUI
- *
- * @author Florian Wyss <fw@studer-raimann.ch>
  */
 class ilParticipationCertificateMultipleResultTableGUI extends ilParticipationCertificateSingleResultTableGUI {
 

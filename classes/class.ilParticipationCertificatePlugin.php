@@ -1,5 +1,6 @@
 <?php
-require_once('./Services/UIComponent/classes/class.ilUserInterfaceHookPlugin.php');
+
+require_once __DIR__ . "/../vendor/autoload.php";
 
 /**
  * Class ilParticipationCertificatePlugin
@@ -8,6 +9,8 @@ require_once('./Services/UIComponent/classes/class.ilUserInterfaceHookPlugin.php
  */
 class ilParticipationCertificatePlugin extends ilUserInterfaceHookPlugin {
 
+	const PLUGIN_ID = "dhbwparticipationpdf";
+	const PLUGIN_NAME = "ParticipationCertificate";
 	/**
 	 * @var ilParticipationCertificatePlugin
 	 */
@@ -15,17 +18,53 @@ class ilParticipationCertificatePlugin extends ilUserInterfaceHookPlugin {
 
 
 	public function getPluginName() {
-		return 'ParticipationCertificate';
+		return self::PLUGIN_NAME;
 	}
 
 
 	public static function getInstance() {
-
 		if (is_null(self::$instance)) {
 			self::$instance = new self();
 		}
 
 		return self::$instance;
 	}
+
+
+	/**
+	 * @var ilDB
+	 */
+	protected $db;
+
+
+	public function __construct() {
+		parent::__construct();
+
+		global $DIC;
+
+		$this->db = $DIC->database();
+	}
+
+
+	protected function init() {
+		parent::init();
+		require_once __DIR__ . "/../../../../Cron/CronHook/LearningObjectiveSuggestions/vendor/autoload.php";
+		require_once __DIR__ . "/../../../../EventHandling/EventHook/UserDefaults/vendor/autoload.php";
+		require_once __DIR__ . "/../../../../UIComponent/UserInterfaceHook/LearningObjectiveSuggestionsUI/vendor/autoload.php";
+	}
+
+
+	/**
+	 * @return bool
+	 */
+	protected function beforeUninstall() {
+		$this->db->dropTable(ilParticipationCertificateConfig::TABLE_NAME, false);
+		$this->db->dropTable(ilParticipationCert::TABLE_NAME, false);
+
+		// TODO Remove data cert and picture folder
+
+		return true;
+	}
 }
+
 ?>

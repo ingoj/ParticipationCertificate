@@ -1,5 +1,5 @@
 <?php
-require_once 'class.ilExcerciseState.php';
+
 class ilExcerciseStates {
 
 	/**
@@ -8,9 +8,8 @@ class ilExcerciseStates {
 	 * @return ilExcerciseState[]
 	 */
 	public static function getData(array $arr_usr_ids = array()) {
-		global $ilDB;
-
-
+		global $DIC;
+		$ilDB = $DIC->database();
 		$result = $ilDB->query(self::getSQL($arr_usr_ids));
 		$exerc_data = array();
 		while ($row = $ilDB->fetchAssoc($result)) {
@@ -36,8 +35,8 @@ class ilExcerciseStates {
 	 * @return string
 	 */
 	protected static function getSQL(array $arr_usr_ids = array()) {
-		global $ilDB;
-
+		global $DIC;
+		$ilDB = $DIC->database();
 		$select = "SELECT 
 					exerc.usr_id as exc_usr_id,
 					exc_obj.title as exc_obj_title,
@@ -49,9 +48,9 @@ class ilExcerciseStates {
 					FROM 
 					exc_mem_ass_status as exerc
 					inner join exc_assignment as exc_ass on exc_ass.id = exerc.ass_id
-					inner join object_data as exc_obj on exc_obj.obj_id = exc_ass.exc_id
+					inner join " . usrdefObj::TABLE_NAME . " as exc_obj on exc_obj.obj_id = exc_ass.exc_id
 					inner join object_reference as exc_ref on exc_ref.obj_id = exc_ass.exc_id
-					where  ".$ilDB->in('exerc.usr_id', $arr_usr_ids, false, 'integer')."
+					where  " . $ilDB->in('exerc.usr_id', $arr_usr_ids, false, 'integer') . "
 					group by 
 					exerc.usr_id,
 					exc_ass.exc_id,
@@ -61,4 +60,5 @@ class ilExcerciseStates {
 		return $select;
 	}
 }
+
 ?>

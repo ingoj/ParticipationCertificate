@@ -1,13 +1,5 @@
 <?php
 
-require_once './Services/Table/classes/class.ilTable2GUI.php';
-require_once './Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/ParticipationCertificate/classes/Table/class.ilParticipationCertificateResultModificationGUI.php';
-require_once './Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/ParticipationCertificate/classes/SingleResultTable/class.ilParticipationCertificateSingleResultGUI.php';
-require_once './Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/ParticipationCertificate/classes/getFineWeights/class.getFineWeights.php';
-require_once './Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/ParticipationCertificate/classes/TestMark/class.TestMarks.php';
-require_once './Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/ParticipationCertificate/classes/Learningsugg/class.getLearnSuggs.php';
-require_once './Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/ParticipationCertificate/classes/Score/NewLearningObjectiveScores.php';
-
 /**
  * Class ilParticipationCertificateResultGUI
  *
@@ -47,6 +39,18 @@ class ilParticipationCertificateSingleResultTableGUI extends ilTable2GUI {
 	 * @var array
 	 */
 	protected $marks = array();
+	/**
+	 * @var string
+	 */
+	protected $color;
+	/**
+	 * @var array
+	 */
+	protected $usr_ids;
+	/**
+	 * @var ilLearningObjectivesMasterCrs[]
+	 */
+	protected $sugg;
 
 
 	/**
@@ -57,10 +61,10 @@ class ilParticipationCertificateSingleResultTableGUI extends ilTable2GUI {
 	 * @param int                                 $usr_id
 	 */
 	public function __construct($a_parent_obj, $a_parent_cmd, $usr_id) {
-		global $ilCtrl, $tabs;
+		global $DIC;
 
-		$this->ctrl = $ilCtrl;
-		$this->tabs = $tabs;
+		$this->ctrl = $DIC->ctrl();
+		$this->tabs = $DIC->tabs();
 		$this->pl = ilParticipationCertificatePlugin::getInstance();
 
 		$config = ilParticipationCertificateConfig::where(array(
@@ -78,9 +82,8 @@ class ilParticipationCertificateSingleResultTableGUI extends ilTable2GUI {
 		$this->setLimit(0);
 		$this->setShowRowsSelector(false);
 
-
-		$this->ctrl->saveParameterByClass('ilParticipationCertificateResultModificationGUI', [ 'ref_id', 'group_id' ]);
-		$this->ctrl->saveParameterByClass('ilParticipationCertificateResultGUI', 'usr_id');
+		$this->ctrl->saveParameterByClass(ilParticipationCertificateResultModificationGUI::class, [ 'ref_id', 'group_id' ]);
+		$this->ctrl->saveParameterByClass(ilParticipationCertificateResultGUI::class, 'usr_id');
 
 		$cert_access = new ilParticipationCertificateAccess($_GET['ref_id']);
 		$this->usr_ids = $cert_access->getUserIdsOfGroup();
@@ -149,9 +152,11 @@ class ilParticipationCertificateSingleResultTableGUI extends ilTable2GUI {
 		$sorting = array();
 
 		foreach ($scores as $score) {
-			$sorting[$score->getTitle()] = ['score' => $score->getScore(),
-											'obj_id' => $score->getObjectiveId(),
-											'weight' => $newWeights['weight_fine_'.$score->getObjectiveId()]];
+			$sorting[$score->getTitle()] = [
+				'score' => $score->getScore(),
+				'obj_id' => $score->getObjectiveId(),
+				'weight' => $newWeights['weight_fine_' . $score->getObjectiveId()]
+			];
 		}
 
 		//sort the array first for the score. Second argument is the weight.
@@ -162,6 +167,7 @@ class ilParticipationCertificateSingleResultTableGUI extends ilTable2GUI {
 			$weighting[$key] = $item['weight'];
 		}
 		array_multisort($scored, SORT_DESC, $weighting, SORT_DESC, $sorting);
+
 		return $sorting;
 	}
 
@@ -198,7 +204,11 @@ class ilParticipationCertificateSingleResultTableGUI extends ilTable2GUI {
 				}
 				//create two arrays, one for the mark when a test is fulfilled and one for the scores.
 				$marks [$rec->getLocftestCrsObjId()][] = $rec->getLocftestTestRefId();
-				$scores[$rec->getLocftestCrsObjId()][] = [ $rec->getLocftestPercentage() . '%', $rec->getLocftestTestObjId(), $rec->getLocftestTries() ];
+				$scores[$rec->getLocftestCrsObjId()][] = [
+					$rec->getLocftestPercentage() . '%',
+					$rec->getLocftestTestObjId(),
+					$rec->getLocftestTries()
+				];
 			}
 			//merge the score array and the array with the test titles
 			foreach ($rec_array as $key => $item) {
@@ -225,7 +235,7 @@ class ilParticipationCertificateSingleResultTableGUI extends ilTable2GUI {
 	}
 
 
-	protected function buildProgressBar($points, $test_obj,$tries) {
+	protected function buildProgressBar($points, $test_obj, $tries) {
 		//Holt von allen Tests das minimum um zu bestehen
 		$mark = TestMarks::getData($test_obj);
 
@@ -254,12 +264,9 @@ class ilParticipationCertificateSingleResultTableGUI extends ilTable2GUI {
 
 		if ($points >= $required_amount_of_points) {
 			$css_class = self::SUCCESSFUL_PROGRESS_CSS_CLASS;
-		}
-		elseif($tries == NULL)
-		{
+		} elseif ($tries == NULL) {
 			$css_class = self::NON_SUCCESSFUL_PROGRESS_CSS_CLASS;
-		}
-		else {
+		} else {
 			$css_class = self::FAILED_PROGRESS_CSS_CLASS;
 		}
 
@@ -278,7 +285,7 @@ class ilParticipationCertificateSingleResultTableGUI extends ilTable2GUI {
 				if ($a_set[$k]) {
 					$this->tpl->setCurrentBlock('td');
 					if (is_array($a_set[$k])) {
-						$this->tpl->setVariable('COURSE', $this->buildProgressBar(explode('%', $a_set[$k][0]), $a_set[$k][1],$a_set[$k][2]));
+						$this->tpl->setVariable('COURSE', $this->buildProgressBar(explode('%', $a_set[$k][0]), $a_set[$k][1], $a_set[$k][2]));
 					} else {
 						$this->tpl->setVariable('COURSE', $a_set[$k]);
 					}
@@ -309,4 +316,5 @@ class ilParticipationCertificateSingleResultTableGUI extends ilTable2GUI {
 		return false;
 	}
 }
+
 ?>

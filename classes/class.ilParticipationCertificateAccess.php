@@ -1,6 +1,29 @@
 <?php
+require_once __DIR__ . "/../vendor/autoload.php";
 
 class ilParticipationCertificateAccess {
+
+	/**
+	 * @var ilParticipationCertificatePlugin
+	 */
+	protected $pl;
+	/**
+	 * @var int
+	 */
+	protected $group_ref_id;
+	/**
+	 * @var ilAccessHandler
+	 */
+	protected $access;
+	/**
+	 * @var ilObjUser
+	 */
+	protected $usr;
+	/**
+	 * @var ilDB
+	 */
+	protected $db;
+
 
 	/**
 	 * ilParticipationCertificateAccess constructor.
@@ -8,15 +31,17 @@ class ilParticipationCertificateAccess {
 	 * @param int $group_ref_id
 	 */
 	public function __construct($group_ref_id) {
+		global $DIC;
 		$this->pl = ilParticipationCertificatePlugin::getInstance();
 		$this->group_ref_id = $group_ref_id;
+		$this->access = $DIC->access();
+		$this->usr = $DIC->user();
+		$this->db = $DIC->database();
 	}
 
 
 	public function hasCurrentUserWriteAccess() {
-		global $ilAccess;
-
-		if ($ilAccess->checkAccess("write", "", $this->group_ref_id)) {
+		if ($this->access->checkAccess("write", "", $this->group_ref_id)) {
 			return true;
 		}
 
@@ -44,9 +69,7 @@ class ilParticipationCertificateAccess {
 
 
 	public function hasCurrentUserReadAccess() {
-		global $ilAccess;
-
-		if ($ilAccess->checkAccess("read", "", $this->group_ref_id)) {
+		if ($this->access->checkAccess("read", "", $this->group_ref_id)) {
 			return true;
 		}
 
@@ -55,9 +78,7 @@ class ilParticipationCertificateAccess {
 
 
 	public function hasCurrentUserSpecialAccess() {
-		global $ilAccess;
-
-		if ($ilAccess->checkAccess("read_learning_progress", "", $this->group_ref_id)) {
+		if ($this->access->checkAccess("read_learning_progress", "", $this->group_ref_id)) {
 			return true;
 		}
 
@@ -66,25 +87,22 @@ class ilParticipationCertificateAccess {
 
 
 	public function getUserIdsOfGroup() {
-		global $ilUser;
 		if ($this->hasCurrentUserWriteAccess() || $this->hasCurrentUserSpecialAccess()) {
-			global $ilDB;
-
 			$select = "select obj_members.usr_id from obj_members
-						inner join object_data as grp_obj on grp_obj.obj_id = obj_members.obj_id and grp_obj.type = 'grp'
+						inner join " . usrdefObj::TABLE_NAME . " as grp_obj on grp_obj.obj_id = obj_members.obj_id and grp_obj.type = 'grp'
 						inner join object_reference as grp_ref on grp_ref.obj_id = obj_members.obj_id
-						where grp_ref.ref_id = " . $ilDB->quote($this->group_ref_id, "integer") . " and obj_members.member = 1";
+						where grp_ref.ref_id = " . $this->db->quote($this->group_ref_id, "integer") . " and obj_members.member = 1";
 
-			$result = $ilDB->query($select);
+			$result = $this->db->query($select);
 			$usr_data = array();
-			while ($row = $ilDB->fetchAssoc($result)) {
+			while ($row = $this->db->fetchAssoc($result)) {
 				$usr_data[] = $row['usr_id'];
 			}
 
 			return $usr_data;
 		} elseif ($this->hasCurrentUserReadAccess()) {
 			$usr_data = array();
-			$usr_data[] = $ilUser->getId();
+			$usr_data[] = $this->usr->getId();
 
 			return $usr_data;
 		}

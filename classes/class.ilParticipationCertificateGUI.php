@@ -1,14 +1,6 @@
 <?php
-require_once './Services/Form/classes/class.ilPropertyFormGUI.php';
-require_once './Services/Object/classes/class.ilObjectListGUIFactory.php';
-require_once './Modules/Course/classes/class.ilObjCourseGUI.php';
-require_once './Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/ParticipationCertificate/classes/class.ilParticipationCertificateConfigGUI.php';
-require_once './Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/ParticipationCertificate/classes/Report/class.ilParticipationCertificatePDFGenerator.php';
-require_once './Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/ParticipationCertificate/classes/Report/class.ilParticipationCertificateTwigParser.php';
-require_once "./Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/ParticipationCertificate/classes/class.ilParticipationCertificateAccess.php";
-require_once "./Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/ParticipationCertificate/classes/Report/class.ilParticipationCertificateTwigParser.php";
-require_once './Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/ParticipationCertificate/classes/Table/class.ilParticipationCertificateResultGUI.php';
-require_once 'Services/Form/classes/class.ilDateDurationInputGUI.php';
+
+require_once __DIR__ . "/../vendor/autoload.php";
 
 /**
  * Class ilParticipationCertificateGUI
@@ -71,28 +63,33 @@ class ilParticipationCertificateGUI {
 	 * @var ilParticipationCertificatePlugin
 	 */
 	protected $pl;
+	/**
+	 * @var ilLanguage
+	 */
+	protected $lng;
 
 
 	function __construct() {
-		global $ilCtrl, $tpl, $ilTabs, $objDefinition, $ilToolbar, $lng;
+		global $DIC;
 
-		$this->toolbar = $ilToolbar;
-		$this->ctrl = $ilCtrl;
-		$this->tpl = $tpl;
-		$this->tabs = $ilTabs;
-		$this->objectDefinition = $objDefinition;
+		$this->toolbar = $DIC->toolbar();
+		$this->ctrl = $DIC->ctrl();
+		$this->tpl = $DIC->ui()->mainTemplate();
+		$this->tabs = $DIC->tabs();
+		$this->objectDefinition = $DIC["objDefinition"];
 		$this->groupRefId = (int)$_GET['ref_id'];
+		$this->lng = $DIC->language();
 
 		//Access
 		$cert_access = new ilParticipationCertificateAccess($this->groupRefId);
 		if (!$cert_access->hasCurrentUserWriteAccess()) {
-			ilUtil::sendFailure($lng->txt('no_permission'), true);
+			ilUtil::sendFailure($this->lng->txt('no_permission'), true);
 			ilUtil::redirect('login.php');
 		}
 
 		$this->pl = ilParticipationCertificatePlugin::getInstance();
 		$this->learnGroup = ilObjectFactory::getInstanceByRefId($this->groupRefId);
-		$this->ctrl->saveParameterByClass('ilParticipationCertificateGUI', [ 'ref_id', 'group_id' ]);
+		$this->ctrl->saveParameterByClass(ilParticipationCertificateResultGUI::class, [ 'ref_id', 'group_id' ]);
 	}
 
 
@@ -101,7 +98,7 @@ class ilParticipationCertificateGUI {
 		$nextClass = $this->ctrl->getNextClass();
 
 		switch ($nextClass) {
-			case 'ilparticipationcertificateresultgui':
+			case strtolower(ilParticipationCertificateResultGUI::class):
 				$ilParticipationCertificateTableGUI = new ilParticipationCertificateResultGUI();
 				$this->ctrl->forwardCommand($ilParticipationCertificateTableGUI);
 				break;
@@ -137,15 +134,18 @@ class ilParticipationCertificateGUI {
 		$this->tpl->setDescription($this->learnGroup->getDescription());
 		$this->tpl->setTitleIcon(ilObject::_getIcon($this->learnGroup->getId()));
 
-		$this->ctrl->saveParameterByClass('ilRepositoryGUI', 'ref_id');
+		$this->ctrl->saveParameterByClass(ilRepositoryGUI::class, 'ref_id');
 
-		$this->ctrl->setParameterByClass('ilrepositorygui', 'ref_id', $this->groupRefId);
-		$this->tabs->setBackTarget($this->pl->txt('header_btn_back'), $this->ctrl->getLinkTargetByClass(array( 'ilrepositorygui', 'ilobjgroupgui' )));
+		$this->ctrl->setParameterByClass(ilRepositoryGUI::class, 'ref_id', $this->groupRefId);
+		$this->tabs->setBackTarget($this->pl->txt('header_btn_back'), $this->ctrl->getLinkTargetByClass(array(
+			ilRepositoryGUI::class,
+			ilObjGroupGUI::class
+		)));
 
-		$this->ctrl->saveParameterByClass('ilParticipationCertificateResultGUI', 'ref_id');
+		$this->ctrl->saveParameterByClass(ilParticipationCertificateResultGUI::class, 'ref_id');
 		$this->tabs->addTab(ilParticipationCertificateResultGUI::CMD_OVERVIEW, $this->pl->txt('header_overview'), $this->ctrl->getLinkTargetByClass(ilParticipationCertificateResultGUI::class, ilParticipationCertificateResultGUI::CMD_CONTENT));
 
-		//$this->tabs->addTab(ilParticipationCertificateResultGUI::CMD_OVERVIEW,$this->pl->txt('header_overview'),$this->ctrl->getLinkTargetByClass('ilParticipationCertificateResultGUI',ilParticipationCertificateResultGUI::CMD_CONTENT));
+		//$this->tabs->addTab(ilParticipationCertificateResultGUI::CMD_OVERVIEW,$this->pl->txt('header_overview'),$this->ctrl->getLinkTargetByClass(ilParticipationCertificateResultGUI::class,ilParticipationCertificateResultGUI::CMD_CONTENT));
 		$this->tabs->addTab(self::TAB_CONFIG, $this->pl->txt('header_config'), $this->ctrl->getLinkTargetByClass(self::class, self::CMD_CONFIG));
 		$this->tabs->activateTab(self::TAB_CONFIG);
 	}
@@ -195,10 +195,10 @@ class ilParticipationCertificateGUI {
 		$form->setFormAction($this->ctrl->getFormAction($this));
 
 		$form->setTitle($this->pl->txt('config_plugin'));
-		$form->setDescription('Folgende Platzhalter sind verfügbar: <br>
+		$form->setDescription($this->pl->txt("placeholders") . ' <br>
 		&lbrace;&lbrace;username&rbrace;&rbrace;: Anrede Vorname Nachname <br>
 		&lbrace;&lbrace;date&rbrace;&rbrace;: Datum
-		');
+		'); // TODO lang
 
 		$arr_config = ilParticipationCertificateConfig::where(array(
 			"config_type" => ilParticipationCertificateConfig::CONFIG_TYPE_GROUP,
@@ -250,11 +250,11 @@ class ilParticipationCertificateGUI {
 				'config_key' => 'percent_value'
 			))->first();
 		}
-		$percent = new ilNumberInputGUI('Schwellenwert für Videokonferenz (Prozent)','percent_value');
+		$percent = new ilNumberInputGUI($this->pl->txt("udf_percent_value"),'percent_value');
 		$percent->setValue($arr_config_value->getConfigValue());
 		$form->addItem($percent);*/
 
-		$this->ctrl->saveParameterByClass('ilObjGroup', 'ref_id');
+		$this->ctrl->saveParameterByClass(ilObjGroup::class, 'ref_id');
 		$form->addCommandButton(self::CMD_SAVE, $this->pl->txt('save'));
 
 		return $form;
@@ -356,7 +356,6 @@ class ilParticipationCertificateGUI {
 	*/
 
 	public function resetCertText() {
-		global $ilCtrl;
 		$arr_config = ilParticipationCertificateConfig::where(array(
 			"config_type" => ilParticipationCertificateConfig::CONFIG_TYPE_GROUP,
 			"group_ref_id" => $this->groupRefId,
@@ -380,7 +379,7 @@ class ilParticipationCertificateGUI {
 			}
 		}
 		ilUtil::sendSuccess($this->pl->txt('successForm'), true);
-		$ilCtrl->redirect($this, self::CMD_DISPLAY);
+		$this->ctrl->redirect($this, self::CMD_DISPLAY);
 	}
 
 

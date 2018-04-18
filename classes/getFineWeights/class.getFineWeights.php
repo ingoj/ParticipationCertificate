@@ -1,17 +1,18 @@
 <?php
-require_once 'class.getFineWeight.php';
+
+use SRAG\ILIAS\Plugins\LearningObjectiveSuggestions\Config\CourseConfig;
 
 class getFineWeights {
 
 	public static function getData() {
-		global $ilDB;
-
+		global $DIC;
+		$ilDB = $DIC->database();
 		$result = $ilDB->query(self::getSQL());
 		$weight = array();
 		$weights = new getFineWeight();
 
-		while ($row = $ilDB->fetchAssoc($result)){
-			switch ($row['cfg_key']){
+		while ($row = $ilDB->fetchAssoc($result)) {
+			switch ($row['cfg_key']) {
 				case 'weight_fine_90':
 					$weights->setWeightFine90($row['value']);
 					break;
@@ -44,23 +45,14 @@ class getFineWeights {
 					break;
 			}
 		}
+
 		return $weights;
-
 	}
-
-
-
-
-
 
 
 	protected static function getSQL() {
-		global $ilDB;
-
-		$select = "select * from alo_crs_config";
+		$select = "select * from " . CourseConfig::TABLE_NAME;
 
 		return $select;
 	}
-
-
 }

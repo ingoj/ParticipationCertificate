@@ -360,6 +360,7 @@ class ilParticipationCertificateConfig extends ActiveRecord {
 
 
 	public static function returnDefaultValues() {
+		// TODO lang
 		return array(
 			'page1_title' => 'Teilnahmebescheinigung',
 			'page1_introduction1' => '{{username}}, hat am Studienvorbereitungsprogramm mit Schwerpunkt „Mathematik“ auf der Lernplattform studienvorbereitung.dhbw.de teilgenommen.',
@@ -385,20 +386,13 @@ class ilParticipationCertificateConfig extends ActiveRecord {
 			'page2_box2_title' => 'Studienvorbereitung – eMentoring',
 			'page2_box2_row1' => 'Aktive Teilnahme an Videokonferenzen',
 			'page2_box2_row2' => 'Bearbeitung der Aufgaben zu überfachlichen Themen:',
-			'percent_value' => '50',
-			'keyword' => 'Lerngruppe',
-			'period_start' => NULL,
-			'period_end' => NULL,
-			'footer_config' => 'Die Resultate dieser Bescheinigung wurden manuell berechnet.',
-			'self_print_enable' => false,
-			'self_print_start' => NULL,
-			'self_print_end' => NULL
+			'footer_config' => 'Die Resultate dieser Bescheinigung wurden manuell berechnet.'
 		);
 	}
 
 
 	/**
-	 * @param group_ref_id $
+	 * @param group_ref_id
 	 * @param $config_type
 	 */
 	public static function returnTextValues($group_ref_id = 0, $config_type = self::CONFIG_TYPE_GLOBAL) {

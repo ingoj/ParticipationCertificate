@@ -1,11 +1,12 @@
 <?php
-require_once 'NewLearningObjectiveScore.php';
+
+use SRAG\ILIAS\Plugins\LearningObjectiveSuggestions\Score\LearningObjectiveScore;
 
 class NewLearningObjectiveScores {
 
 	public static function getData($usr_id) {
-		global $ilDB;
-
+		global $DIC;
+		$ilDB = $DIC->database();
 		$result = $ilDB->query(self::getSQL($usr_id));
 		$scores = array();
 
@@ -24,11 +25,11 @@ class NewLearningObjectiveScores {
 
 
 	protected static function getSQL($usr_id) {
-		global $ilDB;
-
-		$select = "select * from alo_score
-					inner join crs_objectives on alo_score.objective_id = crs_objectives.objective_id 
-					where user_id =".$ilDB->quote($usr_id, "integer")."
+		global $DIC;
+		$ilDB = $DIC->database();
+		$select = "select * from " . LearningObjectiveScore::TABLE_NAME . "
+					inner join crs_objectives on " . LearningObjectiveScore::TABLE_NAME . ".objective_id = crs_objectives.objective_id 
+					where user_id =" . $ilDB->quote($usr_id, "integer") . "
 					order by score DESC";
 
 		return $select;

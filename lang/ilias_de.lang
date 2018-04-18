@@ -45,3 +45,11 @@ pluginreader#:#Resultate Studienvorbereitung
 period#:#Zeitraum
 period_self_print#:#Zeitraum Selbstausdruck konfigurieren
 enable_self_print#:#Selbstausdruck aktivieren
+color#:#Color
+keyword#:#Keyword
+logo#:#Logo
+udf_percent_value#:#Schwellenwert Videokonferenzen (Prozent)
+placeholders#:#Folgende Platzhalter sind verfügbar:
+yes#:#Ja
+no#:#Nein
+no_tests#:#Keine Tests

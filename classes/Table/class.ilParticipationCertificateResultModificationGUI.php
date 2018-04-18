@@ -1,8 +1,5 @@
 <?php
 
-require_once './Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/ParticipationCertificate/classes/class.ilParticipationCertificateGUI.php';
-require_once './Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/ParticipationCertificate/classes/Table/class.ilParticipationCertificateResultGUI.php';
-
 /**
  * Class ilParticipationCertificateResultModificationGUI
  *
@@ -34,22 +31,66 @@ class ilParticipationCertificateResultModificationGUI {
 	 * @var ilToolbarGUI
 	 */
 	protected $toolbar;
+	/**
+	 * @var int
+	 */
+	protected $groupRefId;
+	/**
+	 * @var
+	 */
+	protected $learnGroup;
+	/**
+	 * @var array
+	 */
+	protected $usr_ids;
+	/**
+	 * @var int
+	 */
+	protected $usr_id;
+	/**
+	 * @var ilPartCertUserData[]
+	 */
+	protected $arr_usr_data;
+	/**
+	 * @var ilCrsInitialTestState[]
+	 */
+	protected $arr_initial_test_states;
+	/**
+	 * @var ilLearnObjectSuggReachedPercentage[]
+	 */
+	protected $arr_learn_reached_percentages;
+	/**
+	 * @var ilIassState[]
+	 */
+	protected $arr_iass_states;
+	/**
+	 * @var ilExcerciseState[]
+	 */
+	protected $arr_excercise_states;
+	/**
+	 * @var ilLearnObjectFinalTestState[][]
+	 */
+	protected $arr_FinalTestsStates;
+	/**
+	 * @var ilLearnObjectFinalTestState[][]
+	 */
+	protected $array_obj_ids;
 
 
 	public function __construct() {
-		global $ilCtrl, $ilTabs, $tpl, $ilToolbar;
+		global $DIC;
 
-		$this->toolbar = $ilToolbar;
-		$this->ctrl = $ilCtrl;
-		$this->tabs = $ilTabs;
-		$this->tpl = $tpl;
+		$this->toolbar = $DIC->toolbar();
+		$this->ctrl = $DIC->ctrl();
+		$this->tabs = $DIC->tabs();
+		$this->tpl = $DIC->ui()->mainTemplate();
 		$this->pl = ilParticipationCertificatePlugin::getInstance();
 
 		$this->groupRefId = (int)$_GET['ref_id'];
 		$this->learnGroup = ilObjectFactory::getInstanceByRefId($_GET['ref_id']);
-		$this->ctrl->saveParameterByClass('ilParticipationCertificateResultModificationGUI', [ 'ref_id', 'group_id' ]);
-		$this->ctrl->saveParameterByClass('ilParticipationCertificateResultModificationGUI', 'ementor');
-		$this->ctrl->saveParameterByClass('ilParticipationCertificateResultGUI', 'usr_id');
+		$this->ctrl->saveParameterByClass(ilParticipationCertificateResultModificationGUI::class, [ 'ref_id', 'group_id' ]);
+		$this->ctrl->saveParameterByClass(ilParticipationCertificateResultModificationGUI::class, 'ementor');
+		$this->ctrl->saveParameterByClass(ilParticipationCertificateResultGUI::class, 'usr_id');
 		$cert_access = new ilParticipationCertificateAccess($_GET['ref_id']);
 		$this->usr_ids = $cert_access->getUserIdsOfGroup();
 		$usr_id = $_GET[self::IDENTIFIER];
@@ -63,15 +104,15 @@ class ilParticipationCertificateResultModificationGUI {
 		$this->arr_FinalTestsStates = ilLearnObjectFinalTestStates::getData($this->usr_ids);
 		$this->array_obj_ids = ilLearnObjectFinalTestStates::getData($this->usr_ids);
 
-		$this->ctrl->setParameterByClass('ilParticipationCertificateResultModificationGUI', 'edited', true);
-		$this->ctrl->setParameterByClass('ilParticipationCertificateResultModificationGUI', 'ementor', true);
+		$this->ctrl->setParameterByClass(ilParticipationCertificateResultModificationGUI::class, 'edited', true);
+		$this->ctrl->setParameterByClass(ilParticipationCertificateResultModificationGUI::class, 'ementor', true);
 	}
 
 
 	public function executeCommand() {
 		$nextClass = $this->ctrl->getNextClass();
 		switch ($nextClass) {
-			case 'ilparticipationcertificateresultgui':
+			case strtolower(ilParticipationCertificateResultGUI::class):
 				$ilParticipationCertificateresultGUI = new ilParticipationCertificateResultGUI();
 				$this->ctrl->forwardCommand($ilParticipationCertificateresultGUI);
 				break;
@@ -99,9 +140,9 @@ class ilParticipationCertificateResultModificationGUI {
 		$this->tpl->setDescription($this->learnGroup->getDescription());
 		$this->tpl->setTitleIcon(ilObject::_getIcon($this->learnGroup->getId()));
 
-		$this->ctrl->saveParameterByClass('ilParticipationCertificateResultGUI', 'ref_id');
+		$this->ctrl->saveParameterByClass(ilParticipationCertificateResultGUI::class, 'ref_id');
 		$this->tabs->setBackTarget($this->pl->txt('header_btn_back'), $this->ctrl->getLinkTargetByClass(array(
-			'ilUIPluginRouterGUI',
+			ilUIPluginRouterGUI::class,
 			ilParticipationCertificateResultGUI::class
 		), ilParticipationCertificateResultGUI::CMD_CONTENT));
 	}

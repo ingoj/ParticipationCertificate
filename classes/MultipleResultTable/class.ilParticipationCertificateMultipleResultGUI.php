@@ -1,13 +1,8 @@
 <?php
 
-require_once './Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/ParticipationCertificate/classes/class.ilParticipationCertificateGUI.php';
-require_once './Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/ParticipationCertificate/classes/Table/class.ilParticipationCertificateResultGUI.php';
-require_once './Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/ParticipationCertificate/classes/MultipleResultTable/class.ilParticipationCertificateMultipleResultTableGUI.php';
-
 /**
  * Class ilParticipationCertificateMultipleResultGUI
- *
- * @author            Florian Wyss <fw@studer-raimann.ch>
+
  * @ilCtrl_isCalledBy ilParticipationCertificateMultipleResultGUI: ilUIPluginRouterGUI
  */
 class ilParticipationCertificateMultipleResultGUI {

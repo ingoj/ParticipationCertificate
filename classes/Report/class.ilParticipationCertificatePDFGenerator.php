@@ -1,6 +1,4 @@
 <?php
-require_once('./Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/ParticipationCertificate/vendor/twig/twig/lib/Twig/Autoloader.php');
-require_once './Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/ParticipationCertificate/vendor/autoload.php';
 
 /**
  * Class ilParticipationCertificatePDFGenerator
@@ -24,12 +22,17 @@ class ilParticipationCertificatePDFGenerator {
 	 * @var string
 	 */
 	public $temp;
+	/**
+	 * @var ilParticipationCertificatePlugin
+	 */
+	protected $pl;
 
 
 	public function __construct() {
-		global $tpl, $ilCtrl, $tempFile, $tempCount;
-		$this->tpl = $tpl;
-		$this->ctrl = $ilCtrl;
+		global $DIC, $tempFile, $tempCount;
+		$this->tpl = $DIC->ui()->mainTemplate();
+		$this->ctrl = $DIC->ctrl();
+		$this->pl = ilParticipationCertificatePlugin::getInstance();
 
 		if ($tempCount == 0) {
 			$tempFile = $this->temp = ilUtil::ilTempnam();
@@ -55,14 +58,14 @@ class ilParticipationCertificatePDFGenerator {
 		//mPDF Instanz wird erzeugt. Mit Margin-Left-Right:20.
 		$mpdf = new mPDF('', '', '', '', 20, 20, '', '', 0, 0);
 		//Css file wird geladen
-		$css = file_get_contents('./Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/ParticipationCertificate/templates/report/Teilnahmebescheinigung.css');
+		$css = file_get_contents($this->pl->getDirectory() . '/templates/report/Teilnahmebescheinigung.css');
 		$printCount ++;
 
 		//Checkt ob es nur einen User in der Gruppe hat. Wenn True wird das PDf direkt nur für diesen gedruckt
 		if ($total_users == 1) {
 			$mpdf->WriteHTML($css, 1);
 			$mpdf->WriteHTML($rendered, 2);
-			$mpdf->Output('Teilnahmebescheinigungen' . '.pdf', 'D');
+			$mpdf->Output($this->pl->txt("plugin") . '.pdf', 'D');
 			$this->tpl->getStandardTemplate();
 			$this->ctrl->redirectByClass(ilParticipationCertificateResultGUI::class, ilParticipationCertificateResultGUI::CMD_INIT_TABLE);
 		}
@@ -83,7 +86,7 @@ class ilParticipationCertificatePDFGenerator {
 				$tplID = $mpdf->ImportPage($i);
 				$mpdf->UseTemplate($tplID);
 			}
-			$mpdf->Output('Teilnahmebescheinigungen' . '.pdf', 'D');
+			$mpdf->Output($this->pl->txt("plugin") . '.pdf', 'D');
 			$this->tpl->getStandardTemplate();
 			$this->ctrl->redirectByClass(ilParticipationCertificateResultGUI::class, ilParticipationCertificateResultGUI::CMD_INIT_TABLE);
 		} /*Wenn es nicht der erste oder letzte Durchlauf ist, wird ein neues PDF erzeugt. Die bereits erzeugten PDF auf dem Server
@@ -102,4 +105,5 @@ class ilParticipationCertificatePDFGenerator {
 		}
 	}
 }
+
 ?>
