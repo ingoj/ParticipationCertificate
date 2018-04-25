@@ -40,26 +40,31 @@ class ilParticipationCertificateUIHookGUI extends ilUIHookPluginGUI {
 
 	public function __construct() {
 		global $DIC;
-		$this->ctrl = $DIC->ctrl();
-		$this->pl = ilParticipationCertificatePlugin::getInstance();
-		$this->groupRefId = (int)$_GET['ref_id'];
 
-		if ($this->groupRefId == !0 && $this->groupRefId == !NULL) {
-			$this->learnGroup = ilObjectFactory::getInstanceByRefId($this->groupRefId);
-			$this->learnGroupTitle = $this->learnGroup->getTitle();
+
+		if($DIC->offsetExists('tpl')) {
+			$this->ctrl = $DIC->ctrl();
+			$this->pl = ilParticipationCertificatePlugin::getInstance();
+			$this->groupRefId = (int)$_GET['ref_id'];
+
+			if ($this->groupRefId == !0 && $this->groupRefId == !NULL) {
+				$this->learnGroup = ilObjectFactory::getInstanceByRefId($this->groupRefId);
+				$this->learnGroupTitle = $this->learnGroup->getTitle();
+			}
+
+			try {
+				$config = ilParticipationCertificateConfig::where(array(
+					'config_key' => 'keyword',
+					'config_type' => ilParticipationCertificateConfig::CONFIG_TYPE_GLOBAL,
+					'config_value_type' => ilParticipationCertificateConfig::CONFIG_VALUE_TYPE_OTHER,
+					"group_ref_id" => 0
+				))->first();
+				$this->keyword = $config->getConfigValue();
+			} catch (Exception $ex) {
+				// Fix uninstall (Table not found)
+			}
 		}
 
-		try {
-			$config = ilParticipationCertificateConfig::where(array(
-				'config_key' => 'keyword',
-				'config_type' => ilParticipationCertificateConfig::CONFIG_TYPE_GLOBAL,
-				'config_value_type' => ilParticipationCertificateConfig::CONFIG_VALUE_TYPE_OTHER,
-				"group_ref_id" => 0
-			))->first();
-			$this->keyword = $config->getConfigValue();
-		} catch (Exception $ex) {
-			// Fix uninstall (Table not found)
-		}
 	}
 
 
