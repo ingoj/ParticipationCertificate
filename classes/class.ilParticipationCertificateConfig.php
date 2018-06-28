@@ -17,6 +17,23 @@ class ilParticipationCertificateConfig extends ActiveRecord {
 
 
 	/**
+	 * @return string
+	 */
+	public function getConnectorContainerName() {
+		return self::TABLE_NAME;
+	}
+
+
+	/**
+	 * @return string
+	 * @deprecated
+	 */
+	public static function returnDbTableName() {
+		return self::TABLE_NAME;
+	}
+
+
+	/**
 	 * @param string      $config_key
 	 * @param int         $group_ref_id
 	 * @param int         $config_type
@@ -150,11 +167,6 @@ class ilParticipationCertificateConfig extends ActiveRecord {
 	 * @db_length       8
 	 */
 	protected $order_by = 0;
-
-
-	public static function returnDbTableName() {
-		return self::TABLE_NAME;
-	}
 
 
 	/**
@@ -424,5 +436,3 @@ class ilParticipationCertificateConfig extends ActiveRecord {
 		return $arr_config;
 	}
 }
-
-?>

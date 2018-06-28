@@ -17,11 +17,17 @@ class ilParticipationCertificatePlugin extends ilUserInterfaceHookPlugin {
 	protected static $instance;
 
 
+	/**
+	 * @return string
+	 */
 	public function getPluginName() {
 		return self::PLUGIN_NAME;
 	}
 
 
+	/**
+	 * @return ilParticipationCertificatePlugin
+	 */
 	public static function getInstance() {
 		if (is_null(self::$instance)) {
 			self::$instance = new self();
@@ -37,6 +43,9 @@ class ilParticipationCertificatePlugin extends ilUserInterfaceHookPlugin {
 	protected $db;
 
 
+	/**
+	 *
+	 */
 	public function __construct() {
 		parent::__construct();
 
@@ -46,6 +55,9 @@ class ilParticipationCertificatePlugin extends ilUserInterfaceHookPlugin {
 	}
 
 
+	/**
+	 *
+	 */
 	protected function init() {
 		parent::init();
 		require_once __DIR__ . "/../../../../Cron/CronHook/LearningObjectiveSuggestions/vendor/autoload.php";
@@ -61,10 +73,8 @@ class ilParticipationCertificatePlugin extends ilUserInterfaceHookPlugin {
 		$this->db->dropTable(ilParticipationCertificateConfig::TABLE_NAME, false);
 		$this->db->dropTable(ilParticipationCert::TABLE_NAME, false);
 
-		// TODO Remove data cert and picture folder
+		ilUtil::delDir(CLIENT_WEB_DIR . "/dhbw_part_cert");
 
 		return true;
 	}
 }
-
-?>
