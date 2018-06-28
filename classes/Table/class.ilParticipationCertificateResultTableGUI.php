@@ -292,10 +292,10 @@ class ilParticipationCertificateResultTableGUI extends ilTable2GUI {
 			if ($current >= $start) {
 				// Started
 				$rest_days = $end->diff($current)->days;
-				//$total_days = $end->diff($start)->days;
+				$total_days = ($end->diff($start)->days + 1);
 				//$past_days = ($total_days - $rest_days);
 
-				$a_perc_limit = (100 / max($rest_days, 1));
+				$a_perc_limit = (100 - (max($rest_days, 0) / $total_days * 100));
 
 				if ($a_perc_result >= 100) {
 					// 100% reached
@@ -305,7 +305,7 @@ class ilParticipationCertificateResultTableGUI extends ilTable2GUI {
 					if ($current <= $end) {
 						// End not reached
 						if ($a_perc_result >= ($a_perc_limit - 10)) {
-							// In time (+/-10%)
+							// In time or already farer
 							$css_class = self::ORANGE_PROGRESS;
 						} else {
 							// Not in time
@@ -318,6 +318,7 @@ class ilParticipationCertificateResultTableGUI extends ilTable2GUI {
 				}
 			} else {
 				// Not started
+				$a_perc_limit = NULL;
 				$css_class = self::NO_PROGRESS;
 			}
 		} else {
@@ -488,5 +489,3 @@ class ilParticipationCertificateResultTableGUI extends ilTable2GUI {
 		$this->custom_export_formats[$$custom_export_format_key] = $custom_export_format_label;
 	}
 }
-
-?>
