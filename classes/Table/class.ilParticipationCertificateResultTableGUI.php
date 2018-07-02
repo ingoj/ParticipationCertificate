@@ -285,17 +285,28 @@ class ilParticipationCertificateResultTableGUI extends ilTable2GUI {
 
 		if ($start !== NULL && $end !== NULL) {
 			// Period set
-			$current = new DateTime();
 			$start = new DateTime($start);
 			$end = new DateTime($end);
+			$current = new DateTime();
+
+			// Test
+			/*$start = new DateTime("2018-01-01");
+			$end = new DateTime("2018-06-30");
+			$current = new DateTime("2018-03-26");*/
 
 			if ($current >= $start) {
 				// Started
-				$rest_days = $end->diff($current)->days;
-				$total_days = ($end->diff($start)->days + 1);
-				//$past_days = ($total_days - $rest_days);
+				if ($current <= $end) {
+					// Running
+					$rest_days = $end->diff($current)->days;
+					$total_days = $end->diff($start)->days;
+					//$past_days = ($total_days - $rest_days);
 
-				$a_perc_limit = (100 - (max($rest_days, 0) / $total_days * 100));
+					$a_perc_limit = (100 - ($rest_days / $total_days * 100));
+				} else {
+					// Ended
+					$a_perc_limit = 100;
+				}
 
 				if ($a_perc_result >= 100) {
 					// 100% reached
@@ -318,7 +329,7 @@ class ilParticipationCertificateResultTableGUI extends ilTable2GUI {
 				}
 			} else {
 				// Not started
-				$a_perc_limit = NULL;
+				$a_perc_limit = 1;
 				$css_class = self::NO_PROGRESS;
 			}
 		} else {
