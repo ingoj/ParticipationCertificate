@@ -308,24 +308,33 @@ class ilParticipationCertificateResultTableGUI extends ilTable2GUI {
 					$a_perc_limit = 100;
 				}
 
-				if ($a_perc_result >= 100) {
-					// 100% reached
+				if ($a_perc_result >= 90) {
+					// 90% reached
 					$css_class = self::GREEN_PROGRESS;
 				} else {
-					// <100%
+					// <90%
 					if ($current <= $end) {
 						// End not reached
-						if ($a_perc_result >= ($a_perc_limit - 10)) {
+						if ($a_perc_result >= ($a_perc_limit - 30)) {
 							// In time or already farer
-							$css_class = self::ORANGE_PROGRESS;
+							$css_class = self::GREEN_PROGRESS;
 						} else {
-							// Not in time
-							$css_class = self::RED_PROGRESS;
+							if ($a_perc_result >= ($a_perc_limit - 40)) {
+								//
+								$css_class = self::ORANGE_PROGRESS;
+							} else {
+								// Not in time
+								$css_class = self::RED_PROGRESS;
+							}
 						}
 					} else {
 						// End reached
 						$css_class = self::RED_PROGRESS;
 					}
+				}
+				if ($a_perc_limit < 30) {
+					//
+					$a_perc_limit = 30;
 				}
 			} else {
 				// Not started
@@ -336,11 +345,11 @@ class ilParticipationCertificateResultTableGUI extends ilTable2GUI {
 			// No period set
 			$a_perc_limit = NULL;
 
-			if ($a_perc_result >= 100) {
-				// 100% reached
+			if ($a_perc_result >= 80) {
+				// 80% reached
 				$css_class = self::GREEN_PROGRESS;
 			} else {
-				// <100%
+				// <80%
 				$css_class = self::RED_PROGRESS;
 			}
 		}
