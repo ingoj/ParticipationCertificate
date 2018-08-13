@@ -280,7 +280,6 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI {
 		$form = $this->initForm();
 
 		if (!$form->checkInput()) {
-			//TODO error message plus redirect
 			$this->tpl->setContent($form->getHTML());
 
 			return false;
