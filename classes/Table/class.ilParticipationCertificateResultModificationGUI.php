@@ -179,6 +179,7 @@ class ilParticipationCertificateResultModificationGUI {
 		$form = $this->initForm();
 
 		if (!$form->checkInput()) {
+			//TODO error message plus redirect
 			return false;
 		}
 	}
@@ -226,5 +227,3 @@ class ilParticipationCertificateResultModificationGUI {
 		$twigParser->parseData();
 	}
 }
-
-?>

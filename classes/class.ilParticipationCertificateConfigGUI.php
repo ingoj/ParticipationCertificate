@@ -49,7 +49,7 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI {
 	 */
 	protected $courseobject;
 	/**
-	 * @var \ilDB
+	 * @var ilDB
 	 */
 	protected $db;
 	/**
@@ -87,6 +87,9 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI {
 	}
 
 
+	/**
+	 * @param string $cmd
+	 */
 	function performCommand($cmd) {
 		switch ($cmd) {
 			default:
@@ -101,10 +104,6 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI {
 
 	/**
 	 * Configure
-	 *
-	 * @param
-	 *
-	 * @return
 	 */
 	public function configure() {
 
@@ -115,6 +114,9 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI {
 	}
 
 
+	/**
+	 * @return ilPropertyFormGUI
+	 */
 	public function initForm() {
 		$form = new ilPropertyFormGUI();
 		$form->setFormAction($this->ctrl->getFormAction($this));
@@ -253,6 +255,9 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI {
 	}
 
 
+	/**
+	 * @return array
+	 */
 	protected function getUdfDropdownValues() {
 
 		$sql = "SELECT * FROM udf_definition";
@@ -275,6 +280,9 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI {
 		$form = $this->initForm();
 
 		if (!$form->checkInput()) {
+			//TODO error message plus redirect
+			$this->tpl->setContent($form->getHTML());
+
 			return false;
 		}
 
@@ -407,5 +415,3 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI {
 		return true;
 	}
 }
-
-?>

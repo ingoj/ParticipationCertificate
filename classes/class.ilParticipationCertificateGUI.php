@@ -69,6 +69,9 @@ class ilParticipationCertificateGUI {
 	protected $lng;
 
 
+	/**
+	 *
+	 */
 	function __construct() {
 		global $DIC;
 
@@ -93,6 +96,9 @@ class ilParticipationCertificateGUI {
 	}
 
 
+	/**
+	 *
+	 */
 	function executeCommand() {
 		$cmd = $this->ctrl->getCmd();
 		$nextClass = $this->ctrl->getNextClass();
@@ -124,11 +130,17 @@ class ilParticipationCertificateGUI {
 	}
 
 
+	/**
+	 *
+	 */
 	protected function config() {
 		$this->period();
 	}
 
 
+	/**
+	 *
+	 */
 	function initHeader() {
 		$this->tpl->setTitle($this->learnGroup->getTitle());
 		$this->tpl->setDescription($this->learnGroup->getDescription());
@@ -151,6 +163,9 @@ class ilParticipationCertificateGUI {
 	}
 
 
+	/**
+	 *
+	 */
 	protected function initConfTabs() {
 		$this->tabs->addSubTab(self::TAB_CONFIG_PERIOD, $this->pl->txt('period'), $this->ctrl->getLinkTarget($this, self::CMD_PERIOD));
 		$this->tabs->addSubTab(self::TAB_CONFIG_SELF_PRINT, $this->pl->txt('period_self_print'), $this->ctrl->getLinkTarget($this, self::CMD_SELF_PRINT));
@@ -158,6 +173,9 @@ class ilParticipationCertificateGUI {
 	}
 
 
+	/**
+	 *
+	 */
 	protected function display() {
 		$this->tpl->getStandardTemplate();
 		$this->initHeader();
@@ -172,6 +190,9 @@ class ilParticipationCertificateGUI {
 	}
 
 
+	/**
+	 * @return ilPropertyFormGUI
+	 */
 	public function initForm() {
 		$form = new ilPropertyFormGUI();
 
@@ -269,7 +290,10 @@ class ilParticipationCertificateGUI {
 		$form = $this->initForm();
 
 		if (!$form->checkInput()) {
-			//TODO error message plus redirect
+			$this->tpl->setContent($form->getHTML());
+			$this->tpl->getStandardTemplate();
+			$this->tpl->show();
+
 			return false;
 		}
 
@@ -343,18 +367,24 @@ class ilParticipationCertificateGUI {
 	}
 
 
-	/*
+	/*	/ **
+	 *
+	 * /
 	public function printPdf() {
 		$twigParser = new ilParticipationCertificateTwigParser($this->groupRefId);
 		$twigParser->parseData();
 	}
-
+	/*	/ **
+	 *
+	 * /
 	public function printPdfWithoutMentoring() {
 		$twigParser = new ilParticipationCertificateTwigParser($this->groupRefId,array(),false);
 		$twigParser->parseData();
 	}
 	*/
-
+	/**
+	 *
+	 */
 	public function resetCertText() {
 		$arr_config = ilParticipationCertificateConfig::where(array(
 			"config_type" => ilParticipationCertificateConfig::CONFIG_TYPE_GROUP,
@@ -383,6 +413,9 @@ class ilParticipationCertificateGUI {
 	}
 
 
+	/**
+	 *
+	 */
 	protected function period() {
 		$this->tpl->getStandardTemplate();
 		$this->initHeader();
@@ -418,6 +451,9 @@ class ilParticipationCertificateGUI {
 	}
 
 
+	/**
+	 *
+	 */
 	protected function savePeriod() {
 		$form = $this->initPeriodForm();
 
@@ -436,6 +472,9 @@ class ilParticipationCertificateGUI {
 	}
 
 
+	/**
+	 *
+	 */
 	protected function selfPrint() {
 		$this->tpl->getStandardTemplate();
 		$this->initHeader();
@@ -475,6 +514,9 @@ class ilParticipationCertificateGUI {
 	}
 
 
+	/**
+	 *
+	 */
 	protected function saveSelfPrint() {
 		$form = $this->initSelfPrintForm();
 
@@ -495,5 +537,3 @@ class ilParticipationCertificateGUI {
 		$this->ctrl->redirect($this, self::CMD_SELF_PRINT);
 	}
 }
-
-?>
