@@ -2,6 +2,8 @@
 
 class ilPartCertUsersData {
 
+
+
 	/**
 	 * @param array $arr_usr_ids
 	 *
@@ -15,6 +17,7 @@ class ilPartCertUsersData {
 		while ($row = $ilDB->fetchAssoc($result)) {
 			$usr = new ilPartCertUserData();
 			$usr->setPartCertUsrId($row['usr_id']);
+			$usr->setPartCertUserName($row['login']);
 			$usr->setPartCertFirstname($row['firstname']);
 			$usr->setPartCertLastname($row['lastname']);
 			$usr->setPartCertGender($row['gender']);
@@ -27,11 +30,17 @@ class ilPartCertUsersData {
 	}
 
 
+	/**
+	 * @param array $arr_usr_ids
+	 *
+	 * @return string
+	 */
 	protected static function getSQL(array $arr_usr_ids = array()) {
 		global $DIC;
 		$ilDB = $DIC->database();
 		$select = "select 
 					usr_data.usr_id,
+					usr_data.login,
 					udf_firstname.value as firstname,   
 					udf_lastname.value as lastname,   
 					udf_gender.value as gender
@@ -48,6 +57,11 @@ class ilPartCertUsersData {
 	}
 
 
+	/**
+	 * @param string $gender
+	 *
+	 * @return string
+	 */
 	public static function returnSalutation($gender) {
 		switch ($gender) {
 			case 'Männlich': // TODO lang
@@ -62,5 +76,3 @@ class ilPartCertUsersData {
 		}
 	}
 }
-
-?>

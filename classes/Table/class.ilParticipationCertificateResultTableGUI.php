@@ -90,13 +90,14 @@ class ilParticipationCertificateResultTableGUI extends ilTable2GUI {
 	/**
 	 * Get selectable columns
 	 *
-	 * @return        array    key: column id, val: true/false -> default on/off
+	 * @return array    key: column id, val: true/false -> default on/off
 	 */
 	function getSelectableColumns() {
 
 
 		$cols = array();
 		//$cols['usr_id'] = array( 'txt' => 'usr_id', 'default' => false, 'width' => 'auto', 'sort_field' => 'usr_id' );
+		$cols['loginname'] = array( 'txt' => $this->pl->txt('loginname'), 'default' => false, 'width' => 'auto', 'sort_field' => 'usr_id' );
 		$cols['firstname'] = array( 'txt' => $this->pl->txt('cols_firstname'), 'default' => true, 'width' => 'auto', 'sort_field' => 'firstname' );
 		$cols['lastname'] = array( 'txt' => $this->pl->txt('cols_lastname'), 'default' => true, 'width' => 'auto', 'sort_field' => 'lastname' );
 		$cols['initial_test_finished'] = array(
@@ -140,6 +141,9 @@ class ilParticipationCertificateResultTableGUI extends ilTable2GUI {
 	}
 
 
+	/**
+	 *
+	 */
 	private function addColumns() {
 		$cert_access = new ilParticipationCertificateAccess($_GET['ref_id']);
 		if ($cert_access->hasCurrentUserWriteAccess()) {
@@ -161,6 +165,9 @@ class ilParticipationCertificateResultTableGUI extends ilTable2GUI {
 	}
 
 
+	/**
+	 * @return array
+	 */
 	public function parseData() {
 
 
@@ -176,6 +183,7 @@ class ilParticipationCertificateResultTableGUI extends ilTable2GUI {
 		foreach ($this->usr_ids as $usr_id) {
 			$row = array();
 			$row['usr_id'] = $usr_id;
+			$row['loginname'] = $arr_usr_data[$usr_id]->getPartCertUserName();
 			if ($row['firstname'] = $arr_usr_data[$usr_id]->getPartCertFirstname() != NULL) {
 				$row['firstname'] = $arr_usr_data[$usr_id]->getPartCertFirstname();
 			} else {
@@ -395,9 +403,9 @@ class ilParticipationCertificateResultTableGUI extends ilTable2GUI {
 
 
 	/**
-	 * @param object $a_worksheet
-	 * @param int    $a_row
-	 * @param array  $a_set
+	 * @param ilExcel $a_excel
+	 * @param int     $a_row
+	 * @param array   $a_set
 	 */
 	protected function fillRowExcel(ilExcel $a_excel, &$a_row, $a_set) {
 		$col = 0;
@@ -431,6 +439,9 @@ class ilParticipationCertificateResultTableGUI extends ilTable2GUI {
 	}
 
 
+	/**
+	 *
+	 */
 	public function initFilter() {
 		$firstname = new ilTextInputGUI($this->pl->txt('firstname'), 'firstname');
 		$lastname = new ilTextInputGUI($this->pl->txt('lastname'), 'lastname');
@@ -447,7 +458,7 @@ class ilParticipationCertificateResultTableGUI extends ilTable2GUI {
 
 
 	/**
-	 * @param $item
+	 * @param ilFormPropertyGUI $item
 	 */
 	public function addAndReadFilterItem($item) {
 		$this->addFilterItem($item);
@@ -475,6 +486,10 @@ class ilParticipationCertificateResultTableGUI extends ilTable2GUI {
 	}
 
 
+	/**
+	 * @param int  $format
+	 * @param bool $send
+	 */
 	public function exportData($format, $send = false) {
 		if (array_key_exists($format, $this->custom_export_formats)) {
 			if ($this->dataExists()) {
@@ -492,9 +507,9 @@ class ilParticipationCertificateResultTableGUI extends ilTable2GUI {
 
 
 	/**
-	 * @param       $export_format_key
-	 * @param       $custom_export_generators
-	 * @param array $params
+	 * @param string $export_format_key
+	 * @param object $custom_export_generators
+	 * @param array  $params
 	 */
 	public function addCustomExportGenerator($export_format_key, $custom_export_generators, $params = array()) {
 		$this->custom_export_generators[$export_format_key] = array( 'generator' => $custom_export_generators, 'params' => $params );
@@ -502,8 +517,8 @@ class ilParticipationCertificateResultTableGUI extends ilTable2GUI {
 
 
 	/**
-	 * @param $custom_export_format_key
-	 * @param $custom_export_format_label
+	 * @param string $custom_export_format_key
+	 * @param string $custom_export_format_label
 	 */
 	public function addCustomExportFormat($custom_export_format_key, $custom_export_format_label) {
 		$this->custom_export_formats[$$custom_export_format_key] = $custom_export_format_label;

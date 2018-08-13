@@ -100,6 +100,10 @@ class ilParticipationCertificateSingleResultTableGUI extends ilTable2GUI {
 
 		$arr_usr_data = ilPartCertUsersData::getData($this->usr_ids);
 		$nameUser = $arr_usr_data[$usr_id]->getPartCertFirstname() . ' ' . $arr_usr_data[$usr_id]->getPartCertLastname();
+		if ($nameUser == ' ') {
+			$nameUser = $this->pl->txt('loginname') . ' ' . $arr_usr_data[$usr_id]->getPartCertUserName();
+		}
+
 		$this->setTitle($this->pl->txt('result_for ') . ' ' . $nameUser);
 
 		$this->addColumns();
@@ -110,7 +114,7 @@ class ilParticipationCertificateSingleResultTableGUI extends ilTable2GUI {
 	/**
 	 * Get selectable columns
 	 *
-	 * @return        array    key: column id, val: true/false -> default on/off
+	 * @return array    key: column id, val: true/false -> default on/off
 	 */
 	function getSelectableColumns() {
 		$cols = array();
@@ -142,6 +146,9 @@ class ilParticipationCertificateSingleResultTableGUI extends ilTable2GUI {
 	}
 
 
+	/**
+	 * @return array
+	 */
 	function sortColumns() {
 		//First sort scores
 		$scores = NewLearningObjectiveScores::getData($this->usr_id);
@@ -172,6 +179,9 @@ class ilParticipationCertificateSingleResultTableGUI extends ilTable2GUI {
 	}
 
 
+	/**
+	 *
+	 */
 	private function addColumns() {
 		foreach ($this->getSelectableColumns() as $k => $v) {
 			if ($this->isColumnSelected($k)) {
@@ -186,6 +196,9 @@ class ilParticipationCertificateSingleResultTableGUI extends ilTable2GUI {
 	}
 
 
+	/**
+	 * @return array
+	 */
 	public function parseData() {
 
 		$arr_FinalTestsStates = ilLearnObjectFinalTestStates::getData($this->usr_ids);
@@ -235,6 +248,13 @@ class ilParticipationCertificateSingleResultTableGUI extends ilTable2GUI {
 	}
 
 
+	/**
+	 * @param object $points
+	 * @param object $test_obj
+	 * @param object $tries
+	 *
+	 * @return string
+	 */
 	protected function buildProgressBar($points, $test_obj, $tries) {
 		//Holt von allen Tests das minimum um zu bestehen
 		$mark = TestMarks::getData($test_obj);
@@ -306,6 +326,12 @@ class ilParticipationCertificateSingleResultTableGUI extends ilTable2GUI {
 	}
 
 
+	/**
+	 * @param int $id
+	 * @param array $array
+	 *
+	 * @return bool
+	 */
 	function searchForId($id, $array) {
 		foreach ($array as $key => $val) {
 			if ($val->getSuggObjectiveId() === $id) {
@@ -316,5 +342,3 @@ class ilParticipationCertificateSingleResultTableGUI extends ilTable2GUI {
 		return false;
 	}
 }
-
-?>
