@@ -97,7 +97,7 @@ class ilParticipationCertificateResultTableGUI extends ilTable2GUI {
 
 		$cols = array();
 		//$cols['usr_id'] = array( 'txt' => 'usr_id', 'default' => false, 'width' => 'auto', 'sort_field' => 'usr_id' );
-		$cols['loginname'] = array( 'txt' => $this->pl->txt('loginname'), 'default' => false, 'width' => 'auto', 'sort_field' => 'usr_id' );
+		$cols['loginname'] = array( 'txt' => $this->pl->txt('loginname'), 'default' => false, 'width' => 'auto', 'sort_field' => 'loginname' );
 		$cols['firstname'] = array( 'txt' => $this->pl->txt('cols_firstname'), 'default' => true, 'width' => 'auto', 'sort_field' => 'firstname' );
 		$cols['lastname'] = array( 'txt' => $this->pl->txt('cols_lastname'), 'default' => true, 'width' => 'auto', 'sort_field' => 'lastname' );
 		$cols['initial_test_finished'] = array(
@@ -307,7 +307,7 @@ class ilParticipationCertificateResultTableGUI extends ilTable2GUI {
 				if ($current <= $end) {
 					// Running
 					$rest_days = $end->diff($current)->days;
-					$total_days = $end->diff($start)->days;
+					$total_days = max(1, $end->diff($start)->days);
 					//$past_days = ($total_days - $rest_days);
 
 					$a_perc_limit = (100 - ($rest_days / $total_days * 100));
