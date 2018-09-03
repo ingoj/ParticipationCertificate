@@ -145,10 +145,7 @@ class ilParticipationCertificateResultTableGUI extends ilTable2GUI {
 	 *
 	 */
 	private function addColumns() {
-		$cert_access = new ilParticipationCertificateAccess($_GET['ref_id']);
-		if ($cert_access->hasCurrentUserWriteAccess()) {
-			$this->addColumn('', '', '', true);
-		}
+		$this->addColumn('', '', '', true);
 		foreach ($this->getSelectableColumns() as $k => $v) {
 			if ($this->isColumnSelected($k)) {
 				if (isset($v['sort_field'])) {
