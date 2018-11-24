@@ -57,11 +57,14 @@
 {% endif %}
 <div class="date"> <p>{{text_values.page1_location_date}}</p>  </div>
 <div id="signature">
+  {% if text_values.page1_issuer_signature %}
   <img alt="" src="{{text_values.page1_issuer_signature}}"/><br/>
+  {% endif %}
   <p>{{text_values.page1_issuer_name}}<br/>
   <b>{{text_values.page1_issuer_title}}</b><br/><br/>
   </p>
 </div>
+  <br/>{{text_values.page1_disclaimer}}<br/>
   {% if show_footer %}
   <div class="footer"><i>{{text_values.footer_config}}</i></div>
   {% endif %}
@@ -113,7 +116,7 @@
   </tr>
   </table>
 </div>
-<br/>text_values.page1_disclaimer<br/>
+<br/>{{text_values.page1_disclaimer}}<br/>
 {% endif %}
   {% if show_footer %}
   <div class="footer"><i>{{text_values.footer_config}}</i></div>
