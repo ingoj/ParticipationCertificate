@@ -1,6 +1,8 @@
 <?php
 require_once __DIR__ . "/../vendor/autoload.php";
 
+use srag\Plugins\UserDefaults\UserSearch\usrdefObj;
+
 class ilParticipationCertificateAccess {
 
 	/**

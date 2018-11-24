@@ -93,7 +93,7 @@ class ilParticipationCertificateResultGUI {
 				$ret2 = $this->ctrl->forwardCommand($ilParticipationCertificateGUI);
 				$this->tabs->activateTab(self::CMD_OVERVIEW);
 				break;
-			case strtolower(ilParticipationCertificateResultGUI::class):
+			case strtolower(ilparticipationcertificatesingleresultgui::class):
 				$ilparticipationcertificateresultoverviewgui = new ilParticipationCertificateSingleResultGUI();
 				$ret3 = $this->ctrl->forwardCommand($ilparticipationcertificateresultoverviewgui);
 				break;

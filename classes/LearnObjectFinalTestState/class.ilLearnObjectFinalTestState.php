@@ -1,4 +1,5 @@
 <?php
+
 class ilLearnObjectFinalTestState {
 	/**
 	 * @var int

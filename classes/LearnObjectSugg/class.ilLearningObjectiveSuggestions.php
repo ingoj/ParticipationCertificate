@@ -1,5 +1,5 @@
 <?php
-
+use srag\Plugins\UserDefaults\UserSearch\usrdefObj;
 use SRAG\ILIAS\Plugins\LearningObjectiveSuggestions\Suggestion\LearningObjectiveSuggestion;
 
 class ilLearningObjectiveSuggestions {

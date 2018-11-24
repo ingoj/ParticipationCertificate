@@ -1,4 +1,5 @@
 <?php
+use srag\Plugins\UserDefaults\UserSearch\usrdefObj;
 
 class ilCrsInitialTestStates {
 
