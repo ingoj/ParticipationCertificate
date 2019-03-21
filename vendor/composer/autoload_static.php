@@ -489,6 +489,7 @@ class ComposerStaticInit9caaefbd715a46c2eca1e02fe5bdbce3
         'ilParticipationCertificateGlobalConfigs' => __DIR__ . '/../..' . '/classes/class.ilParticipationCertificateGlobalConfigs.php',
         'ilParticipationCertificateMultipleResultGUI' => __DIR__ . '/../..' . '/classes/MultipleResultTable/class.ilParticipationCertificateMultipleResultGUI.php',
         'ilParticipationCertificateMultipleResultTableGUI' => __DIR__ . '/../..' . '/classes/MultipleResultTable/class.ilParticipationCertificateMultipleResultTableGUI.php',
+        'ilParticipationCertificateObjectConfig' => __DIR__ . '/../..' . '/classes/class.ilParticipationCertificateObjectConfig.php',
         'ilParticipationCertificatePDFGenerator' => __DIR__ . '/../..' . '/classes/Report/class.ilParticipationCertificatePDFGenerator.php',
         'ilParticipationCertificatePlugin' => __DIR__ . '/../..' . '/classes/class.ilParticipationCertificatePlugin.php',
         'ilParticipationCertificateResultGUI' => __DIR__ . '/../..' . '/classes/Table/class.ilParticipationCertificateResultGUI.php',

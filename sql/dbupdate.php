@@ -298,3 +298,10 @@ $part_cert_global = ilParticipationCertificateGlobalConfig::where(["order_by" =>
 $part_cert_global->setActive(1);
 $part_cert_global->store();
 ?>
+<#29>
+<?php
+require_once "Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/ParticipationCertificate/vendor/autoload.php";
+ilParticipationCertificateObjectConfig::updateDB();
+?>
+
+

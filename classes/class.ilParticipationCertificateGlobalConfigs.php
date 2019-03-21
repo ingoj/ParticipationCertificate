@@ -28,6 +28,18 @@ class ilParticipationCertificateGlobalConfigs {
 
 
 	/**
+	 * @return ilParticipationCertificateGlobalConfig
+	 */
+	public function getDefaultConfig() {
+		/**
+		 * @var ilParticipationCertificateGlobalConfig $gl_config
+		 */
+		$gl_config = ilParticipationCertificateGlobalConfig::where(['order_by' => 1])->first();
+		return $gl_config;
+	}
+
+
+	/**
 	 * @param array $arr_order_by
 	 *
 	 * @throws Exception

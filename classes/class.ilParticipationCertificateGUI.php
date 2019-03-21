@@ -20,7 +20,11 @@ class ilParticipationCertificateGUI {
 	const CMD_SELF_PRINT = 'selfPrint';
 	const CMD_SELF_PRINT_SAVE = 'saveSelfPrint';
 	const CMD_DISPLAY = 'display';
-	const CMD_RESET_CERT_TEXT = 'resetCertText';
+
+	const CMD_SET_CERT_TEMPLATE = 'setCertTemplate';
+	const CMD_SET_OWN_CERT_TEXT_FROM_TEMPLATE = 'setOwnCertTextFromTemplate';
+
+
 	/*const CMD_PRINT_PDF = 'printPdf';
 	const CMD_PRINT_PDF_WITHOUT_MENTORING = 'printPdfWithoutMentoring';*/
 	const TAB_CONFIG = 'config';
@@ -113,7 +117,8 @@ class ilParticipationCertificateGUI {
 					case self::CMD_CONFIG:
 					case self::CMD_PERIOD:
 					case self::CMD_DISPLAY:
-					case self::CMD_RESET_CERT_TEXT:
+					case self::CMD_SET_CERT_TEMPLATE:
+					case self::CMD_SET_OWN_CERT_TEXT_FROM_TEMPLATE:
 					case self::CMD_SAVE:
 					case self::CMD_PERIOD_SAVE:
 					case self::CMD_SELF_PRINT:
@@ -196,50 +201,35 @@ class ilParticipationCertificateGUI {
 	public function initForm() {
 		$form = new ilPropertyFormGUI();
 
-		/*
-		$b_print = ilLinkButton::getInstance();
-		$b_print->setCaption($this->pl->txt('header_btn_print'), false);
-		$b_print->setUrl($this->ctrl->getLinkTarget($this, self::CMD_PRINT_PDF));
-		$this->toolbar->addButtonInstance($b_print);
+		$this->toolbar->setFormAction($this->ctrl->getFormAction($this,  self::CMD_CONFIG));
 
-		$b_print = ilLinkButton::getInstance();
-		$b_print->setCaption($this->pl->txt('header_btn_print_eMentoring'), false);
-		$b_print->setUrl($this->ctrl->getLinkTarget($this, self::CMD_PRINT_PDF_WITHOUT_MENTORING));
-		$this->toolbar->addButtonInstance($b_print);
-		*/
-
-		$dropdown = new ilSelectInputGUI($this->pl->txt("choose_template"),"choose_template");
+		$dropdown = new ilSelectInputGUI($this->pl->txt("choose_template"),"global_template_id");
 		$cert_global_configs = new ilParticipationCertificateGlobalConfigs();
 		$dropdown->setOptions($cert_global_configs->getSelectOptions());
-
 		$this->toolbar->addInputItem($dropdown);
 
-
-		$button = ilLinkButton::getInstance();
+		$button = ilSubmitButton::getInstance();
+		$button->setCommand(self::CMD_SET_CERT_TEMPLATE);
 		$button->setCaption($this->pl->txt('btn_reset'), false);
-		$button->setUrl($this->ctrl->getLinkTarget($this, self::CMD_RESET_CERT_TEXT));
 		$this->toolbar->addButtonInstance($button);
 
-		$form->setFormAction($this->ctrl->getFormAction($this));
+		$button = ilSubmitButton::getInstance();
+		$button->setCommand(self::CMD_SET_OWN_CERT_TEXT_FROM_TEMPLATE);
+		$button->setCaption($this->pl->txt('btn_reset'), false);
+		$this->toolbar->addButtonInstance($button);
 
+
+
+
+		$form->setFormAction($this->ctrl->getFormAction($this));
 		$form->setTitle($this->pl->txt('config_plugin'));
 		$form->setDescription($this->pl->txt("placeholders") . ' <br>
 		&lbrace;&lbrace;username&rbrace;&rbrace;: Anrede Vorname Nachname <br>
 		&lbrace;&lbrace;date&rbrace;&rbrace;: Datum
-		'); // TODO lang
+		');
 
-		$arr_config = ilParticipationCertificateConfig::where(array(
-			"config_type" => ilParticipationCertificateConfig::CONFIG_TYPE_GROUP,
-			"group_ref_id" => $this->groupRefId,
-			"config_value_type" => ilParticipationCertificateConfig::CONFIG_VALUE_TYPE_CERT_TEXT
-		))->orderBy('id')->get();
-		if (count($arr_config) == 0) {
-			$arr_config = ilParticipationCertificateConfig::where(array(
-				"config_type" => ilParticipationCertificateConfig::CONFIG_TYPE_GLOBAL,
-				"group_ref_id" => 0,
-				"config_value_type" => ilParticipationCertificateConfig::CONFIG_VALUE_TYPE_CERT_TEXT
-			))->orderBy('id')->get();
-		}
+		$cert_configs = new ilParticipationCertificateConfigs();
+		$arr_config = $cert_configs->getObjConfigSetIfNoneCreateDefault($this->groupRefId);
 
 		foreach ($arr_config as $config) {
 			/**
@@ -392,7 +382,8 @@ class ilParticipationCertificateGUI {
 	/**
 	 *
 	 */
-	public function resetCertText() {
+	public function setCertTemplate() {
+
 		$arr_config = ilParticipationCertificateConfig::where(array(
 			"config_type" => ilParticipationCertificateConfig::CONFIG_TYPE_GROUP,
 			"group_ref_id" => $this->groupRefId,
@@ -407,7 +398,6 @@ class ilParticipationCertificateGUI {
 					case "page1_issuer_signature":
 						ilParticipationCertificateConfig::deletePicture($config->getGroupRefId(), $config->getConfigKey() . ".png");
 						break;
-
 					default:
 						break;
 				}
@@ -415,8 +405,29 @@ class ilParticipationCertificateGUI {
 				$config->delete();
 			}
 		}
+
+		if($global_template_id = filter_input(INPUT_POST,'global_template_id')) {
+
+			/**
+			 *  @var ilParticipationCertificateObjectConfig $part_cert_config
+			 */
+			$part_cert_config = ilParticipationCertificateObjectConfig::where(['obj_ref_id' => $this->groupRefId])->first();
+			if(!is_object($part_cert_config)) {
+				$part_cert_config = new ilParticipationCertificateObjectConfig();
+			}
+			$part_cert_config->setObjRefId($this->groupRefId);
+			$part_cert_config->setConfigType(ilParticipationCertificateObjectConfig::CONFIG_TYPE_TEMPLATE);
+			$part_cert_config->setGlConfTemplateId($global_template_id);
+			$part_cert_config->store();
+		}
+
+
 		ilUtil::sendSuccess($this->pl->txt('successForm'), true);
 		$this->ctrl->redirect($this, self::CMD_DISPLAY);
+	}
+
+	public function setOwnCertTextFromTemplate() {
+
 	}
 
 

@@ -452,6 +452,7 @@ return array(
     'ilParticipationCertificateGlobalConfigs' => $baseDir . '/classes/class.ilParticipationCertificateGlobalConfigs.php',
     'ilParticipationCertificateMultipleResultGUI' => $baseDir . '/classes/MultipleResultTable/class.ilParticipationCertificateMultipleResultGUI.php',
     'ilParticipationCertificateMultipleResultTableGUI' => $baseDir . '/classes/MultipleResultTable/class.ilParticipationCertificateMultipleResultTableGUI.php',
+    'ilParticipationCertificateObjectConfig' => $baseDir . '/classes/class.ilParticipationCertificateObjectConfig.php',
     'ilParticipationCertificatePDFGenerator' => $baseDir . '/classes/Report/class.ilParticipationCertificatePDFGenerator.php',
     'ilParticipationCertificatePlugin' => $baseDir . '/classes/class.ilParticipationCertificatePlugin.php',
     'ilParticipationCertificateResultGUI' => $baseDir . '/classes/Table/class.ilParticipationCertificateResultGUI.php',
