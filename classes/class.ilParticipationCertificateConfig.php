@@ -140,6 +140,15 @@ class ilParticipationCertificateConfig extends ActiveRecord {
 	 * @con_is_notnull  true
 	 * @db_length       8
 	 */
+	protected $global_config_id = 0;
+	/**
+	 * @var int
+	 *
+	 * @db_has_field    true
+	 * @db_fieldtype    integer
+	 * @con_is_notnull  true
+	 * @db_length       8
+	 */
 	protected $config_value_type;
 	/**
 	 * @var string
@@ -358,6 +367,22 @@ class ilParticipationCertificateConfig extends ActiveRecord {
 	/**
 	 * @return int
 	 */
+	public function getGlobalConfigId() {
+		return $this->global_config_id;
+	}
+
+
+	/**
+	 * @param int $global_config_id
+	 */
+	public function setGlobalConfigId($global_config_id) {
+		$this->global_config_id = $global_config_id;
+	}
+
+
+	/**
+	 * @return int
+	 */
 	public function getOrderBy() {
 		return $this->order_by;
 	}
@@ -398,7 +423,19 @@ class ilParticipationCertificateConfig extends ActiveRecord {
 			'page2_box2_title' => 'Studienvorbereitung – eMentoring',
 			'page2_box2_row1' => 'Aktive Teilnahme an Videokonferenzen',
 			'page2_box2_row2' => 'Bearbeitung der Aufgaben zu überfachlichen Themen:',
-			'footer_config' => 'Die Resultate dieser Bescheinigung wurden manuell berechnet.'
+			'footer_config' => 'Die Resultate dieser Bescheinigung wurden manuell berechnet.',
+		);
+	}
+
+	public static function returnDefaultValuesTypeOther() {
+
+		return array(
+			'udf_firstname' => 0,
+			'udf_lastname' => 0,
+			'udf_gender' => 0,
+			'percent_value' => 0,
+			'color' => '73B249',
+			'keyword' => 'Lerngruppe'
 		);
 	}
 

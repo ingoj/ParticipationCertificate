@@ -262,3 +262,39 @@ while ($row = $this->db->fetchAssoc($result)) {
 	}
 }
 ?>
+<#25>
+<?php
+require_once "Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/ParticipationCertificate/vendor/autoload.php";
+ilParticipationCertificateConfig::updateDB();
+
+//Set Config ID of Default Config to 1.
+foreach (ilParticipationCertificateConfig::where(array(
+	"config_type" => ilParticipationCertificateConfig::CONFIG_TYPE_GLOBAL,
+	"group_ref_id" => 0
+))->orderBy('order_by')->get() as $config) {
+	$config->setGlobalConfigId(1);
+	$config->update();
+}
+?>
+<#26>
+<?php
+require_once "Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/ParticipationCertificate/vendor/autoload.php";
+ilParticipationCertificateGlobalConfig::updateDB();
+?>
+<#27>
+<?php
+require_once "Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/ParticipationCertificate/vendor/autoload.php";
+$global_config = new ilParticipationCertificateGlobalConfig();
+$global_config->setId(1);
+$global_config->setOrderBy(1);
+$global_config->setTitle("Default");
+$global_config->store();
+?>
+<#28>
+<?php
+require_once "Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/ParticipationCertificate/vendor/autoload.php";
+ilParticipationCertificateGlobalConfig::updateDB();
+$part_cert_global = ilParticipationCertificateGlobalConfig::where(["order_by" => 1])->first();
+$part_cert_global->setActive(1);
+$part_cert_global->store();
+?>

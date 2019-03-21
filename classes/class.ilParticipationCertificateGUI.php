@@ -208,6 +208,13 @@ class ilParticipationCertificateGUI {
 		$this->toolbar->addButtonInstance($b_print);
 		*/
 
+		$dropdown = new ilSelectInputGUI($this->pl->txt("choose_template"),"choose_template");
+		$cert_global_configs = new ilParticipationCertificateGlobalConfigs();
+		$dropdown->setOptions($cert_global_configs->getSelectOptions());
+
+		$this->toolbar->addInputItem($dropdown);
+
+
 		$button = ilLinkButton::getInstance();
 		$button->setCaption($this->pl->txt('btn_reset'), false);
 		$button->setUrl($this->ctrl->getLinkTarget($this, self::CMD_RESET_CERT_TEXT));

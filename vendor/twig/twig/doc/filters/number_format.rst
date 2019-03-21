@@ -37,8 +37,8 @@ These defaults can be easily changed through the core extension:
 
 .. code-block:: php
 
-    $twig = new Twig_Environment($loader);
-    $twig->getExtension('Twig_Extension_Core')->setNumberFormat(3, '.', ',');
+    $twig = new \Twig\Environment($loader);
+    $twig->getExtension('\Twig\Extension\CoreExtension')->setNumberFormat(3, '.', ',');
 
     // before Twig 1.26
     $twig->getExtension('core')->setNumberFormat(3, '.', ',');
@@ -53,4 +53,4 @@ Arguments
 * ``decimal_point``: The character(s) to use for the decimal point
 * ``thousand_sep``:   The character(s) to use for the thousands separator
 
-.. _`number_format`: http://php.net/number_format
+.. _`number_format`: https://secure.php.net/number_format
