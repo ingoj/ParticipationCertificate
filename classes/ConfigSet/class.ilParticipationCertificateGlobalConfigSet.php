@@ -5,7 +5,7 @@
  *
  * @author Martin Studer <ms@studer-raimann.ch>
  */
-class ilParticipationCertificateGlobalConfig extends ActiveRecord {
+class ilParticipationCertificateGlobalConfigSet extends ActiveRecord {
 
 	const TABLE_NAME = 'dhbw_part_cert_gl_conf';
 
@@ -126,5 +126,26 @@ class ilParticipationCertificateGlobalConfig extends ActiveRecord {
 	 */
 	public function setActive($active) {
 		$this->active = $active;
+	}
+
+
+	/**
+	 * @return ilParticipationCertificateGlobalConfigSet
+	 */
+	public function duplicate() {
+
+		$gl_configs = new ilParticipationCertificateGlobalConfigSets();
+		$gl_config = $gl_configs->addNewConfig();
+		$gl_config->setTitle("untitled");
+		$gl_config->store();
+
+		$configs = new ilParticipationCertificateConfigs();
+
+		foreach($configs->getGlobalConfigSet($this->getId()) as $config) {
+			$config->setGlobalConfigId($gl_config->getId());
+			$config->create();
+		}
+
+		return $gl_config;
 	}
 }

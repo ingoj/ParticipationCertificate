@@ -5,22 +5,22 @@
  *
  * @author Martin Studer <ms@studer-raimann.ch>
  */
-class ilParticipationCertificateGlobalConfigs {
+class ilParticipationCertificateGlobalConfigSets {
 
 	public function __construct() {
 
 	}
 
 	public function getAllConfigsAsArray() {
-		return ilParticipationCertificateGlobalConfig::orderBy('order_by')->getArray();
+		return ilParticipationCertificateGlobalConfigSet::orderBy('order_by')->getArray();
 	}
 
 
 	/**
-	 * @return ilParticipationCertificateGlobalConfig
+	 * @return ilParticipationCertificateGlobalConfigSet
 	 */
 	public function addNewConfig() {
-			$gl_config = new ilParticipationCertificateGlobalConfig;
+			$gl_config = new ilParticipationCertificateGlobalConfigSet;
 			$gl_config->setOrderBy($this->getUnreservedOrderByValue());
 			$gl_config->store();
 			return $gl_config;
@@ -28,13 +28,13 @@ class ilParticipationCertificateGlobalConfigs {
 
 
 	/**
-	 * @return ilParticipationCertificateGlobalConfig
+	 * @return ilParticipationCertificateGlobalConfigSet
 	 */
 	public function getDefaultConfig() {
 		/**
-		 * @var ilParticipationCertificateGlobalConfig $gl_config
+		 * @var ilParticipationCertificateGlobalConfigSet $gl_config
 		 */
-		$gl_config = ilParticipationCertificateGlobalConfig::where(['order_by' => 1])->first();
+		$gl_config = ilParticipationCertificateGlobalConfigSet::where(['order_by' => 1])->first();
 		return $gl_config;
 	}
 
@@ -56,16 +56,16 @@ class ilParticipationCertificateGlobalConfigs {
 				$order_by = $order_by + 1;
 			}
 
-			$part_cert_config = new ilParticipationCertificateGlobalConfig($id);
+			$part_cert_config = new ilParticipationCertificateGlobalConfigSet($id);
 			$part_cert_config->setOrderBy($order_by);
 			$part_cert_config->store();
 			$arr_reserved[] = $order_by;
 		}
 
 		$i = 1;
-		foreach(ilParticipationCertificateGlobalConfig::orderBy('order_by')->get() as $global_config) {
+		foreach(ilParticipationCertificateGlobalConfigSet::orderBy('order_by')->get() as $global_config) {
 			/**
-			 * @var ilParticipationCertificateGlobalConfig $global_config
+			 * @var ilParticipationCertificateGlobalConfigSet $global_config
 			 */
 			$global_config->setOrderBy($i);
 			if($i === 1) {
@@ -83,9 +83,9 @@ class ilParticipationCertificateGlobalConfigs {
 	 */
 	public function getUnreservedOrderByValue() {
 		/**
-		 * @var ilParticipationCertificateGlobalConfig $config
+		 * @var ilParticipationCertificateGlobalConfigSet $config
 		 */
-		$config = ilParticipationCertificateGlobalConfig::orderBy('order_by','DESC')->first();
+		$config = ilParticipationCertificateGlobalConfigSet::orderBy('order_by','DESC')->first();
 		return $config->getOrderBy() + 1;
 	}
 
@@ -93,9 +93,9 @@ class ilParticipationCertificateGlobalConfigs {
 
 		$arr_select_options = [];
 
-		foreach(ilParticipationCertificateGlobalConfig::where(['active' => 1])->orderBy('order_by')->get() as $global_config) {
+		foreach(ilParticipationCertificateGlobalConfigSet::where(['active' => 1])->orderBy('order_by')->get() as $global_config) {
 			/**
-			 * @var ilParticipationCertificateGlobalConfig $global_config
+			 * @var ilParticipationCertificateGlobalConfigSet $global_config
 			 */
 			$arr_select_options[$global_config->getId()] = $global_config->getTitle();
 		}

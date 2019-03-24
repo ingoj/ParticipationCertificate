@@ -89,7 +89,7 @@ class ilParticipationCertificateTwigParser {
 
 
 	public function parseData() {
-		$arr_text_values = ilParticipationCertificateConfig::returnTextValues($this->group_ref_id, ilParticipationCertificateConfig::CONFIG_TYPE_GROUP);
+		$arr_text_values = ilParticipationCertificateConfig::returnTextValues($this->group_ref_id, ilParticipationCertificateConfig::CONFIG_SET_TYPE_GROUP);
 		$arr_percent_value = ilParticipationCertificateConfig::returnStandardValue();
 
 		$arr_iass_multi = ilIassStatesMulti::getData($this->usr_ids);

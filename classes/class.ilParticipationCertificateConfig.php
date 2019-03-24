@@ -9,9 +9,11 @@ class ilParticipationCertificateConfig extends ActiveRecord {
 
 	const TABLE_NAME = 'dhbw_part_cert_conf';
 	const LOGO_FILE_NAME = "pic.png";
-	const CONFIG_TYPE_GLOBAL = 1;
-	const CONFIG_TYPE_GROUP = 2;
-	const CONFIG_TYPE_OTHER = 3;
+
+	const CONFIG_SET_TYPE_TEMPLATE = 1;
+	const CONFIG_SET_TYPE_GROUP = 2;
+	const CONFIG_SET_TYPE_GLOBAL = 3;
+
 	const CONFIG_VALUE_TYPE_CERT_TEXT = 1;
 	const CONFIG_VALUE_TYPE_OTHER = 2;
 
@@ -32,6 +34,10 @@ class ilParticipationCertificateConfig extends ActiveRecord {
 		return self::TABLE_NAME;
 	}
 
+	public function __construct($primary_key = 0, arConnector $connector = null) {
+		parent::__construct($primary_key, $connector);
+	}
+
 
 	/**
 	 * @param string      $config_key
@@ -42,7 +48,7 @@ class ilParticipationCertificateConfig extends ActiveRecord {
 	 *
 	 * @return string|null
 	 */
-	static function getConfig($config_key, $group_ref_id = 0, $config_type = self::CONFIG_TYPE_OTHER, $config_value_type = self::CONFIG_VALUE_TYPE_OTHER, $default = NULL) {
+	static function getConfig($config_key, $group_ref_id = 0, $config_type = self::CONFIG_SET_TYPE_GROUP, $config_value_type = self::CONFIG_VALUE_TYPE_OTHER, $default = NULL) {
 		/**
 		 * @var ilParticipationCertificateConfig|null $config
 		 */
@@ -70,7 +76,7 @@ class ilParticipationCertificateConfig extends ActiveRecord {
 	 * @param int         $config_value_type
 	 * @param int         $group_ref_id
 	 */
-	static function setConfig($config_key, $config_value, $group_ref_id = 0, $config_type = self::CONFIG_TYPE_OTHER, $config_value_type = self::CONFIG_VALUE_TYPE_OTHER) {
+	static function setConfig($config_key, $config_value, $group_ref_id = 0, $config_type = self::CONFIG_SET_TYPE_GROUP, $config_value_type = self::CONFIG_VALUE_TYPE_OTHER) {
 		/**
 		 * @var ilParticipationCertificateConfig|null $config
 		 */
@@ -131,7 +137,7 @@ class ilParticipationCertificateConfig extends ActiveRecord {
 	 * @con_is_notnull  true
 	 * @db_length       8
 	 */
-	protected $group_ref_id;
+	protected $group_ref_id = 0;
 	/**
 	 * @var int
 	 *
@@ -396,46 +402,15 @@ class ilParticipationCertificateConfig extends ActiveRecord {
 	}
 
 
-	public static function returnDefaultValues() {
-		// TODO lang
-		return array(
-			'page1_title' => 'Teilnahmebescheinigung',
-			'page1_introduction1' => '{{username}}, hat am Studienvorbereitungsprogramm mit Schwerpunkt „Mathematik“ auf der Lernplattform studienvorbereitung.dhbw.de teilgenommen.',
-			'page1_introduction2' => 'Die Teilnahme vor Studienbeginn an der DHBW Karlsruhe umfasste:',
-			'page1_box1_title' => 'Studienvorbereitung - Mathematik:',
-			'page1_box1_row1' => 'Abschluss Diagnostischer Einstiegstest Mathematik',
-			'page1_box1_row2' => 'Bearbeitung von empfohlenen Mathematik- Lernmodulen',
-			'page1_box2_title' => 'Studienvorbereitung -  eMentoring:',
-			'page1_box2_row1' => 'Aktive Teilnahme an Videokonferenzen',
-			'page1_box2_row2' => 'Bearbeitung der Aufgaben zu überfachlichen Themen:',
-			'page1_location_date' => 'Karlsruhe, den {{date}}',
-			'page1_issuer_name' => 'Max Mustermann',
-			'page1_issuer_title' => '(Education Support Center)',
-			'page1_issuer_signature' => '',
-			'page1_disclaimer' => '',
-			'page2_title' => 'Erläuterungen zur Bescheinigung',
-			'page2_introduction1' => 'Das  Studienvorbereitungsprogramm  mit  Schwerpunkt  Mathematik  auf  der  Lernplattform studienstart.dhbw.de,  richtet  sich  an  Studienanfänger/-innen der  Wirtschaftsinformatik  der DHBW Karlsruhe. Die Teilnehmer/-innen des Programms erhalten die Möglichkeit sich bereits vor  Studienbeginn,  Studientechniken anzueignen  sowie  das  fehlende  Vorwissen  im  Fach  „Mathematik“  aufzuarbeiten.  Dadurch  haben Studierende  mehr  Zeit  ihre  Wissenslücken  in  Mathematik zu schließen und sich mit dem neuen Lernen auseinanderzusetzen.',
-			'page2_introduction2' => 'Ziel des Programms ist es,  Studienanfänger/-innen vor Studienbeginn auf das Fach Mathematik im Studium vorzubereiten. Neben der Vermittlung von mathematischen Inhalten, fördert der Online-Vorkurs  überfachliche  Kompetenzen  wie  Zeitmanagement  und  Lerntechniken  sowie  die Fähigkeit zum Selbststudium.',
-			'page2_introduction3' => '{{username}} hat im Rahmen des Studienvorbereitungsprogramms mit Schwerpunkt Mathematik mit folgenden Aufgabenstellungen teilgenommen:',
-			'page2_box1_title' => 'Studienvorbereitung – Mathematik',
-			'page2_box1_row1' => 'Abschluss Diagnostischer Einstiegstest Mathematik',
-			'page2_box1_row2' => 'Bearbeitung von empfohlenen Mathematik- Lernmodulen',
-			'page2_box2_title' => 'Studienvorbereitung – eMentoring',
-			'page2_box2_row1' => 'Aktive Teilnahme an Videokonferenzen',
-			'page2_box2_row2' => 'Bearbeitung der Aufgaben zu überfachlichen Themen:',
-			'footer_config' => 'Die Resultate dieser Bescheinigung wurden manuell berechnet.',
-		);
-	}
-
 	public static function returnDefaultValuesTypeOther() {
 
 		return array(
 			'udf_firstname' => 0,
 			'udf_lastname' => 0,
 			'udf_gender' => 0,
-			'percent_value' => 0,
 			'color' => '73B249',
-			'keyword' => 'Lerngruppe'
+			'keyword' => 'Lerngruppe',
+			'Logo' => null,
 		);
 	}
 
@@ -444,7 +419,7 @@ class ilParticipationCertificateConfig extends ActiveRecord {
 	 * @param group_ref_id
 	 * @param $config_type
 	 */
-	public static function returnTextValues($group_ref_id = 0, $config_type = self::CONFIG_TYPE_GLOBAL) {
+	public static function returnTextValues($group_ref_id = 0, $config_type = self::CONFIG_SET_TYPE_TEMPLATE) {
 		$arr_config = ilParticipationCertificateConfig::where(array(
 			"config_type" => $config_type,
 			"group_ref_id" => $group_ref_id,
@@ -452,7 +427,7 @@ class ilParticipationCertificateConfig extends ActiveRecord {
 		))->orderBy('order_by')->getArray('config_key', 'config_value');
 		if (count($arr_config) == 0) {
 			$arr_config = ilParticipationCertificateConfig::where(array(
-				"config_type" => ilParticipationCertificateConfig::CONFIG_TYPE_GLOBAL,
+				"config_type" => ilParticipationCertificateConfig::CONFIG_SET_TYPE_TEMPLATE,
 				'config_value_type' => ilParticipationCertificateConfig::CONFIG_VALUE_TYPE_CERT_TEXT,
 				"group_ref_id" => 0
 			))->orderBy('order_by')->getArray('config_key', 'config_value');
@@ -462,7 +437,7 @@ class ilParticipationCertificateConfig extends ActiveRecord {
 	}
 
 
-	public static function returnStandardValue($group_ref_id = 0, $config_type = self::CONFIG_TYPE_GLOBAL) {
+	public static function returnStandardValue($group_ref_id = 0, $config_type = self::CONFIG_SET_TYPE_TEMPLATE) {
 		$arr_config = ilParticipationCertificateConfig::where(array(
 			"config_type" => $config_type,
 			"group_ref_id" => $group_ref_id,

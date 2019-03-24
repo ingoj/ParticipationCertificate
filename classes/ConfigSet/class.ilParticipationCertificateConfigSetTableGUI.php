@@ -5,7 +5,7 @@
  *
  * @author Martin Studer <ms@studer-raimann.ch>
  */
-class ilParticipationCertificateConfigTableGUI extends ilTable2GUI {
+class ilParticipationCertificateConfigSetTableGUI extends ilTable2GUI {
 
 	/*CONST IDENTIFIER = 'ilpartusr';
 	const GREEN_PROGRESS = "ilCourseObjectiveProgressBarCompleted";
@@ -21,7 +21,7 @@ class ilParticipationCertificateConfigTableGUI extends ilTable2GUI {
 	 */
 	protected $ctrl;
 	/**
-	 * @var ilParticipationCertificateConfigTableGUI
+	 * @var ilParticipationCertificateConfigSetTableGUI
 	 */
 	protected $parent_obj;
 	/**
@@ -71,18 +71,9 @@ class ilParticipationCertificateConfigTableGUI extends ilTable2GUI {
 
 		parent::__construct($a_parent_obj, $a_parent_cmd);
 
-		//$this->getEnableHeader();
-		//$this->setTitle($this->pl->txt('tbl_overview_results'));
 		$this->addColumns();
-		//$this->setExportFormats(array( self::EXPORT_EXCEL, self::EXPORT_CSV ));
+		//$this->initFilter();
 
-		$this->initFilter();
-		//$this->setSelectAllCheckbox('record_ids');
-		/*if ($cert_access->hasCurrentUserPrintAccess()) {
-			$this->addMultiCommand(ilParticipationCertificateResultGUI::CMD_PRINT_SELECTED, $this->pl->txt('list_print'));
-			$this->addMultiCommand(ilParticipationCertificateResultGUI::CMD_PRINT_SELECTED_WITHOUTE_MENTORING, $this->pl->txt('list_print_without'));
-		}
-		$this->addMultiCommand(ilParticipationCertificateMultipleResultGUI::CMD_SHOW_ALL_RESULTS, $this->pl->txt('list_overview'));*/
 		$this->addMultiCommand(ilParticipationCertificateConfigGUI::CMD_SAVE_ORDER, $this->pl->txt('save_order'));
 		$this->setRowTemplate('tpl.default_row.html', $this->pl->getDirectory());
 		$this->setFormAction($this->ctrl->getFormAction($a_parent_obj));
@@ -99,7 +90,9 @@ class ilParticipationCertificateConfigTableGUI extends ilTable2GUI {
 	function getSelectableColumns() {
 		$cols = array();
 		$cols['order_by'] = array( 'txt' => $this->pl->txt('order_by'), 'default' => false, 'width' => 'auto');
+		$cols['config_type'] = array( 'txt' => $this->pl->txt('config_type'), 'default' => true, 'width' => 'auto');
 		$cols['title'] = array( 'txt' => $this->pl->txt('title'), 'default' => true, 'width' => 'auto');
+		$cols['parent_title'] = array( 'txt' => $this->pl->txt('parent_title'), 'default' => true, 'width' => 'auto');
 		$cols['active'] = array( 'txt' => $this->pl->txt('active'), 'default' => true, 'width' => 'auto');
 		return $cols;
 	}
@@ -127,8 +120,8 @@ class ilParticipationCertificateConfigTableGUI extends ilTable2GUI {
 
 
 	public function parseData() {
-		$global_configs = new ilParticipationCertificateGlobalConfigs();
-		$this->setData($global_configs->getAllConfigsAsArray());
+		$global_configs = new ilParticipationCertificateConfigSets();
+		$this->setData($global_configs->getAllConfigSets());
 	}
 
 
@@ -138,9 +131,8 @@ class ilParticipationCertificateConfigTableGUI extends ilTable2GUI {
 	 */
 	public function fillRow($a_set) {
 		$this->tpl->setCurrentBlock('record_id');
-		$this->tpl->setVariable('RECORD_ID', $a_set['id']);
+		$this->tpl->setVariable('RECORD_ID', $a_set['conf_id']);
 		$this->tpl->parseCurrentBlock();
-
 
 
 		foreach ($this->getSelectableColumns() as $k => $v) {
@@ -149,17 +141,24 @@ class ilParticipationCertificateConfigTableGUI extends ilTable2GUI {
 
 				switch ($k) {
 					case 'order_by':
-						$number_input_gui =  new ilNumberInputGUI('','order_by['.$a_set['id'].']');
 						$value = intval($a_set[$k]) * 10;
-						$number_input_gui->setSize(3);
-						$number_input_gui->setValue($value);
 						$this->tpl->setCurrentBlock('td');
-						$this->tpl->setVariable('VALUE',$number_input_gui->render());
+						if($value > 0) {
+							$number_input_gui =  new ilNumberInputGUI('','order_by['.$a_set['id'].']');
+							$number_input_gui->setSize(3);
+							$number_input_gui->setValue($value);
+
+							$this->tpl->setVariable('VALUE',$number_input_gui->render());
+						} else {
+							$this->tpl->setCurrentBlock('td');
+							$this->tpl->setVariable('VALUE',"&nbsp");
+						}
+
 						$this->tpl->parseCurrentBlock();
 						break;
 					default:
 						$this->tpl->setCurrentBlock('td');
-						$this->tpl->setVariable('VALUE', (is_array($a_set[$k]) ? implode("<br/>", $a_set[$k]) : ($a_set[$k]?$a_set[$k]:0)));
+						$this->tpl->setVariable('VALUE', (is_array($a_set[$k]) ? implode("<br/>", $a_set[$k]) : ($a_set[$k]?$a_set[$k]:"&nbsp;")));
 						$this->tpl->parseCurrentBlock();
 					break;
 				}
@@ -172,23 +171,37 @@ class ilParticipationCertificateConfigTableGUI extends ilTable2GUI {
 		$action_list->setListTitle($this->pl->txt('list_actions'));
 		$action_list->setId('_actions' . $a_set['id']);
 		$action_list->setUseImages(false);
-		$this->ctrl->setParameterByClass(ilParticipationCertificateConfigGUI::class, 'id', $a_set['id']);
 
-		$action_list->addItem($this->pl->txt('edit'), ilParticipationCertificateConfigGUI::CMD_SHOW_FORM, $this->ctrl->getLinkTargetByClass(ilParticipationCertificateConfigGUI::class, ilParticipationCertificateConfigGUI::CMD_SHOW_FORM));
 
-		$action_list->addItem($this->pl->txt('copy'), ilParticipationCertificateConfigGUI::CMD_COPY_CONFIG, $this->ctrl->getLinkTargetByClass(ilParticipationCertificateConfigGUI::class, ilParticipationCertificateConfigGUI::CMD_COPY_CONFIG));
+		switch($a_set['configset_type']) {
+			case  ilParticipationCertificateConfig::CONFIG_SET_TYPE_GLOBAL:
+				$this->ctrl->setParameterByClass(ilParticipationCertificateConfigGUI::class, 'id', $a_set['conf_id']);
+				$this->ctrl->setParameterByClass(ilParticipationCertificateConfigGUI::class, 'set_type', $a_set['configset_type']);
+				$action_list->addItem($this->pl->txt('edit'), ilParticipationCertificateConfigGUI::CMD_SHOW_FORM, $this->ctrl->getLinkTargetByClass(ilParticipationCertificateConfigGUI::class, ilParticipationCertificateConfigGUI::CMD_SHOW_FORM));
+				break;
+			case  ilParticipationCertificateConfig::CONFIG_SET_TYPE_TEMPLATE:
+				$this->ctrl->setParameterByClass(ilParticipationCertificateConfigGUI::class, 'id', $a_set['conf_id']);
+				$this->ctrl->setParameterByClass(ilParticipationCertificateConfigGUI::class, 'set_type', $a_set['configset_type']);
+				$action_list->addItem($this->pl->txt('edit'), ilParticipationCertificateConfigGUI::CMD_SHOW_FORM, $this->ctrl->getLinkTargetByClass(ilParticipationCertificateConfigGUI::class, ilParticipationCertificateConfigGUI::CMD_SHOW_FORM));
+				$action_list->addItem($this->pl->txt('copy'), ilParticipationCertificateConfigGUI::CMD_COPY_CONFIG, $this->ctrl->getLinkTargetByClass(ilParticipationCertificateConfigGUI::class, ilParticipationCertificateConfigGUI::CMD_COPY_CONFIG));
+				if($a_set['order_by'] != 1) {
+					$action_list->addItem($this->pl->txt('delete'), ilParticipationCertificateConfigGUI::CMD_DELETE_CONFIG, $this->ctrl->getLinkTargetByClass(ilParticipationCertificateConfigGUI::class, ilParticipationCertificateConfigGUI::CMD_DELETE_CONFIG));
 
-		if($a_set['order_by'] != 1) {
-			$action_list->addItem($this->pl->txt('delete'), ilParticipationCertificateConfigGUI::CMD_DELETE_CONFIG, $this->ctrl->getLinkTargetByClass(ilParticipationCertificateConfigGUI::class, ilParticipationCertificateConfigGUI::CMD_DELETE_CONFIG));
+					if($a_set['active'] == 1) {
+						$action_list->addItem($this->pl->txt('set_inactive'), ilParticipationCertificateConfigGUI::CMD_SET_INACTIVE, $this->ctrl->getLinkTargetByClass(ilParticipationCertificateConfigGUI::class, ilParticipationCertificateConfigGUI::CMD_SET_INACTIVE));
+					}
+				}
 
-			if($a_set['active'] == 1) {
-				$action_list->addItem($this->pl->txt('set_inactive'), ilParticipationCertificateConfigGUI::CMD_SET_INACTIVE, $this->ctrl->getLinkTargetByClass(ilParticipationCertificateConfigGUI::class, ilParticipationCertificateConfigGUI::CMD_SET_INACTIVE));
-			}
+				if($a_set['active'] == 0) {
+					$action_list->addItem($this->pl->txt('set_active'), ilParticipationCertificateConfigGUI::CMD_SET_ACTIVE, $this->ctrl->getLinkTargetByClass(ilParticipationCertificateConfigGUI::class, ilParticipationCertificateConfigGUI::CMD_SET_ACTIVE));
+				}
+			break;
+			case  ilParticipationCertificateConfig::CONFIG_SET_TYPE_GROUP:
+
+				break;
 		}
 
-		if($a_set['active'] == 0) {
-			$action_list->addItem($this->pl->txt('set_active'), ilParticipationCertificateConfigGUI::CMD_SET_ACTIVE, $this->ctrl->getLinkTargetByClass(ilParticipationCertificateConfigGUI::class, ilParticipationCertificateConfigGUI::CMD_SET_ACTIVE));
-		}
+
 
 
 		$this->tpl->setVariable('ACTIONS', $action_list->getHTML());

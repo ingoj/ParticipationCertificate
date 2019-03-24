@@ -5,7 +5,7 @@
  *
  * @author Martin Studer <ms@studer-raimann.ch>
  */
-class ilParticipationCertificateObjectConfig extends ActiveRecord {
+class ilParticipationCertificateObjectConfigSet extends ActiveRecord {
 
 	const TABLE_NAME = 'dhbw_part_cert_ob_conf';
 
