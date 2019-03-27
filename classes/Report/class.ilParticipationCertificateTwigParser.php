@@ -174,6 +174,24 @@ class ilParticipationCertificateTwigParser {
 					}
 					$iass_state = (100 / $iass_state2) * $iass_state1;
 				}
+
+
+				switch ($iass_state2) {
+					case 0:
+						$iass_states =  "<img alt='' src=".ILIAS_ABSOLUTE_PATH.substr($this->pl->getImagePath("not_attempted_s.png"), 1).">";
+						break;
+					case 1:
+						if ($iass_state1 == 1) {
+							$iass_states = "<img alt='' src=".ILIAS_ABSOLUTE_PATH.substr($this->pl->getImagePath("passed_s.png"),1).">";
+						} else {
+							$iass_states = "<img alt='' src=".ILIAS_ABSOLUTE_PATH.substr($this->pl->getImagePath("failed_s.png"),1).">";
+						}
+						break;
+					default:
+						$iass_states = $iass_state1 . "/" . $iass_state2;
+						break;
+				}
+
 				//Home Work
 				$excercise_percentage = 0;
 				if (is_object($arr_excercise_states[$usr_id])) {
@@ -189,8 +207,7 @@ class ilParticipationCertificateTwigParser {
 				'crsitest_itest_submitted' => $initial_test_state,
 				'learn_sugg_reached_percentage' => $learn_sugg_reached_percentage,
 				'iass_state' => $iass_state,
-				'iass_state1' => $iass_state1,
-				'iass_state2' => $iass_state2,
+				'iass_states' => $iass_states,
 				'excercise_percentage' => $excercise_percentage,
 				'logo_path' => $logo_path,
 				'standard_value' => $participation_certificate_configs->returnPercentValue($this->group_ref_id)

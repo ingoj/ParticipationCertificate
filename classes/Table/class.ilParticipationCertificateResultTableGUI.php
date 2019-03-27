@@ -232,9 +232,21 @@ class ilParticipationCertificateResultTableGUI extends ilTable2GUI {
 					$countPassed = $countPassed + $item->getPassed();
 					$countTests = $countTests + $item->getTotal();
 				}
-				$row['eMentoring_finished'] = $countPassed . "/" . $countTests;
+
+				switch ($countTests) {
+					case 1:
+						if ($countPassed == 1) {
+							$row['eMentoring_finished'] = ilUtil::img($this->pl->getImagePath("passed.svg"));
+						} else {
+							$row['eMentoring_finished'] = ilUtil::img($this->pl->getImagePath("failed.svg"));
+						}
+						break;
+					default:
+						$row['eMentoring_finished'] = $countPassed . "/" . $countTests;
+						break;
+				}
 			} else {
-				$row['eMentoring_finished'] = "0/0";
+						$row['eMentoring_finished'] = ilUtil::img($this->pl->getImagePath("not_attempted.svg"));
 			}
 			/*
 			if (is_object($arr_iass_states[$usr_id])) {
