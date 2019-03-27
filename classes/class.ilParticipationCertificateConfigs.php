@@ -21,6 +21,49 @@ class ilParticipationCertificateConfigs {
 		return ilParticipationCertificateConfig::where(array( "global_config_id" => $global_config_id ))->orderBy('order_by')->get();
 	}
 
+	/**
+	 * @param int group_ref_id
+	 * @param $config_type
+	 */
+	public function returnTextValues($group_ref_id = 0, $config_type = self::CONFIG_SET_TYPE_TEMPLATE) {
+		$arr_config = ilParticipationCertificateConfig::where(array(
+			"config_type" => $config_type,
+			"group_ref_id" => $group_ref_id,
+			'config_value_type' => ilParticipationCertificateConfig::CONFIG_VALUE_TYPE_CERT_TEXT
+		))->orderBy('order_by')->getArray('config_key', 'config_value');
+		if (count($arr_config) == 0) {
+			$arr_config = ilParticipationCertificateConfig::where(array(
+				"config_type" => ilParticipationCertificateConfig::CONFIG_SET_TYPE_TEMPLATE,
+				'config_value_type' => ilParticipationCertificateConfig::CONFIG_VALUE_TYPE_CERT_TEXT,
+				"group_ref_id" => 0
+			))->orderBy('order_by')->getArray('config_key', 'config_value');
+		}
+
+		return $arr_config;
+	}
+
+	/**
+	 * @param int $group_ref_id
+	 *
+	 * @return bool|string
+	 */
+	public function returnPercentValue($group_ref_id = 0) {
+		/**
+		 * @var $config ilParticipationCertificateConfig
+		 */
+		$config = ilParticipationCertificateConfig::where(array(
+			'group_ref_id' => $group_ref_id,
+			'config_key' => 'percent_value',
+			'config_type' => ilParticipationCertificateConfig::CONFIG_SET_TYPE_GROUP
+		))->first();
+		if(is_object($config)) {
+			return $config->getConfigValue();
+		}
+
+		$config_set_templates = new ilParticipationCertificateGlobalConfigSets();
+		return $config_set_templates->getDefaultConfigSetValue('percent_value');
+	}
+
 
 	/**
 	 * @param int $obj_ref_id
@@ -53,10 +96,19 @@ class ilParticipationCertificateConfigs {
 					}
 				}
 
-				return ilParticipationCertificateConfig::where(array(
+
+
+				return
+					array_merge(ilParticipationCertificateConfig::where(array(
+						'group_ref_id' => $obj_ref_id,
+						'config_key' => 'percent_value',
+						'config_type' => ilParticipationCertificateConfig::CONFIG_SET_TYPE_GROUP
+					))->get(),
+					ilParticipationCertificateConfig::where([
 					"config_type" => ilParticipationCertificateConfig::CONFIG_SET_TYPE_GROUP,
-					"group_ref_id" => $obj_ref_id
-				))->orderBy('order_by')->get();
+					"group_ref_id" => $obj_ref_id,
+					"config_value_type" => ilParticipationCertificateConfig::CONFIG_VALUE_TYPE_CERT_TEXT
+				])->orderBy('order_by')->get());
 
 				break;
 		}
@@ -174,7 +226,7 @@ class ilParticipationCertificateConfigs {
 		$part_cert_config->setObjRefId($obj_ref_id);
 		$part_cert_config->setConfigType(ilParticipationCertificateObjectConfigSet::CONFIG_TYPE_OWN);
 		$part_cert_config->setGlConfTemplateId($global_template_id);
-		$part_cert_config->create();
+		$part_cert_config->store();
 
 		$this->createOrUpdateObjConfigSetFromTemplate($obj_ref_id, $global_template_id);
 	}

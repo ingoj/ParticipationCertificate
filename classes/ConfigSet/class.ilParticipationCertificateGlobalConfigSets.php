@@ -40,6 +40,23 @@ class ilParticipationCertificateGlobalConfigSets {
 
 
 	/**
+	 * @param $config_key
+	 *
+	 * @return bool|string
+	 */
+	public function getDefaultConfigSetValue($config_key) {
+		$gl_config = $this->getDefaultConfig();
+
+		$participation_configs = new ilParticipationCertificateConfigs();
+
+		if(is_object($participation_configs->getParticipationTemplateConfigValueByKey($gl_config->getId(),$config_key))) {
+			return $participation_configs->getParticipationTemplateConfigValueByKey($gl_config->getId(),$config_key)->getConfigValue();
+		}
+		return false;
+	}
+
+
+	/**
 	 * @param array $arr_order_by
 	 *
 	 * @throws Exception

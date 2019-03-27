@@ -45,7 +45,7 @@ pluginreader#:#Resultate Studienvorbereitung
 period#:#Zeitraum
 period_self_print#:#Zeitraum Selbstausdruck konfigurieren
 enable_self_print#:#Selbstausdruck aktivieren
-color#:#Color
+color#:#Farbe
 keyword#:#Keyword
 logo#:#Logo
 udf_percent_value#:#Schwellenwert Videokonferenzen (Prozent)
@@ -54,3 +54,21 @@ yes#:#Ja
 no#:#Nein
 no_tests#:#Keine Tests
 loginname#:#Benutzername
+add_config#:#Konfiguration hinzufügen
+save_order#:#Sortierung Speichern
+config_type#:#Konfigurationstyp
+title#:#Bezeichnung
+parent_title#:#Titel darüberliegendes Objekt
+active#:#Aktiv
+edit#:#Bearbeiten
+config_title#:#Bezeichnung
+order_by#:#Sortierung
+copy#:#Kopieren
+delete#:#Löschen
+configset_type_1#:#Zertifikatsvorlage
+configset_type_2#:#Zertifikatskonfiguration ILIAS Objekt
+configset_type_3#:#Globale Einstellungen
+go_to_object#:#Öffne ILIAS Objekt
+object_config_type_1#:#Vorlagenkonfiguration
+object_config_type_2#:#Gruppenspezfische Konfiguration
+origin_template#:#Ursprungsvorlage

@@ -301,7 +301,6 @@ class ilParticipationCertificateGUI {
 			return false;
 		}
 
-		//TODO auslagern nach ilParticipationCertificateConfig
 		//save Text
 		foreach ($form->getItems() as $item) {
 			/**
@@ -312,7 +311,6 @@ class ilParticipationCertificateGUI {
 				$config = ilParticipationCertificateConfig::where(array(
 					'config_key' => $item->getPostVar(),
 					"group_ref_id" => $this->groupRefId,
-					'config_type' => ilParticipationCertificateConfig::CONFIG_SET_TYPE_GROUP,
 					'config_value_type' => ilParticipationCertificateConfig::CONFIG_VALUE_TYPE_CERT_TEXT
 				))->first();
 				if (!is_object($config)) {
@@ -351,7 +349,6 @@ class ilParticipationCertificateGUI {
 		$config_value = ilParticipationCertificateConfig::where(array(
 			"config_type" => ilParticipationCertificateConfig::CONFIG_SET_TYPE_GROUP,
 			"group_ref_id" => $this->groupRefId,
-			"config_value_type" => ilParticipationCertificateConfig::CONFIG_VALUE_TYPE_OTHER,
 			'config_key' => 'percent_value'
 		))->first();
 		if (!is_object($config_value)) {

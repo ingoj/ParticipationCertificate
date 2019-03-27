@@ -26,7 +26,9 @@ class ilParticipationCertificateConfigSets {
 			     '' as parent_title,
 			     0 as obj_ref_id,
 			     active,
-			      CONCAT('1-',order_by) conf_order
+			      CONCAT('1-',order_by) conf_order,
+			      0 as object_config_type,
+			      0 as object_gl_conf_template_id
 			     FROM
 			    dhbw_part_cert_gl_conf)
 			UNION ALL 
@@ -39,7 +41,9 @@ class ilParticipationCertificateConfigSets {
 			     '' as parent_title,
 			     0 as obj_ref_id,
 			     1 as active,
-			     0 as conf_order)
+			     0 as conf_order,
+			     0 as object_config_type,
+			     0 as object_gl_conf_template_id)
 					UNION ALL 	
 			(SELECT 	
 			    dhbw_part_cert_ob_conf.id AS conf_id,
@@ -50,7 +54,9 @@ class ilParticipationCertificateConfigSets {
 			    parent_obj.title as parent_title,
 			    obj_ref.ref_id as obj_ref_id,
 			    1 as active,
-			    3 as conf_order
+			    3 as conf_order,
+			    dhbw_part_cert_ob_conf.config_type as object_config_type,
+			    dhbw_part_cert_ob_conf.gl_conf_template_id as object_gl_conf_template_id
 			FROM
 			    dhbw_part_cert_ob_conf
 			        INNER JOIN

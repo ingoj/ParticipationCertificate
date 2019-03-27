@@ -68,7 +68,6 @@ class ilParticipationCertificateConfigSetTableGUI extends ilTable2GUI {
 		$button->setUrl($this->ctrl->getLinkTargetByClass(ilParticipationCertificateConfigGUI::class, ilParticipationCertificateConfigGUI::CMD_ADD_CONFIG));
 		$toolbar->addButtonInstance($button);
 
-
 		parent::__construct($a_parent_obj, $a_parent_cmd);
 
 		$this->addColumns();
@@ -89,11 +88,12 @@ class ilParticipationCertificateConfigSetTableGUI extends ilTable2GUI {
 	 */
 	function getSelectableColumns() {
 		$cols = array();
-		$cols['order_by'] = array( 'txt' => $this->pl->txt('order_by'), 'default' => false, 'width' => 'auto');
-		$cols['config_type'] = array( 'txt' => $this->pl->txt('config_type'), 'default' => true, 'width' => 'auto');
-		$cols['title'] = array( 'txt' => $this->pl->txt('title'), 'default' => true, 'width' => 'auto');
-		$cols['parent_title'] = array( 'txt' => $this->pl->txt('parent_title'), 'default' => true, 'width' => 'auto');
-		$cols['active'] = array( 'txt' => $this->pl->txt('active'), 'default' => true, 'width' => 'auto');
+		$cols['order_by'] = array( 'txt' => $this->pl->txt('order_by'), 'default' => false, 'width' => 'auto' );
+		$cols['configset_type'] = array( 'txt' => $this->pl->txt('config_type'), 'default' => true, 'width' => 'auto' );
+		$cols['title'] = array( 'txt' => $this->pl->txt('title'), 'default' => true, 'width' => 'auto' );
+		$cols['parent_title'] = array( 'txt' => $this->pl->txt('parent_title'), 'default' => true, 'width' => 'auto' );
+		$cols['active'] = array( 'txt' => $this->pl->txt('active'), 'default' => true, 'width' => 'auto' );
+
 		return $cols;
 	}
 
@@ -102,7 +102,7 @@ class ilParticipationCertificateConfigSetTableGUI extends ilTable2GUI {
 	 *
 	 */
 	private function addColumns() {
-		$this->addColumn('', '', '', true);
+		//$this->addColumn('', '', '', true);
 		foreach ($this->getSelectableColumns() as $k => $v) {
 			if ($this->isColumnSelected($k)) {
 				if (isset($v['sort_field'])) {
@@ -125,45 +125,60 @@ class ilParticipationCertificateConfigSetTableGUI extends ilTable2GUI {
 	}
 
 
-
 	/**
 	 * @param array $a_set
 	 */
 	public function fillRow($a_set) {
-		$this->tpl->setCurrentBlock('record_id');
+		/*$this->tpl->setCurrentBlock('record_id');
 		$this->tpl->setVariable('RECORD_ID', $a_set['conf_id']);
-		$this->tpl->parseCurrentBlock();
-
+		$this->tpl->parseCurrentBlock();*/
 
 		foreach ($this->getSelectableColumns() as $k => $v) {
-			
+
 			if ($this->isColumnSelected($k)) {
 
 				switch ($k) {
 					case 'order_by':
 						$value = intval($a_set[$k]) * 10;
 						$this->tpl->setCurrentBlock('td');
-						if($value > 0) {
-							$number_input_gui =  new ilNumberInputGUI('','order_by['.$a_set['id'].']');
+						if ($a_set[$k] > 0) {
+							$number_input_gui = new ilNumberInputGUI('', 'order_by[' . $a_set['conf_id'] . ']');
 							$number_input_gui->setSize(3);
 							$number_input_gui->setValue($value);
 
-							$this->tpl->setVariable('VALUE',$number_input_gui->render());
+							$this->tpl->setVariable('VALUE', $number_input_gui->render());
 						} else {
-							$this->tpl->setCurrentBlock('td');
-							$this->tpl->setVariable('VALUE',"&nbsp");
+							$this->tpl->setVariable('VALUE', "&nbsp");
 						}
 
 						$this->tpl->parseCurrentBlock();
 						break;
+					case 'configset_type':
+						$this->tpl->setCurrentBlock('td');
+						if ($a_set[$k] > 0) {
+							switch ($a_set['configset_type']) {
+								case ilParticipationCertificateConfig::CONFIG_SET_TYPE_GROUP:
+									$arr_type[] =  $this->pl->txt('configset_type_' . $a_set[$k]);
+									$arr_type[] = $this->pl->txt('object_config_type_' . $a_set['object_config_type']);
+									$template = new ilParticipationCertificateGlobalConfigSet($a_set['object_gl_conf_template_id']);
+									$arr_type[] = $this->pl->txt('origin_template') . ": " . $template->getTitle();
+									$this->tpl->setVariable('VALUE', implode($arr_type, "<br/>"));
+									break;
+								default:
+									$this->tpl->setVariable('VALUE', $this->pl->txt('configset_type_' . $a_set[$k]));
+									break;
+							}
+						} else {
+							$this->tpl->setVariable('VALUE', "&nbsp");
+						}
+						$this->tpl->parseCurrentBlock();
+						break;
 					default:
 						$this->tpl->setCurrentBlock('td');
-						$this->tpl->setVariable('VALUE', (is_array($a_set[$k]) ? implode("<br/>", $a_set[$k]) : ($a_set[$k]?$a_set[$k]:"&nbsp;")));
+						$this->tpl->setVariable('VALUE', (is_array($a_set[$k]) ? implode("<br/>", $a_set[$k]) : ($a_set[$k] ? $a_set[$k] : "&nbsp;")));
 						$this->tpl->parseCurrentBlock();
-					break;
+						break;
 				}
-
-
 			}
 		}
 
@@ -172,8 +187,7 @@ class ilParticipationCertificateConfigSetTableGUI extends ilTable2GUI {
 		$action_list->setId('_actions' . $a_set['id']);
 		$action_list->setUseImages(false);
 
-
-		switch($a_set['configset_type']) {
+		switch ($a_set['configset_type']) {
 			case  ilParticipationCertificateConfig::CONFIG_SET_TYPE_GLOBAL:
 				$this->ctrl->setParameterByClass(ilParticipationCertificateConfigGUI::class, 'id', $a_set['conf_id']);
 				$this->ctrl->setParameterByClass(ilParticipationCertificateConfigGUI::class, 'set_type', $a_set['configset_type']);
@@ -184,25 +198,22 @@ class ilParticipationCertificateConfigSetTableGUI extends ilTable2GUI {
 				$this->ctrl->setParameterByClass(ilParticipationCertificateConfigGUI::class, 'set_type', $a_set['configset_type']);
 				$action_list->addItem($this->pl->txt('edit'), ilParticipationCertificateConfigGUI::CMD_SHOW_FORM, $this->ctrl->getLinkTargetByClass(ilParticipationCertificateConfigGUI::class, ilParticipationCertificateConfigGUI::CMD_SHOW_FORM));
 				$action_list->addItem($this->pl->txt('copy'), ilParticipationCertificateConfigGUI::CMD_COPY_CONFIG, $this->ctrl->getLinkTargetByClass(ilParticipationCertificateConfigGUI::class, ilParticipationCertificateConfigGUI::CMD_COPY_CONFIG));
-				if($a_set['order_by'] != 1) {
+				if ($a_set['order_by'] != 1) {
 					$action_list->addItem($this->pl->txt('delete'), ilParticipationCertificateConfigGUI::CMD_DELETE_CONFIG, $this->ctrl->getLinkTargetByClass(ilParticipationCertificateConfigGUI::class, ilParticipationCertificateConfigGUI::CMD_DELETE_CONFIG));
 
-					if($a_set['active'] == 1) {
+					if ($a_set['active'] == 1) {
 						$action_list->addItem($this->pl->txt('set_inactive'), ilParticipationCertificateConfigGUI::CMD_SET_INACTIVE, $this->ctrl->getLinkTargetByClass(ilParticipationCertificateConfigGUI::class, ilParticipationCertificateConfigGUI::CMD_SET_INACTIVE));
 					}
 				}
 
-				if($a_set['active'] == 0) {
+				if ($a_set['active'] == 0) {
 					$action_list->addItem($this->pl->txt('set_active'), ilParticipationCertificateConfigGUI::CMD_SET_ACTIVE, $this->ctrl->getLinkTargetByClass(ilParticipationCertificateConfigGUI::class, ilParticipationCertificateConfigGUI::CMD_SET_ACTIVE));
 				}
-			break;
+				break;
 			case  ilParticipationCertificateConfig::CONFIG_SET_TYPE_GROUP:
-
+				$action_list->addItem($this->pl->txt('go_to_object'), $a_set['obj_ref_id'], ilLink::_getStaticLink($a_set['obj_ref_id']));
 				break;
 		}
-
-
-
 
 		$this->tpl->setVariable('ACTIONS', $action_list->getHTML());
 		$this->tpl->parseCurrentBlock();
@@ -228,7 +239,6 @@ class ilParticipationCertificateConfigSetTableGUI extends ilTable2GUI {
 		}
 	}*/
 
-
 	/**
 	 * @param object $a_csv
 	 * @param array  $a_set
@@ -244,7 +254,6 @@ class ilParticipationCertificateConfigSetTableGUI extends ilTable2GUI {
 		}
 		$a_csv->addRow();
 	}*/
-
 
 	/**
 	 *
@@ -311,7 +320,4 @@ class ilParticipationCertificateConfigSetTableGUI extends ilTable2GUI {
 			parent::exportData($format, $send);
 		}*/
 	}
-
-
-
 }
