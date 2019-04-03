@@ -73,3 +73,5 @@ go_to_object#:#Öffne ILIAS Objekt
 object_config_type_1#:#Vorlagenkonfiguration
 object_config_type_2#:#Gruppenspezfische Konfiguration
 origin_template#:#Ursprungsvorlage
+set_inactive#:#Deaktivieren
+set_inactive#:#Aktivieren

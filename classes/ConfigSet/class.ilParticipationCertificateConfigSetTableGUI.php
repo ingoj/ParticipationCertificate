@@ -7,11 +7,6 @@
  */
 class ilParticipationCertificateConfigSetTableGUI extends ilTable2GUI {
 
-	/*CONST IDENTIFIER = 'ilpartusr';
-	const GREEN_PROGRESS = "ilCourseObjectiveProgressBarCompleted";
-	const ORANGE_PROGRESS = "progress-bar-warning";
-	const RED_PROGRESS = "ilCourseObjectiveProgressBarFailed";
-	const NO_PROGRESS = "ilCourseObjectiveProgressBarNeutral";*/
 	/**
 	 * @var ilTabsGUI
 	 */
@@ -129,10 +124,7 @@ class ilParticipationCertificateConfigSetTableGUI extends ilTable2GUI {
 	 * @param array $a_set
 	 */
 	public function fillRow($a_set) {
-		/*$this->tpl->setCurrentBlock('record_id');
-		$this->tpl->setVariable('RECORD_ID', $a_set['conf_id']);
-		$this->tpl->parseCurrentBlock();*/
-
+		global $DIC;
 		foreach ($this->getSelectableColumns() as $k => $v) {
 
 			if ($this->isColumnSelected($k)) {
@@ -158,6 +150,10 @@ class ilParticipationCertificateConfigSetTableGUI extends ilTable2GUI {
 						if ($a_set[$k] > 0) {
 							switch ($a_set['configset_type']) {
 								case ilParticipationCertificateConfig::CONFIG_SET_TYPE_GROUP:
+									if(!ilParticipationCertificateGlobalConfigSet::find($a_set['object_gl_conf_template_id'])) {
+										$this->tpl->setVariable('VALUE',"&nbsp");
+										break;
+									}
 									$arr_type[] =  $this->pl->txt('configset_type_' . $a_set[$k]);
 									$arr_type[] = $this->pl->txt('object_config_type_' . $a_set['object_config_type']);
 									$template = new ilParticipationCertificateGlobalConfigSet($a_set['object_gl_conf_template_id']);
@@ -172,6 +168,14 @@ class ilParticipationCertificateConfigSetTableGUI extends ilTable2GUI {
 							$this->tpl->setVariable('VALUE', "&nbsp");
 						}
 						$this->tpl->parseCurrentBlock();
+						break;
+					case "active":
+						$factory = $DIC->ui()->factory();
+						if ($a_set[$k] == 1) {
+							$this->tpl->setVariable('VALUE',$DIC->ui()->renderer()->render($factory->image()->standard($this->pl->getImagePath("on.svg"), '')));
+						} else {
+							$this->tpl->setVariable('VALUE',$DIC->ui()->renderer()->render($factory->image()->standard($this->pl->getImagePath("off.svg"), '')));
+						}
 						break;
 					default:
 						$this->tpl->setCurrentBlock('td');
