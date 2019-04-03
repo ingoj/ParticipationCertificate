@@ -248,19 +248,7 @@ class ilParticipationCertificateResultTableGUI extends ilTable2GUI {
 			} else {
 						$row['eMentoring_finished'] = ilUtil::img($this->pl->getImagePath("not_attempted.svg"));
 			}
-			/*
-			if (is_object($arr_iass_states[$usr_id])) {
-				$row['eMentoring_finished'] = $arr_iass_states[$usr_id]->getPassed();
 
-				if ($row['eMentoring_finished'] >= 1) {
-					$row['eMentoring_finished'] = $this->pl->txt("yes");
-				} else {
-					$row['eMentoring_finished'] =$this->pl->txt("no");
-				}
-			} else {
-				$row['eMentoring_finished'] = $this->pl->txt("no");
-			}
-*/
 			if (is_object($arr_excercise_states[$usr_id])) {
 				$row['eMentoring_homework'] = $arr_excercise_states[$usr_id]->getPassed();
 				//$row['eMentoring_percentage'] = $arr_excercise_states[$usr_id]->getPassedPercentage() . '%';
