@@ -215,7 +215,7 @@ class ilParticipationCertificateGUI {
 
 		$button = ilSubmitButton::getInstance();
 		$button->setCommand(self::CMD_SET_OWN_CERT_TEXT_FROM_TEMPLATE);
-		$button->setCaption($this->pl->txt('btn_reset'), false);
+		$button->setCaption($this->pl->txt('btn_modify'), false);
 		$this->toolbar->addButtonInstance($button);
 
 		$form->setFormAction($this->ctrl->getFormAction($this));

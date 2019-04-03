@@ -23,6 +23,7 @@ lastname#:#Nachname
 usr_id#:#UserID
 list_overview#:#Alle Resultate anzeigen
 btn_reset#:#Textwerte für das Formular zurücksetzen
+btn_modify#:#Textwerte für das Formular bearbeitbar übernehmen
 result_for#:#Alle Resultate für
 no_records_selected#:#Keine User ausgewählt
 upload_header #:# Laden Sie Ihren PDF Header hoch
