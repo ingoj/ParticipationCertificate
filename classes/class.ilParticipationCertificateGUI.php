@@ -228,6 +228,16 @@ class ilParticipationCertificateGUI {
 		$cert_configs = new ilParticipationCertificateConfigs();
 		$arr_config = $cert_configs->getObjConfigSetIfNoneCreateDefaultAndCreateNewObjConfigValues($this->groupRefId);
 
+		$global_config_sets = new ilParticipationCertificateGlobalConfigSets();
+		$global_config_id = reset($arr_config)->getGlobalConfigId();
+		if($global_config_id > 0) {
+			$global_config_set = $global_config_sets->getConfigSetById($global_config_id);
+			ilUtil::sendInfo($this->pl->txt('configset_type_1').' '.$global_config_set->getTitle());
+		} else {
+			ilUtil::sendInfo($this->pl->txt('configset_type_2'));
+		}
+
+
 		foreach ($arr_config as $config) {
 
 			$disbaled = false;
@@ -260,24 +270,6 @@ class ilParticipationCertificateGUI {
 
 			$form->addItem($input);
 		}
-
-		/*$arr_config_value = ilParticipationCertificateConfig::where(array(
-			"config_type" => ilParticipationCertificateConfig::CONFIG_TYPE_GROUP,
-			"group_ref_id" => $this->groupRefId,
-			"config_value_type" => ilParticipationCertificateConfig::CONFIG_VALUE_TYPE_OTHER,
-			'config_key' => 'percent_value'
-		))->first();
-		if ($arr_config_value == NULL) {
-			$arr_config_value = ilParticipationCertificateConfig::where(array(
-				"config_type" => ilParticipationCertificateConfig::CONFIG_TYPE_GLOBAL,
-				"group_ref_id" => 0,
-				"config_value_type" => ilParticipationCertificateConfig::CONFIG_VALUE_TYPE_OTHER,
-				'config_key' => 'percent_value'
-			))->first();
-		}
-		$percent = new ilNumberInputGUI($this->pl->txt("udf_percent_value"),'percent_value');
-		$percent->setValue($arr_config_value->getConfigValue());
-		$form->addItem($percent);*/
 
 		$this->ctrl->saveParameterByClass(ilObjGroup::class, 'ref_id');
 		$form->addCommandButton(self::CMD_SAVE, $this->pl->txt('save'));

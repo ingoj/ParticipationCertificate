@@ -28,6 +28,19 @@ class ilParticipationCertificateGlobalConfigSets {
 
 
 	/**
+	 * @param int $id
+	 *
+	 * @return ilParticipationCertificateGlobalConfigSet
+	 */
+	public function getConfigSetById($id) {
+		/**
+		 * @var ilParticipationCertificateGlobalConfigSet $gl_config
+		 */
+		$gl_config = ilParticipationCertificateGlobalConfigSet::where(['id' => $id])->first();
+		return $gl_config;
+	}
+
+	/**
 	 * @return ilParticipationCertificateGlobalConfigSet
 	 */
 	public function getDefaultConfig() {
@@ -108,7 +121,7 @@ class ilParticipationCertificateGlobalConfigSets {
 
 	public function getSelectOptions() {
 
-		$arr_select_options = [];
+		$arr_select_options = [0 => '--'];
 
 		foreach(ilParticipationCertificateGlobalConfigSet::where(['active' => 1])->orderBy('order_by')->get() as $global_config) {
 			/**
