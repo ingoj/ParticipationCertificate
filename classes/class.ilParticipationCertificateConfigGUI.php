@@ -282,9 +282,9 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI {
 				case "logo":
 					$input = new ilFileInputGUI($this->pl->txt("logo"), 'headerpic');
 					$input->setSuffixes(array( 'png' ));
-					if (is_file(ilParticipationCertificateConfig::returnPicturePath('absolute', 0, ilParticipationCertificateConfig::LOGO_FILE_NAME))) {
+					if (is_file(ilParticipationCertificateConfig::returnPicturePath('absolute', $global_config_id, ilParticipationCertificateConfig::LOGO_FILE_NAME))) {
 						$input->setInfo('<img src="'
-							. ilParticipationCertificateConfig::returnPicturePath('relative', 0, ilParticipationCertificateConfig::LOGO_FILE_NAME) . '" />');
+							. ilParticipationCertificateConfig::returnPicturePath('relative', $global_config_id, ilParticipationCertificateConfig::LOGO_FILE_NAME) . '" />');
 					}
 					break;
 				default:
@@ -360,6 +360,13 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI {
 							$global_config->setTitle($form->getInput($item->getPostVar()));
 							$global_config->store();
 							break;
+						case 'headerpic':
+							//Picture
+							$file_data = $form->getInput('headerpic');
+							if ($file_data['tmp_name']) {
+								ilParticipationCertificateConfig::storePicture($file_data, $global_config_id, ilParticipationCertificateConfig::LOGO_FILE_NAME);
+							}
+							break;
 						default:
 							$global_config = $part_cert_configs->getParticipationTemplateConfigValueByKey($global_config_id,$item->getPostVar());
 							$global_config->setConfigValue($form->getInput($item->getPostVar()));
@@ -374,11 +381,11 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI {
 					 * @var ilFormPropertyGUI $item
 					 */
 					switch($item->getPostVar()) {
-						case 'headerpic':
+						case 'logo':
 							//Picture
 							$file_data = $form->getInput('headerpic');
 							if ($file_data['tmp_name']) {
-								ilParticipationCertificateConfig::storePicture($file_data, 0, ilParticipationCertificateConfig::LOGO_FILE_NAME);
+								ilParticipationCertificateConfig::storePicture($file_data, $global_config_id, ilParticipationCertificateConfig::LOGO_FILE_NAME);
 							}
 							break;
 						default:

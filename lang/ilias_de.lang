@@ -22,7 +22,7 @@ firstname#:#Vorname
 lastname#:#Nachname
 usr_id#:#UserID
 list_overview#:#Alle Resultate anzeigen
-btn_reset#:#Textwerte für das Formular zurücksetzen
+btn_reset#:#Textwerte für das Formular fixiert übernehmen
 btn_modify#:#Textwerte für das Formular bearbeitbar übernehmen
 result_for#:#Alle Resultate für
 no_records_selected#:#Keine User ausgewählt

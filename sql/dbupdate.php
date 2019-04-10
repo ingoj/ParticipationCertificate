@@ -384,3 +384,30 @@ foreach($part_cert_configs->returnCertTextDefaultValues() as $key => $value) {
 	$config->store();
 }
 ?>
+<#32>
+<?php
+require_once "Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/ParticipationCertificate/vendor/autoload.php";
+
+$config = ilParticipationCertificateConfig::where(["config_key" => 'logo'])->first();
+$config->delete();
+
+$part_cert_global_config_sets = new ilParticipationCertificateGlobalConfigSets();
+$part_cert_default_config_set = $part_cert_global_config_sets->getDefaultConfig();
+
+$part_cert_configs = new ilParticipationCertificateConfigs();
+foreach($part_cert_configs->returnCertTextDefaultValues() as $key => $value) {
+	/**
+	 * @var $value ilParticipationCertificateConfig
+	 */
+	$config = ilParticipationCertificateConfig::where(['config_key' => $value->getConfigKey(),
+		"global_config_id" => $part_cert_default_config_set->getId()])->first();
+
+	if(!is_object($config)) {
+		$value->setGlobalConfigId($part_cert_default_config_set->getId());
+		$config = $value;
+	} else {
+		$config->setOrderBy($value->getOrderBy());
+	}
+	$config->store();
+}
+?>

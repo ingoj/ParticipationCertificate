@@ -234,28 +234,28 @@ class ilParticipationCertificateConfig extends ActiveRecord {
 
 	/**
 	 * @param array  $file_data
-	 * @param int    $grp_ref_id
+	 * @param int    $template_id
 	 * @param string $file_name
 	 *
 	 * @return string
 	 */
-	public static function storePicture(array $file_data, $grp_ref_id = 0, $file_name) {
+	public static function storePicture(array $file_data, $template_id = 0, $file_name) {
 
-		self::deletePicture($grp_ref_id, $file_name);
+		self::deletePicture($template_id, $file_name);
 
-		$file_path = self::getFileStoragePath('img', 'absolute', $grp_ref_id, true);
+		$file_path = self::getFileStoragePath('img', 'absolute', $template_id, true);
 		ilUtil::moveUploadedFile($file_data['tmp_name'], '', $file_path . $file_name);
 
-		return self::returnPicturePath("relative", $grp_ref_id, $file_name);
+		return self::returnPicturePath("relative", $template_id, $file_name);
 	}
 
 
 	/**
-	 * @param int    $grp_ref_id
+	 * @param int    $template_id
 	 * @param string $file_name
 	 */
-	public static function deletePicture($grp_ref_id = 0, $file_name) {
-		$file_path = self::returnPicturePath('absolute', $grp_ref_id, $file_name);
+	public static function deletePicture($template_id = 0, $file_name) {
+		$file_path = self::returnPicturePath('absolute', $template_id, $file_name);
 
 		if (is_file($file_path)) {
 			unlink($file_path);
@@ -270,7 +270,7 @@ class ilParticipationCertificateConfig extends ActiveRecord {
 	 * @return string
 	 */
 	public static function returnPicturePath($path_type = 'absolute', $grp_ref_id = 0, $file_name) {
-		return self::getFileStoragePath('img', $path_type, $grp_ref_id) . $file_name;
+		return self::getFileStoragePath('img', $path_type, $grp_ref_id, true) . $file_name;
 	}
 
 

@@ -33,9 +33,9 @@ class ilParticipationCertificateUIHookGUI extends ilUIHookPluginGUI {
 	 */
 	protected $learnGroupTitle;
 	/**
-	 * @var string
+	 * @var array
 	 */
-	protected $keyword;
+	protected $keywords;
 
 
 	public function __construct() {
@@ -61,7 +61,7 @@ class ilParticipationCertificateUIHookGUI extends ilUIHookPluginGUI {
 			))->first();
 
 			if(is_object($config)) {
-				$this->keyword = $config->getConfigValue();
+				$this->keywords = explode(",",$config->getConfigValue());
 			}
 		}
 
@@ -114,13 +114,23 @@ class ilParticipationCertificateUIHookGUI extends ilUIHookPluginGUI {
 	function checkGroup() {
 		foreach ($this->ctrl->getCallHistory() as $GUIClassesArray) {
 			if ($GUIClassesArray['class'] == ilObjGroupGUI::class) {
-				if (stripos($this->learnGroupTitle, $this->keyword) !== false) {
+				if ($this->strposa($this->learnGroupTitle, $this->keywords) !== false) {
 					return true;
 				}
 			}
 		}
 
 		return false;
+	}
+
+	private function strposa($haystack, $needles=array(), $offset=0) {
+		$chr = array();
+		foreach($needles as $needle) {
+			$res = strpos($haystack, $needle, $offset);
+			if ($res !== false) $chr[$needle] = $res;
+		}
+		if(empty($chr)) return false;
+		return min($chr);
 	}
 }
 

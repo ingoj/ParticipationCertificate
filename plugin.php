@@ -2,7 +2,7 @@
 // alphanumerical ID of the plugin; never change this
 $id = 'dhbwparticipationpdf';
 
-$version = '0.0.74';
+$version = '0.0.75';
 
 //ilias min and max version; must always reflect the versions that should run with the plugin
 $ilias_min_version = '5.2.0';

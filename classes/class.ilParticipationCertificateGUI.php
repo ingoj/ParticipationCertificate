@@ -249,6 +249,23 @@ class ilParticipationCertificateGUI {
 			 * @var ilParticipationCertificateConfig $config
 			 */
 			switch ($config->getConfigKey()) {
+				case "logo":
+					if($disbaled) {
+						$input = new ilFileInputGUI($this->pl->txt("logo"), 'headerpic');
+						if (is_file(ilParticipationCertificateConfig::returnPicturePath('absolute', $global_config_id, ilParticipationCertificateConfig::LOGO_FILE_NAME))) {
+							$input->setInfo('<img src="'
+								. ilParticipationCertificateConfig::returnPicturePath('relative', $global_config_id, ilParticipationCertificateConfig::LOGO_FILE_NAME) . '" />');
+						}
+					} else {
+						$input = new ilFileInputGUI($this->pl->txt("logo"), 'headerpic');
+						$input->setSuffixes(array( 'png' ));
+						if (is_file(ilParticipationCertificateConfig::returnPicturePath('absolute', $this->groupRefId, ilParticipationCertificateConfig::LOGO_FILE_NAME))) {
+							$input->setInfo('<img src="'
+								. ilParticipationCertificateConfig::returnPicturePath('relative', $this->groupRefId, ilParticipationCertificateConfig::LOGO_FILE_NAME) . '" />');
+						}
+
+					}
+					break;
 				case "page1_issuer_signature":
 					$input = new ilFileInputGUI($config->getConfigKey(), $config->getConfigKey());
 					$input->setSuffixes(array( 'png' ));
@@ -328,7 +345,16 @@ class ilParticipationCertificateGUI {
 							$input = $config->getConfigValue();
 						}
 						break;
-
+					case 'headerpic':
+						//Picture
+						$file_data = $form->getInput('headerpic');
+						if ($file_data['tmp_name']) {
+							$input = ilParticipationCertificateConfig::storePicture($file_data, $this->groupRefId, ilParticipationCertificateConfig::LOGO_FILE_NAME);
+						} else {
+							// Previous upload
+							$input = $config->getConfigValue();
+						}
+						break;
 					default:
 						break;
 				}

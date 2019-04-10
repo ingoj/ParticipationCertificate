@@ -142,6 +142,27 @@ class ilParticipationCertificateGlobalConfigSet extends ActiveRecord {
 		$configs = new ilParticipationCertificateConfigs();
 
 		foreach($configs->getGlobalConfigSet($this->getId()) as $config) {
+
+			switch ($config->getConfigKey()) {
+				case 'logo':
+
+					global $ilLog;
+					$ilLog->write($this->getId());
+
+					if (is_file(ilParticipationCertificateConfig::returnPicturePath('absolute', $this->getId(), ilParticipationCertificateConfig::LOGO_FILE_NAME))) {
+
+						if(is_file(ilParticipationCertificateConfig::returnPicturePath('absolute', $gl_config->getId(), ilParticipationCertificateConfig::LOGO_FILE_NAME))) {
+							unlink(ilParticipationCertificateConfig::returnPicturePath('absolute', $gl_config->getId(), ilParticipationCertificateConfig::LOGO_FILE_NAME));
+						}
+
+						copy(ilParticipationCertificateConfig::returnPicturePath('absolute', $this->getId(), ilParticipationCertificateConfig::LOGO_FILE_NAME), ilParticipationCertificateConfig::returnPicturePath('absolute', $gl_config->getId(), ilParticipationCertificateConfig::LOGO_FILE_NAME));
+
+					}
+					break;
+			}
+
+
+
 			$config->setGlobalConfigId($gl_config->getId());
 			$config->create();
 		}
