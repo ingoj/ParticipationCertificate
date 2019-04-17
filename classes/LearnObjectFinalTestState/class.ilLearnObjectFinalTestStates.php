@@ -22,9 +22,9 @@ class ilLearnObjectFinalTestStates {
 			$locftst_state->setLocftestTestObjId($row['locftest_test_obj_id']);
 			$locftst_state->setLocftestTestRefId($row['locftest_test_ref_id']);
 			$locftst_state->setLocftestTestTitle($row['locftest_test_title']);
-			$locftst_state->setLocftestTries($row['locftest_tries']);
-			$locftst_state->setLocftestPoints($row['locftest_points']);
-			$locftst_state->setLocftestMaxpoints($row['locftest_maxpoints']);
+			//$locftst_state->setLocftestTries($row['locftest_tries']);
+			//$locftst_state->setLocftestPoints($row['locftest_points']);
+			//$locftst_state->setLocftestMaxpoints($row['locftest_maxpoints']);
 			$locftst_state->setLocftestPercentage($row['locftest_percentage']);
 
 			$locftst_data[$row['locftest_usr_id']][$row['locftest_objective_id']] = $locftst_state;
@@ -42,8 +42,7 @@ class ilLearnObjectFinalTestStates {
 	protected static function getSQL(array $arr_usr_ids = array()) {
 		global $DIC;
 		$ilDB = $DIC->database();
-		self::createTemporaryTableTestMaxResult();
-
+		//self::createTemporaryTableTestMaxResult();
 
 		$select = "SELECT
 					crsolm.objective_id as locftest_master_crs_objective_id,
@@ -55,8 +54,7 @@ class ilLearnObjectFinalTestStates {
 					loc_user.result_perc as locftest_percentage,
 					tst_ref.ref_id as locftest_test_ref_id,
 					tst_ref.obj_id as locftest_test_obj_id,
-					tst_obj.title as locftest_test_title,
-					test_act.tries as locftest_tries
+					tst_obj.title as locftest_test_title
                     FROM 
                     crs_objective_lm as crsolm
                     inner join object_reference as crsolm_ref on crsolm_ref.ref_id = crsolm.ref_id

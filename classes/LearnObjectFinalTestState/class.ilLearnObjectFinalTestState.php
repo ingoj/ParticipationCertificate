@@ -43,21 +43,6 @@ class ilLearnObjectFinalTestState {
 	 *
 	 * @var int
 	 */
-	protected $locftest_tries;
-	/**
-	 *
-	 * @var int
-	 */
-	protected $locftest_points;
-	/**
-	 *
-	 * @var int
-	 */
-	protected $locftest_maxpoints;
-	/**
-	 *
-	 * @var int
-	 */
 	protected $locftest_percentage;
 
 
@@ -186,55 +171,6 @@ class ilLearnObjectFinalTestState {
 	public function setLocftestTestTitle($locftest_test_title) {
 		$this->locftest_test_title = $locftest_test_title;
 	}
-
-
-	/**
-	 * @return int
-	 */
-	public function getLocftestTries() {
-		return $this->locftest_tries;
-	}
-
-
-	/**
-	 * @param int $locftest_tries
-	 */
-	public function setLocftestTries($locftest_tries) {
-		$this->locftest_tries = $locftest_tries;
-	}
-
-
-	/**
-	 * @return int
-	 */
-	public function getLocftestPoints() {
-		return $this->locftest_points;
-	}
-
-
-	/**
-	 * @param int $locftest_points
-	 */
-	public function setLocftestPoints($locftest_points) {
-		$this->locftest_points = $locftest_points;
-	}
-
-
-	/**
-	 * @return int
-	 */
-	public function getLocftestMaxpoints() {
-		return $this->locftest_maxpoints;
-	}
-
-
-	/**
-	 * @param int $locftest_maxpoints
-	 */
-	public function setLocftestMaxpoints($locftest_maxpoints) {
-		$this->locftest_maxpoints = $locftest_maxpoints;
-	}
-
 
 	/**
 	 * @return int
