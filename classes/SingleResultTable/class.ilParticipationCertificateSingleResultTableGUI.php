@@ -217,8 +217,7 @@ class ilParticipationCertificateSingleResultTableGUI extends ilTable2GUI {
 				$marks [$rec->getLocftestCrsObjId()][] = $rec->getLocftestTestRefId();
 				$scores[$rec->getLocftestCrsObjId()][] = [
 					$rec->getLocftestPercentage() . '%',
-					$rec->getLocftestTestObjId(),
-					$rec->getLocftestTries()
+					$rec->getLocftestTestObjId()
 				];
 			}
 			//merge the score array and the array with the test titles

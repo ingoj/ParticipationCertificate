@@ -22,9 +22,9 @@ class ilLearnObjectFinalTestStates {
 			$locftst_state->setLocftestTestObjId($row['locftest_test_obj_id']);
 			$locftst_state->setLocftestTestRefId($row['locftest_test_ref_id']);
 			$locftst_state->setLocftestTestTitle($row['locftest_test_title']);
-			$locftst_state->setLocftestTries($row['locftest_tries']);
-			$locftst_state->setLocftestPoints($row['locftest_points']);
-			$locftst_state->setLocftestMaxpoints($row['locftest_maxpoints']);
+			//$locftst_state->setLocftestTries($row['locftest_tries']);
+			//$locftst_state->setLocftestPoints($row['locftest_points']);
+			//$locftst_state->setLocftestMaxpoints($row['locftest_maxpoints']);
 			$locftst_state->setLocftestPercentage($row['locftest_percentage']);
 
 			$locftst_data[$row['locftest_usr_id']][$row['locftest_objective_id']] = $locftst_state;
@@ -42,9 +42,35 @@ class ilLearnObjectFinalTestStates {
 	protected static function getSQL(array $arr_usr_ids = array()) {
 		global $DIC;
 		$ilDB = $DIC->database();
-		self::createTemporaryTableTestMaxResult();
+		//self::createTemporaryTableTestMaxResult();
 
-		$select = "SELECT 
+		$select = "SELECT
+					crsolm.objective_id as locftest_master_crs_objective_id,
+					crs_memb.usr_id as locftest_usr_id,
+					crsolm_crs.obj_id as locftest_crs_obj_id,
+					crsolm_crs.title as locftest_crs_title,
+					crsolm_crs_crso.objective_id as locftest_objective_id,
+					crsolm_crs_crso.title as locftest_objective_title,
+					loc_user.result_perc as locftest_percentage,
+					tst_ref.ref_id as locftest_test_ref_id,
+					tst_ref.obj_id as locftest_test_obj_id,
+					tst_obj.title as locftest_test_title
+                    FROM 
+                    crs_objective_lm as crsolm
+                    inner join object_reference as crsolm_ref on crsolm_ref.ref_id = crsolm.ref_id
+					inner join container_reference as crsolm_crs_ref on crsolm_crs_ref.obj_id = crsolm_ref.obj_id
+					inner join object_data as crsolm_crs on crsolm_crs.obj_id = crsolm_crs_ref.target_obj_id and  crsolm_crs.type = 'crs'
+					inner join obj_members as crs_memb on ".$ilDB->in('crs_memb.usr_id ', $arr_usr_ids, false, 'integer')." and crs_memb.obj_id = crsolm_crs.obj_id
+					inner join crs_objectives as crsolm_crs_crso on crsolm_crs_crso.crs_id = crsolm_crs.obj_id
+					inner join loc_tst_assignments as loc_crs_ass on loc_crs_ass.objective_id = crsolm_crs_crso.objective_id
+					inner join object_reference as tst_ref on tst_ref.ref_id = loc_crs_ass.tst_ref_id
+					inner join tst_tests as test on test.obj_fi = tst_ref.obj_id
+					inner join object_data as tst_obj on tst_obj.obj_id = test.obj_fi
+					left join tst_active as test_act on test_act.test_fi = test.test_id and test_act.user_fi = crs_memb.usr_id
+                    left  join loc_user_results as loc_user on loc_user.course_id = crsolm_crs.obj_id 
+                    and loc_user.user_id = crs_memb.usr_id and loc_user.objective_id = crsolm_crs_crso.objective_id and loc_user.type = ".ilLOUserResults::TYPE_QUALIFIED;
+
+		/*$select = "SELECT
 					crsolm.objective_id as locftest_master_crs_objective_id,
 					crs_memb.usr_id as locftest_usr_id,
 					crsolm_crs.obj_id as locftest_crs_obj_id,
@@ -62,8 +88,8 @@ class ilLearnObjectFinalTestStates {
 					crs_objective_lm as crsolm
 					inner join object_reference as crsolm_ref on crsolm_ref.ref_id = crsolm.ref_id
 					inner join container_reference as crsolm_crs_ref on crsolm_crs_ref.obj_id = crsolm_ref.obj_id
-					inner join " . usrdefObj::TABLE_NAME . " as crsolm_crs on crsolm_crs.obj_id = crsolm_crs_ref.target_obj_id and crsolm_crs.type = \"crs\"
-					inner join obj_members as crs_memb on " . $ilDB->in('crs_memb.usr_id ', $arr_usr_ids, false, 'integer') . " and crs_memb.obj_id = crsolm_crs.obj_id
+					inner join " . usrdefObj::TABLE_NAME . " as crsolm_crs on crsolm_crs.obj_id = crsolm_crs_ref.target_obj_id and crsolm_crs.type = 'crs'
+					inner join obj_members as crs_memb on ".$ilDB->in('crs_memb.usr_id ', $arr_usr_ids, false, 'integer')." and crs_memb.obj_id = crsolm_crs.obj_id
 					inner join crs_objectives as crsolm_crs_crso on crsolm_crs_crso.crs_id = crsolm_crs.obj_id
 					inner join loc_tst_assignments as loc_crs_ass on loc_crs_ass.objective_id = crsolm_crs_crso.objective_id
 					inner join object_reference as tst_ref on tst_ref.ref_id = loc_crs_ass.tst_ref_id
@@ -82,7 +108,7 @@ class ilLearnObjectFinalTestStates {
 					tmp_test_max_result.maxpoints,
 					crsolm_crs.title,
 					crsolm_crs.title,
-					locftest_test_title";
+					locftest_test_title";*/
 
 		return $select;
 	}
@@ -113,7 +139,6 @@ class ilLearnObjectFinalTestStates {
 		$ilDB->query($sql);
 
 		$sql = "CREATE Temporary Table $table_name (" . self::getSql($arr_usr_ids) . ")";
-
 		$ilDB->query($sql);
 	}
 }
