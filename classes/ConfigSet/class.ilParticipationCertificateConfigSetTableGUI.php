@@ -63,6 +63,11 @@ class ilParticipationCertificateConfigSetTableGUI extends ilTable2GUI {
 		$button->setUrl($this->ctrl->getLinkTargetByClass(ilParticipationCertificateConfigGUI::class, ilParticipationCertificateConfigGUI::CMD_ADD_CONFIG));
 		$toolbar->addButtonInstance($button);
 
+		$button = ilLinkButton::getInstance();
+		$button->setCaption($this->pl->txt('reset_config'), false);
+		$button->setUrl($this->ctrl->getLinkTargetByClass(ilParticipationCertificateConfigGUI::class, ilParticipationCertificateConfigGUI::CMD_RESET_CONFIG));
+		$toolbar->addButtonInstance($button);
+
 		parent::__construct($a_parent_obj, $a_parent_cmd);
 
 		$this->addColumns();
