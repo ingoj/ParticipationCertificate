@@ -13,6 +13,7 @@ require_once __DIR__ . "/../vendor/autoload.php";
  */
 class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI {
 
+	const CMD_CONFIRM_RESET_CONFIG = 'confirm_reset_config';
 	const CMD_RESET_CONFIG = 'resetConfig';
 	const CMD_SHOW_FORM = 'showForm';
 	const CMD_ADD_CONFIG = 'addConfig';
@@ -107,6 +108,7 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI {
 			default:
 			case self::CMD_ADD_CONFIG:
 			case self::CMD_RESET_CONFIG:
+			case self::CMD_CONFIRM_RESET_CONFIG;
 			case self::CMD_DELETE_CONFIG:
 			case self::CMD_SET_ACTIVE:
 			case self::CMD_SET_INACTIVE:
@@ -145,6 +147,9 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI {
 	}
 
 	public function resetConfig() {
+		global $DIC;
+
+
 		foreach(ilParticipationCertificateConfig::get() as $config) {
 			$config->delete();
 		}
@@ -246,6 +251,25 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI {
 		}
 
 
+		ilUtil::sendSuccess($this->pl->txt('config_reseted'),true);
+		$DIC->ctrl()->redirect($this,self::CMD_CONFIGURE);
+
+
+	}
+
+	public function confirm_reset_config() {
+		global $DIC;
+
+		$confirmation = new ilConfirmationGUI();
+
+		$confirmation->setFormAction($DIC->ctrl()->getFormAction($this));
+
+		$confirmation->setHeaderText($this->pl->txt("confirm_reset_config"));
+
+		$confirmation->setConfirm($this->pl->txt("reset_config"), self::CMD_RESET_CONFIG);
+		$confirmation->setCancel($DIC->language()->txt("cancel"), self::CMD_CONFIGURE);
+
+		$DIC->ui()->mainTemplate()->setContent($confirmation->getHTML());
 	}
 
 	public function deleteConfig() {
