@@ -196,6 +196,7 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI {
 			$config = new ilParticipationCertificateConfig();
 		}
 		$config->setConfigKey('keyword');
+		$config->setConfigValue("Lerngruppe");
 		$config->setConfigType(ilParticipationCertificateConfig::CONFIG_SET_TYPE_GLOBAL);
 		$config->setConfigValueType(ilParticipationCertificateConfig::CONFIG_VALUE_TYPE_OTHER);
 		$config->setGlobalConfigId(0);

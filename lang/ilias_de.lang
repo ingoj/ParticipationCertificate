@@ -75,3 +75,6 @@ object_config_type_2#:#Gruppenspezfische Konfiguration
 origin_template#:#Ursprungsvorlage
 set_inactive#:#Deaktivieren
 set_inactive#:#Aktivieren
+reset_config#:#Konfiguration zurücksetzen
+confirm_reset_config#:#Wollen Sie wirklich die Konfiguration zurücksetzen. Sämtliche Zertifikatseinstellungen werden gelöscht.
+config_reseted#:#Die Konfiguration wurde zurückgesetzt
