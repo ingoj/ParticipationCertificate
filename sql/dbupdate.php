@@ -411,3 +411,103 @@ foreach($part_cert_configs->returnCertTextDefaultValues() as $key => $value) {
 	$config->store();
 }
 ?>
+<#33>
+<?php
+require_once "Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/ParticipationCertificate/vendor/autoload.php";
+global $DIC;
+
+//FIX cert_config
+$select = "UPDATE dhbw_part_cert_conf SET config_type = 2, config_value_type = 2  where config_key in('period_start','period_end','enable_self_print','self_print_start','self_print_end') and group_ref_id is not null";
+$DIC->database()->query($select);
+
+//Fix global config if necessary
+$config = ilParticipationCertificateConfig::where(["config_key" => 'udf_firstname'])->first();
+if(!is_object($config)) {
+	$config = new ilParticipationCertificateConfig();
+}
+$config->setConfigType(ilParticipationCertificateConfig::CONFIG_SET_TYPE_GLOBAL);
+$config->setConfigKey('udf_firstname');
+$config->setGlobalConfigId(0);
+$config->setConfigValueType(ilParticipationCertificateConfig::CONFIG_VALUE_TYPE_OTHER);
+$config->store();
+
+$config = ilParticipationCertificateConfig::where(["config_key" => 'udf_lastname'])->first();
+if(!is_object($config)) {
+	$config = new ilParticipationCertificateConfig();
+}
+$config->setConfigKey('udf_lastname');
+$config->setConfigType(ilParticipationCertificateConfig::CONFIG_SET_TYPE_GLOBAL);
+$config->setConfigValueType(ilParticipationCertificateConfig::CONFIG_VALUE_TYPE_OTHER);
+$config->setGlobalConfigId(0);
+$config->store();
+
+
+$config = ilParticipationCertificateConfig::where(["config_key" => 'udf_gender'])->first();
+if(!is_object($config)) {
+	$config = new ilParticipationCertificateConfig();
+}
+$config->setConfigKey('udf_gender');
+$config->setConfigType(ilParticipationCertificateConfig::CONFIG_SET_TYPE_GLOBAL);
+$config->setConfigValueType(ilParticipationCertificateConfig::CONFIG_VALUE_TYPE_OTHER);
+$config->setGlobalConfigId(0);
+$config->store();
+
+
+$config = ilParticipationCertificateConfig::where(["config_key" => 'keyword'])->first();
+if(!is_object($config)) {
+	$config = new ilParticipationCertificateConfig();
+}
+$config->setConfigKey('keyword');
+$config->setConfigValue("Lerngruppe");
+$config->setConfigType(ilParticipationCertificateConfig::CONFIG_SET_TYPE_GLOBAL);
+$config->setConfigValueType(ilParticipationCertificateConfig::CONFIG_VALUE_TYPE_OTHER);
+$config->setGlobalConfigId(0);
+$config->store();
+
+
+$config = ilParticipationCertificateConfig::where(["config_key" => 'color'])->first();
+if(!is_object($config)) {
+	$config = new ilParticipationCertificateConfig();
+}
+$config->setConfigKey('color');
+$config->setConfigType(ilParticipationCertificateConfig::CONFIG_SET_TYPE_GLOBAL);
+$config->setConfigValueType(ilParticipationCertificateConfig::CONFIG_VALUE_TYPE_OTHER);
+$config->setGlobalConfigId(0);
+$config->store();
+
+
+//TEMPLATE
+//Config Template
+require_once "Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/ParticipationCertificate/vendor/autoload.php";
+
+$part_cert_global_config_sets = new ilParticipationCertificateGlobalConfigSets();
+$part_cert_default_config_set = $part_cert_global_config_sets->getDefaultConfig();
+
+$part_cert_configs = new ilParticipationCertificateConfigs();
+foreach($part_cert_configs->returnCertTextDefaultValues() as $key => $value) {
+	/**
+	 * @var $value ilParticipationCertificateConfig
+	 */
+	$config = new ilParticipationCertificateConfig();
+	$config->setConfigKey($value->getConfigKey());
+	$config->setGlobalConfigId($part_cert_default_config_set->getId());
+	$config->setConfigType(ilParticipationCertificateConfig::CONFIG_SET_TYPE_TEMPLATE);
+
+
+	$config->setConfigKey($value->getConfigKey());
+	$config->setOrderBy($value->getOrderBy());
+	$config->setConfigType($value->getConfigType());
+	$config->setConfigValueType($value->getConfigValueType());
+
+
+	$config->store();
+
+	if(!is_object($config)) {
+		$value->setGlobalConfigId($part_cert_default_config_set->getId());
+		$config = $value;
+	} else {
+		$config->setOrderBy($value->getOrderBy());
+	}
+	$config->store();
+}
+?>
