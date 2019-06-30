@@ -31,10 +31,11 @@ class ilLearnObjectSuggReachedPercentages {
 	 */
 	protected static function getSQL(array $arr_usr_ids = array()) {
 		ilLearningObjectiveSuggestions::createTemporaryTableLearnObjectSugg($arr_usr_ids, 'tmp_lo_sugg');
-		ilLearnObjectFinalTestStates::createTemporaryTableLearnObjectFinalTest($arr_usr_ids, 'tmp_lo_fin_test');
 
-		$select = "SELECT *
-			from tmp_lo_sugg";
+		$select = "SELECT sugg_for_user as usr_id,
+						 COALESCE(round(avg(result_perc),2),0) as average_percentage
+			from tmp_lo_sugg
+			 group by sugg_for_user";
 
 		/*$select = "SELECT
 					sugg_for_user as usr_id,

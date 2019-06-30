@@ -170,7 +170,7 @@ class ilParticipationCertificateResultTableGUI extends ilTable2GUI {
 
 		$arr_usr_data = ilPartCertUsersData::getData($this->usr_ids);
 		$arr_initial_test_states = ilCrsInitialTestStates::getData($this->usr_ids);
-		//$arr_learn_reached_percentages = ilLearnObjectSuggReachedPercentages::getData($this->usr_ids);
+		$arr_learn_reached_percentages = ilLearnObjectSuggReachedPercentages::getData($this->usr_ids);
 		$arr_iass_states = ilIassStates::getData($this->usr_ids);
 		$arr_new_iass_states = ilIassStatesMulti::getData($this->usr_ids);
 		$arr_excercise_states = ilExcerciseStates::getData($this->usr_ids);
@@ -203,7 +203,6 @@ class ilParticipationCertificateResultTableGUI extends ilTable2GUI {
 				$row['initial_test_finished'] = $this->pl->txt("no");
 			}
 			if (is_object($arr_learn_reached_percentages[$usr_id])) {
-				//$row['result_qualifing_tests'] = $arr_learn_reached_percentages[$usr_id]->getAveragePercentage() . '%';
 				$row['result_qualifing_tests'] = $this->buildProgressBar($arr_learn_reached_percentages[$usr_id]->getAveragePercentage());
 			} else {
 				//$row['result_qualifing_tests'] = 0 . '%';
