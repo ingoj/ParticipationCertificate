@@ -201,11 +201,50 @@ class ilParticipationCertificateSingleResultTableGUI extends ilTable2GUI {
 
 		$arr_FinalTestsStates = ilLearnObjectFinalTestStates::getData($this->usr_ids);
 
-		$usr_id = $this->usr_id;
+		//print_r($arr_FinalTestsStates);exit;
 
+		$usr_id = $this->usr_id;
+//print_r($arr_FinalTestsStates);
 		$rec_array = array();
 		$new_rec_array = array();
 
+		if (count($arr_FinalTestsStates[$usr_id])) {
+
+			//build_row_key_s
+			foreach ($arr_FinalTestsStates[$usr_id] as $rec) {
+				/**
+				 * @var ilLearnObjectFinalTestState $rec;
+				 */
+				$row_key[$rec->getLocftestCrsObjId()] = 0;
+			}
+
+			foreach ($arr_FinalTestsStates[$usr_id] as $rec) {
+				/**
+				 * @var ilLearnObjectFinalTestState $rec;
+				 */
+
+				if ($rec->getLocftestCrsObjId()) {
+					/*$strng = explode(':', $rec->getLocftestTestTitle());
+					$string = $strng[0] . "<br>" . $strng[1];*/
+
+					//first line - title lp
+					$rec_array[$row_key[$rec->getLocftestCrsObjId()]][$rec->getLocftestCrsObjId()] = $rec->getLocftestObjectiveTitle();
+
+					$row_key[$rec->getLocftestCrsObjId()] += 1;
+
+					//second line - array progressbar
+					$rec_array[$row_key[$rec->getLocftestCrsObjId()]][$rec->getLocftestCrsObjId()][0] = $rec->getLocftestPercentage();
+					$rec_array[$row_key[$rec->getLocftestCrsObjId()]][$rec->getLocftestCrsObjId()][1] = $rec->getLocftestTestObjId();
+					$rec_array[$row_key[$rec->getLocftestCrsObjId()]][$rec->getLocftestCrsObjId()][2] = 1;
+
+					$row_key[$rec->getLocftestCrsObjId()] += 1;
+				}
+
+			}
+		}
+
+
+		/*
 		if (count($arr_FinalTestsStates[$usr_id])) {
 			foreach ($arr_FinalTestsStates[$usr_id] as $rec) {
 				if ($rec->getLocftestCrsObjId()) {
@@ -220,6 +259,7 @@ class ilParticipationCertificateSingleResultTableGUI extends ilTable2GUI {
 					$rec->getLocftestTestObjId()
 				];
 			}
+			print_r($rec_array);
 			//merge the score array and the array with the test titles
 			foreach ($rec_array as $key => $item) {
 				$v = 0;
@@ -237,11 +277,11 @@ class ilParticipationCertificateSingleResultTableGUI extends ilTable2GUI {
 			}
 
 			ksort($new_rec_array);
-		}
+		}*/
+//print_R($new_rec_array);exit;
+		$this->setData($rec_array);
 
-		$this->setData($new_rec_array);
-
-		return $new_rec_array;
+		return $rec_array;
 	}
 
 
@@ -302,6 +342,7 @@ class ilParticipationCertificateSingleResultTableGUI extends ilTable2GUI {
 				if ($a_set[$k]) {
 					$this->tpl->setCurrentBlock('td');
 					if (is_array($a_set[$k])) {
+
 						$this->tpl->setVariable('COURSE', $this->buildProgressBar(explode('%', $a_set[$k][0]), $a_set[$k][1], $a_set[$k][2]));
 					} else {
 						$this->tpl->setVariable('COURSE', $a_set[$k]);

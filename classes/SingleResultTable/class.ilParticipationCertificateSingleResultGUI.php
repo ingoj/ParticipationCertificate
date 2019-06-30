@@ -53,7 +53,7 @@ class ilParticipationCertificateSingleResultGUI {
 	/**
 	 * @var ilLearnObjectSuggReachedPercentage[]
 	 */
-	protected $arr_learn_reached_percentages;
+	//protected $arr_learn_reached_percentages;
 	/**
 	 * @var ilIassState[]
 	 */
@@ -98,7 +98,7 @@ class ilParticipationCertificateSingleResultGUI {
 
 		$this->arr_usr_data = ilPartCertUsersData::getData($this->usr_ids);
 		$this->arr_initial_test_states = ilCrsInitialTestStates::getData($this->usr_ids);
-		$this->arr_learn_reached_percentages = ilLearnObjectSuggReachedPercentages::getData($this->usr_ids);
+		//$this->arr_learn_reached_percentages = ilLearnObjectSuggReachedPercentages::getData($this->usr_ids);
 		$this->arr_iass_states = ilIassStates::getData($this->usr_ids);
 		$this->arr_excercise_states = ilExcerciseStates::getData($this->usr_ids);
 		$this->arr_FinalTestsStates = ilLearnObjectFinalTestStates::getData($this->usr_ids);
