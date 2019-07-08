@@ -10,6 +10,11 @@ class ilLearnObjectSuggReachedPercentage {
 	 * @var int
 	 */
 	protected $average_percentage;
+	/**
+	 * @var int $limit_percentage;
+	 */
+	protected $limit_percentage;
+
 
 
 	/**
@@ -42,5 +47,23 @@ class ilLearnObjectSuggReachedPercentage {
 	public function setAveragePercentage($average_percentage) {
 		$this->average_percentage = $average_percentage;
 	}
+
+
+	/**
+	 * @return int
+	 */
+	public function getLimitPercentage() {
+		return $this->limit_percentage;
+	}
+
+
+	/**
+	 * @param int $limit_percentage
+	 */
+	public function setLimitPercentage($limit_percentage) {
+		$this->limit_percentage = $limit_percentage;
+	}
+
+
 }
 ?>

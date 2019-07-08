@@ -203,10 +203,10 @@ class ilParticipationCertificateResultTableGUI extends ilTable2GUI {
 				$row['initial_test_finished'] = $this->pl->txt("no");
 			}
 			if (is_object($arr_learn_reached_percentages[$usr_id])) {
-				$row['result_qualifing_tests'] = $this->buildProgressBar($arr_learn_reached_percentages[$usr_id]->getAveragePercentage());
+				$row['result_qualifing_tests'] = $this->buildProgressBar($arr_learn_reached_percentages[$usr_id]->getAveragePercentage(),$arr_learn_reached_percentages[$usr_id]->getLimitPercentage());
 			} else {
 				//$row['result_qualifing_tests'] = 0 . '%';
-				$row['result_qualifing_tests'] = $this->buildProgressBar(0);
+				$row['result_qualifing_tests'] = $this->buildProgressBar(0,0);
 			}
 
 			if (is_array($arr_FinalTestsStates[$usr_id])) {
@@ -251,11 +251,11 @@ class ilParticipationCertificateResultTableGUI extends ilTable2GUI {
 			if (is_object($arr_excercise_states[$usr_id])) {
 				$row['eMentoring_homework'] = $arr_excercise_states[$usr_id]->getPassed();
 				//$row['eMentoring_percentage'] = $arr_excercise_states[$usr_id]->getPassedPercentage() . '%';
-				$row['eMentoring_percentage'] = $this->buildProgressBar($arr_excercise_states[$usr_id]->getPassedPercentage());
+				$row['eMentoring_percentage'] = $this->buildProgressBar($arr_excercise_states[$usr_id]->getPassedPercentage(),0);
 			} else {
 				$row['eMentoring_homework'] = 0;
 				//$row['eMentoring_percentage'] = 0 . '%';
-				$row['eMentoring_percentage'] = $this->buildProgressBar(0);
+				$row['eMentoring_percentage'] = $this->buildProgressBar(0,0);
 			}
 
 			if ($this->filter['firstname'] != false) {
@@ -281,7 +281,7 @@ class ilParticipationCertificateResultTableGUI extends ilTable2GUI {
 	 *
 	 * @return string
 	 */
-	protected function buildProgressBar($a_perc_result) {
+	protected function buildProgressBar($a_perc_result,$a_perc_limit) {
 		$groupRefId = filter_input(INPUT_GET, 'ref_id');
 
 		$start = ilParticipationCertificateConfig::getConfig('period_start', $groupRefId);
@@ -299,18 +299,17 @@ class ilParticipationCertificateResultTableGUI extends ilTable2GUI {
 			$current = new DateTime("2018-03-26");*/
 
 			if ($current >= $start) {
-				// Started
 				if ($current <= $end) {
 					// Running
 					$rest_days = $end->diff($current)->days;
 					$total_days = max(1, $end->diff($start)->days);
-					//$past_days = ($total_days - $rest_days);
-
-					$a_perc_limit = (100 - ($rest_days / $total_days * 100));
+					$perc_limit = ($a_perc_limit - ($rest_days / $total_days * 100));
 				} else {
-					// Ended
-					$a_perc_limit = 100;
+					 // Ended
+					 $perc_limit = $a_perc_limit;
 				}
+
+
 
 				if ($a_perc_result >= 90) {
 					// 90% reached
@@ -319,11 +318,11 @@ class ilParticipationCertificateResultTableGUI extends ilTable2GUI {
 					// <90%
 					if ($current <= $end) {
 						// End not reached
-						if ($a_perc_result >= ($a_perc_limit - 30)) {
+						if ($a_perc_result >= ($perc_limit - 30)) {
 							// In time or already farer
 							$css_class = self::GREEN_PROGRESS;
 						} else {
-							if ($a_perc_result >= ($a_perc_limit - 40)) {
+							if ($a_perc_result >= ($perc_limit - 40)) {
 								//
 								$css_class = self::ORANGE_PROGRESS;
 							} else {
@@ -336,18 +335,18 @@ class ilParticipationCertificateResultTableGUI extends ilTable2GUI {
 						$css_class = self::RED_PROGRESS;
 					}
 				}
-				if ($a_perc_limit < 30) {
+				if ($perc_limit < 30) {
 					//
-					$a_perc_limit = 30;
+					$perc_limit = 30;
 				}
 			} else {
 				// Not started
-				$a_perc_limit = 1;
+				$perc_limit = 1;
 				$css_class = self::NO_PROGRESS;
 			}
 		} else {
 			// No period set
-			$a_perc_limit = NULL;
+			$perc_limit = NULL;
 
 			if ($a_perc_result >= 80) {
 				// 80% reached
@@ -358,7 +357,7 @@ class ilParticipationCertificateResultTableGUI extends ilTable2GUI {
 			}
 		}
 
-		return ilContainerObjectiveGUI::renderProgressBar($a_perc_result, $a_perc_limit, $css_class);
+		return ilContainerObjectiveGUI::renderProgressBar($a_perc_result, $perc_limit, $css_class);
 	}
 
 

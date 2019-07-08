@@ -16,7 +16,7 @@ class ilLearnObjectSuggReachedPercentages {
 			$reached_percentage = new ilLearnObjectSuggReachedPercentage();
 			$reached_percentage->setUsrId($row['usr_id']);
 			$reached_percentage->setAveragePercentage($row['average_percentage']);
-
+			$reached_percentage->setLimitPercentage($row['limit_perc']);
 			$reached_percentage_data[$row['usr_id']] = $reached_percentage;
 		}
 
@@ -32,10 +32,11 @@ class ilLearnObjectSuggReachedPercentages {
 	protected static function getSQL(array $arr_usr_ids = array()) {
 		ilLearningObjectiveSuggestions::createTemporaryTableLearnObjectSugg($arr_usr_ids, 'tmp_lo_sugg');
 
-		$select = "SELECT sugg_for_user as usr_id,
-						 COALESCE(round(avg(result_perc),2),0) as average_percentage
-			from tmp_lo_sugg
-			 group by sugg_for_user";
+
+		$select = "SELECT round(avg(result_perc),0) as average_percentage, 
+					sugg_for_user as usr_id, 
+					sugg_master_crs_obj_id, 
+					limit_perc from tmp_lo_sugg";
 
 		/*$select = "SELECT
 					sugg_for_user as usr_id,
