@@ -200,13 +200,8 @@ class ilParticipationCertificateSingleResultTableGUI extends ilTable2GUI {
 	public function parseData() {
 
 		$arr_FinalTestsStates = ilLearnObjectFinalTestStates::getData($this->usr_ids);
-
-		//print_r($arr_FinalTestsStates);exit;
-
 		$usr_id = $this->usr_id;
-//print_r($arr_FinalTestsStates);
 		$rec_array = array();
-		$new_rec_array = array();
 
 		if (count($arr_FinalTestsStates[$usr_id])) {
 
@@ -224,17 +219,13 @@ class ilParticipationCertificateSingleResultTableGUI extends ilTable2GUI {
 				 */
 
 				if ($rec->getLocftestCrsObjId()) {
-					/*$strng = explode(':', $rec->getLocftestTestTitle());
-					$string = $strng[0] . "<br>" . $strng[1];*/
-
 					//first line - title lp
 					$rec_array[$row_key[$rec->getLocftestCrsObjId()]][$rec->getLocftestCrsObjId()] = $rec->getLocftestObjectiveTitle();
 
 					$row_key[$rec->getLocftestCrsObjId()] += 1;
-
 					//second line - array progressbar
 					$rec_array[$row_key[$rec->getLocftestCrsObjId()]][$rec->getLocftestCrsObjId()][0] = $rec->getLocftestPercentage();
-					$rec_array[$row_key[$rec->getLocftestCrsObjId()]][$rec->getLocftestCrsObjId()][1] = $rec->getLocftestTestObjId();
+					$rec_array[$row_key[$rec->getLocftestCrsObjId()]][$rec->getLocftestCrsObjId()][1] = $rec->getLocftestQplsRequiredPercentage();
 					$rec_array[$row_key[$rec->getLocftestCrsObjId()]][$rec->getLocftestCrsObjId()][2] = 1;
 
 					$row_key[$rec->getLocftestCrsObjId()] += 1;
@@ -243,42 +234,6 @@ class ilParticipationCertificateSingleResultTableGUI extends ilTable2GUI {
 			}
 		}
 
-
-		/*
-		if (count($arr_FinalTestsStates[$usr_id])) {
-			foreach ($arr_FinalTestsStates[$usr_id] as $rec) {
-				if ($rec->getLocftestCrsObjId()) {
-					$strng = explode(':', $rec->getLocftestTestTitle());
-					$string = $strng[0] . "<br>" . $strng[1];
-					$rec_array[$rec->getLocftestCrsObjId()][] = $string;
-				}
-				//create two arrays, one for the mark when a test is fulfilled and one for the scores.
-				$marks [$rec->getLocftestCrsObjId()][] = $rec->getLocftestTestRefId();
-				$scores[$rec->getLocftestCrsObjId()][] = [
-					$rec->getLocftestPercentage() . '%',
-					$rec->getLocftestTestObjId()
-				];
-			}
-			print_r($rec_array);
-			//merge the score array and the array with the test titles
-			foreach ($rec_array as $key => $item) {
-				$v = 0;
-				for ($k = 0; $k <= count($item); $k ++) {
-					$new_rec_array[$v][$key] = $item[$k];
-					$v = $v + 2;
-				}
-			}
-			foreach ($scores as $key => $score) {
-				$v = 1;
-				for ($k = 0; $k <= count($score); $k ++) {
-					$new_rec_array[$v][$key] = $score[$k];
-					$v = $v + 2;
-				}
-			}
-
-			ksort($new_rec_array);
-		}*/
-//print_R($new_rec_array);exit;
 		$this->setData($rec_array);
 
 		return $rec_array;
@@ -287,39 +242,29 @@ class ilParticipationCertificateSingleResultTableGUI extends ilTable2GUI {
 
 	/**
 	 * @param object $points
-	 * @param object $test_obj
+	 * @param int $req_percentage
 	 * @param object $tries
 	 *
 	 * @return string
 	 */
-	protected function buildProgressBar($points, $test_obj, $tries) {
-		//Holt von allen Tests das minimum um zu bestehen
-		$mark = TestMarks::getData($test_obj);
-
+	protected function buildProgressBar($points, $required_percent = 0, $tries) {
 		$points = $points[0];
 		$tooltip_id = "prg_";
 
-		if (is_object($mark)) {
-			$required_amount_of_points = $mark->getMinimumlvl();
-		} else {
-			$required_amount_of_points = 50;
-		}
 		$maximum_possible_amount_of_points = 100;
 		$current_amount_of_points = $points;
 
 		if ($maximum_possible_amount_of_points > 0) {
 			$current_percent = (int)($current_amount_of_points * 100 / $maximum_possible_amount_of_points);
-			$required_percent = (int)($required_amount_of_points * 100 / $maximum_possible_amount_of_points);
 		} else {
 			$current_percent = 0;
-			$required_percent = 0;
 		}
 		//required to dodge bug in ilContainerObjectiveGUI::renderProgressBar
 		if ($required_percent == 0) {
 			$required_percent = 0.1;
 		}
 
-		if ($points >= $required_amount_of_points) {
+		if ($current_percent >= $required_percent) {
 			$css_class = self::SUCCESSFUL_PROGRESS_CSS_CLASS;
 		} elseif ($tries == NULL) {
 			$css_class = self::NON_SUCCESSFUL_PROGRESS_CSS_CLASS;
@@ -337,6 +282,7 @@ class ilParticipationCertificateSingleResultTableGUI extends ilTable2GUI {
 	 * @param array $a_set
 	 */
 	public function fillRow($a_set) {
+
 		foreach ($this->getSelectableColumns() as $k => $v) {
 			if ($this->isColumnSelected($k)) {
 				if ($a_set[$k]) {

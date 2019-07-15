@@ -171,7 +171,9 @@ class ilParticipationCertificateResultTableGUI extends ilTable2GUI {
 		$arr_usr_data = ilPartCertUsersData::getData($this->usr_ids);
 		$arr_initial_test_states = ilCrsInitialTestStates::getData($this->usr_ids);
 		$arr_learn_reached_percentages = ilLearnObjectSuggReachedPercentages::getData($this->usr_ids);
-		$arr_iass_states = ilIassStates::getData($this->usr_ids);
+
+		$arr_final_tests = ilLearnObjectFinalTestStates::getData($this->usr_ids);
+
 		$arr_new_iass_states = ilIassStatesMulti::getData($this->usr_ids);
 		$arr_excercise_states = ilExcerciseStates::getData($this->usr_ids);
 		$arr_FinalTestsStates = ilLearnObjectFinalTestOfSuggStates::getData($this->usr_ids);
@@ -209,14 +211,21 @@ class ilParticipationCertificateResultTableGUI extends ilTable2GUI {
 				$row['result_qualifing_tests'] = $this->buildProgressBar(0,0);
 			}
 
-			if (is_array($arr_FinalTestsStates[$usr_id])) {
+			$rec_array = [];
+			$array_results = [];
+			if (is_array($arr_final_tests[$usr_id])) {
 
-				foreach ($arr_FinalTestsStates[$usr_id] as $rec) {
-					/**
-					 * @var ilLearnObjectFinalTestOfSuggState $rec
-					 */
-					$rec_array[] = $rec->getLocftestObjectiveTitle() . '<br/>' . $rec->getLocftestTestTitle() . '<br/>'
-						. round($rec->getLocftestPercentage(), 0) . '%<br/>';
+				foreach ($arr_final_tests[$usr_id] as $rec) {
+
+					if($rec->getObjectivesSuggested()) {
+						/**
+						 * @var ilLearnObjectFinalTestState $rec
+						 */
+						$rec_array[] = $rec->getLocftestObjectiveTitle() . '<br/>' . $rec->getLocftestTestTitle() . '<br/>'
+							. round($rec->getLocftestPercentage(), 0) . '%<br/>';
+					}
+
+
 				}
 				$array_results = $rec_array;
 				$row['results_qualifing_tests'] = $array_results;
@@ -303,10 +312,10 @@ class ilParticipationCertificateResultTableGUI extends ilTable2GUI {
 					// Running
 					$rest_days = $end->diff($current)->days;
 					$total_days = max(1, $end->diff($start)->days);
-					$perc_limit = ($a_perc_limit - ($rest_days / $total_days * 100));
+					$perc_limit = (100 - ($rest_days / $total_days * 100));
 				} else {
 					 // Ended
-					 $perc_limit = $a_perc_limit;
+					 $perc_limit = 100;
 				}
 
 

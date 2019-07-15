@@ -20,6 +20,7 @@ class ilLearnObjectSuggReachedPercentages {
 			$reached_percentage_data[$row['usr_id']] = $reached_percentage;
 		}
 
+
 		return $reached_percentage_data;
 	}
 
@@ -30,26 +31,18 @@ class ilLearnObjectSuggReachedPercentages {
 	 * @return string
 	 */
 	protected static function getSQL(array $arr_usr_ids = array()) {
-		ilLearningObjectiveSuggestions::createTemporaryTableLearnObjectSugg($arr_usr_ids, 'tmp_lo_sugg');
 
 
-		$select = "SELECT round(avg(result_perc),0) as average_percentage, 
-					sugg_for_user as usr_id, 
-					sugg_master_crs_obj_id, 
-					limit_perc from tmp_lo_sugg";
 
-		/*$select = "SELECT
-					sugg_for_user as usr_id,
-					COALESCE(round(avg(average_percentage),0),0) as average_percentage
-					from(
-					select 
-					sugg_for_user,
-					locftest_crs_obj_id,
-					COALESCE(round(avg(locftest_percentage),2),0) as average_percentage
-					from 
-					(select * from tmp_lo_sugg
-					LEFT JOIN tmp_lo_fin_test on tmp_lo_fin_test.locftest_master_crs_objective_id = tmp_lo_sugg.sugg_objective_id 
-					and tmp_lo_fin_test.locftest_usr_id = tmp_lo_sugg.sugg_for_user) as locftest group by sugg_for_user, locftest_crs_obj_id) as average group by sugg_for_user";*/
+		ilLearnObjectFinalTestStates::createTemporaryTableLearnObjectFinalTest($arr_usr_ids, 'tmp_lo_fin_test');
+
+
+		$select = "SELECT round((SUM(objectives_sug_completed) / SUM(suggested)) * 100,0) as average_percentage, 
+					locftest_usr_id as usr_id, 
+				
+					round(avg(locftest_qpls_required_percentage),0) as limit_perc
+					from tmp_lo_fin_test
+					group by locftest_usr_id";
 
 		return $select;
 	}

@@ -22,6 +22,9 @@ class ilLearnObjectFinalTestOfSuggStates {
 			$locftst_state->setLocftestTestObjId($row['locftest_test_obj_id']);
 			$locftst_state->setLocftestTestRefId($row['locftest_test_ref_id']);
 			$locftst_state->setLocftestTestTitle($row['locftest_test_title']);
+			$locftst_state->setObjectivesAllCompleted($row['objectives_all_completed']);
+			$locftst_state->setObjectivesSugCompleted($row['objectives_sug_completed']);
+			$locftst_state->setObjectivesSuggested($row['objectives_suggested']);
 			//$locftst_state->setLocftestTries($row['locftest_tries']);
 			//$locftst_state->setLocftestPoints($row['locftest_points']);
 			//$locftst_state->setLocftestMaxpoints($row['locftest_maxpoints']);
@@ -55,9 +58,9 @@ class ilLearnObjectFinalTestOfSuggStates {
 					locftest_crs_title,
 					locftest_objective_id,
 					locftest_objective_title,
-					locftest_test_ref_id,
-					locftest_test_obj_id,
-					locftest_test_title,
+					0 as locftest_test_ref_id,
+					0 as locftest_test_obj_id,
+					0 as locftest_test_title,
 					/*locftest_tries,
 					locftest_points,
 					locftest_maxpoints,*/

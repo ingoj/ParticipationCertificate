@@ -44,7 +44,23 @@ class ilLearnObjectFinalTestState {
 	 * @var int
 	 */
 	protected $locftest_percentage;
-
+	/**
+	 *
+	 * @var int
+	 */
+	protected $locftest_qpls_required_percentage;
+	/**
+	 * @var bool
+	 */
+	protected  $objectives_all_completed;
+	/**
+	 * @var bool
+	 */
+	protected  $objectives_sug_completed;
+	/**
+	 * @var bool
+	 */
+	protected  $objectives_suggested;
 
 	/**
 	 * @return int
@@ -52,6 +68,7 @@ class ilLearnObjectFinalTestState {
 	public function getLocftestUsrId() {
 		return $this->locftest_usr_id;
 	}
+
 
 
 	/**
@@ -186,5 +203,72 @@ class ilLearnObjectFinalTestState {
 	public function setLocftestPercentage($locftest_percentage) {
 		$this->locftest_percentage = $locftest_percentage;
 	}
+
+
+	/**
+	 * @return int
+	 */
+	public function getLocftestQplsRequiredPercentage() {
+		return $this->locftest_qpls_required_percentage;
+	}
+
+
+	/**
+	 * @param int $locftest_qpls_required_percentage
+	 */
+	public function setLocftestQplsRequiredPercentage($locftest_qpls_required_percentage) {
+		$this->locftest_qpls_required_percentage = $locftest_qpls_required_percentage;
+	}
+
+
+	/**
+	 * @return bool
+	 */
+	public function isObjectivesAllCompleted() {
+		return $this->objectives_all_completed;
+	}
+
+
+	/**
+	 * @param bool $objectives_all_completed
+	 */
+	public function setObjectivesAllCompleted($objectives_all_completed) {
+		$this->objectives_all_completed = $objectives_all_completed;
+	}
+
+
+	/**
+	 * @return bool
+	 */
+	public function isObjectivesSugCompleted() {
+		return $this->objectives_sug_completed;
+	}
+
+
+	/**
+	 * @param bool $objectives_sug_completed
+	 */
+	public function setObjectivesSugCompleted($objectives_sug_completed) {
+		$this->objectives_sug_completed = $objectives_sug_completed;
+	}
+
+
+	/**
+	 * @return bool
+	 */
+	public function getObjectivesSuggested() {
+		return $this->objectives_suggested;
+	}
+
+
+	/**
+	 * @param bool $objectives_suggested
+	 */
+	public function setObjectivesSuggested($objectives_suggested) {
+		$this->objectives_suggested = $objectives_suggested;
+	}
+
+
+
 }
 ?>
