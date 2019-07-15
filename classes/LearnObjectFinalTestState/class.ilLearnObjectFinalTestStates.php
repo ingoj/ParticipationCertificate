@@ -87,7 +87,7 @@ DISTINCT
                LEFT JOIN crs_objectives as master_objective on master_objective.crs_id = master_loc_ref.obj_id
                LEFT JOIN alo_suggestion as sug on sug.objective_id = master_objective.objective_id and sug.user_id = crs_memb.usr_id
 			        
-		ORDER BY crsolm_crs.title";
+		ORDER BY ORDER BY crs_objectives.position, crsolm_crs.title, crs_objectives.title ";
 
 		return $select;
 	}
