@@ -109,7 +109,7 @@ class ilLearnObjectFinalTestStates {
     loc_user_results ON loc_user_results.course_id = final_tests.crs_id
 			        AND loc_user_results.user_id = crs_memb.usr_id AND ".$ilDB->in('loc_user_results.user_id', $arr_usr_ids, false, 'integer')."
 			        AND loc_user_results.type = ".ilLOUserResults::TYPE_QUALIFIED."
-			         
+			        AND  loc_user_results.objective_id = final_tests.crs_objective_id 
 			        ORDER BY learn_objective_crs.master_crs_objective_position, final_tests.crs_objective_title";
 
 		//echo $select;	exit;

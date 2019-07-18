@@ -44,8 +44,6 @@ class ilLearnObjectSuggReachedPercentages {
 					from tmp_lo_fin_test
 					group by usr_id";
 
-		echo $select."; ";
-
 		return $select;
 	}
 }

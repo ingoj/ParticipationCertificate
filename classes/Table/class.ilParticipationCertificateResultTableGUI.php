@@ -166,9 +166,6 @@ class ilParticipationCertificateResultTableGUI extends ilTable2GUI {
 	 * @return array
 	 */
 	public function parseData() {
-		$this->usr_ids = array();
-		$this->usr_ids[] = 1884;
-
 		$arr_usr_data = ilPartCertUsersData::getData($this->usr_ids);
 		$arr_initial_test_states = ilCrsInitialTestStates::getData($this->usr_ids);
 		$arr_learn_reached_percentages = ilLearnObjectSuggReachedPercentages::getData($this->usr_ids);
