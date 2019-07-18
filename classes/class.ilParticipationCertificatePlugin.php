@@ -80,6 +80,14 @@ class ilParticipationCertificatePlugin extends ilUserInterfaceHookPlugin {
 	 * @inheritdoc
 	 */
 	protected function deleteData()/*: void*/ {
+
+		self::dic()->database()->dropTable(ilParticipationCertificateGlobalConfigSet::TABLE_NAME, false);
+		self::dic()->database()->dropTable(ilParticipationCertificateObjectConfigSet::TABLE_NAME, false);
+
+
+		self::dic()->database()->manipulateF('DELETE FROM ctrl_classfile WHERE comp_prefix=%s', [ ilDBConstants::T_TEXT ], [ $this->getPrefix() ]);
+		self::dic()->database()->manipulateF('DELETE FROM ctrl_calls WHERE comp_prefix=%s', [ ilDBConstants::T_TEXT ], [ $this->getPrefix() ]);
+
 		self::dic()->database()->dropTable(ilParticipationCertificateConfig::TABLE_NAME, false);
 	}
 

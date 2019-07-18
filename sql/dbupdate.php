@@ -413,7 +413,7 @@ foreach($part_cert_configs->returnCertTextDefaultValues() as $key => $value) {
 ?>
 <#33>
 <?php
-
+/*
 require_once "Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/ParticipationCertificate/vendor/autoload.php";
 global $DIC;
 
@@ -486,9 +486,11 @@ $part_cert_default_config_set = $part_cert_global_config_sets->getDefaultConfig(
 
 $part_cert_configs = new ilParticipationCertificateConfigs();
 foreach($part_cert_configs->returnCertTextDefaultValues() as $key => $value) {
+*/
 	/**
 	 * @var $value ilParticipationCertificateConfig
 	 */
+	/*
 	$config = new ilParticipationCertificateConfig();
 	$config->setConfigKey($value->getConfigKey());
 	$config->setGlobalConfigId($part_cert_default_config_set->getId());
@@ -511,7 +513,7 @@ foreach($part_cert_configs->returnCertTextDefaultValues() as $key => $value) {
 	}
 	$config->store();
 }
-
+*/
 ?>
 <#34>
 <?php
