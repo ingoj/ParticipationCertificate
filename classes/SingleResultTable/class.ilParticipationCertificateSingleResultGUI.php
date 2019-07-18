@@ -96,13 +96,7 @@ class ilParticipationCertificateSingleResultGUI {
 		$usr_id = $_GET[self::IDENTIFIER];
 		$this->usr_id = $usr_id;
 
-		$this->arr_usr_data = ilPartCertUsersData::getData($this->usr_ids);
-		$this->arr_initial_test_states = ilCrsInitialTestStates::getData($this->usr_ids);
-		//$this->arr_learn_reached_percentages = ilLearnObjectSuggReachedPercentages::getData($this->usr_ids);
-		$this->arr_iass_states = ilIassStates::getData($this->usr_ids);
-		$this->arr_excercise_states = ilExcerciseStates::getData($this->usr_ids);
-		$this->arr_FinalTestsStates = ilLearnObjectFinalTestStates::getData($this->usr_ids);
-		$this->array_obj_ids = ilLearnObjectFinalTestStates::getData($this->usr_ids);
+
 	}
 
 

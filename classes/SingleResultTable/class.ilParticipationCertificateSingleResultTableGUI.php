@@ -120,7 +120,7 @@ class ilParticipationCertificateSingleResultTableGUI extends ilTable2GUI {
 		$finalTestsStates = ilLearnObjectFinalTestStates::getData([$this->usr_id ]);
 
 		$sorted = $this->sortColumns();
-
+		$i = 0;
 		if (count($finalTestsStates[$this->usr_id])) {
 			while (count($sorted)) {
 				foreach ($finalTestsStates[$this->usr_id] as $finalTestsState) {
@@ -136,6 +136,12 @@ class ilParticipationCertificateSingleResultTableGUI extends ilTable2GUI {
 						);
 						unset($sorted[key($sorted)]);
 					}
+				}
+				$i = $i+1;
+
+				if($i == 1000) {
+					ilUtil::sendFailure("Der Aufruf ist Fehlgeschlagen");
+					break;
 				}
 			}
 		}
