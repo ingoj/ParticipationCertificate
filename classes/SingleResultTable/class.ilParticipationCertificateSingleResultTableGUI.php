@@ -121,16 +121,18 @@ class ilParticipationCertificateSingleResultTableGUI extends ilTable2GUI {
 
 		$sorted = $this->sortColumns();
 		$i = 0;
+
 		if (count($finalTestsStates[$this->usr_id])) {
 			while (count($sorted)) {
 				foreach ($finalTestsStates[$this->usr_id] as $finalTestsState) {
-					if ($finalTestsState->getLocftestCrsTitle() == key($sorted)) {
+					if ($finalTestsState->getLocftestObjectiveId() == key($sorted)) {
 						/**
 						 * @var ilLearnObjectFinalTestState $finalTestsState
 						 */
 						$cols[$finalTestsState->getLocftestCrsObjId()] = array(
 							'txt' => $finalTestsState->getLocftestCrsTitle(),
 							'obj_id' => $sorted[key($sorted)]['obj_id'],
+							'objective_id' => $sorted[key($sorted)]['objective_id'],
 							'default' => true,
 							'width' => 'auto',
 						);
@@ -163,14 +165,24 @@ class ilParticipationCertificateSingleResultTableGUI extends ilTable2GUI {
 		$sorting = array();
 
 		foreach ($scores as $score) {
-			$sorting[$score->getTitle()] = [
+
+			/**
+			 * @var NewLearningObjectiveScore $score
+			 */
+
+
+			$sorting[$score->getObjectiveId()] = [
+				'title' => $score->getTitle(),
 				'score' => $score->getScore(),
-				'obj_id' => $score->getObjectiveId(),
+				'obj_id' => $score->getCourseObjId(),
+				'objective_id' => $score->getObjectiveId(),
 				'weight' => $newWeights['weight_fine_' . $score->getObjectiveId()]
 			];
 		}
 
+
 		//sort the array first for the score. Second argument is the weight.
+	/*
 		$scored = array();
 		$weighting = array();
 		foreach ($sorting as $key => $item) {
@@ -178,7 +190,8 @@ class ilParticipationCertificateSingleResultTableGUI extends ilTable2GUI {
 			$weighting[$key] = $item['weight'];
 		}
 		array_multisort($scored, SORT_DESC, $weighting, SORT_DESC, $sorting);
-
+		print_r($sorting);exit;
+	*/
 		return $sorting;
 	}
 
@@ -291,6 +304,7 @@ class ilParticipationCertificateSingleResultTableGUI extends ilTable2GUI {
 	public function fillRow($a_set) {
 
 		foreach ($this->getSelectableColumns() as $k => $v) {
+
 			if ($this->isColumnSelected($k)) {
 				if ($a_set[$k]) {
 					$this->tpl->setCurrentBlock('td');
@@ -300,14 +314,14 @@ class ilParticipationCertificateSingleResultTableGUI extends ilTable2GUI {
 					} else {
 						$this->tpl->setVariable('COURSE', $a_set[$k]);
 					}
-					if ($this->searchForId($v['obj_id'], $this->sugg)) {
+					if ($this->searchForId($v['objective_id'], $this->sugg)) {
 						$this->tpl->setVariable('COLOR', $this->color);
 					}
 					$this->tpl->parseCurrentBlock();
 				} else {
 					$this->tpl->setCurrentBlock('td');
 					$this->tpl->setVariable('COURSE', '&nbsp;');
-					if ($this->searchForId($v['obj_id'], $this->sugg)) {
+					if ($this->searchForId($v['objective_id'], $this->sugg)) {
 						$this->tpl->setVariable('COLOR', $this->color);
 					}
 					$this->tpl->parseCurrentBlock();
@@ -325,7 +339,7 @@ class ilParticipationCertificateSingleResultTableGUI extends ilTable2GUI {
 	 */
 	function searchForId($id, $array) {
 		foreach ($array as $key => $val) {
-			if ($val->getSuggObjectiveId() === $id) {
+			if ($val->getSuggObjectiveId() == $id) {
 				return true;
 			}
 		}
