@@ -414,9 +414,6 @@ foreach($part_cert_configs->returnCertTextDefaultValues() as $key => $value) {
 <#33>
 <?php
 
-?>
-<#34>
-<?php
 require_once "Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/ParticipationCertificate/vendor/autoload.php";
 global $DIC;
 
@@ -514,4 +511,9 @@ foreach($part_cert_configs->returnCertTextDefaultValues() as $key => $value) {
 	}
 	$config->store();
 }
+
+?>
+<#34>
+<?php
+//
 ?>

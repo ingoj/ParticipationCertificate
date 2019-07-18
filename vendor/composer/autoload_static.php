@@ -11,6 +11,11 @@ class ComposerStaticInit9caaefbd715a46c2eca1e02fe5bdbce3
     );
 
     public static $prefixLengthsPsr4 = array (
+        's' => 
+        array (
+            'srag\\RemovePluginDataConfirm\\' => 29,
+            'srag\\DIC\\' => 9,
+        ),
         'T' => 
         array (
             'Twig\\' => 5,
@@ -22,6 +27,14 @@ class ComposerStaticInit9caaefbd715a46c2eca1e02fe5bdbce3
     );
 
     public static $prefixDirsPsr4 = array (
+        'srag\\RemovePluginDataConfirm\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/srag/removeplugindataconfirm/src',
+        ),
+        'srag\\DIC\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/srag/dic/src',
+        ),
         'Twig\\' => 
         array (
             0 => __DIR__ . '/..' . '/twig/twig/src',
@@ -64,6 +77,7 @@ class ComposerStaticInit9caaefbd715a46c2eca1e02fe5bdbce3
         'NewLearningObjectiveScores' => __DIR__ . '/../..' . '/classes/Score/NewLearningObjectiveScores.php',
         'OTLdump' => __DIR__ . '/..' . '/mpdf/mpdf/classes/otl_dump.php',
         'PDFBarcode' => __DIR__ . '/..' . '/mpdf/mpdf/classes/barcode.php',
+        'ParticipationCertificateRemoveDataConfirm' => __DIR__ . '/../..' . '/classes/uninstall/class.ParticipationCertificateRemoveDataConfirm.php',
         'SEA' => __DIR__ . '/..' . '/mpdf/mpdf/classes/sea.php',
         'SVG' => __DIR__ . '/..' . '/mpdf/mpdf/classes/svg.php',
         'Symfony\\Polyfill\\Ctype\\Ctype' => __DIR__ . '/..' . '/symfony/polyfill-ctype/Ctype.php',
@@ -516,6 +530,34 @@ class ComposerStaticInit9caaefbd715a46c2eca1e02fe5bdbce3
         'mpdfform' => __DIR__ . '/..' . '/mpdf/mpdf/classes/mpdfform.php',
         'otl' => __DIR__ . '/..' . '/mpdf/mpdf/classes/otl.php',
         'pdf_context' => __DIR__ . '/..' . '/setasign/fpdi/pdf_context.php',
+        'srag\\DIC\\DICStatic' => __DIR__ . '/..' . '/srag/dic/src/DICStatic.php',
+        'srag\\DIC\\DICStaticInterface' => __DIR__ . '/..' . '/srag/dic/src/DICStaticInterface.php',
+        'srag\\DIC\\DICTrait' => __DIR__ . '/..' . '/srag/dic/src/DICTrait.php',
+        'srag\\DIC\\DIC\\AbstractDIC' => __DIR__ . '/..' . '/srag/dic/src/DIC/AbstractDIC.php',
+        'srag\\DIC\\DIC\\DICInterface' => __DIR__ . '/..' . '/srag/dic/src/DIC/DICInterface.php',
+        'srag\\DIC\\DIC\\Implementation\\ILIAS53DIC' => __DIR__ . '/..' . '/srag/dic/src/DIC/Implementation/ILIAS53DIC.php',
+        'srag\\DIC\\DIC\\Implementation\\ILIAS54DIC' => __DIR__ . '/..' . '/srag/dic/src/DIC/Implementation/ILIAS54DIC.php',
+        'srag\\DIC\\DIC\\Implementation\\ILIAS60DIC' => __DIR__ . '/..' . '/srag/dic/src/DIC/Implementation/ILIAS60DIC.php',
+        'srag\\DIC\\Database\\AbstractILIASDatabaseDetector' => __DIR__ . '/..' . '/srag/dic/src/Database/AbstractILIASDatabaseDetector.php',
+        'srag\\DIC\\Database\\DatabaseDetector' => __DIR__ . '/..' . '/srag/dic/src/Database/DatabaseDetector.php',
+        'srag\\DIC\\Database\\DatabaseInterface' => __DIR__ . '/..' . '/srag/dic/src/Database/DatabaseInterface.php',
+        'srag\\DIC\\Database\\PdoContextHelper' => __DIR__ . '/..' . '/srag/dic/src/Database/PdoContextHelper.php',
+        'srag\\DIC\\Database\\PdoStatementContextHelper' => __DIR__ . '/..' . '/srag/dic/src/Database/PdoStatementContextHelper.php',
+        'srag\\DIC\\Exception\\DICException' => __DIR__ . '/..' . '/srag/dic/src/Exception/DICException.php',
+        'srag\\DIC\\Output\\Output' => __DIR__ . '/..' . '/srag/dic/src/Output/Output.php',
+        'srag\\DIC\\Output\\OutputInterface' => __DIR__ . '/..' . '/srag/dic/src/Output/OutputInterface.php',
+        'srag\\DIC\\PHPVersionChecker' => __DIR__ . '/..' . '/srag/dic/src/PHPVersionChecker.php',
+        'srag\\DIC\\Plugin\\Plugin' => __DIR__ . '/..' . '/srag/dic/src/Plugin/Plugin.php',
+        'srag\\DIC\\Plugin\\PluginInterface' => __DIR__ . '/..' . '/srag/dic/src/Plugin/PluginInterface.php',
+        'srag\\DIC\\Plugin\\Pluginable' => __DIR__ . '/..' . '/srag/dic/src/Plugin/Pluginable.php',
+        'srag\\DIC\\Util\\LibraryLanguageInstaller' => __DIR__ . '/..' . '/srag/dic/src/Util/LibraryLanguageInstaller.php',
+        'srag\\DIC\\Version\\Version' => __DIR__ . '/..' . '/srag/dic/src/Version/Version.php',
+        'srag\\DIC\\Version\\VersionInterface' => __DIR__ . '/..' . '/srag/dic/src/Version/VersionInterface.php',
+        'srag\\RemovePluginDataConfirm\\AbstractPluginUninstallTrait' => __DIR__ . '/..' . '/srag/removeplugindataconfirm/src/AbstractPluginUninstallTrait.php',
+        'srag\\RemovePluginDataConfirm\\AbstractRemovePluginDataConfirm' => __DIR__ . '/..' . '/srag/removeplugindataconfirm/src/AbstractRemovePluginDataConfirm.php',
+        'srag\\RemovePluginDataConfirm\\Exception\\RemovePluginDataConfirmException' => __DIR__ . '/..' . '/srag/removeplugindataconfirm/src/Exception/RemovePluginDataConfirmException.php',
+        'srag\\RemovePluginDataConfirm\\PluginUninstallTrait' => __DIR__ . '/..' . '/srag/removeplugindataconfirm/src/PluginUninstallTrait.php',
+        'srag\\RemovePluginDataConfirm\\RepositoryObjectPluginUninstallTrait' => __DIR__ . '/..' . '/srag/removeplugindataconfirm/src/RepositoryObjectPluginUninstallTrait.php',
         'tocontents' => __DIR__ . '/..' . '/mpdf/mpdf/classes/tocontents.php',
         'wmf' => __DIR__ . '/..' . '/mpdf/mpdf/classes/wmf.php',
     );

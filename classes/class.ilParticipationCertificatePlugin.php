@@ -1,5 +1,8 @@
 <?php
 
+use srag\DIC\Util\LibraryLanguageInstaller;
+use srag\RemovePluginDataConfirm\PluginUninstallTrait;
+
 require_once __DIR__ . "/../vendor/autoload.php";
 
 /**
@@ -9,8 +12,14 @@ require_once __DIR__ . "/../vendor/autoload.php";
  */
 class ilParticipationCertificatePlugin extends ilUserInterfaceHookPlugin {
 
+	use PluginUninstallTrait;
+
 	const PLUGIN_ID = "dhbwparticipationpdf";
 	const PLUGIN_NAME = "ParticipationCertificate";
+	const PLUGIN_CLASS_NAME = self::class;
+	const REMOVE_PLUGIN_DATA_CONFIRM_CLASS_NAME = ParticipationCertificateRemoveDataConfirm::class;
+
+
 	/**
 	 * @var ilParticipationCertificatePlugin
 	 */
@@ -66,15 +75,23 @@ class ilParticipationCertificatePlugin extends ilUserInterfaceHookPlugin {
 	}
 
 
+
 	/**
-	 * @return bool
+	 * @inheritdoc
 	 */
-	protected function beforeUninstall() {
-		$this->db->dropTable(ilParticipationCertificateConfig::TABLE_NAME, false);
-		$this->db->dropTable(ilParticipationCert::TABLE_NAME, false);
-
-		ilUtil::delDir(CLIENT_WEB_DIR . "/dhbw_part_cert");
-
-		return true;
+	protected function deleteData()/*: void*/ {
+		self::dic()->database()->dropTable(ilParticipationCertificateConfig::TABLE_NAME, false);
 	}
+
+	/**
+	 * @inheritdoc
+	 */
+	public function updateLanguages($a_lang_keys = null) {
+		parent::updateLanguages($a_lang_keys);
+
+		LibraryLanguageInstaller::getInstance()->withPlugin(self::plugin())->withLibraryLanguageDirectory(__DIR__ . "/../vendor/srag/removeplugindataconfirm/lang")
+			->updateLanguages();
+	}
+
+
 }
