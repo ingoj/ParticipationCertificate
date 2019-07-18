@@ -166,17 +166,19 @@ class ilParticipationCertificateResultTableGUI extends ilTable2GUI {
 	 * @return array
 	 */
 	public function parseData() {
-
+		$this->usr_ids = array();
+		$this->usr_ids[] = 1884;
 
 		$arr_usr_data = ilPartCertUsersData::getData($this->usr_ids);
 		$arr_initial_test_states = ilCrsInitialTestStates::getData($this->usr_ids);
 		$arr_learn_reached_percentages = ilLearnObjectSuggReachedPercentages::getData($this->usr_ids);
 
+
 		$arr_final_tests = ilLearnObjectFinalTestStates::getData($this->usr_ids);
 
 		$arr_new_iass_states = ilIassStatesMulti::getData($this->usr_ids);
 		$arr_excercise_states = ilExcerciseStates::getData($this->usr_ids);
-		$arr_FinalTestsStates = ilLearnObjectFinalTestOfSuggStates::getData($this->usr_ids);
+		//$arr_FinalTestsStates = ilLearnObjectFinalTestOfSuggStates::getData($this->usr_ids);
 
 		$rows = array();
 		foreach ($this->usr_ids as $usr_id) {
@@ -213,6 +215,7 @@ class ilParticipationCertificateResultTableGUI extends ilTable2GUI {
 
 			$rec_array = [];
 			$array_results = [];
+
 			if (is_array($arr_final_tests[$usr_id])) {
 
 				foreach ($arr_final_tests[$usr_id] as $rec) {

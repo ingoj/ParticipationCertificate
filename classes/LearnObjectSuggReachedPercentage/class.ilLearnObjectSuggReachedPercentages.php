@@ -37,12 +37,14 @@ class ilLearnObjectSuggReachedPercentages {
 		ilLearnObjectFinalTestStates::createTemporaryTableLearnObjectFinalTest($arr_usr_ids, 'tmp_lo_fin_test');
 
 
-		$select = "SELECT round((SUM(objectives_sug_completed) / SUM(suggested)) * 100,0) as average_percentage, 
-					locftest_usr_id as usr_id, 
+		$select = "SELECT round((SUM(objectives_sug_percentage) / SUM(suggested)),0) as average_percentage, 
+					usr_id, 
 				
-					round(avg(locftest_qpls_required_percentage),0) as limit_perc
+					round(avg(tst_req_percentage),0) as limit_perc
 					from tmp_lo_fin_test
-					group by locftest_usr_id";
+					group by usr_id";
+
+		echo $select."; ";
 
 		return $select;
 	}

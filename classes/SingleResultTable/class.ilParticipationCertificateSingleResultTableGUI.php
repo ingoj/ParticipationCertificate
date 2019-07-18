@@ -117,7 +117,7 @@ class ilParticipationCertificateSingleResultTableGUI extends ilTable2GUI {
 	function getSelectableColumns() {
 		$cols = array();
 
-		$finalTestsStates = ilLearnObjectFinalTestStates::getData($this->usr_ids);
+		$finalTestsStates = ilLearnObjectFinalTestStates::getData([$this->usr_id ]);
 
 		$sorted = $this->sortColumns();
 
@@ -199,9 +199,10 @@ class ilParticipationCertificateSingleResultTableGUI extends ilTable2GUI {
 	 */
 	public function parseData() {
 
-		$arr_FinalTestsStates = ilLearnObjectFinalTestStates::getData($this->usr_ids);
+		$arr_FinalTestsStates = ilLearnObjectFinalTestStates::getData([$this->usr_id]);
 		$usr_id = $this->usr_id;
 		$rec_array = array();
+
 
 		if (count($arr_FinalTestsStates[$usr_id])) {
 
