@@ -9,6 +9,7 @@ class ilParticipationCertificateConfig extends ActiveRecord {
 
 	const TABLE_NAME = 'dhbw_part_cert_conf';
 	const LOGO_FILE_NAME = "pic.png";
+    const ISSUER_SIGNATURE_FILE_NAME = "page1_issuer_signature.png";
 
 	const CONFIG_SET_TYPE_TEMPLATE = 1;
 	const CONFIG_SET_TYPE_GROUP = 2;

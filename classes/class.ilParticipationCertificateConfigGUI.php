@@ -411,12 +411,20 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI {
 					$input->setValue($config->getConfigValue());
 					break;
 				case "logo":
-					$input = new ilFileInputGUI($this->pl->txt("logo"), 'headerpic');
+					$input = new ilFileInputGUI($this->pl->txt("logo"), 'logo');
 					$input->setSuffixes(array( 'png' ));
 					if (is_file(ilParticipationCertificateConfig::returnPicturePath('absolute', $global_config_id, ilParticipationCertificateConfig::LOGO_FILE_NAME))) {
 						$input->setInfo('<img src="'
 							. ilParticipationCertificateConfig::returnPicturePath('relative', $global_config_id, ilParticipationCertificateConfig::LOGO_FILE_NAME) . '" />');
 					}
+					break;
+                case "page1_issuer_signature":
+                    $input = new ilFileInputGUI($config->getConfigKey(), $config->getConfigKey());
+                    $input->setSuffixes(array( 'png' ));
+                    if (is_file(ilParticipationCertificateConfig::returnPicturePath('absolute', $global_config_id, ilParticipationCertificateConfig::ISSUER_SIGNATURE_FILE_NAME))) {
+                        $input->setInfo('<img src="'
+                            . ilParticipationCertificateConfig::returnPicturePath('relative', $global_config_id, ilParticipationCertificateConfig::ISSUER_SIGNATURE_FILE_NAME) . '" />');
+                    }
 					break;
 				default:
 					$input = new ilTextAreaInputGUI($config->getConfigKey(), $config->getConfigKey());
@@ -491,14 +499,26 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI {
 							$global_config->setTitle($form->getInput($item->getPostVar()));
 							$global_config->store();
 							break;
-						case 'headerpic':
+						case 'logo':
 							//Picture
-							$file_data = $form->getInput('headerpic');
+							$file_data = $form->getInput('logo');
 							if ($file_data['tmp_name']) {
 								ilParticipationCertificateConfig::storePicture($file_data, $global_config_id, ilParticipationCertificateConfig::LOGO_FILE_NAME);
 							}
 							break;
+                        case "page1_issuer_signature":
+                            $file_data = $form->getInput('page1_issuer_signature');
+                            if ($file_data['tmp_name']) {
+                                /**
+                                 * @var array $input
+                                 */
+                               ilParticipationCertificateConfig::storePicture($file_data, $global_config_id, ilParticipationCertificateConfig::ISSUER_SIGNATURE_FILE_NAME);
+                            }
+                            break;
 						default:
+						    if(is_array($form->getInput($item->getPostVar()))) {
+						        echo $item->getPostVar();exit;
+                            }
 							$global_config = $part_cert_configs->getParticipationTemplateConfigValueByKey($global_config_id,$item->getPostVar());
 							$global_config->setConfigValue($form->getInput($item->getPostVar()));
 							$global_config->store();
@@ -514,7 +534,7 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI {
 					switch($item->getPostVar()) {
 						case 'logo':
 							//Picture
-							$file_data = $form->getInput('headerpic');
+							$file_data = $form->getInput('logo');
 							if ($file_data['tmp_name']) {
 								ilParticipationCertificateConfig::storePicture($file_data, $global_config_id, ilParticipationCertificateConfig::LOGO_FILE_NAME);
 							}

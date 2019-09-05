@@ -95,6 +95,15 @@ class ilParticipationCertificateTwigParser {
 		$arr_text_values = $participation_certificate_configs->returnTextValues($this->group_ref_id, ilParticipationCertificateConfig::CONFIG_SET_TYPE_GROUP,
 		ilParticipationCertificateConfig::CONFIG_SET_TYPE_TEMPLATE);
 
+        $global_config_id = NULL;
+        $part_cert_ob_conf = new ilParticipationCertificateObjectConfigSet();
+		if($part_cert_ob_conf::where(array('obj_ref_id' => $this->group_ref_id,'config_type' => ilParticipationCertificateObjectConfigSet::CONFIG_TYPE_TEMPLATE))->count() > 0)    {
+            /**
+             * @var $arr_ob_conf ilParticipationCertificateObjectConfigSet
+             */
+            $arr_ob_conf = $part_cert_ob_conf::where(array('obj_ref_id' => $this->group_ref_id, 'config_type' => ilParticipationCertificateObjectConfigSet::CONFIG_TYPE_TEMPLATE))->first();
+            $global_config_id = (int)$arr_ob_conf->getGlConfTemplateId();
+        }
 
 		$arr_iass_multi = ilIassStatesMulti::getData($this->usr_ids);
 
@@ -109,13 +118,21 @@ class ilParticipationCertificateTwigParser {
 
 		$part_pdf = new ilParticipationCertificatePDFGenerator();
 
-		if (is_file(ilParticipationCertificateConfig::returnPicturePath('absolute', $this->group_ref_id, ilParticipationCertificateConfig::LOGO_FILE_NAME))) {
-			$logo_path = ilParticipationCertificateConfig::returnPicturePath('absolute', $this->group_ref_id, ilParticipationCertificateConfig::LOGO_FILE_NAME);
-		} elseif (is_file(ilParticipationCertificateConfig::returnPicturePath('absolute', 0, ilParticipationCertificateConfig::LOGO_FILE_NAME))) {
-			$logo_path = ilParticipationCertificateConfig::returnPicturePath('absolute', 0, ilParticipationCertificateConfig::LOGO_FILE_NAME);
-		} else {
+		if (is_int($global_config_id) && is_file(ilParticipationCertificateConfig::returnPicturePath('absolute', $global_config_id, ilParticipationCertificateConfig::LOGO_FILE_NAME))) {
+			$logo_path = ilParticipationCertificateConfig::returnPicturePath('absolute', $global_config_id, ilParticipationCertificateConfig::LOGO_FILE_NAME);
+		} elseif (is_file(ilParticipationCertificateConfig::returnPicturePath('absolute', $this->group_ref_id, ilParticipationCertificateConfig::LOGO_FILE_NAME))) {
+            $logo_path = ilParticipationCertificateConfig::returnPicturePath('absolute', $this->group_ref_id, ilParticipationCertificateConfig::LOGO_FILE_NAME);
+        } else {
 			$logo_path = '';
 		}
+
+        if (is_int($global_config_id) && is_file(ilParticipationCertificateConfig::returnPicturePath('absolute', $global_config_id, ilParticipationCertificateConfig::ISSUER_SIGNATURE_FILE_NAME))) {
+            $page1_issuer_signature = ilParticipationCertificateConfig::returnPicturePath('absolute', $global_config_id, ilParticipationCertificateConfig::ISSUER_SIGNATURE_FILE_NAME);
+        }  elseif (is_file(ilParticipationCertificateConfig::returnPicturePath('absolute', $this->group_ref_id, ilParticipationCertificateConfig::ISSUER_SIGNATURE_FILE_NAME))) {
+            $page1_issuer_signature = ilParticipationCertificateConfig::returnPicturePath('absolute', $this->group_ref_id, ilParticipationCertificateConfig::ISSUER_SIGNATURE_FILE_NAME);
+        } else {
+            $page1_issuer_signature = '';
+        }
 
 		//quickfix, wenn nur ein User $this->usr_id ist kein array -> foreach kann also nicht gebraucht werden. Jetzt wird ein array erstellt auch wenn nur ein user
 		if (count($this->usr_id) == 1) {
@@ -210,6 +227,7 @@ class ilParticipationCertificateTwigParser {
 				'iass_states' => $iass_states,
 				'excercise_percentage' => $excercise_percentage,
 				'logo_path' => $logo_path,
+				'page1_issuer_signature' => $page1_issuer_signature,
 				'standard_value' => $participation_certificate_configs->returnPercentValue($this->group_ref_id)
 			);
 

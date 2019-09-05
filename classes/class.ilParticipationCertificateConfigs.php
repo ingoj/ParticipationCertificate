@@ -32,10 +32,18 @@ class ilParticipationCertificateConfigs {
 			'config_value_type' => ilParticipationCertificateConfig::CONFIG_VALUE_TYPE_CERT_TEXT
 		))->orderBy('order_by')->getArray('config_key', 'config_value');
 		if (count($arr_config) == 0) {
+
+           $part_cert_ob_conf = new ilParticipationCertificateObjectConfigSet();
+            /**
+             * @var $arr_ob_conf ilParticipationCertificateObjectConfigSet
+             */
+           $arr_ob_conf = $part_cert_ob_conf::where(array('obj_ref_id' => $group_ref_id))->first();
+
 			$arr_config = ilParticipationCertificateConfig::where(array(
 				"config_type" => ilParticipationCertificateConfig::CONFIG_SET_TYPE_TEMPLATE,
 				'config_value_type' => ilParticipationCertificateConfig::CONFIG_VALUE_TYPE_CERT_TEXT,
-				"group_ref_id" => 0
+				"group_ref_id" => 0,
+                "global_config_id" => $arr_ob_conf->getGlConfTemplateId(),
 			))->orderBy('order_by')->getArray('config_key', 'config_value');
 		}
 
