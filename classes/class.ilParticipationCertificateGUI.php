@@ -229,7 +229,10 @@ class ilParticipationCertificateGUI {
 		$arr_config = $cert_configs->getObjConfigSetIfNoneCreateDefaultAndCreateNewObjConfigValues($this->groupRefId);
 
 		$global_config_sets = new ilParticipationCertificateGlobalConfigSets();
-		$global_config_id = reset($arr_config)->getGlobalConfigId();
+		if(count($arr_config) > 0) {
+            $global_config_id = reset($arr_config)->getGlobalConfigId();
+        }
+
 		if($global_config_id > 0) {
 			$global_config_set = $global_config_sets->getConfigSetById($global_config_id);
 			ilUtil::sendInfo($this->pl->txt('configset_type_1').' '.$global_config_set->getTitle());
