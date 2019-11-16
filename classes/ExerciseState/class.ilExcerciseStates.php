@@ -8,12 +8,20 @@ class ilExcerciseStates {
 	 *
 	 * @return ilExcerciseState[]
 	 */
-	public static function getData(array $arr_usr_ids = array()) {
+	public static function getData(array $arr_usr_ids = array(), int $group_ref_id) {
 		global $DIC;
 		$ilDB = $DIC->database();
 		$result = $ilDB->query(self::getSQL($arr_usr_ids));
 		$exerc_data = array();
+
+        $items = $DIC->repositoryTree()->getChildIds($group_ref_id);
+
 		while ($row = $ilDB->fetchAssoc($result)) {
+
+            if(!in_array($row['exc_ref_id'], $items)) {
+                continue;
+            }
+
 			$exerc_state = new ilExcerciseState();
 			$exerc_state->setUsrId($row['exc_usr_id']);
 			$exerc_state->setExcObjId($row['exc_obj_id']);

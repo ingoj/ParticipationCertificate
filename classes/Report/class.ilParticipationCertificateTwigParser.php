@@ -105,12 +105,12 @@ class ilParticipationCertificateTwigParser {
             $global_config_id = (int)$arr_ob_conf->getGlConfTemplateId();
         }
 
-		$arr_iass_multi = ilIassStatesMulti::getData($this->usr_ids);
+		$arr_iass_multi = ilIassStatesMulti::getData($this->usr_ids, $this->group_ref_id);
 
 		$arr_usr_data = ilPartCertUsersData::getData($this->usr_ids);
 		$arr_lo_master_crs = ilLearningObjectivesMasterCrs::getData($this->usr_ids);
 		$arr_initial_test_states = ilCrsInitialTestStates::getData($this->usr_ids);
-		$arr_excercise_states = ilExcerciseStates::getData($this->usr_ids);
+		$arr_excercise_states = ilExcerciseStates::getData($this->usr_ids,$this->group_ref_id);
 		$arr_iass_states = ilIassStates::getData($this->usr_ids);
 		$arr_learn_reached_percentages = ilLearnObjectSuggReachedPercentages::getData($this->usr_ids);
 

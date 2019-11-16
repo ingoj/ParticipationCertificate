@@ -173,8 +173,8 @@ class ilParticipationCertificateResultTableGUI extends ilTable2GUI {
 
 		$arr_final_tests = ilLearnObjectFinalTestStates::getData($this->usr_ids);
 
-		$arr_new_iass_states = ilIassStatesMulti::getData($this->usr_ids);
-		$arr_excercise_states = ilExcerciseStates::getData($this->usr_ids);
+		$arr_new_iass_states = ilIassStatesMulti::getData($this->usr_ids,$_GET['ref_id']);
+		$arr_excercise_states = ilExcerciseStates::getData($this->usr_ids,$_GET['ref_id']);
 		//$arr_FinalTestsStates = ilLearnObjectFinalTestOfSuggStates::getData($this->usr_ids);
 
 		$rows = array();

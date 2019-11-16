@@ -7,12 +7,21 @@ class ilIassStatesMulti {
 	 *
 	 * @return ilIassStateMulti[]
 	 */
-	public static function getData(array $arr_usr_ids = array()) {
+	public static function getData(array $arr_usr_ids = array(), int $group_ref_id) {
 		global $DIC;
 		$ilDB = $DIC->database();
 		$result = $ilDB->query(self::getSQL($arr_usr_ids));
 		$iass_data = array();
+
+		$items = $DIC->repositoryTree()->getChildIds($group_ref_id);
+
+
 		while ($row = $ilDB->fetchAssoc($result)) {
+
+		    if(!in_array($row['iass_ref_id'], $items)) {
+		        continue;
+		    }
+
 			$iass_state = new ilIassStateMulti();
 			$iass_state->setUsrId($row['iass_usr_id']);
 			$iass_state->setIassObjTitle($row['iass_obj_title']);
