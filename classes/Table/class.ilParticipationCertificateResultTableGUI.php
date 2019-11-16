@@ -174,6 +174,10 @@ class ilParticipationCertificateResultTableGUI extends ilTable2GUI {
 		$arr_final_tests = ilLearnObjectFinalTestStates::getData($this->usr_ids);
 
 		$arr_new_iass_states = ilIassStatesMulti::getData($this->usr_ids,$_GET['ref_id']);
+
+		$arr_xali_states = xaliStates::getData($this->usr_ids,$_GET['ref_id']);
+
+
 		$arr_excercise_states = ilExcerciseStates::getData($this->usr_ids,$_GET['ref_id']);
 		//$arr_FinalTestsStates = ilLearnObjectFinalTestOfSuggStates::getData($this->usr_ids);
 
@@ -240,6 +244,15 @@ class ilParticipationCertificateResultTableGUI extends ilTable2GUI {
 					$countPassed = $countPassed + $item->getPassed();
 					$countTests = $countTests + $item->getTotal();
 				}
+
+                if (is_object($arr_xali_states[$usr_id])) {
+                    $countPassed = $countPassed + $arr_xali_states[$usr_id]->getPassed();
+                    $countTests = $countTests +  $arr_xali_states[$usr_id]->getTotal();
+                }
+
+                $percentage = $countPassed / $countTests * 100;
+
+
 
 				switch ($countTests) {
 					case 1:

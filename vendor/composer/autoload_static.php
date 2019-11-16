@@ -560,6 +560,8 @@ class ComposerStaticInit9caaefbd715a46c2eca1e02fe5bdbce3
         'srag\\RemovePluginDataConfirm\\RepositoryObjectPluginUninstallTrait' => __DIR__ . '/..' . '/srag/removeplugindataconfirm/src/RepositoryObjectPluginUninstallTrait.php',
         'tocontents' => __DIR__ . '/..' . '/mpdf/mpdf/classes/tocontents.php',
         'wmf' => __DIR__ . '/..' . '/mpdf/mpdf/classes/wmf.php',
+        'xaliState' => __DIR__ . '/../..' . '/classes/xaliState/class.xaliState.php',
+        'xaliStates' => __DIR__ . '/../..' . '/classes/xaliState/class.xaliStates.php',
     );
 
     public static function getInitializer(ClassLoader $loader)

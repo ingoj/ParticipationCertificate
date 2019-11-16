@@ -510,4 +510,6 @@ return array(
     'srag\\RemovePluginDataConfirm\\RepositoryObjectPluginUninstallTrait' => $vendorDir . '/srag/removeplugindataconfirm/src/RepositoryObjectPluginUninstallTrait.php',
     'tocontents' => $vendorDir . '/mpdf/mpdf/classes/tocontents.php',
     'wmf' => $vendorDir . '/mpdf/mpdf/classes/wmf.php',
+    'xaliState' => $baseDir . '/classes/xaliState/class.xaliState.php',
+    'xaliStates' => $baseDir . '/classes/xaliState/class.xaliStates.php',
 );
