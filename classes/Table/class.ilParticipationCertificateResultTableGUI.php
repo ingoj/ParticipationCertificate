@@ -245,13 +245,12 @@ class ilParticipationCertificateResultTableGUI extends ilTable2GUI {
                     $countTests = $countTests + $item->getTotal();
                 }
             }
-            if (is_array($arr_xali_states[$usr_id])) {
-                if (is_object($arr_xali_states[$usr_id])) {
-                    $countPassed = $countPassed + $arr_xali_states[$usr_id]->getPassed();
-                    $countTests = $countTests + $arr_xali_states[$usr_id]->getTotal();
-                }
-            }
 
+            if (is_object($arr_xali_states[$usr_id])) {
+                $countPassed = $countPassed + $arr_xali_states[$usr_id]->getPassed();
+                $countTests = $countTests + $arr_xali_states[$usr_id]->getTotal();
+            }
+            
             if($countTests > 0) {
                 $percentage = $countPassed / $countTests * 100;
 
