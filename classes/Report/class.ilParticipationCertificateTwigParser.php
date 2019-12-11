@@ -81,8 +81,8 @@ class ilParticipationCertificateTwigParser {
 		$this->array = $array;
 
 		$this->loadTwig();
-		$loader = new \Twig_Loader_Filesystem($this->pl->getDirectory() . '/templates/report/');
-		$twig = new \Twig_Environment($loader, $twig_options);
+		$loader = new Twig_Loader_Filesystem($this->pl->getDirectory() . '/templates/report/');
+		$twig = new Twig_Environment($loader, $twig_options);
 
 		$this->twig_template = $twig->load('certificate.html');
 	}

@@ -250,7 +250,7 @@ class ilParticipationCertificateResultTableGUI extends ilTable2GUI {
                 $countPassed = $countPassed + $arr_xali_states[$usr_id]->getPassed();
                 $countTests = $countTests + $arr_xali_states[$usr_id]->getTotal();
             }
-            
+
             if($countTests > 0) {
                 $percentage = $countPassed / $countTests * 100;
 
