@@ -105,7 +105,8 @@ class ilParticipationCertificateTwigParser {
             $global_config_id = (int)$arr_ob_conf->getGlConfTemplateId();
         }
 
-		$arr_iass_multi = ilIassStatesMulti::getData($this->usr_ids, $this->group_ref_id);
+        $arr_new_iass_states = ilIassStatesMulti::getData($this->usr_ids,$_GET['ref_id']);
+        $arr_xali_states = xaliStates::getData($this->usr_ids,$_GET['ref_id']);
 
 		$arr_usr_data = ilPartCertUsersData::getData($this->usr_ids);
 		$arr_lo_master_crs = ilLearningObjectivesMasterCrs::getData($this->usr_ids);
@@ -181,33 +182,38 @@ class ilParticipationCertificateTwigParser {
 					$learn_sugg_reached_percentage = $arr_learn_reached_percentages[$usr_id]->getAveragePercentage();
 				}
 				/*Video Conferences */
-				$iass_state = 0;
-				$iass_state1 = 0;
-				$iass_state2 = 0;
-				if (is_array($arr_iass_multi[$usr_id])) {
-					foreach ($arr_iass_multi[$usr_id] as $multis) {
-						$iass_state1 = $iass_state1 + $multis->getPassed();
-						$iass_state2 = $iass_state2 + $multis->getTotal();
-					}
-					$iass_state = (100 / $iass_state2) * $iass_state1;
-				}
+                $countPassed = 0;
+                $countTests = 0;
+                if (is_array($arr_new_iass_states[$usr_id])) {
+                    foreach ($arr_new_iass_states[$usr_id] as $item) {
+                        $countPassed = $countPassed + $item->getPassed();
+                        $countTests = $countTests + $item->getTotal();
+                    }
+                }
 
+                if (is_object($arr_xali_states[$usr_id])) {
+                    $countPassed = $countPassed + $arr_xali_states[$usr_id]->getPassed();
+                    $countTests = $countTests + $arr_xali_states[$usr_id]->getTotal();
+                }
 
-				switch ($iass_state2) {
-					case 0:
-						$iass_states =  "<img alt='' src=".ILIAS_ABSOLUTE_PATH.substr($this->pl->getImagePath("not_attempted_s.png"), 1).">";
-						break;
-					case 1:
-						if ($iass_state1 == 1) {
-							$iass_states = "<img alt='' src=".ILIAS_ABSOLUTE_PATH.substr($this->pl->getImagePath("passed_s.png"),1).">";
-						} else {
-							$iass_states = "<img alt='' src=".ILIAS_ABSOLUTE_PATH.substr($this->pl->getImagePath("failed_s.png"),1).">";
-						}
-						break;
-					default:
-						$iass_states = $iass_state1 . "/" . $iass_state2;
-						break;
-				}
+                if($countTests > 0) {
+                    $percentage = $countPassed / $countTests * 100;
+
+                    switch ($countTests) {
+                        case 1:
+                            if ($countPassed == 1) {
+                                $iass_states = "<img alt='' src=" . ILIAS_ABSOLUTE_PATH . substr($this->pl->getImagePath("passed_s.png"), 1) . ">";
+                            } else {
+                                $iass_states = "<img alt='' src=" . ILIAS_ABSOLUTE_PATH . substr($this->pl->getImagePath("failed_s.png"), 1) . ">";
+                            }
+                            break;
+                        default:
+                            $iass_states = $countPassed . "/" . $countTests;
+                            break;
+                    }
+                } else {
+                    $iass_states =  "<img alt='' src=" . ILIAS_ABSOLUTE_PATH . substr($this->pl->getImagePath("not_attempted_s.png"), 1) . ">";
+                }
 
 				//Home Work
 				$excercise_percentage = 0;
@@ -223,7 +229,7 @@ class ilParticipationCertificateTwigParser {
 				'arr_lo_master_crs' => $arr_usr_lo_master_crs,
 				'crsitest_itest_submitted' => $initial_test_state,
 				'learn_sugg_reached_percentage' => $learn_sugg_reached_percentage,
-				'iass_state' => $iass_state,
+				'iass_state' => $percentage,
 				'iass_states' => $iass_states,
 				'excercise_percentage' => $excercise_percentage,
 				'logo_path' => $logo_path,
