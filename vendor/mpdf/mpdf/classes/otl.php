@@ -335,7 +335,7 @@ class otl
 
 				if (!isset($this->GSUBdata[$this->GSUBfont])) {
 					if (file_exists(_MPDF_TTFONTDATAPATH . $this->mpdf->CurrentFont['fontkey'] . '.GSUB.' . $GSUBscriptTag . '.' . $GSUBlangsys . '.php')) {
-						require_once(_MPDF_TTFONTDATAPATH . $this->mpdf->CurrentFont['fontkey'] . '.GSUB.' . $GSUBscriptTag . '.' . $GSUBlangsys . '.php');
+						include_once(_MPDF_TTFONTDATAPATH . $this->mpdf->CurrentFont['fontkey'] . '.GSUB.' . $GSUBscriptTag . '.' . $GSUBlangsys . '.php');
 						$this->GSUBdata[$this->GSUBfont]['rtlSUB'] = $rtlSUB;
 						$this->GSUBdata[$this->GSUBfont]['finals'] = $finals;
 						if ($this->shaper == 'I') {
