@@ -81,7 +81,7 @@ class ilParticipationCertificatePDFGenerator {
 			*/ elseif ($printCount == $total_users) {
 			$mpdf->WriteHTML($css, 1);
 			$mpdf->WriteHTML($rendered, 2);
-			$mpdf->SetImportUse();
+			//$mpdf->SetImportUse();
 			$page = $mpdf->SetSourceFile($tempFile . '.pdf');
 			for ($i = 1; $i <= $page; $i ++) {
 				$mpdf->AddPage();
@@ -96,7 +96,7 @@ class ilParticipationCertificatePDFGenerator {
 		 */ else {
 			$mpdf->WriteHTML($css, 1);
 			$mpdf->WriteHTML($rendered, 2);
-			$mpdf->SetImportUse();
+			//$mpdf->importPage();
 			$page = $mpdf->SetSourceFile($tempFile . '.pdf');
 			for ($i = 1; $i <= $page; $i ++) {
 				$mpdf->AddPage();
