@@ -56,7 +56,7 @@ class ilParticipationCertificatePDFGenerator {
 		global $printCount, $tempFile;
 
 		//mPDF Instanz wird erzeugt. Mit Margin-Left-Right:20.
-		$mpdf = new mPDF('', '', '', '', 20, 20, '', '', 0, 0);
+		$mpdf = new mPDF('', 'A4', 0, '', 20, 20, 16, 16, 0, 0);
 		//Css file wird geladen
 		$css = file_get_contents($this->pl->getDirectory() . '/templates/report/Teilnahmebescheinigung.css');
 		$printCount ++;
