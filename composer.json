@@ -1,6 +1,6 @@
 {
   "require": {
-    "mpdf/mpdf": "^6.1",
+    "mpdf/mpdf": "^8.0",
     "twig/twig": "~1.0",
     "srag/removeplugindataconfirm": ">=0.1.0"
   },
