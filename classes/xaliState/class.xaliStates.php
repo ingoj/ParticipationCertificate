@@ -28,7 +28,7 @@ class xaliStates
             foreach ($arr_usr_ids as $usr_id) {
                 $xaliUserStatus = xaliUserStatus::getInstance($usr_id, $object_id);
                 $arr_xali_status[$usr_id]['present'] = (int) $arr_xali_status[$usr_id]['present'] + $xaliUserStatus->getAttendanceStatuses(xaliChecklistEntry::STATUS_PRESENT);
-                $arr_xali_status[$usr_id]['total'] = $arr_xali_status[$usr_id]['total'] + $total_checklist - $xaliUserStatus->getAttendanceStatuses(xaliChecklistEntry::STATUS_NOT_RELEVANT);
+                $arr_xali_status[$usr_id]['total'] = $arr_xali_status[$usr_id]['total'] + $xaliUserStatus->getAttendanceStatuses(xaliChecklistEntry::STATUS_ABSENT_UNEXCUSED) + $xaliUserStatus->getAttendanceStatuses(xaliChecklistEntry::STATUS_ABSENT_EXCUSED) + $xaliUserStatus->getAttendanceStatuses(xaliChecklistEntry::STATUS_PRESENT);
             }
         }
 
