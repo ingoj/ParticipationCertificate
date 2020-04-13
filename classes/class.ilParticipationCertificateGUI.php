@@ -328,7 +328,7 @@ class ilParticipationCertificateGUI {
 			 * @var ilFormPropertyGUI                $item
 			 * @var ilParticipationCertificateConfig $config
 			 */
-			if ($item->getPostVar() != 'percent_value') {
+
 				$config = ilParticipationCertificateConfig::where(array(
 					'config_key' => $item->getPostVar(),
 					"group_ref_id" => $this->groupRefId,
@@ -373,22 +373,8 @@ class ilParticipationCertificateGUI {
 				$config->setConfigValue($input);
 				$config->store();
 			}
-		}
 
-		$config_value = ilParticipationCertificateConfig::where(array(
-			"config_type" => ilParticipationCertificateConfig::CONFIG_SET_TYPE_GROUP,
-			"group_ref_id" => $this->groupRefId,
-			'config_key' => 'percent_value'
-		))->first();
-		if (!is_object($config_value)) {
-			$config_value = new ilParticipationCertificateConfig();
-			$config_value->setGroupRefId($this->groupRefId);
-			$config_value->setConfigType(ilParticipationCertificateConfig::CONFIG_SET_TYPE_GROUP);
-			$config_value->setConfigValueType(ilParticipationCertificateConfig::CONFIG_VALUE_TYPE_OTHER);
-			$config_value->setConfigKey('percent_value');
-		}
-		$config_value->setConfigValue($form->getInput('percent_value'));
-		$config_value->store();
+
 		ilUtil::sendSuccess($this->pl->txt('successFormSave'), true);
 
 		$this->ctrl->redirect($this, self::CMD_DISPLAY);

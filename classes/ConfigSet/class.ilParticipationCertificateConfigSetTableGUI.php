@@ -196,15 +196,17 @@ class ilParticipationCertificateConfigSetTableGUI extends ilTable2GUI {
 		$action_list->setId('_actions' . $a_set['id']);
 		$action_list->setUseImages(false);
 
+
+
 		switch ($a_set['configset_type']) {
 			case  ilParticipationCertificateConfig::CONFIG_SET_TYPE_GLOBAL:
-				$this->ctrl->setParameterByClass(ilParticipationCertificateConfigGUI::class, 'id', $a_set['conf_id']);
-				$this->ctrl->setParameterByClass(ilParticipationCertificateConfigGUI::class, 'set_type', $a_set['configset_type']);
+                $this->ctrl->setParameterByClass(ilParticipationCertificateConfigGUI::class, 'id', $a_set['conf_id']);
+				$this->ctrl->setParameterByClass(ilParticipationCertificateConfigGUI::class, 'set_type', ilParticipationCertificateConfig::CONFIG_SET_TYPE_GLOBAL);
 				$action_list->addItem($this->pl->txt('edit'), ilParticipationCertificateConfigGUI::CMD_SHOW_FORM, $this->ctrl->getLinkTargetByClass(ilParticipationCertificateConfigGUI::class, ilParticipationCertificateConfigGUI::CMD_SHOW_FORM));
 				break;
 			case  ilParticipationCertificateConfig::CONFIG_SET_TYPE_TEMPLATE:
-				$this->ctrl->setParameterByClass(ilParticipationCertificateConfigGUI::class, 'id', $a_set['conf_id']);
-				$this->ctrl->setParameterByClass(ilParticipationCertificateConfigGUI::class, 'set_type', $a_set['configset_type']);
+                $this->ctrl->setParameterByClass(ilParticipationCertificateConfigGUI::class, 'id', $a_set['conf_id']);
+				$this->ctrl->setParameterByClass(ilParticipationCertificateConfigGUI::class, 'set_type', ilParticipationCertificateConfig::CONFIG_SET_TYPE_TEMPLATE);
 				$action_list->addItem($this->pl->txt('edit'), ilParticipationCertificateConfigGUI::CMD_SHOW_FORM, $this->ctrl->getLinkTargetByClass(ilParticipationCertificateConfigGUI::class, ilParticipationCertificateConfigGUI::CMD_SHOW_FORM));
 				$action_list->addItem($this->pl->txt('copy'), ilParticipationCertificateConfigGUI::CMD_COPY_CONFIG, $this->ctrl->getLinkTargetByClass(ilParticipationCertificateConfigGUI::class, ilParticipationCertificateConfigGUI::CMD_COPY_CONFIG));
 				if ($a_set['order_by'] != 1) {
@@ -221,6 +223,10 @@ class ilParticipationCertificateConfigSetTableGUI extends ilTable2GUI {
 				break;
 			case  ilParticipationCertificateConfig::CONFIG_SET_TYPE_GROUP:
 				$action_list->addItem($this->pl->txt('go_to_object'), $a_set['obj_ref_id'], ilLink::_getStaticLink($a_set['obj_ref_id']));
+
+                $this->ctrl->setParameterByClass(ilParticipationCertificateConfigGUI::class, 'grp_ref_id', $a_set['obj_ref_id']);
+
+                $action_list->addItem($this->pl->txt('copy'), ilParticipationCertificateConfigGUI::CMD_CREATE_TEMPLATE_FRON_LOCAL_CONFIG, $this->ctrl->getLinkTargetByClass(ilParticipationCertificateConfigGUI::class, ilParticipationCertificateConfigGUI::CMD_CREATE_TEMPLATE_FRON_LOCAL_CONFIG));
 				break;
 		}
 

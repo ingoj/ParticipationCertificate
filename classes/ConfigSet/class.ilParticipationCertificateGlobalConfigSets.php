@@ -20,7 +20,7 @@ class ilParticipationCertificateGlobalConfigSets {
 	 * @return ilParticipationCertificateGlobalConfigSet
 	 */
 	public function addNewConfig() {
-			$gl_config = new ilParticipationCertificateGlobalConfigSet;
+			$gl_config = new ilParticipationCertificateGlobalConfigSet();
 			$gl_config->setOrderBy($this->getUnreservedOrderByValue());
 			$gl_config->store();
 			return $gl_config;

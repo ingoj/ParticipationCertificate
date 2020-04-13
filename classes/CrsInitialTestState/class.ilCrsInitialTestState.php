@@ -82,7 +82,7 @@ class ilCrsInitialTestState {
 	/**
 	 * @return int
 	 */
-	public function getCrsitestCrsRefId() {
+	public function getCrsitestCrsRefId():int {
 		return $this->crsitest_crs_ref_id;
 	}
 

@@ -18,6 +18,7 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI {
 	const CMD_SHOW_FORM = 'showForm';
 	const CMD_ADD_CONFIG = 'addConfig';
 	const CMD_COPY_CONFIG = 'copyConfig';
+    const CMD_CREATE_TEMPLATE_FRON_LOCAL_CONFIG = 'createTemplateFromLocalConfig';
 	const CMD_DELETE_CONFIG = 'deleteConfig';
 	const CMD_SET_ACTIVE = 'setActive';
 	const CMD_SET_INACTIVE = 'setInactive';
@@ -126,19 +127,42 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI {
 	public function addConfig() {
 		$gl_configs = new ilParticipationCertificateGlobalConfigSets();
 		$gl_config = $gl_configs->getDefaultConfig();
-		$new_config_set = $gl_config->duplicate();
+        $configs = new ilParticipationCertificateConfigs();
+
+		$new_config_set = ilParticipationCertificateGlobalConfigSet::createNewFromConfigs($configs->getGlobalConfigSet($gl_config->getId()));
 
 		$this->ctrl->setParameter($this,"id",$new_config_set->getId());
 		$this->ctrl->setParameter($this,"set_type",ilParticipationCertificateConfig::CONFIG_SET_TYPE_TEMPLATE);
 		$this->ctrl->redirect($this, self::CMD_SHOW_FORM);
 	}
 
+	public function createTemplateFromLocalConfig() {
+	    $grp_ref_id =  (int)filter_input(INPUT_GET,'grp_ref_id');
+
+        if($grp_ref_id == 0) {
+            $this->ctrl->redirect($this, '');
+        }
+
+        $configs = new ilParticipationCertificateConfigs();
+
+        $new_config_set = ilParticipationCertificateGlobalConfigSet::createNewFromConfigs($configs->getObjectConfigSet($grp_ref_id));
+
+        $this->ctrl->setParameter($this,"id",$new_config_set->getId());
+        $this->ctrl->setParameter($this,"set_type",ilParticipationCertificateConfig::CONFIG_SET_TYPE_TEMPLATE);
+        $this->ctrl->redirect($this, self::CMD_SHOW_FORM);
+    }
+
 
 	public function copyConfig() {
-		$id = filter_input(INPUT_GET,'id');
+		$id = (int)filter_input(INPUT_GET,'id');
 
-		$gl_config = new ilParticipationCertificateGlobalConfigSet($id);
-		$new_config_set = $gl_config->duplicate();
+		if($id == 0) {
+            $this->ctrl->redirect($this, '');
+        }
+
+        $configs = new ilParticipationCertificateConfigs();
+
+        $new_config_set = ilParticipationCertificateGlobalConfigSet::createNewFromConfigs($configs->getGlobalConfigSet($id));
 
 		$this->ctrl->setParameter($this,"id",$new_config_set->getId());
 		$this->ctrl->setParameter($this,"set_type",ilParticipationCertificateConfig::CONFIG_SET_TYPE_TEMPLATE);
@@ -333,9 +357,6 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI {
 
 		$id = filter_input(INPUT_GET,'id');
 		$set_type = filter_input(INPUT_GET,'set_type');
-
-
-
 
 		$this->ctrl->setParameter($this,"id",$id);
 
