@@ -136,7 +136,7 @@ class ilParticipationCertificateTwigParser {
         }
 
 		//quickfix, wenn nur ein User $this->usr_id ist kein array -> foreach kann also nicht gebraucht werden. Jetzt wird ein array erstellt auch wenn nur ein user
-		if (count($this->usr_id) == 1) {
+		if (!is_array($this->usr_id)) {
 			$usr = $this->usr_id;
 			$this->usr_id = array( $usr );
 		}
