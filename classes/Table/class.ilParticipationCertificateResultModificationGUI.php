@@ -196,7 +196,7 @@ class ilParticipationCertificateResultModificationGUI {
 			$array['initial'] = 0;
 		}
 		if (is_object($this->arr_learn_reached_percentages[$usr_id])) {
-			$array['resultstest'] = $this->arr_learn_reached_percentages[$usr_id]->getAveragePercentage();
+			$array['resultstest'] = $this->arr_learn_reached_percentages[$usr_id]->getAveragePercentage(ilParticipationCertificateConfig::getConfig('calculation_type_processing_state_suggested_objectives',$_GET['ref_id']));
 		} else {
 			$array['resultstest'] = 0;
 		}

@@ -208,7 +208,12 @@ class ilParticipationCertificateResultTableGUI extends ilTable2GUI {
 				$row['initial_test_finished'] = $this->pl->txt("no");
 			}
 			if (is_object($arr_learn_reached_percentages[$usr_id])) {
-				$row['result_qualifing_tests'] = $this->buildProgressBar($arr_learn_reached_percentages[$usr_id]->getAveragePercentage(),$arr_learn_reached_percentages[$usr_id]->getLimitPercentage());
+
+
+				$row['result_qualifing_tests'] = $this->buildProgressBar($arr_learn_reached_percentages[$usr_id]->getAveragePercentage(ilParticipationCertificateConfig::getConfig('calculation_type_processing_state_suggested_objectives',$_GET['ref_id'])
+                ), $arr_learn_reached_percentages[$usr_id]->getLimitPercentage());
+
+
 			} else {
 				//$row['result_qualifing_tests'] = 0 . '%';
 				$row['result_qualifing_tests'] = $this->buildProgressBar(0,0);

@@ -179,7 +179,7 @@ class ilParticipationCertificateTwigParser {
 				//Percentage final tests of suggested modules
 				$learn_sugg_reached_percentage = 0;
 				if (is_object($arr_learn_reached_percentages[$usr_id])) {
-					$learn_sugg_reached_percentage = $arr_learn_reached_percentages[$usr_id]->getAveragePercentage();
+					$learn_sugg_reached_percentage = $arr_learn_reached_percentages[$usr_id]->getAveragePercentage(ilParticipationCertificateConfig::getConfig('calculation_type_processing_state_suggested_objectives',$_GET['ref_id']));
 				}
 				/*Video Conferences */
                 $countPassed = 0;

@@ -15,8 +15,8 @@ class ilParticipationCertificateGUI {
 	const CMD_CANCEL = 'cancel';
 	const CMD_LOOP = 'loop';
 	const CMD_CONFIG = 'config';
-	const CMD_PERIOD = 'period';
-	const CMD_PERIOD_SAVE = 'savePeriod';
+	const CMD_CONFIG_RESULT_TABLE = 'configResultTable';
+	const CMD_RESULT_TABLE_CONFIG = 'saveResultTableConfig';
 	const CMD_SELF_PRINT = 'selfPrint';
 	const CMD_SELF_PRINT_SAVE = 'saveSelfPrint';
 	const CMD_DISPLAY = 'display';
@@ -25,11 +25,13 @@ class ilParticipationCertificateGUI {
 	const CMD_SET_OWN_CERT_TEXT_FROM_TEMPLATE = 'setOwnCertTextFromTemplate';
 
 
+
+
 	/*const CMD_PRINT_PDF = 'printPdf';
 	const CMD_PRINT_PDF_WITHOUT_MENTORING = 'printPdfWithoutMentoring';*/
 	const TAB_CONFIG = 'config';
 	const TAB_CONFIG_DISPLAY = 'config_display';
-	const TAB_CONFIG_PERIOD = 'config_period';
+	const TAB_CONFIG_RESULT_TABLE = 'config_result_table';
 	const TAB_CONFIG_SELF_PRINT = 'config_self_print';
 	/**
 	 * @var ilTemplate
@@ -115,12 +117,12 @@ class ilParticipationCertificateGUI {
 			default:
 				switch ($cmd) {
 					case self::CMD_CONFIG:
-					case self::CMD_PERIOD:
+					case self::CMD_CONFIG_RESULT_TABLE:
 					case self::CMD_DISPLAY:
 					case self::CMD_SET_CERT_TEMPLATE:
 					case self::CMD_SET_OWN_CERT_TEXT_FROM_TEMPLATE:
 					case self::CMD_SAVE:
-					case self::CMD_PERIOD_SAVE:
+					case self::CMD_RESULT_TABLE_CONFIG:
 					case self::CMD_SELF_PRINT:
 					case self::CMD_SELF_PRINT_SAVE:
 						/*case self::CMD_PRINT_PDF:
@@ -139,7 +141,7 @@ class ilParticipationCertificateGUI {
 	 *
 	 */
 	protected function config() {
-		$this->period();
+		$this->configResultTable();
 	}
 
 
@@ -172,7 +174,7 @@ class ilParticipationCertificateGUI {
 	 *
 	 */
 	protected function initConfTabs() {
-		$this->tabs->addSubTab(self::TAB_CONFIG_PERIOD, $this->pl->txt('period'), $this->ctrl->getLinkTarget($this, self::CMD_PERIOD));
+		$this->tabs->addSubTab(self::TAB_CONFIG_RESULT_TABLE, $this->pl->txt('config_result_table'), $this->ctrl->getLinkTarget($this, self::CMD_CONFIG_RESULT_TABLE));
 		$this->tabs->addSubTab(self::TAB_CONFIG_SELF_PRINT, $this->pl->txt('period_self_print'), $this->ctrl->getLinkTarget($this, self::CMD_SELF_PRINT));
 		$this->tabs->addSubTab(self::TAB_CONFIG_DISPLAY, $this->pl->txt('plugin'), $this->ctrl->getLinkTarget($this, self::CMD_DISPLAY));
 	}
@@ -426,14 +428,14 @@ class ilParticipationCertificateGUI {
 	/**
 	 *
 	 */
-	protected function period() {
+	protected function configResultTable() {
 		$this->tpl->getStandardTemplate();
 		$this->initHeader();
 
 		$this->initConfTabs();
-		$this->tabs->activateSubTab(self::TAB_CONFIG_PERIOD);
+		$this->tabs->activateSubTab(self::TAB_CONFIG_RESULT_TABLE);
 
-		$form = $this->initPeriodForm();
+		$form = $this->initConfigResultTableForm();
 
 		$this->tpl->setContent($form->getHTML());
 		$this->tpl->show();
@@ -443,7 +445,7 @@ class ilParticipationCertificateGUI {
 	/**
 	 * @return ilPropertyFormGUI
 	 */
-	protected function initPeriodForm() {
+	protected function initConfigResultTableForm() {
 		$form = new ilPropertyFormGUI();
 
 		$form->setFormAction($this->ctrl->getFormAction($this));
@@ -455,7 +457,33 @@ class ilParticipationCertificateGUI {
 		$period->setEnd(new ilDateTime(ilParticipationCertificateConfig::getConfig('period_end', $this->groupRefId), IL_CAL_DATE));
 		$form->addItem($period);
 
-		$form->addCommandButton(self::CMD_PERIOD_SAVE, $this->pl->txt('save'));
+		$calculation_type_processing_state_suggested_objectives = new ilRadioGroupInputGUI(
+            $this->pl->txt('calculation_type_processing_state_suggested_objectives'),
+            'calculation_type_processing_state_suggested_objectives'
+        );
+            $option = new ilRadioOption(
+                $this->pl->txt('calculation_by_points'),
+                ilLearnObjectSuggReachedPercentage::CALC_TYPE_BY_POINTS
+            );
+            $calculation_type_processing_state_suggested_objectives->addOption($option);
+
+            $option = new ilRadioOption(
+                $this->pl->txt('calculation_by_completed_learning_objective'),
+                ilLearnObjectSuggReachedPercentage::CALC_TYPE_BY_COMPLETED_OBJECTIVE
+            );
+            $calculation_type_processing_state_suggested_objectives->addOption($option);
+
+            $option = new ilRadioOption(
+                $this->pl->txt('calculation_by_highest_value'),
+                ilLearnObjectSuggReachedPercentage::CALC_TYPE_HIGHEST_VALUE
+            );
+            $calculation_type_processing_state_suggested_objectives->addOption($option);
+            $calculation_type_processing_state_suggested_objectives->setValue(
+                ilParticipationCertificateConfig::getConfig('calculation_type_processing_state_suggested_objectives',$this->groupRefId)
+            );
+        $form->addItem($calculation_type_processing_state_suggested_objectives);
+
+		$form->addCommandButton(self::CMD_RESULT_TABLE_CONFIG, $this->pl->txt('save'));
 
 		return $form;
 	}
@@ -464,8 +492,8 @@ class ilParticipationCertificateGUI {
 	/**
 	 *
 	 */
-	protected function savePeriod() {
-		$form = $this->initPeriodForm();
+	protected function saveResultTableConfig() {
+		$form = $this->initConfigResultTableForm();
 
 		if (!$form->checkInput()) {
 			//TODO error message plus redirect
@@ -476,9 +504,15 @@ class ilParticipationCertificateGUI {
 		ilParticipationCertificateConfig::setConfig('period_start', $period['start'], $this->groupRefId);
 		ilParticipationCertificateConfig::setConfig('period_end', $period['end'], $this->groupRefId);
 
+
+        $calculation_type_processing_state_suggested_objectives = $form->getInput('calculation_type_processing_state_suggested_objectives');
+
+        ilParticipationCertificateConfig::setConfig('calculation_type_processing_state_suggested_objectives', $calculation_type_processing_state_suggested_objectives, $this->groupRefId);
+
+
 		ilUtil::sendSuccess($this->pl->txt('successFormSave'), true);
 
-		$this->ctrl->redirect($this, self::CMD_PERIOD);
+		$this->ctrl->redirect($this, self::CMD_CONFIG_RESULT_TABLE);
 	}
 
 

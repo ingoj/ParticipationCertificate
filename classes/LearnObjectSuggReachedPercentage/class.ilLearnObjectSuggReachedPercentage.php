@@ -1,6 +1,10 @@
 <?php
 class ilLearnObjectSuggReachedPercentage {
 
+    const CALC_TYPE_BY_POINTS = 1;
+    const CALC_TYPE_BY_COMPLETED_OBJECTIVE = 2;
+    const CALC_TYPE_HIGHEST_VALUE = 3;
+
 	/**
 	 * @var int
 	 */
@@ -9,7 +13,11 @@ class ilLearnObjectSuggReachedPercentage {
 	 *
 	 * @var int
 	 */
-	protected $average_percentage;
+	protected $points_average_percentage;
+    /**
+     * @var int
+     */
+    protected $objective_average_percentage;
 	/**
 	 * @var int $limit_percentage;
 	 */
@@ -36,16 +44,16 @@ class ilLearnObjectSuggReachedPercentage {
 	/**
 	 * @return int
 	 */
-	public function getAveragePercentage() {
-		return $this->average_percentage;
+	public function getPointsAveragePercentage() {
+		return $this->points_average_percentage;
 	}
 
 
 	/**
-	 * @param int $average_percentage
+	 * @param int $points_average_percentage
 	 */
-	public function setAveragePercentage($average_percentage) {
-		$this->average_percentage = $average_percentage;
+	public function setPointsAveragePercentage($points_average_percentage) {
+		$this->points_average_percentage = $points_average_percentage;
 	}
 
 
@@ -63,6 +71,40 @@ class ilLearnObjectSuggReachedPercentage {
 	public function setLimitPercentage($limit_percentage) {
 		$this->limit_percentage = $limit_percentage;
 	}
+
+
+    /**
+     * @return int
+     */
+    public function getObjectiveAveragePercentage() : int
+    {
+        return $this->objective_average_percentage;
+    }
+
+
+    /**
+     * @param int $objective_average_percentage
+     */
+    public function setObjectiveAveragePercentage(int $objective_average_percentage)
+    {
+        $this->objective_average_percentage = $objective_average_percentage;
+    }
+
+    public function getAveragePercentage($average_type = self::CALC_TYPE_BY_POINTS) {
+
+        switch($average_type) {
+            case self::CALC_TYPE_BY_POINTS:
+                return $this->points_average_percentage;
+                break;
+            case self::CALC_TYPE_BY_COMPLETED_OBJECTIVE:
+                return $this->objective_average_percentage;
+                break;
+            case self::CALC_TYPE_HIGHEST_VALUE:
+                return $this->points_average_percentage > $this->objective_average_percentage ? $this->points_average_percentage : $this->objective_average_percentage;
+                break;
+        }
+    }
+
 
 
 }

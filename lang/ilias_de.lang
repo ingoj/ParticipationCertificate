@@ -78,3 +78,8 @@ set_active#:#Aktivieren
 reset_config#:#Konfiguration zurücksetzen
 confirm_reset_config#:#Wollen Sie wirklich die Konfiguration zurücksetzen. Sämtliche Zertifikatseinstellungen werden gelöscht.
 config_reseted#:#Die Konfiguration wurde zurückgesetzt
+calculation_by_points#:#Berechnung basierend auf Punkten
+calculation_by_completed_learning_objective#:#Berechnung aufgrund der Anzahl der erreichten Lernziele
+calculation_by_highest_value#:#Berechnung beider Varianten. Es gilt der jeweils bessere Wert.
+calculation_type_processing_state_suggested_objectives#:#Berechnungstyp 'Bearbeitung der empfohlenen Mathematik-Lernmodule'
+config_result_table#:#Konfiguration Zeitraum & Berechnungstyp
