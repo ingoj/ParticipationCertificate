@@ -1,6 +1,11 @@
 <?php
 
 class ilLearnObjectFinalTestState {
+
+    /**
+     * @var string
+     */
+    protected $locftest_learn_objective_title;
 	/**
 	 * @var int
 	 */
@@ -61,6 +66,26 @@ class ilLearnObjectFinalTestState {
 	 * @var bool
 	 */
 	protected  $objectives_suggested;
+
+
+    /**
+     * @return string
+     */
+    public function getLocftestLearnObjectiveTitle() : string
+    {
+        return $this->locftest_learn_objective_title;
+    }
+
+
+    /**
+     * @param string $locftest_learn_objective_title
+     */
+    public function setLocftestLearnObjectiveTitle(string $locftest_learn_objective_title)
+    {
+        $this->locftest_learn_objective_title = $locftest_learn_objective_title;
+    }
+
+
 
 	/**
 	 * @return int

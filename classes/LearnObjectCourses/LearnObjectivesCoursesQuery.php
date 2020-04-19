@@ -7,6 +7,7 @@ class LearnObjectivesCoursesQuery {
 	public function getSQL() {
 		return "SELECT  crs_objectives.crs_id as master_crs_id, 
 		master_crs_obj.title as master_crs_title,
+		crs_objectives.title as learn_objective_title,
 		crs_objectives.objective_id as master_crs_objective_id, 
 		crs_objectives.title as master_crs_objective_title, 
 		crs_objectives.position as master_crs_objective_position, 

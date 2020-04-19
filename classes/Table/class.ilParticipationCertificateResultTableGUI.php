@@ -222,11 +222,15 @@ class ilParticipationCertificateResultTableGUI extends ilTable2GUI {
 				foreach ($arr_final_tests[$usr_id] as $rec) {
 
 					if($rec->getObjectivesSuggested()) {
+
+					    if(!array_key_exists($rec->getLocftestObjectiveId(),$rec_array)) {
+                            $rec_array[$rec->getLocftestObjectiveId()] = $rec->getLocftestLearnObjectiveTitle() . '<br/>';
+					    }
+
 						/**
 						 * @var ilLearnObjectFinalTestState $rec
 						 */
-						$rec_array[] = $rec->getLocftestObjectiveTitle() . '<br/>' . $rec->getLocftestTestTitle() . '<br/>'
-							. round($rec->getLocftestPercentage(), 0) . '%<br/>';
+						$rec_array[$rec->getLocftestObjectiveId()] .= '- '.round($rec->getLocftestPercentage(), 0) . '% '. $rec->getLocftestObjectiveTitle() . '<br/>';
 					}
 
 

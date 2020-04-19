@@ -130,7 +130,7 @@ class ilParticipationCertificateSingleResultTableGUI extends ilTable2GUI {
 						 * @var ilLearnObjectFinalTestState $finalTestsState
 						 */
 						$cols[$finalTestsState->getLocftestCrsObjId()] = array(
-							'txt' => $finalTestsState->getLocftestCrsTitle(),
+							'txt' => $finalTestsState->getLocftestLearnObjectiveTitle(),
 							'obj_id' => $sorted[key($sorted)]['obj_id'],
 							'objective_id' => $sorted[key($sorted)]['objective_id'],
 							'default' => true,
