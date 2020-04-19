@@ -272,10 +272,10 @@ class ilParticipationCertificateSingleResultTableGUI extends ilTable2GUI {
 		$tooltip_id = "prg_";
 
 		$maximum_possible_amount_of_points = 100;
-		$current_amount_of_points = $points;
+		$current_amount_of_points = (int)$points;
 
 		if ($maximum_possible_amount_of_points > 0) {
-			$current_percent = (int)($current_amount_of_points * 100 / $maximum_possible_amount_of_points);
+            $current_percent = (int)($current_amount_of_points * 100 / $maximum_possible_amount_of_points);
 		} else {
 			$current_percent = 0;
 		}
