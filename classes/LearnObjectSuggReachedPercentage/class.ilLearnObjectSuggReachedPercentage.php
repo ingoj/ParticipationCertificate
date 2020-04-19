@@ -102,6 +102,9 @@ class ilLearnObjectSuggReachedPercentage {
             case self::CALC_TYPE_HIGHEST_VALUE:
                 return $this->points_average_percentage > $this->objective_average_percentage ? $this->points_average_percentage : $this->objective_average_percentage;
                 break;
+            default:
+                return $this->points_average_percentage;
+                break;
         }
     }
 
