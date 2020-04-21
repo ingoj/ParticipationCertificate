@@ -213,10 +213,10 @@ if(!is_object($config)) {
 	$part_conf->store();
 }
 
-$config = ilParticipationCertificateConfig::where(array('config_key' =>  'color', 'config_type' => ilParticipationCertificateConfig::CONFIG_SET_TYPE_TEMPLATE, 'config_value_type' => ilParticipationCertificateConfig::CONFIG_VALUE_TYPE_OTHER, "group_ref_id" => 0))->first();
+$config = ilParticipationCertificateConfig::where(array('config_key' =>  'color', 'config_type' => ilParticipationCertificateConfig::CONFIG_SET_TYPE_GLOBAL, 'config_value_type' => ilParticipationCertificateConfig::CONFIG_VALUE_TYPE_OTHER, "group_ref_id" => 0))->first();
 if(!is_object($config)) {
 	$part_conf = new ilParticipationCertificateConfig();
-	$part_conf->setConfigType(ilParticipationCertificateConfig::CONFIG_SET_TYPE_TEMPLATE);
+	$part_conf->setConfigType(ilParticipationCertificateConfig::CONFIG_SET_TYPE_GLOBAL);
 	$part_conf->setConfigValueType(ilParticipationCertificateConfig::CONFIG_VALUE_TYPE_OTHER);
 	$part_conf->setConfigKey('color');
 	$part_conf->setConfigValue("");

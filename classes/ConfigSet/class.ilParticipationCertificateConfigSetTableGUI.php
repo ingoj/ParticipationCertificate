@@ -226,7 +226,7 @@ class ilParticipationCertificateConfigSetTableGUI extends ilTable2GUI {
 
                 $this->ctrl->setParameterByClass(ilParticipationCertificateConfigGUI::class, 'grp_ref_id', $a_set['obj_ref_id']);
 
-                $action_list->addItem($this->pl->txt('copy'), ilParticipationCertificateConfigGUI::CMD_CREATE_TEMPLATE_FRON_LOCAL_CONFIG, $this->ctrl->getLinkTargetByClass(ilParticipationCertificateConfigGUI::class, ilParticipationCertificateConfigGUI::CMD_CREATE_TEMPLATE_FRON_LOCAL_CONFIG));
+                $action_list->addItem($this->pl->txt('create_template'), ilParticipationCertificateConfigGUI::CMD_CREATE_TEMPLATE_FRON_LOCAL_CONFIG, $this->ctrl->getLinkTargetByClass(ilParticipationCertificateConfigGUI::class, ilParticipationCertificateConfigGUI::CMD_CREATE_TEMPLATE_FRON_LOCAL_CONFIG));
 				break;
 		}
 

@@ -478,9 +478,21 @@ class ilParticipationCertificateGUI {
                 ilLearnObjectSuggReachedPercentage::CALC_TYPE_HIGHEST_VALUE
             );
             $calculation_type_processing_state_suggested_objectives->addOption($option);
-            $calculation_type_processing_state_suggested_objectives->setValue(
-                ilParticipationCertificateConfig::getConfig('calculation_type_processing_state_suggested_objectives',$this->groupRefId)
-            );
+
+            $value = ilParticipationCertificateConfig::getConfig
+            (
+                'calculation_type_processing_state_suggested_objectives',
+                $this->groupRefId
+            )
+                ?
+                ilParticipationCertificateConfig::getConfig(
+                    'calculation_type_processing_state_suggested_objectives',
+                    $this->groupRefId)
+                :
+                ilLearnObjectSuggReachedPercentage::CALC_TYPE_BY_POINTS;
+
+            $calculation_type_processing_state_suggested_objectives->setValue($value);
+
         $form->addItem($calculation_type_processing_state_suggested_objectives);
 
 		$form->addCommandButton(self::CMD_RESULT_TABLE_CONFIG, $this->pl->txt('save'));

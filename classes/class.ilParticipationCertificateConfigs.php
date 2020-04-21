@@ -490,10 +490,19 @@ class ilParticipationCertificateConfigs {
 		$cert_config->setConfigValueType(ilParticipationCertificateConfig::CONFIG_VALUE_TYPE_CERT_TEXT);
 		$arr_configs[] = $cert_config;
 
+        $cert_config = new ilParticipationCertificateConfig();
+        $cert_config->setConfigKey('page2_box1_row1_total_questions');
+        $cert_config->setConfigValue('42');
+        $cert_config->setOrderBy(23);
+        $cert_config->setConfigType(ilParticipationCertificateConfig::CONFIG_SET_TYPE_TEMPLATE);
+        $cert_config->setConfigValueType(ilParticipationCertificateConfig::CONFIG_VALUE_TYPE_CERT_TEXT);
+        $arr_configs[] = $cert_config;
+
+
 		$cert_config = new ilParticipationCertificateConfig();
 		$cert_config->setConfigKey('page2_box1_row2');
 		$cert_config->setConfigValue('Bearbeitung von empfohlenen Mathematik - Lernmodulen');
-		$cert_config->setOrderBy(23);
+		$cert_config->setOrderBy(24);
 		$cert_config->setConfigType(ilParticipationCertificateConfig::CONFIG_SET_TYPE_TEMPLATE);
 		$cert_config->setConfigValueType(ilParticipationCertificateConfig::CONFIG_VALUE_TYPE_CERT_TEXT);
 		$arr_configs[] = $cert_config;
@@ -501,7 +510,7 @@ class ilParticipationCertificateConfigs {
 		$cert_config = new ilParticipationCertificateConfig();
 		$cert_config->setConfigKey('page2_box2_title');
 		$cert_config->setConfigValue('Studienvorbereitung - eMentoring');
-		$cert_config->setOrderBy(24);
+		$cert_config->setOrderBy(25);
 		$cert_config->setConfigType(ilParticipationCertificateConfig::CONFIG_SET_TYPE_TEMPLATE);
 		$cert_config->setConfigValueType(ilParticipationCertificateConfig::CONFIG_VALUE_TYPE_CERT_TEXT);
 		$arr_configs[] = $cert_config;
@@ -509,7 +518,7 @@ class ilParticipationCertificateConfigs {
 		$cert_config = new ilParticipationCertificateConfig();
 		$cert_config->setConfigKey('page2_box2_row1');
 		$cert_config->setConfigValue('Aktive Teilnahme an Videokonferenzen');
-		$cert_config->setOrderBy(25);
+		$cert_config->setOrderBy(26);
 		$cert_config->setConfigType(ilParticipationCertificateConfig::CONFIG_SET_TYPE_TEMPLATE);
 		$cert_config->setConfigValueType(ilParticipationCertificateConfig::CONFIG_VALUE_TYPE_CERT_TEXT);
 		$arr_configs[] = $cert_config;
@@ -517,7 +526,7 @@ class ilParticipationCertificateConfigs {
 		$cert_config = new ilParticipationCertificateConfig();
 		$cert_config->setConfigKey('page2_box2_row2');
 		$cert_config->setConfigValue('Bearbeitung der Aufgaben zu überfachlichen Themen:');
-		$cert_config->setOrderBy(26);
+		$cert_config->setOrderBy(27);
 		$cert_config->setConfigType(ilParticipationCertificateConfig::CONFIG_SET_TYPE_TEMPLATE);
 		$cert_config->setConfigValueType(ilParticipationCertificateConfig::CONFIG_VALUE_TYPE_CERT_TEXT);
 		$arr_configs[] = $cert_config;
@@ -525,7 +534,7 @@ class ilParticipationCertificateConfigs {
 		$cert_config = new ilParticipationCertificateConfig();
 		$cert_config->setConfigKey('footer_config');
 		$cert_config->setConfigValue('Die Resultate dieser Bescheinigung wurden manuell berechnet.');
-		$cert_config->setOrderBy(27);
+		$cert_config->setOrderBy(28);
 		$cert_config->setConfigType(ilParticipationCertificateConfig::CONFIG_SET_TYPE_TEMPLATE);
 		$cert_config->setConfigValueType(ilParticipationCertificateConfig::CONFIG_VALUE_TYPE_CERT_TEXT);
 		$arr_configs[] = $cert_config;

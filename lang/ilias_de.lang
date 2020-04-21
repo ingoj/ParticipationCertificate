@@ -65,6 +65,7 @@ edit#:#Bearbeiten
 config_title#:#Bezeichnung
 order_by#:#Sortierung
 copy#:#Kopieren
+create_template#:#Vorlage erzeugen
 delete#:#Löschen
 configset_type_1#:#Zertifikatsvorlage
 configset_type_2#:#Zertifikatskonfiguration ILIAS Objekt
