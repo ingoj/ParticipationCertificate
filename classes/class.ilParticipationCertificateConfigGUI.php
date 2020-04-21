@@ -232,6 +232,7 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI {
 			$config = new ilParticipationCertificateConfig();
 		}
 		$config->setConfigKey('color');
+        $config->setConfigValue("fff5ba");
 		$config->setConfigType(ilParticipationCertificateConfig::CONFIG_SET_TYPE_GLOBAL);
 		$config->setConfigValueType(ilParticipationCertificateConfig::CONFIG_VALUE_TYPE_OTHER);
 		$config->setGlobalConfigId(0);
@@ -253,25 +254,13 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI {
 			 * @var $value ilParticipationCertificateConfig
 			 */
 			$config = new ilParticipationCertificateConfig();
-			$config->setConfigKey($value->getConfigKey());
 			$config->setGlobalConfigId($part_cert_default_config_set->getId());
-			$config->setConfigType(ilParticipationCertificateConfig::CONFIG_SET_TYPE_TEMPLATE);
-
-
 			$config->setConfigKey($value->getConfigKey());
 			$config->setOrderBy($value->getOrderBy());
 			$config->setConfigType($value->getConfigType());
 			$config->setConfigValueType($value->getConfigValueType());
+            $config->setOrderBy($value->getOrderBy());
 
-
-			$config->store();
-
-			if(!is_object($config)) {
-				$value->setGlobalConfigId($part_cert_default_config_set->getId());
-				$config = $value;
-			} else {
-				$config->setOrderBy($value->getOrderBy());
-			}
 			$config->store();
 		}
 
