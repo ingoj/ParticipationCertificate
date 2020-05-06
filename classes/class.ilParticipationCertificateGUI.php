@@ -385,7 +385,7 @@ class ilParticipationCertificateGUI {
 	}
 
 
-	/*	/ **
+	/*
 	 *
 	 * /
 	public function printPdf() {

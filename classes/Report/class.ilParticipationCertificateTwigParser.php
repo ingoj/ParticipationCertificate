@@ -90,20 +90,38 @@ class ilParticipationCertificateTwigParser {
 
 	public function parseData() {
 
-		$participation_certificate_configs = new ilParticipationCertificateConfigs();
 
-		$arr_text_values = $participation_certificate_configs->returnTextValues($this->group_ref_id, ilParticipationCertificateConfig::CONFIG_SET_TYPE_GROUP,
-		ilParticipationCertificateConfig::CONFIG_SET_TYPE_TEMPLATE);
+        $cert_configs = new ilParticipationCertificateConfigs();
+        $arr_config = $cert_configs->getObjConfigSetIfNoneCreateDefaultAndCreateNewObjConfigValues($this->group_ref_id);
 
-        $global_config_id = NULL;
-        $part_cert_ob_conf = new ilParticipationCertificateObjectConfigSet();
-		if($part_cert_ob_conf::where(array('obj_ref_id' => $this->group_ref_id,'config_type' => ilParticipationCertificateObjectConfigSet::CONFIG_TYPE_TEMPLATE))->count() > 0)    {
-            /**
-             * @var $arr_ob_conf ilParticipationCertificateObjectConfigSet
-             */
-            $arr_ob_conf = $part_cert_ob_conf::where(array('obj_ref_id' => $this->group_ref_id, 'config_type' => ilParticipationCertificateObjectConfigSet::CONFIG_TYPE_TEMPLATE))->first();
-            $global_config_id = (int)$arr_ob_conf->getGlConfTemplateId();
+        $global_config_sets = new ilParticipationCertificateGlobalConfigSets();
+        if(count($arr_config) > 0) {
+            $global_config_id = reset($arr_config)->getGlobalConfigId();
         }
+
+        if($global_config_id > 0) {
+            $global_config_set = $global_config_sets->getConfigSetById($global_config_id);
+            ilUtil::sendInfo($this->pl->txt('configset_type_1').' '.$global_config_set->getTitle());
+        } else {
+            ilUtil::sendInfo($this->pl->txt('configset_type_2'));
+        }
+
+        $arr_config_text = [];
+        foreach ($arr_config as $config) {
+            $arr_config_text[$config->getConfigKey()] = $config->getConfigValue();
+        }
+        
+        if(count($arr_config) > 0) {
+            $global_config_id = reset($arr_config)->getGlobalConfigId();
+        }
+
+        if($global_config_id > 0) {
+            $global_config_set = $global_config_sets->getConfigSetById($global_config_id);
+            ilUtil::sendInfo($this->pl->txt('configset_type_1').' '.$global_config_set->getTitle());
+        } else {
+            ilUtil::sendInfo($this->pl->txt('configset_type_2'));
+        }
+
 
         $arr_new_iass_states = ilIassStatesMulti::getData($this->usr_ids,$_GET['ref_id']);
         $arr_xali_states = xaliStates::getData($this->usr_ids,$_GET['ref_id']);
@@ -147,9 +165,10 @@ class ilParticipationCertificateTwigParser {
 				$usr_id = $usr_id[0];
 			}
 
-			$processed_arr_text_values = $arr_text_values;
+
+			$processed_arr_text_values = $arr_config_text;
 			//Preprocess text values
-			foreach ($arr_text_values as $key => $value) {
+			foreach ($arr_config_text as $key => $value) {
 				$twig = new \Twig_Environment(new \Twig_Loader_String());
 				$peparsed_value = $twig->render($value, array(
 					"username" => ($arr_usr_data[$usr_id]->getPartCertSalutation() ? $arr_usr_data[$usr_id]->getPartCertSalutation() . ' ' : '')
@@ -234,7 +253,7 @@ class ilParticipationCertificateTwigParser {
 				'excercise_percentage' => $excercise_percentage,
 				'logo_path' => $logo_path,
 				'page1_issuer_signature' => $page1_issuer_signature,
-				'standard_value' => $participation_certificate_configs->returnPercentValue($this->group_ref_id)
+				'standard_value' => $cert_configs->returnPercentValue($this->group_ref_id)
 			);
 
 			$part_pdf->generatePDF($this->twig_template->render($arr_render), count($this->usr_id));
