@@ -22,6 +22,12 @@ class ilLearnObjectSuggReachedPercentage {
 	 * @var int $limit_percentage;
 	 */
 	protected $limit_percentage;
+    /**
+     * @var string $cert_output_string;
+     */
+    protected $cert_output_string;
+
+
 
 
 
@@ -90,20 +96,46 @@ class ilLearnObjectSuggReachedPercentage {
         $this->objective_average_percentage = $objective_average_percentage;
     }
 
-    public function getAveragePercentage($average_type = self::CALC_TYPE_BY_POINTS) {
+
+    /**
+     * @return string
+     */
+    public function getCertOutputString() : string
+    {
+        return $this->cert_output_string;
+    }
+
+
+    /**
+     * @param string $cert_output_string
+     */
+    public function setCertOutputString(string $cert_output_string)
+    {
+        $this->cert_output_string = $cert_output_string;
+    }
+
+
+
+    public function getAveragePercentage($average_type = self::CALC_TYPE_BY_POINTS,$as_string = false) {
 
         switch($average_type) {
             case self::CALC_TYPE_BY_POINTS:
+                if($as_string) {
+                    return $this->points_average_percentage."%";
+                }
                 return $this->points_average_percentage;
                 break;
             case self::CALC_TYPE_BY_COMPLETED_OBJECTIVE:
-                return $this->objective_average_percentage;
+                return $this->cert_output_string;
                 break;
             case self::CALC_TYPE_HIGHEST_VALUE:
-                return $this->points_average_percentage > $this->objective_average_percentage ? $this->points_average_percentage : $this->objective_average_percentage;
+                if($as_string) {
+                    return $this->points_average_percentage > $this->objective_average_percentage ? $this->points_average_percentage."%" : $this->cert_output_string;
+                }
+                return $this->points_average_percentage > $this->objective_average_percentage ? $this->points_average_percentage : $this->cert_output_string;
                 break;
             default:
-                return $this->points_average_percentage;
+                return $this->points_average_percentage."%";
                 break;
         }
     }

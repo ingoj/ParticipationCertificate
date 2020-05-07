@@ -519,3 +519,118 @@ foreach($part_cert_configs->returnCertTextDefaultValues() as $key => $value) {
 <?php
 //
 ?>
+<#35>
+<?php
+//
+?>
+<#36>
+<?php
+
+$config_textes_to_reconfigure[] = 'page2_box1_row2';
+$config_textes_to_reconfigure[] = 'page2_box2_title';
+$config_textes_to_reconfigure[] = 'page2_box2_row1';
+$config_textes_to_reconfigure[] = 'page2_box2_row2';
+
+$configs_with_box_total_questions = ilParticipationCertificateConfig::where(
+		[
+				"config_key" => "page2_box1_row1_total_questions",
+		"config_value_type" => ilParticipationCertificateConfig::CONFIG_VALUE_TYPE_CERT_TEXT])->get();
+
+$global_config_ids_already_configured = [];
+$group_ref_ids_already_configured = [];
+
+if(count($configs_with_box_total_questions) > 0) {
+	foreach($configs_with_box_total_questions as $configs_with_box_total_question) {
+		/** @var ilParticipationCertificateConfig $configs_with_box_total_question */
+        if($configs_with_box_total_question->getGlobalConfigId()
+	        > 0) {
+            $global_config_ids_already_configured[] = $configs_with_box_total_question->getGlobalConfigId();
+        }
+
+        if($configs_with_box_total_question->getGlobalConfigId()
+            > 0) {
+            $group_ref_ids_already_configured[] = $configs_with_box_total_question->getGroupRefId();
+        }
+	}
+}
+
+
+$configs_type_cert_text = ilParticipationCertificateConfig::where(
+    [
+        "config_value_type" => ilParticipationCertificateConfig::CONFIG_VALUE_TYPE_CERT_TEXT])->get();
+
+$global_config_ids_to_configure = [];
+$group_ref_ids_to_configure = [];
+if(count($configs_type_cert_text) > 0) {
+    foreach ($configs_type_cert_text as $config_type_cert_text) {
+        /** @var ilParticipationCertificateConfig $config_type_cert_text */
+        if($config_type_cert_text->getGlobalConfigId()
+            > 0) {
+        	if(in_array(
+        			$config_type_cert_text->getGlobalConfigId(),
+		        $global_config_ids_already_configured
+	        )) {
+                continue;
+	        }
+            $global_config_ids_to_configure[$config_type_cert_text->getGlobalConfigId()] = $config_type_cert_text->getGlobalConfigId();
+
+        	if(in_array(
+        			$config_type_cert_text->getConfigKey(),
+                $config_textes_to_reconfigure
+	        )
+	        )  {
+                $config_type_cert_text->setOrderBy(((int)$config_type_cert_text->getOrderBy() + 1));
+                $config_type_cert_text->update();
+               }
+
+        }
+
+        if($config_type_cert_text->getGroupRefId()
+            > 0) {
+            if(in_array(
+                $config_type_cert_text->getGroupRefId(),
+                $group_ref_ids_already_configured
+            )) {
+                continue;
+            }
+            $group_ref_ids_to_configure[$config_type_cert_text->getGroupRefId()] = $config_type_cert_text->getGroupRefId();
+
+            if(in_array(
+                $config_type_cert_text->getConfigKey(),
+                $config_textes_to_reconfigure
+            )
+            )  {
+                $config_type_cert_text->setOrderBy(((int)$config_type_cert_text->getOrderBy() + 1));
+                $config_type_cert_text->update();
+            }
+        }
+    }
+
+    foreach($global_config_ids_to_configure as $global_config_id_to_configure) {
+        $cert_config = new ilParticipationCertificateConfig();
+        $cert_config->setConfigType(ilParticipationCertificateConfig::CONFIG_SET_TYPE_TEMPLATE);
+        $cert_config->setGroupRefId(0);
+        $cert_config->setGlobalConfigId($global_config_id_to_configure);
+        $cert_config->setConfigValueType(ilParticipationCertificateConfig::CONFIG_VALUE_TYPE_CERT_TEXT);
+        $cert_config->setConfigKey('page2_box1_row1_total_questions');
+        $cert_config->setConfigValue('');
+        $cert_config->setOrderBy(23);
+        $cert_config->store();
+    }
+
+    foreach($group_ref_ids_to_configure as $group_ref_id_to_configure) {
+        $cert_config = new ilParticipationCertificateConfig();
+        $cert_config->setConfigType(ilParticipationCertificateConfig::CONFIG_SET_TYPE_GROUP);
+        $cert_config->setGroupRefId($group_ref_id_to_configure);
+        $cert_config->setGlobalConfigId(0);
+        $cert_config->setConfigValueType(ilParticipationCertificateConfig::CONFIG_VALUE_TYPE_CERT_TEXT);
+        $cert_config->setConfigKey('page2_box1_row1_total_questions');
+        $cert_config->setConfigValue('');
+        $cert_config->setOrderBy(23);
+        $cert_config->store();
+    }
+}
+?>
+
+
+

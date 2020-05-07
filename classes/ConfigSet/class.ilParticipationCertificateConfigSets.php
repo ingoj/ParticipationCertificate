@@ -60,9 +60,9 @@ class ilParticipationCertificateConfigSets {
 			FROM
 			    dhbw_part_cert_ob_conf
 			        INNER JOIN
-			    object_reference AS obj_ref ON obj_ref.ref_id = dhbw_part_cert_ob_conf.obj_ref_id
+			    object_reference AS obj_ref ON obj_ref.ref_id = dhbw_part_cert_ob_conf.obj_ref_id  AND obj_ref.deleted is null
 			        INNER JOIN
-			    object_data AS obj_data ON obj_data.obj_id = obj_ref.obj_id 
+			    object_data AS obj_data ON obj_data.obj_id = obj_ref.obj_id
 			    INNER JOIN tree on tree.child = obj_ref.ref_id
 			    INNER JOIN object_reference as parent_ref on parent_ref.ref_id = tree.parent
 			    INNER JOIN object_data as parent_obj on parent_obj.obj_id = parent_ref.obj_id

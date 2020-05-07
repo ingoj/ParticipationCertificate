@@ -15,6 +15,7 @@ class ilLearnObjectSuggReachedPercentages {
 		while ($row = $ilDB->fetchAssoc($result)) {
 			$reached_percentage = new ilLearnObjectSuggReachedPercentage();
 			$reached_percentage->setUsrId($row['usr_id']);
+            $reached_percentage->setCertOutputString('TEST');
 			$reached_percentage->setPointsAveragePercentage($row['average_percentage']);
 			$reached_percentage->setLimitPercentage($row['limit_perc']);
 			$reached_percentage_data[$row['usr_id']] = $reached_percentage;
@@ -28,6 +29,9 @@ class ilLearnObjectSuggReachedPercentages {
              * @var ilLearnObjectSuggReachedPercentage $reached_percentage
              */
             $reached_percentage->setObjectiveAveragePercentage($row['average_percentage']);
+            $reached_percentage->setObjectiveAveragePercentage($row['average_output_string']);
+
+
             $reached_percentage_data[$row['usr_id']] = $reached_percentage;
         }
 
@@ -46,7 +50,7 @@ class ilLearnObjectSuggReachedPercentages {
 
 		ilLearnObjectFinalTestStates::createTemporaryTableLearnObjectFinalTest($arr_usr_ids, 'tmp_lo_fin_test');
 
-		$select = "SELECT round((SUM(objectives_sug_percentage) / SUM(suggested)),0) as average_percentage, 
+        $select = "SELECT round((SUM(objectives_sug_percentage) / SUM(suggested)),0) as average_percentage,
 					usr_id, 
 					round(avg(tst_req_percentage),0) as limit_perc
 					from tmp_lo_fin_test
@@ -68,10 +72,14 @@ class ilLearnObjectSuggReachedPercentages {
         ilLearnObjectFinalTestStates::createTemporaryTableLearnObjectFinalTest($arr_usr_ids, 'tmp_lo_fin_test');
 
 
-        $select = "Select (sum(objectives_all_completed) / count(suggested) * 100) as   average_percentage,
+
+
+        $select = "Select (sum(objectives_sug_completed) / count(suggested) * 100) as   average_percentage,
+Concat(SUM(objectives_sug_completed), '/', SUM(suggested)) as average_output_string,
+
 usr_id from (
             
-            select objectives_all_completed, master_crs_objective_id, suggested, usr_id from 
+            select objectives_all_completed, objectives_sug_completed, master_crs_objective_id, suggested, usr_id from 
             tmp_lo_fin_test
              where suggested = 1
             group by usr_id, master_crs_objective_id

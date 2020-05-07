@@ -291,9 +291,17 @@ class ilParticipationCertificateConfigs {
 		$arr_config = ilParticipationCertificateConfig::where([ "group_ref_id" => $obj_ref_id ])->get();
 		if (count($arr_config)) {
 			foreach ($arr_config as $config) {
+
 				/**
 				 * @var ilParticipationCertificateConfig $config
 				 */
+                if
+                ($config->getConfigValueType() == ilParticipationCertificateConfig::CONFIG_VALUE_TYPE_OTHER) {
+                    continue;
+
+                }
+
+
 				switch ($config->getConfigKey()) {
 					case "page1_issuer_signature":
 						ilParticipationCertificateConfig::deletePicture($config->getGroupRefId(), $config->getConfigKey() . ".png");

@@ -110,7 +110,7 @@ class ilParticipationCertificateTwigParser {
         foreach ($arr_config as $config) {
             $arr_config_text[$config->getConfigKey()] = $config->getConfigValue();
         }
-        
+
         if(count($arr_config) > 0) {
             $global_config_id = reset($arr_config)->getGlobalConfigId();
         }
@@ -198,7 +198,7 @@ class ilParticipationCertificateTwigParser {
 				//Percentage final tests of suggested modules
 				$learn_sugg_reached_percentage = 0;
 				if (is_object($arr_learn_reached_percentages[$usr_id])) {
-					$learn_sugg_reached_percentage = $arr_learn_reached_percentages[$usr_id]->getAveragePercentage(ilParticipationCertificateConfig::getConfig('calculation_type_processing_state_suggested_objectives',$_GET['ref_id']));
+					$learn_sugg_reached_percentage = $arr_learn_reached_percentages[$usr_id]->getAveragePercentage(ilParticipationCertificateConfig::getConfig('calculation_type_processing_state_suggested_objectives',$_GET['ref_id']),true);
 				}
 				/*Video Conferences */
                 $countPassed = 0;
