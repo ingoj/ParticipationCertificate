@@ -15,7 +15,7 @@ class ilLearnObjectSuggReachedPercentages {
 		while ($row = $ilDB->fetchAssoc($result)) {
 			$reached_percentage = new ilLearnObjectSuggReachedPercentage();
 			$reached_percentage->setUsrId($row['usr_id']);
-            $reached_percentage->setCertOutputString('TEST');
+            $reached_percentage->setCertOutputString($row['average_output_string']);
 			$reached_percentage->setPointsAveragePercentage($row['average_percentage']);
 			$reached_percentage->setLimitPercentage($row['limit_perc']);
 			$reached_percentage_data[$row['usr_id']] = $reached_percentage;
@@ -28,7 +28,6 @@ class ilLearnObjectSuggReachedPercentages {
             /**
              * @var ilLearnObjectSuggReachedPercentage $reached_percentage
              */
-            $reached_percentage->setObjectiveAveragePercentage($row['average_percentage']);
             $reached_percentage->setObjectiveAveragePercentage($row['average_output_string']);
 
 
@@ -52,7 +51,8 @@ class ilLearnObjectSuggReachedPercentages {
 
         $select = "SELECT round((SUM(objectives_sug_percentage) / SUM(suggested)),0) as average_percentage,
 					usr_id, 
-					round(avg(tst_req_percentage),0) as limit_perc
+					round(avg(tst_req_percentage),0) as limit_perc,
+					CONCAT(SUM(objectives_sug_completed),'/',SUM(suggested)) as average_output_string,
 					from tmp_lo_fin_test
 					group by usr_id";
 
