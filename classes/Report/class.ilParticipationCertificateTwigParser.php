@@ -131,7 +131,7 @@ class ilParticipationCertificateTwigParser {
 		$arr_initial_test_states = ilCrsInitialTestStates::getData($this->usr_ids);
 		$arr_excercise_states = ilExcerciseStates::getData($this->usr_ids,$this->group_ref_id);
 		$arr_iass_states = ilIassStates::getData($this->usr_ids);
-		$arr_learn_reached_percentages = ilLearnObjectSuggReachedPercentages::getData($this->usr_ids);
+		$arr_learn_sugg_results = ilLearnObjectSuggResults::getData($this->usr_ids);
 
 		$date = new ilDate(time(), IL_CAL_UNIX);
 
@@ -185,7 +185,7 @@ class ilParticipationCertificateTwigParser {
 			}
 			if ($this->edited == true) {
 				$initial_test_state = $this->array[0];
-				$learn_sugg_reached_percentage = $this->array[1];
+				$learn_sugg_result = $this->array[1];
 				$iass_state = $this->array[2];
 				$excercise_percentage = $this->array[3];
 			} else {
@@ -196,9 +196,9 @@ class ilParticipationCertificateTwigParser {
 					$initial_test_state = $arr_initial_test_states[$usr_id]->getCrsitestItestSubmitted();
 				}
 				//Percentage final tests of suggested modules
-				$learn_sugg_reached_percentage = 0;
-				if (is_object($arr_learn_reached_percentages[$usr_id])) {
-					$learn_sugg_reached_percentage = $arr_learn_reached_percentages[$usr_id]->getAveragePercentage(ilParticipationCertificateConfig::getConfig('calculation_type_processing_state_suggested_objectives',$_GET['ref_id']),true);
+				$learn_sugg_result = 0;
+				if (is_object($arr_learn_sugg_results[$usr_id])) {
+					$learn_sugg_result = $arr_learn_sugg_results[$usr_id]->getAveragePercentage(ilParticipationCertificateConfig::getConfig('calculation_type_processing_state_suggested_objectives',$_GET['ref_id']),true);
 				}
 				/*Video Conferences */
                 $countPassed = 0;
@@ -247,7 +247,7 @@ class ilParticipationCertificateTwigParser {
 				'show_footer' => $this->footer,
 				'arr_lo_master_crs' => $arr_usr_lo_master_crs,
 				'crsitest_itest_submitted' => $initial_test_state,
-				'learn_sugg_reached_percentage' => $learn_sugg_reached_percentage,
+				'learn_sugg_reached_percentage' => $learn_sugg_result,
 				'iass_state' => $percentage,
 				'iass_states' => $iass_states,
 				'excercise_percentage' => $excercise_percentage,

@@ -463,19 +463,19 @@ class ilParticipationCertificateGUI {
         );
             $option = new ilRadioOption(
                 $this->pl->txt('calculation_by_points'),
-                ilLearnObjectSuggReachedPercentage::CALC_TYPE_BY_POINTS
+                ilLearnObjectSuggResult::CALC_TYPE_BY_POINTS
             );
             $calculation_type_processing_state_suggested_objectives->addOption($option);
 
             $option = new ilRadioOption(
                 $this->pl->txt('calculation_by_completed_learning_objective'),
-                ilLearnObjectSuggReachedPercentage::CALC_TYPE_BY_COMPLETED_OBJECTIVE
+                ilLearnObjectSuggResult::CALC_TYPE_BY_COMPLETED_OBJECTIVE
             );
             $calculation_type_processing_state_suggested_objectives->addOption($option);
 
             $option = new ilRadioOption(
                 $this->pl->txt('calculation_by_highest_value'),
-                ilLearnObjectSuggReachedPercentage::CALC_TYPE_HIGHEST_VALUE
+                ilLearnObjectSuggResult::CALC_TYPE_HIGHEST_VALUE
             );
             $calculation_type_processing_state_suggested_objectives->addOption($option);
 
@@ -489,7 +489,7 @@ class ilParticipationCertificateGUI {
                     'calculation_type_processing_state_suggested_objectives',
                     $this->groupRefId)
                 :
-                ilLearnObjectSuggReachedPercentage::CALC_TYPE_BY_POINTS;
+                ilLearnObjectSuggResult::CALC_TYPE_BY_POINTS;
 
             $calculation_type_processing_state_suggested_objectives->setValue($value);
 

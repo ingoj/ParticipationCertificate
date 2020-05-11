@@ -89,7 +89,7 @@ class ilLearnObjectFinalTestStates {
     				
     				
     				CASE WHEN exists (SELECT   * from ".LearnObjectivesSuggCoursesQuery::DEFAULT_TMP_TABLE_NAME."_1
- where target_obj_id = learn_objective_crs.learn_objective_crs_obj_id AND  user_id = crs_memb.usr_id)  AND loc_user_results.result_perc > final_tests.tst_req_percentage then 1 else 0 end as objectives_sug_completed,
+ where target_obj_id = learn_objective_crs.learn_objective_crs_obj_id AND  user_id = crs_memb.usr_id)  AND loc_user_results.result_perc >= final_tests.tst_req_percentage then 1 else 0 end as objectives_sug_completed,
  
  
     				CASE WHEN exists (SELECT   * from ".LearnObjectivesSuggCoursesQuery::DEFAULT_TMP_TABLE_NAME."_2

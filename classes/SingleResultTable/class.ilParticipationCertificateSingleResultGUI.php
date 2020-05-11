@@ -51,7 +51,7 @@ class ilParticipationCertificateSingleResultGUI {
 	 */
 	protected $arr_initial_test_states;
 	/**
-	 * @var ilLearnObjectSuggReachedPercentage[]
+	 * @var ilLearnObjectSuggResult[]
 	 */
 	//protected $arr_learn_reached_percentages;
 	/**
