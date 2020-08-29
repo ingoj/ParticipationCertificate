@@ -186,12 +186,12 @@ class ilParticipationCertificateResultTableGUI extends ilTable2GUI {
 			$row = array();
 			$row['usr_id'] = $usr_id;
 			$row['loginname'] = $arr_usr_data[$usr_id]->getPartCertUserName();
-			if ($row['firstname'] = $arr_usr_data[$usr_id]->getPartCertFirstname() != NULL) {
+			if ($row['firstname'] == $arr_usr_data[$usr_id]->getPartCertFirstname()  && $arr_usr_data[$usr_id]->getPartCertFirstname()  != NULL) {
 				$row['firstname'] = $arr_usr_data[$usr_id]->getPartCertFirstname();
 			} else {
 				$row['firstname'] = '';
 			}
-			if ($row['lastname'] = $arr_usr_data[$usr_id]->getPartCertLastname() != NULL) {
+			if ($row['lastname'] == $arr_usr_data[$usr_id]->getPartCertLastname()&& $arr_usr_data[$usr_id]->getPartCertLastname() != NULL) {
 				$row['lastname'] = $arr_usr_data[$usr_id]->getPartCertLastname();
 			} else {
 				$row['lastname'] = '';

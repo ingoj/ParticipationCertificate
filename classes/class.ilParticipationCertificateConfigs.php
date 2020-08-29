@@ -280,6 +280,18 @@ class ilParticipationCertificateConfigs {
 
 				}
 			}
+
+            if($part_cert_template_config_value->getConfigKey() == ilParticipationCertificateConfig::ISSUER_SIGNATURE_FILE_NAME) {
+                if (is_file(ilParticipationCertificateConfig::returnPicturePath('absolute', $global_template_id, ilParticipationCertificateConfig::ISSUER_SIGNATURE_FILE_NAME))) {
+
+                    if(is_file(ilParticipationCertificateConfig::returnPicturePath('absolute', $obj_ref_id, ilParticipationCertificateConfig::ISSUER_SIGNATURE_FILE_NAME))) {
+                        unlink(ilParticipationCertificateConfig::returnPicturePath('absolute', $obj_ref_id, ilParticipationCertificateConfig::ISSUER_SIGNATURE_FILE_NAME));
+                    }
+
+                    copy(ilParticipationCertificateConfig::returnPicturePath('absolute', $global_template_id, ilParticipationCertificateConfig::ISSUER_SIGNATURE_FILE_NAME), ilParticipationCertificateConfig::returnPicturePath('absolute', $obj_ref_id, ilParticipationCertificateConfig::ISSUER_SIGNATURE_FILE_NAME));
+
+                }
+            }
 		}
 	}
 

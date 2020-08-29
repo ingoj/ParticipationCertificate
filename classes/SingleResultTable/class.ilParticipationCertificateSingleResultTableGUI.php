@@ -122,26 +122,33 @@ class ilParticipationCertificateSingleResultTableGUI extends ilTable2GUI {
 		$sorted = $this->sortColumns();
 		$i = 0;
 
+		/*print_r($sorted);
+		print_r($finalTestsStates);exit;*/
+
 		if (count($finalTestsStates[$this->usr_id])) {
-			while (count($sorted)) {
-				foreach ($finalTestsStates[$this->usr_id] as $finalTestsState) {
-					if ($finalTestsState->getLocftestObjectiveId() == key($sorted)) {
+			foreach($sorted as $sort_key => $sort_arr) {
+                if (key_exists($sort_key,$finalTestsStates[$this->usr_id])) {
+
+                    $finalTestsState = $finalTestsStates[$this->usr_id][$sort_key];
+				    /** @var ilLearnObjectFinalTestState $finalTestsState */
+
+
 						/**
 						 * @var ilLearnObjectFinalTestState $finalTestsState
 						 */
 						$cols[$finalTestsState->getLocftestCrsObjId()] = array(
 							'txt' => $finalTestsState->getLocftestLearnObjectiveTitle(),
-							'obj_id' => $sorted[key($sorted)]['obj_id'],
-							'objective_id' => $sorted[key($sorted)]['objective_id'],
+							'obj_id' => $sorted[$sort_key]['obj_id'],
+							'objective_id' => $sorted[$sort_key]['objective_id'],
 							'default' => true,
 							'width' => 'auto',
 						);
-						unset($sorted[key($sorted)]);
 					}
-				}
+
+
 				$i = $i+1;
 
-				if($i == 1000) {
+				if($i == 10000) {
 					//ilUtil::sendFailure("Der Aufruf ist Fehlgeschlagen");
 					break;
 				}
