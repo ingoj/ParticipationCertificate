@@ -126,34 +126,34 @@ class ilParticipationCertificateSingleResultTableGUI extends ilTable2GUI {
 		print_r($finalTestsStates);exit;*/
 
 		if (count($finalTestsStates[$this->usr_id])) {
-			foreach($sorted as $sort_key => $sort_arr) {
-                if (key_exists($sort_key,$finalTestsStates[$this->usr_id])) {
+            foreach ($sorted as $sort_key => $sort_arr) {
+                if (array_key_exists($sort_key, $finalTestsStates[$this->usr_id])) {
+                    /** @var ilLearnObjectFinalTestState $finalTestsState */
 
-                    $finalTestsState = $finalTestsStates[$this->usr_id][$sort_key];
-				    /** @var ilLearnObjectFinalTestState $finalTestsState */
+                    /** @var ilLearnObjectFinalTestState $finalTestsState */
+                    $finalTestsStates_course = $finalTestsStates[$this->usr_id][$sort_key];
 
+                    foreach ($finalTestsStates_course as $finalTestsState) {
+                        $cols[$finalTestsState->getLocftestCrsObjId()] = array(
+                            'txt' => $finalTestsState->getLocftestLearnObjectiveTitle(),
+                            'obj_id' => $sorted[$sort_key]['obj_id'],
+                            'objective_id' => $sorted[$sort_key]['objective_id'],
+                            'default' => true,
+                            'width' => 'auto',
+                        );
+                    }
 
-						/**
-						 * @var ilLearnObjectFinalTestState $finalTestsState
-						 */
-						$cols[$finalTestsState->getLocftestCrsObjId()] = array(
-							'txt' => $finalTestsState->getLocftestLearnObjectiveTitle(),
-							'obj_id' => $sorted[$sort_key]['obj_id'],
-							'objective_id' => $sorted[$sort_key]['objective_id'],
-							'default' => true,
-							'width' => 'auto',
-						);
-					}
+                }
 
+                $i = $i + 1;
 
-				$i = $i+1;
+                if ($i == 10000) {
+                    //ilUtil::sendFailure("Der Aufruf ist Fehlgeschlagen");
+                    break;
+                }
+            }
+        }
 
-				if($i == 10000) {
-					//ilUtil::sendFailure("Der Aufruf ist Fehlgeschlagen");
-					break;
-				}
-			}
-		}
 
 		return $cols;
 	}
@@ -237,26 +237,30 @@ class ilParticipationCertificateSingleResultTableGUI extends ilTable2GUI {
 				/**
 				 * @var ilLearnObjectFinalTestState $rec;
 				 */
-				$row_key[$rec->getLocftestCrsObjId()] = 0;
+				$row_key[$rec[0]->getLocftestCrsObjId()] = 0;
 			}
 
-			foreach ($arr_FinalTestsStates[$usr_id] as $rec) {
+			foreach ($arr_FinalTestsStates[$usr_id] as $rec_final_tests) {
 				/**
-				 * @var ilLearnObjectFinalTestState $rec;
+				 * @var ilLearnObjectFinalTestState $rec_final_test;
 				 */
 
-				if ($rec->getLocftestCrsObjId()) {
-					//first line - title lp
-					$rec_array[$row_key[$rec->getLocftestCrsObjId()]][$rec->getLocftestCrsObjId()] = $rec->getLocftestObjectiveTitle();
+				foreach($rec_final_tests as $key => $value) {
+                    if ($value->getLocftestCrsObjId()) {
+                        //first line - title lp
+                        $rec_array[$row_key[$value->getLocftestCrsObjId()]][$value->getLocftestCrsObjId()] = $value->getLocftestObjectiveTitle();
 
-					$row_key[$rec->getLocftestCrsObjId()] += 1;
-					//second line - array progressbar
-					$rec_array[$row_key[$rec->getLocftestCrsObjId()]][$rec->getLocftestCrsObjId()][0] = $rec->getLocftestPercentage();
-					$rec_array[$row_key[$rec->getLocftestCrsObjId()]][$rec->getLocftestCrsObjId()][1] = $rec->getLocftestQplsRequiredPercentage();
-					$rec_array[$row_key[$rec->getLocftestCrsObjId()]][$rec->getLocftestCrsObjId()][2] = 1;
+                        $row_key[$value->getLocftestCrsObjId()] += 1;
+                        //second line - array progressbar
+                        $rec_array[$row_key[$value->getLocftestCrsObjId()]][$value->getLocftestCrsObjId()][0] = $value->getLocftestPercentage();
+                        $rec_array[$row_key[$value->getLocftestCrsObjId()]][$value->getLocftestCrsObjId()][1] = $value->getLocftestQplsRequiredPercentage();
+                        $rec_array[$row_key[$value->getLocftestCrsObjId()]][$value->getLocftestCrsObjId()][2] = 1;
 
-					$row_key[$rec->getLocftestCrsObjId()] += 1;
-				}
+                        $row_key[$value->getLocftestCrsObjId()] += 1;
+                    }
+                }
+
+
 
 			}
 		}

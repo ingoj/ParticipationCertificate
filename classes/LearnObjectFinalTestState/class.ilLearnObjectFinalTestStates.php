@@ -39,7 +39,7 @@ class ilLearnObjectFinalTestStates {
 			$locftst_state->setObjectivesSuggested($row['suggested']);
 			$locftst_state->setLocftestQplsRequiredPercentage($row['tst_req_percentage']);
 
-			$locftst_data[$row['usr_id']][$row['master_crs_objective_id']] = $locftst_state;
+			$locftst_data[$row['usr_id']][$row['master_crs_objective_id']][] = $locftst_state;
 		}
 
 		return $locftst_data;
