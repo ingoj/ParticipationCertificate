@@ -224,20 +224,25 @@ class ilParticipationCertificateResultTableGUI extends ilTable2GUI {
 
 			if (is_array($arr_final_tests[$usr_id])) {
 
-				foreach ($arr_final_tests[$usr_id] as $rec) {
+				foreach ($arr_final_tests[$usr_id] as $usr_objectives) {
 
-					if($rec->getObjectivesSuggested()) {
+                    if (is_array($usr_objectives)) {
+                        foreach ($usr_objectives as $rec) {
 
-					    if(!array_key_exists($rec->getLocftestObjectiveId(),$rec_array)) {
-                            $rec_array[$rec->getLocftestObjectiveId()] = $rec->getLocftestLearnObjectiveTitle() . '<br/>';
-					    }
+                            if ($rec->getObjectivesSuggested()) {
 
-						/**
-						 * @var ilLearnObjectFinalTestState $rec
-						 */
-						$rec_array[$rec->getLocftestObjectiveId()] .= '- '.round($rec->getLocftestPercentage(), 0) . '% '. $rec->getLocftestObjectiveTitle() . '<br/>';
-					}
+                                if (!array_key_exists($rec->getLocftestObjectiveId(), $rec_array)) {
+                                    $rec_array[$rec->getLocftestObjectiveId()] = $rec->getLocftestLearnObjectiveTitle() . '<br/>';
+                                }
 
+                                /**
+                                 * @var ilLearnObjectFinalTestState $rec
+                                 */
+                                $rec_array[$rec->getLocftestObjectiveId()] .= '- ' . round($rec->getLocftestPercentage(),
+                                        0) . '% ' . $rec->getLocftestObjectiveTitle() . '<br/>';
+                            }
+                        }
+                    }
 
 				}
 				$array_results = $rec_array;
