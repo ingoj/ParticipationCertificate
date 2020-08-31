@@ -255,7 +255,6 @@ class ilParticipationCertificateConfigs {
 	 */
 	private function createOrUpdateObjConfigSetFromTemplate($obj_ref_id, $global_template_id) {
 		$this->deleteObjConfigSet($obj_ref_id);
-
 		foreach (ilParticipationCertificateConfig::where([
 			'config_type' => ilParticipationCertificateObjectConfigSet::CONFIG_TYPE_TEMPLATE,
 			"global_config_id" => $global_template_id
@@ -281,7 +280,7 @@ class ilParticipationCertificateConfigs {
 				}
 			}
 
-            if($part_cert_template_config_value->getConfigKey() == ilParticipationCertificateConfig::ISSUER_SIGNATURE_FILE_NAME) {
+            if($part_cert_template_config_value->getConfigKey() == "page1_issuer_signature") {
                 if (is_file(ilParticipationCertificateConfig::returnPicturePath('absolute', $global_template_id, ilParticipationCertificateConfig::ISSUER_SIGNATURE_FILE_NAME))) {
 
                     if(is_file(ilParticipationCertificateConfig::returnPicturePath('absolute', $obj_ref_id, ilParticipationCertificateConfig::ISSUER_SIGNATURE_FILE_NAME))) {
