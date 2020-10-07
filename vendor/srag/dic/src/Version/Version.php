@@ -22,7 +22,7 @@ final class Version implements VersionInterface
 
 
     /**
-     * @inheritdoc
+     * @inheritDoc
      */
     public function getILIASVersion() : string
     {
@@ -31,61 +31,7 @@ final class Version implements VersionInterface
 
 
     /**
-     * @inheritdoc
-     */
-    public function isEqual(string $version) : bool
-    {
-        return (version_compare($this->getILIASVersion(), $version) === 0);
-    }
-
-
-    /**
-     * @inheritdoc
-     */
-    public function isGreater(string $version) : bool
-    {
-        return (version_compare($this->getILIASVersion(), $version) > 0);
-    }
-
-
-    /**
-     * @inheritdoc
-     */
-    public function isLower(string $version) : bool
-    {
-        return (version_compare($this->getILIASVersion(), $version) < 0);
-    }
-
-
-    /**
-     * @inheritdoc
-     */
-    public function isMaxVersion(string $version) : bool
-    {
-        return (version_compare($this->getILIASVersion(), $version) <= 0);
-    }
-
-
-    /**
-     * @inheritdoc
-     */
-    public function isMinVersion(string $version) : bool
-    {
-        return (version_compare($this->getILIASVersion(), $version) >= 0);
-    }
-
-
-    /**
-     * @inheritdoc
-     */
-    public function is53() : bool
-    {
-        return $this->isMinVersion(self::ILIAS_VERSION_5_3);
-    }
-
-
-    /**
-     * @inheritdoc
+     * @inheritDoc
      */
     public function is54() : bool
     {
@@ -94,10 +40,64 @@ final class Version implements VersionInterface
 
 
     /**
-     * @inheritdoc
+     * @inheritDoc
      */
-    public function is60() : bool
+    public function is6() : bool
     {
-        return $this->isMinVersion(self::ILIAS_VERSION_6_0);
+        return $this->isMinVersion(self::ILIAS_VERSION_6);
+    }
+
+
+    /**
+     * @inheritDoc
+     */
+    public function is7() : bool
+    {
+        return $this->isMinVersion(self::ILIAS_VERSION_7);
+    }
+
+
+    /**
+     * @inheritDoc
+     */
+    public function isEqual(string $version) : bool
+    {
+        return (version_compare($this->getILIASVersion(), $version) === 0);
+    }
+
+
+    /**
+     * @inheritDoc
+     */
+    public function isGreater(string $version) : bool
+    {
+        return (version_compare($this->getILIASVersion(), $version) > 0);
+    }
+
+
+    /**
+     * @inheritDoc
+     */
+    public function isLower(string $version) : bool
+    {
+        return (version_compare($this->getILIASVersion(), $version) < 0);
+    }
+
+
+    /**
+     * @inheritDoc
+     */
+    public function isMaxVersion(string $version) : bool
+    {
+        return (version_compare($this->getILIASVersion(), $version) <= 0);
+    }
+
+
+    /**
+     * @inheritDoc
+     */
+    public function isMinVersion(string $version) : bool
+    {
+        return (version_compare($this->getILIASVersion(), $version) >= 0);
     }
 }

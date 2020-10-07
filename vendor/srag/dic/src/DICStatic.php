@@ -5,11 +5,8 @@ namespace srag\DIC;
 use ilLogLevel;
 use ilPlugin;
 use srag\DIC\DIC\DICInterface;
-use srag\DIC\DIC\Implementation\ILIAS52DIC;
-use srag\DIC\DIC\Implementation\ILIAS53DIC;
 use srag\DIC\DIC\Implementation\ILIAS54DIC;
 use srag\DIC\DIC\Implementation\ILIAS60DIC;
-use srag\DIC\DIC\Implementation\LegacyDIC;
 use srag\DIC\Exception\DICException;
 use srag\DIC\Output\Output;
 use srag\DIC\Output\OutputInterface;
@@ -47,7 +44,16 @@ final class DICStatic implements DICStaticInterface
 
 
     /**
-     * @inheritdoc
+     * DICStatic constructor
+     */
+    private function __construct()
+    {
+
+    }
+
+
+    /**
+     * @inheritDoc
      *
      * @deprecated
      */
@@ -61,22 +67,17 @@ final class DICStatic implements DICStaticInterface
 
 
     /**
-     * @inheritdoc
+     * @inheritDoc
      */
     public static function dic() : DICInterface
     {
         if (self::$dic === null) {
             switch (true) {
-                case (self::version()->isLower(VersionInterface::ILIAS_VERSION_5_3)):
+                case (self::version()->isLower(VersionInterface::ILIAS_VERSION_5_4)):
                     throw new DICException("DIC not supports ILIAS " . self::version()->getILIASVersion() . " anymore!");
                     break;
 
-                case (self::version()->isLower(VersionInterface::ILIAS_VERSION_5_4)):
-                    global $DIC;
-                    self::$dic = new ILIAS53DIC($DIC);
-                    break;
-
-                case (self::version()->isLower(VersionInterface::ILIAS_VERSION_6_0)):
+                case (self::version()->isLower(VersionInterface::ILIAS_VERSION_6)):
                     global $DIC;
                     self::$dic = new ILIAS54DIC($DIC);
                     break;
@@ -93,7 +94,7 @@ final class DICStatic implements DICStaticInterface
 
 
     /**
-     * @inheritdoc
+     * @inheritDoc
      */
     public static function output() : OutputInterface
     {
@@ -106,7 +107,7 @@ final class DICStatic implements DICStaticInterface
 
 
     /**
-     * @inheritdoc
+     * @inheritDoc
      */
     public static function plugin(string $plugin_class_name) : PluginInterface
     {
@@ -135,7 +136,7 @@ final class DICStatic implements DICStaticInterface
 
 
     /**
-     * @inheritdoc
+     * @inheritDoc
      */
     public static function version() : VersionInterface
     {
@@ -144,14 +145,5 @@ final class DICStatic implements DICStaticInterface
         }
 
         return self::$version;
-    }
-
-
-    /**
-     * DICStatic constructor
-     */
-    private function __construct()
-    {
-
     }
 }

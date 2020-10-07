@@ -20,6 +20,15 @@ final class PdoContextHelper extends ilDBPdo
 {
 
     /**
+     * PdoContextHelper constructor
+     */
+    private function __construct()
+    {
+
+    }
+
+
+    /**
      * @param ilDBPdoInterface $db
      *
      * @return PDO
@@ -39,16 +48,7 @@ final class PdoContextHelper extends ilDBPdo
 
 
     /**
-     * PdoContextHelper constructor
-     */
-    private function __construct()
-    {
-
-    }
-
-
-    /**
-     * @inheritdoc
+     * @inheritDoc
      */
     public function initHelpers()
     {

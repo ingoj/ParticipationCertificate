@@ -119,7 +119,7 @@ class ilParticipationCertificateResultGUI {
 
 
 	public function content() {
-		$this->tpl->getStandardTemplate();
+		$this->tpl->loadStandardTemplate();
 		$this->initHeader();
 
 		$cert_access = new ilParticipationCertificateAccess($_GET['ref_id']);
@@ -141,7 +141,7 @@ class ilParticipationCertificateResultGUI {
 		$this->initTable();
 
 		$this->tpl->setContent($this->table->getHTML());
-		$this->tpl->show();
+		$this->tpl->printToStdout();
 	}
 
 

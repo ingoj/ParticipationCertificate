@@ -102,4 +102,11 @@ class ilParticipationCertificatePlugin extends ilUserInterfaceHookPlugin {
 	}
 
 
+    /**
+     * @return bool
+     */
+    protected function shouldUseOneUpdateStepOnly() : bool
+    {
+        return false;
+    }
 }
