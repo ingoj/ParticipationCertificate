@@ -94,7 +94,7 @@ class ilParticipationCertificateMultipleResultGUI {
 	 *
 	 */
 	protected function show_all_results() {
-		$this->tpl->getStandardTemplate();
+		$this->tpl->loadStandardTemplate();
 		$this->tpl->addCss($this->pl->getDirectory() . '/Templates/css/table.css');
 		$this->initHeader();
 
@@ -105,7 +105,7 @@ class ilParticipationCertificateMultipleResultGUI {
 			$html .= $table->getHTML();
 		}
 		$this->tpl->setContent($html);
-		$this->tpl->show();
+		$this->tpl->printToStdout();
 	}
 
 

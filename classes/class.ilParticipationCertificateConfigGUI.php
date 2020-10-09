@@ -349,7 +349,7 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI {
 
 		$this->ctrl->setParameter($this,"id",$id);
 
-		$this->tpl->getStandardTemplate();
+		$this->tpl->loadStandardTemplate();
 
 		$form = $this->initForm($id,$set_type);
 		$this->tpl->setContent($form->getHTML());
@@ -567,7 +567,7 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI {
 	}
 
 	public function configure() {
-		$this->tpl->getStandardTemplate();
+		$this->tpl->loadStandardTemplate();
 
 		$this->initTable();
 
