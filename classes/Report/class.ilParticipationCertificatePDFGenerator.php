@@ -68,7 +68,7 @@ class ilParticipationCertificatePDFGenerator {
 			$mpdf->WriteHTML($css, 1);
 			$mpdf->WriteHTML($rendered, 2);
 			$mpdf->Output($this->pl->txt("plugin") . '.pdf', 'D');
-			$this->tpl->getStandardTemplate();
+			$this->tpl->loadStandardTemplate();
 			$this->ctrl->redirectByClass(ilParticipationCertificateResultGUI::class, ilParticipationCertificateResultGUI::CMD_INIT_TABLE);
 		}
 		//Checkt ob es der erste Durchlauf ist. Wenn True wird das erste PDF erzeugt und auf dem Server abgelegt.
@@ -89,7 +89,7 @@ class ilParticipationCertificatePDFGenerator {
 				$mpdf->UseTemplate($tplID);
 			}
 			$mpdf->Output($this->pl->txt("plugin") . '.pdf', 'D');
-			$this->tpl->getStandardTemplate();
+			$this->tpl->loadStandardTemplate();
 			$this->ctrl->redirectByClass(ilParticipationCertificateResultGUI::class, ilParticipationCertificateResultGUI::CMD_INIT_TABLE);
 		} /*Wenn es nicht der erste oder letzte Durchlauf ist, wird ein neues PDF erzeugt. Die bereits erzeugten PDF auf dem Server
 		 *werden hinten angehängt. Danach wird es wieder auf dem Server gespeichert um im nächsten Durchlauf wieder anzuhängen.

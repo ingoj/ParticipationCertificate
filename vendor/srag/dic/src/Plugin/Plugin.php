@@ -2,10 +2,13 @@
 
 namespace srag\DIC\Plugin;
 
+use Closure;
 use Exception;
+use ilCtrlStructureReader;
 use ilLanguage;
+use ilObjComponentSettingsGUI;
 use ilPlugin;
-use ilTemplate;
+use srag\CustomInputGUIs\Template\Template;
 use srag\DIC\DICTrait;
 use srag\DIC\Exception\DICException;
 
@@ -20,6 +23,7 @@ final class Plugin implements PluginInterface
 {
 
     use DICTrait;
+
     /**
      * @var ilLanguage[]
      */
@@ -42,7 +46,22 @@ final class Plugin implements PluginInterface
 
 
     /**
-     * @inheritdoc
+     * @param string $lang
+     *
+     * @return ilLanguage
+     */
+    private static final function getLanguage(string $lang) : ilLanguage
+    {
+        if (!isset(self::$languages[$lang])) {
+            self::$languages[$lang] = new ilLanguage($lang);
+        }
+
+        return self::$languages[$lang];
+    }
+
+
+    /**
+     * @inheritDoc
      */
     public function directory() : string
     {
@@ -51,20 +70,91 @@ final class Plugin implements PluginInterface
 
 
     /**
-     * @inheritdoc
+     * @inheritDoc
      */
-    public function template(string $template, bool $remove_unknown_variables = true, bool $remove_empty_blocks = true, bool $plugin = true) : ilTemplate
+    public function getPluginObject() : ilPlugin
+    {
+        return $this->plugin_object;
+    }
+
+
+    /**
+     * @inheritDoc
+     */
+    public function reloadCtrlStructure()/* : void*/
+    {
+        if (!self::version()->is6()) {
+            // Stupid core, why not in autoload too?!
+            require_once "./setup/classes/class.ilCtrlStructureReader.php";
+        }
+
+        // https://github.com/ILIAS-eLearning/ILIAS/blob/release_6/Services/Component/classes/class.ilPlugin.php#L1078-L1091
+        $structure_reader = new ilCtrlStructureReader();
+        $structure_reader->readStructure(
+            true,
+            "./" . $this->plugin_object->getDirectory(),
+            $this->plugin_object->getPrefix(),
+            $this->plugin_object->getDirectory()
+        );
+        self::dic()->ctrl()->insertCtrlCalls(
+            strtolower(ilObjComponentSettingsGUI::class),
+            ilPlugin::getConfigureClassName(["name" => $this->plugin_object->getPluginName()]),
+            $this->plugin_object->getPrefix()
+        );
+
+        // Clear loaded ctrl cache for force reload new node ids from database
+        /*self::dic()->ctrl()->class_cid = [];
+        self::dic()->ctrl()->cid_class = [];
+        self::dic()->ctrl()->info_read_class = [];
+        self::dic()->ctrl()->info_read_cid = [];
+        self::dic()->ctrl()->initBaseClass(strval(filter_input(INPUT_GET, "baseClass")));*/
+    }
+
+
+    /**
+     * @inheritDoc
+     */
+    public function reloadDatabase()/* : void*/
+    {
+        $this->plugin_object->updateDatabase();
+    }
+
+
+    /**
+     * @inheritDoc
+     */
+    public function reloadLanguages()/* : void*/
+    {
+        $this->plugin_object->updateLanguages();
+    }
+
+
+    /**
+     * @inheritDoc
+     */
+    public function reloadPluginXml()/* : void*/
+    {
+        Closure::bind(function ()/* : void*/ {
+            $this->readEventListening();
+        }, $this->plugin_object, ilPlugin::class)();
+    }
+
+
+    /**
+     * @inheritDoc
+     */
+    public function template(string $template_file, bool $remove_unknown_variables = true, bool $remove_empty_blocks = true, bool $plugin = true) : Template
     {
         if ($plugin) {
-            return $this->plugin_object->getTemplate($template, $remove_unknown_variables, $remove_empty_blocks);
+            return new Template($this->directory() . "/templates/" . $template_file, $remove_unknown_variables, $remove_empty_blocks);
         } else {
-            return new ilTemplate($template, $remove_unknown_variables, $remove_empty_blocks);
+            return new Template($template_file, $remove_unknown_variables, $remove_empty_blocks);
         }
     }
 
 
     /**
-     * @inheritdoc
+     * @inheritDoc
      */
     public function translate(string $key, string $module = "", array $placeholders = [], bool $plugin = true, string $lang = "", string $default = "MISSING %s") : string
     {
@@ -114,30 +204,10 @@ final class Plugin implements PluginInterface
             }
         }
 
-        return strval($txt);
-    }
+        $txt = strval($txt);
 
+        $txt = str_replace("\\n", "\n", $txt);
 
-    /**
-     * @inheritdoc
-     */
-    public function getPluginObject() : ilPlugin
-    {
-        return $this->plugin_object;
-    }
-
-
-    /**
-     * @param string $lang
-     *
-     * @return ilLanguage
-     */
-    private static final function getLanguage(string $lang) : ilLanguage
-    {
-        if (!isset(self::$languages[$lang])) {
-            self::$languages[$lang] = new ilLanguage($lang);
-        }
-
-        return self::$languages[$lang];
+        return $txt;
     }
 }

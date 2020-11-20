@@ -184,7 +184,7 @@ class ilParticipationCertificateGUI {
 	 *
 	 */
 	protected function display() {
-		$this->tpl->getStandardTemplate();
+		$this->tpl->loadStandardTemplate();
 		$this->initHeader();
 
 		$this->initConfTabs();
@@ -193,7 +193,7 @@ class ilParticipationCertificateGUI {
 		$form = $this->initform();
 
 		$this->tpl->setContent($form->getHTML());
-		$this->tpl->show();
+		$this->tpl->printToStdout();
 	}
 
 
@@ -318,8 +318,8 @@ class ilParticipationCertificateGUI {
 
 		if (!$form->checkInput()) {
 			$this->tpl->setContent($form->getHTML());
-			$this->tpl->getStandardTemplate();
-			$this->tpl->show();
+			$this->tpl->loadStandardTemplate();
+			$this->tpl->printToStdout();
 
 			return false;
 		}
@@ -429,7 +429,7 @@ class ilParticipationCertificateGUI {
 	 *
 	 */
 	protected function configResultTable() {
-		$this->tpl->getStandardTemplate();
+		$this->tpl->loadStandardTemplate();
 		$this->initHeader();
 
 		$this->initConfTabs();
@@ -438,7 +438,7 @@ class ilParticipationCertificateGUI {
 		$form = $this->initConfigResultTableForm();
 
 		$this->tpl->setContent($form->getHTML());
-		$this->tpl->show();
+		$this->tpl->printToStdout();
 	}
 
 
@@ -532,7 +532,7 @@ class ilParticipationCertificateGUI {
 	 *
 	 */
 	protected function selfPrint() {
-		$this->tpl->getStandardTemplate();
+		$this->tpl->loadStandardTemplate();
 		$this->initHeader();
 
 		$this->initConfTabs();
@@ -541,7 +541,7 @@ class ilParticipationCertificateGUI {
 		$form = $this->initSelfPrintForm();
 
 		$this->tpl->setContent($form->getHTML());
-		$this->tpl->show();
+		$this->tpl->printToStdout();
 	}
 
 
