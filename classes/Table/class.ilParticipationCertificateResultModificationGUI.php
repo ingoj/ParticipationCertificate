@@ -127,7 +127,9 @@ class ilParticipationCertificateResultModificationGUI {
 	public function display() {
 		      if(method_exists($this->tpl,'loadStandardTemplate')) {
             $this->tpl->loadStandardTemplate();
-        }
+        } else {
+$this->tpl->getStandardTemplate();
+}
 		$this->initHeader();
 		$form = $this->initForm();
 		$this->fillForm($form);

@@ -186,7 +186,9 @@ class ilParticipationCertificateGUI {
 	protected function display() {
 		      if(method_exists($this->tpl,'loadStandardTemplate')) {
             $this->tpl->loadStandardTemplate();
-        }
+        } else {
+$this->tpl->getStandardTemplate();
+}
 		$this->initHeader();
 
 		$this->initConfTabs();
@@ -327,7 +329,9 @@ $this->tpl->show();
 			$this->tpl->setContent($form->getHTML());
 			      if(method_exists($this->tpl,'loadStandardTemplate')) {
             $this->tpl->loadStandardTemplate();
-        }
+        } else {
+$this->tpl->getStandardTemplate();
+}
 			if(method_exists($this->tpl, 'printToStdout'))
 {
 $this->tpl->printToStdout();
@@ -446,7 +450,9 @@ $this->tpl->show();
     {
         if (method_exists($this->tpl, 'loadStandardTemplate')) {
             $this->tpl->loadStandardTemplate();
-        }
+        } else {
+$this->tpl->getStandardTemplate();
+}
         $this->initHeader();
 
         $this->initConfTabs();
@@ -556,7 +562,9 @@ $this->tpl->show();
 	protected function selfPrint() {
 		      if(method_exists($this->tpl,'loadStandardTemplate')) {
             $this->tpl->loadStandardTemplate();
-        }
+        } else {
+$this->tpl->getStandardTemplate();
+}
 		$this->initHeader();
 
 		$this->initConfTabs();

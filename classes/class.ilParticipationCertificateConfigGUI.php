@@ -345,7 +345,9 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI
         $this->ctrl->setParameter($this, "id", $id);
         if (method_exists($this->tpl, 'loadStandardTemplate')) {
             $this->tpl->loadStandardTemplate();
-        }
+        } else {
+$this->tpl->getStandardTemplate();
+}
 
         $form = $this->initForm($id, $set_type);
         $this->tpl->setContent($form->getHTML());
@@ -570,7 +572,9 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI
     {
         if (method_exists($this->tpl, 'loadStandardTemplate')) {
             $this->tpl->loadStandardTemplate();
-        }
+        } else {
+$this->tpl->getStandardTemplate();
+}
 
         $this->initTable();
 
