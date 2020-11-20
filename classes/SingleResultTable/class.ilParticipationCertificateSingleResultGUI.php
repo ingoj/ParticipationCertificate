@@ -112,14 +112,21 @@ class ilParticipationCertificateSingleResultGUI {
 
 
 	public function display() {
-		$this->tpl->loadStandardTemplate();
+		      if(method_exists($this->tpl,'loadStandardTemplate')) {
+            $this->tpl->loadStandardTemplate();
+        }
 		$this->tpl->addCss($this->pl->getDirectory() . '/Templates/css/table.css');
 		$this->initHeader();
 
 		$this->initTable();
 
 		$this->tpl->setContent($this->table->getHTML());
-		$this->tpl->printToStdout();
+		if(method_exists($this->tpl, 'printToStdout'))
+{
+$this->tpl->printToStdout();
+ } else {
+$this->tpl->show();
+ }
 	}
 
 

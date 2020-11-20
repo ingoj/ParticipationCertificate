@@ -125,13 +125,20 @@ class ilParticipationCertificateResultModificationGUI {
 
 
 	public function display() {
-		$this->tpl->loadStandardTemplate();
+		      if(method_exists($this->tpl,'loadStandardTemplate')) {
+            $this->tpl->loadStandardTemplate();
+        }
 		$this->initHeader();
 		$form = $this->initForm();
 		$this->fillForm($form);
 
 		$this->tpl->setContent($form->getHTML());
-		$this->tpl->printToStdout();
+		if(method_exists($this->tpl, 'printToStdout'))
+{
+$this->tpl->printToStdout();
+ } else {
+$this->tpl->show();
+ }
 	}
 
 

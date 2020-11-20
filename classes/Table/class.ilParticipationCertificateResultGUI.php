@@ -118,54 +118,62 @@ class ilParticipationCertificateResultGUI {
 	}
 
 
-	public function content() {
-		$this->tpl->loadStandardTemplate();
-		$this->initHeader();
+	public function content()
+    {
+        if (method_exists($this->tpl, 'loadStandardTemplate')) {
+            $this->tpl->loadStandardTemplate();
+        }
+       // $this->initHeader();
 
-		$cert_access = new ilParticipationCertificateAccess($_GET['ref_id']);
+        $cert_access = new ilParticipationCertificateAccess($_GET['ref_id']);
 
-		if ($cert_access->hasCurrentUserPrintAccess()) {
-			$b_print = ilLinkButton::getInstance();
-			$b_print->setCaption($this->pl->txt('header_btn_print'), false);
-			$this->ctrl->setParameter($this, 'ementor', true);
-			$b_print->setUrl($this->ctrl->getLinkTarget($this, $this::CMD_PRINT_PDF));
-			$this->toolbar->addButtonInstance($b_print);
+        if ($cert_access->hasCurrentUserPrintAccess()) {
+            $b_print = ilLinkButton::getInstance();
+            $b_print->setCaption($this->pl->txt('header_btn_print'), false);
+            $this->ctrl->setParameter($this, 'ementor', true);
+            $b_print->setUrl($this->ctrl->getLinkTarget($this, $this::CMD_PRINT_PDF));
+            $this->toolbar->addButtonInstance($b_print);
 
-			$b_print = ilLinkButton::getInstance();
-			$this->ctrl->setParameter($this, 'ementor', false);
-			$b_print->setCaption($this->pl->txt('header_btn_print_eMentoring'), false);
-			$b_print->setUrl($this->ctrl->getLinkTarget($this, $this::CMD_PRINT_PDF));
-			$this->toolbar->addButtonInstance($b_print);
-		}
+            $b_print = ilLinkButton::getInstance();
+            $this->ctrl->setParameter($this, 'ementor', false);
+            $b_print->setCaption($this->pl->txt('header_btn_print_eMentoring'), false);
+            $b_print->setUrl($this->ctrl->getLinkTarget($this, $this::CMD_PRINT_PDF));
+            $this->toolbar->addButtonInstance($b_print);
+        }
 
-		$this->initTable();
+        $this->initTable();
 
-		$this->tpl->setContent($this->table->getHTML());
-		$this->tpl->printToStdout();
-	}
+        $this->tpl->setContent($this->table->getHTML());
+        if (method_exists($this->tpl, 'printToStdout')) {
+            $this->tpl->printToStdout();
 
+        }
 
-	function initHeader() {
-		$this->tpl->setTitle($this->learnGroup->getTitle());
-		$this->tpl->setDescription($this->learnGroup->getDescription());
-		$this->tpl->setTitleIcon(ilObject::_getIcon($this->learnGroup->getId()));
+        function initHeader()
+        {
+            $this->tpl->setTitle($this->learnGroup->getTitle());
+            $this->tpl->setDescription($this->learnGroup->getDescription());
+            $this->tpl->setTitleIcon(ilObject::_getIcon($this->learnGroup->getId()));
 
-		$this->ctrl->setParameterByClass(ilRepositoryGUI::class, 'ref_id', (int)$_GET['ref_id']);
-		$this->tabs->setBackTarget($this->pl->txt('header_btn_back'), $this->ctrl->getLinkTargetByClass(array(
-			ilRepositoryGUI::class,
-			ilObjGroupGUI::class
-		)));
-		$this->ctrl->saveParameterByClass(ilParticipationCertificateResultGUI::class, [ 'ref_id', 'group_id' ]);
-		$this->ctrl->saveParameterByClass(ilParticipationCertificateGUI::class, 'ref_id');
+            $this->ctrl->setParameterByClass(ilRepositoryGUI::class, 'ref_id', (int) $_GET['ref_id']);
+            $this->tabs->setBackTarget($this->pl->txt('header_btn_back'), $this->ctrl->getLinkTargetByClass(array(
+                ilRepositoryGUI::class,
+                ilObjGroupGUI::class
+            )));
+            $this->ctrl->saveParameterByClass(ilParticipationCertificateResultGUI::class, ['ref_id', 'group_id']);
+            $this->ctrl->saveParameterByClass(ilParticipationCertificateGUI::class, 'ref_id');
 
-		$this->tabs->addTab(self::CMD_OVERVIEW, $this->pl->txt('header_overview'), $this->ctrl->getLinkTargetByClass(self::class, self::CMD_CONTENT));
-		$cert_access = new ilParticipationCertificateAccess($_GET['ref_id']);
-		if ($cert_access->hasCurrentUserWriteAccess()) {
-			$this->tabs->addTab(ilParticipationCertificateGUI::TAB_CONFIG, $this->pl->txt('header_config'), $this->ctrl->getLinkTargetByClass(ilParticipationCertificateGUI::class, ilParticipationCertificateGUI::CMD_CONFIG));
-		}
-		$this->tabs->activateTab(self::CMD_OVERVIEW);
-	}
-
+            $this->tabs->addTab(self::CMD_OVERVIEW, $this->pl->txt('header_overview'),
+                $this->ctrl->getLinkTargetByClass(self::class, self::CMD_CONTENT));
+            $cert_access = new ilParticipationCertificateAccess($_GET['ref_id']);
+            if ($cert_access->hasCurrentUserWriteAccess()) {
+                $this->tabs->addTab(ilParticipationCertificateGUI::TAB_CONFIG, $this->pl->txt('header_config'),
+                    $this->ctrl->getLinkTargetByClass(ilParticipationCertificateGUI::class,
+                        ilParticipationCertificateGUI::CMD_CONFIG));
+            }
+            $this->tabs->activateTab(self::CMD_OVERVIEW);
+        }
+    }
 
 	public function printPdf() {
 		$cert_access = new ilParticipationCertificateAccess($_GET['ref_id']);
