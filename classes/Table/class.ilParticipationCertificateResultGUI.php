@@ -120,8 +120,8 @@ class ilParticipationCertificateResultGUI
         if (method_exists($this->tpl, 'loadStandardTemplate')) {
             $this->tpl->loadStandardTemplate();
         } else {
-$this->tpl->getStandardTemplate();
-}
+            $this->tpl->getStandardTemplate();
+        }
         // $this->initHeader();
 
         $cert_access = new ilParticipationCertificateAccess($_GET['ref_id']);
@@ -149,8 +149,9 @@ $this->tpl->getStandardTemplate();
         } else {
             $this->tpl->show();
         }
+    }
 
-        function initHeader()
+        public function initHeader()
         {
             $this->tpl->setTitle($this->learnGroup->getTitle());
             $this->tpl->setDescription($this->learnGroup->getDescription());
@@ -174,7 +175,7 @@ $this->tpl->getStandardTemplate();
             }
             $this->tabs->activateTab(self::CMD_OVERVIEW);
         }
-    }
+
 
     protected function initTable($override = false)
     {
