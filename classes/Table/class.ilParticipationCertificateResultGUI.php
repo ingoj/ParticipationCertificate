@@ -122,7 +122,7 @@ class ilParticipationCertificateResultGUI
         } else {
             $this->tpl->getStandardTemplate();
         }
-        // $this->initHeader();
+        $this->initHeader();
 
         $cert_access = new ilParticipationCertificateAccess($_GET['ref_id']);
 
