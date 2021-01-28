@@ -99,6 +99,7 @@ if(!is_object($config)) {
 ?>
 <#17>
 <?php
+/*
 require_once "Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/ParticipationCertificate/vendor/autoload.php";
 $config = ilParticipationCertificateConfig::where(['config_key' =>  'percent_value',
 	'config_type' => ilParticipationCertificateConfig::CONFIG_SET_TYPE_TEMPLATE,
@@ -111,7 +112,7 @@ $part_conf->setConfigValueType(ilParticipationCertificateConfig::CONFIG_VALUE_TY
 $part_conf->setConfigKey('percent_value');
 $part_conf->setConfigValue(50);
 $part_conf->setGroupRefId(0);
-$part_conf->store();
+$part_conf->store();*/
 }
 ?>
 <#18>
