@@ -96,6 +96,7 @@ if(!is_object($config)) {
 ?>
 <#16>
 <?php
+//
 ?>
 <#17>
 <?php
@@ -114,6 +115,7 @@ $part_conf->setConfigValue(50);
 $part_conf->setGroupRefId(0);
 $part_conf->store();
 }*/
+//
 ?>
 <#18>
 <?php
