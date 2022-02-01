@@ -1,5 +1,5 @@
 <?php
-require_once 'class.ilIassStateMulti.php';
+use srag\Plugins\UserDefaults\UserSearch\usrdefObj;
 class ilIassStatesMulti {
 
 	/**
@@ -7,12 +7,21 @@ class ilIassStatesMulti {
 	 *
 	 * @return ilIassStateMulti[]
 	 */
-	public static function getData(array $arr_usr_ids = array()) {
-		global $ilDB;
-
+	public static function getData(array $arr_usr_ids = array(), int $group_ref_id) {
+		global $DIC;
+		$ilDB = $DIC->database();
 		$result = $ilDB->query(self::getSQL($arr_usr_ids));
 		$iass_data = array();
+
+		$items = $DIC->repositoryTree()->getChildIds($group_ref_id);
+
+
 		while ($row = $ilDB->fetchAssoc($result)) {
+
+		    if(!in_array($row['iass_ref_id'], $items)) {
+		        continue;
+		    }
+
 			$iass_state = new ilIassStateMulti();
 			$iass_state->setUsrId($row['iass_usr_id']);
 			$iass_state->setIassObjTitle($row['iass_obj_title']);
@@ -35,8 +44,8 @@ class ilIassStatesMulti {
 	 * @return string
 	 */
 	protected static function getSQL(array $arr_usr_ids = array()) {
-		global $ilDB;
-
+		global $DIC;
+		$ilDB = $DIC->database();
 		$select = "SELECT 
 					iass.usr_id as iass_usr_id,
 					iass_obj.title as iass_obj_title,
@@ -47,9 +56,9 @@ class ilIassStatesMulti {
 					COALESCE(round(( COUNT(CASE WHEN iass.learning_progress = 2 THEN iass.learning_progress END)/COUNT(iass.learning_progress) * 100 ),0),0) as iass_passed_percentage
 					FROM 
 					iass_members as iass
-					inner join object_data as iass_obj on iass_obj.obj_id = iass.obj_id
+					inner join " . usrdefObj::TABLE_NAME . " as iass_obj on iass_obj.obj_id = iass.obj_id
 					inner join object_reference as iass_ref on iass_ref.obj_id = iass_obj.obj_id
-					where  ".$ilDB->in('iass.usr_id', $arr_usr_ids, false, 'integer')."
+					where  " . $ilDB->in('iass.usr_id', $arr_usr_ids, false, 'integer') . "
 					group by 
 					iass.usr_id,
 					iass_obj.obj_id,
@@ -60,4 +69,5 @@ class ilIassStatesMulti {
 		return $select;
 	}
 }
+
 ?>

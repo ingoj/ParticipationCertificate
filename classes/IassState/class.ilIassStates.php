@@ -1,5 +1,5 @@
 <?php
-require_once 'class.ilIassState.php';
+use srag\Plugins\UserDefaults\UserSearch\usrdefObj;
 class ilIassStates {
 
 	/**
@@ -8,8 +8,8 @@ class ilIassStates {
 	 * @return ilIassState[]
 	 */
 	public static function getData(array $arr_usr_ids = array()) {
-		global $ilDB;
-
+		global $DIC;
+		$ilDB = $DIC->database();
 		$result = $ilDB->query(self::getSQL($arr_usr_ids));
 		$iass_data = array();
 		while ($row = $ilDB->fetchAssoc($result)) {
@@ -35,8 +35,8 @@ class ilIassStates {
 	 * @return string
 	 */
 	protected static function getSQL(array $arr_usr_ids = array()) {
-		global $ilDB;
-
+		global $DIC;
+		$ilDB = $DIC->database();
 		$select = "SELECT 
 					iass.usr_id as iass_usr_id,
 					iass_obj.title as iass_obj_title,
@@ -47,9 +47,9 @@ class ilIassStates {
 					COALESCE(round(( COUNT(CASE WHEN iass.learning_progress = 2 THEN iass.learning_progress END)/COUNT(iass.learning_progress) * 100 ),0),0) as iass_passed_percentage
 					FROM 
 					iass_members as iass
-					inner join object_data as iass_obj on iass_obj.obj_id = iass.obj_id
+					inner join " . usrdefObj::TABLE_NAME . " as iass_obj on iass_obj.obj_id = iass.obj_id
 					inner join object_reference as iass_ref on iass_ref.obj_id = iass_obj.obj_id
-					where  ".$ilDB->in('iass.usr_id', $arr_usr_ids, false, 'integer')."
+					where  " . $ilDB->in('iass.usr_id', $arr_usr_ids, false, 'integer') . "
 					group by 
 					iass.usr_id,
 					iass_obj.obj_id,
@@ -60,4 +60,5 @@ class ilIassStates {
 		return $select;
 	}
 }
+
 ?>

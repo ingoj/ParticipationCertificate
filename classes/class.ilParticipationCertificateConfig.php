@@ -1,20 +1,114 @@
 <?php
+
 /**
  * Class ilParticipationCertificate
  *
  * @author Silas Stulz <sst@studer-raimann.ch>
  */
-class ilParticipationCertificateConfig extends ActiveRecord{
+class ilParticipationCertificateConfig extends ActiveRecord {
 
 	const TABLE_NAME = 'dhbw_part_cert_conf';
-
 	const LOGO_FILE_NAME = "pic.png";
+    const ISSUER_SIGNATURE_FILE_NAME = "page1_issuer_signature.png";
 
-	const CONFIG_TYPE_GLOBAL = 1;
-	const CONFIG_TYPE_GROUP = 2;
+	const CONFIG_SET_TYPE_TEMPLATE = 1;
+	const CONFIG_SET_TYPE_GROUP = 2;
+	const CONFIG_SET_TYPE_GLOBAL = 3;
 
 	const CONFIG_VALUE_TYPE_CERT_TEXT = 1;
 	const CONFIG_VALUE_TYPE_OTHER = 2;
+
+
+	/**
+	 * @return string
+	 */
+	public function getConnectorContainerName() {
+		return self::TABLE_NAME;
+	}
+
+
+	/**
+	 * @return string
+	 * @deprecated
+	 */
+	public static function returnDbTableName() {
+		return self::TABLE_NAME;
+	}
+
+	public function __construct($primary_key = 0, arConnector $connector = null) {
+		parent::__construct($primary_key, $connector);
+	}
+
+
+	/**
+	 * @param string      $config_key
+	 * @param int         $group_ref_id
+	 * @param int         $config_type
+	 * @param int         $config_value_type
+	 * @param string|null $default
+	 *
+	 * @return string|null
+	 */
+	static function getConfig($config_key, $group_ref_id = 0, $config_type = self::CONFIG_SET_TYPE_GROUP, $config_value_type = self::CONFIG_VALUE_TYPE_OTHER, $default = NULL) {
+		/**
+		 * @var ilParticipationCertificateConfig|null $config
+		 */
+
+		$config = self::where([
+			"config_key" => $config_key,
+			"config_type" => $config_type,
+			"config_value_type" => $config_value_type,
+			"group_ref_id" => $group_ref_id
+		])->first();
+
+		if ($config !== NULL) {
+			return $config->getConfigValue();
+		} else {
+			return $default;
+		}
+	}
+
+
+	/**
+	 * @param string      $config_key
+	 * @param string|null $config_value
+	 * @param int         $group_ref_id
+	 * @param int         $config_type
+	 * @param int         $config_value_type
+	 * @param int         $group_ref_id
+	 */
+	static function setConfig($config_key, $config_value, $group_ref_id = 0, $config_type = self::CONFIG_SET_TYPE_GROUP, $config_value_type = self::CONFIG_VALUE_TYPE_OTHER) {
+		/**
+		 * @var ilParticipationCertificateConfig|null $config
+		 */
+
+		$config = self::where([
+			"config_key" => $config_key,
+			"config_type" => $config_type,
+			"config_value_type" => $config_value_type,
+			"group_ref_id" => $group_ref_id
+		])->first();
+
+		if ($config !== NULL) {
+			$config->setConfigValue($config_value);
+
+			$config->update();
+		} else {
+			$config = new self();
+
+			$config->setConfigKey($config_key);
+
+			$config->setConfigValue($config_value);
+
+			$config->setConfigType($config_type);
+
+			$config->setConfigValueType($config_value_type);
+
+			$config->setGroupRefId($group_ref_id);
+
+			$config->create();
+		}
+	}
 
 
 	/**
@@ -44,7 +138,16 @@ class ilParticipationCertificateConfig extends ActiveRecord{
 	 * @con_is_notnull  true
 	 * @db_length       8
 	 */
-	protected $group_ref_id;
+	protected $group_ref_id = 0;
+	/**
+	 * @var int
+	 *
+	 * @db_has_field    true
+	 * @db_fieldtype    integer
+	 * @con_is_notnull  true
+	 * @db_length       8
+	 */
+	protected $global_config_id = 0;
 	/**
 	 * @var int
 	 *
@@ -82,26 +185,20 @@ class ilParticipationCertificateConfig extends ActiveRecord{
 	protected $order_by = 0;
 
 
-	public static function returnDbTableName(){
-		return self::TABLE_NAME;
-	}
-
-
-
 	/**
 	 * Get a path where the template layout file and static assets are stored
 	 *
 	 * @param string $type
-	 * @param string $path_type  absolute|relative
-	 * @param int $grp_ref_id
-	 * @param bool $create
+	 * @param string $path_type absolute|relative
+	 * @param int    $grp_ref_id
+	 * @param bool   $create
 	 *
 	 * @return string
 	 */
-	public static function getFileStoragePath($type = 'img',$path_type = "absolute",$grp_ref_id = 0,$create = false) {
+	public static function getFileStoragePath($type = 'img', $path_type = "absolute", $grp_ref_id = 0, $create = false) {
 
 
-		switch($path_type) {
+		switch ($path_type) {
 			case "absolute":
 				$path = CLIENT_WEB_DIR . '/dhbw_part_cert';
 				break;
@@ -113,47 +210,68 @@ class ilParticipationCertificateConfig extends ActiveRecord{
 				break;
 		}
 
-		if($grp_ref_id) {
-			$path =  $path .'/'.$grp_ref_id;
+		if ($grp_ref_id) {
+			$path = $path . '/' . $grp_ref_id;
 		}
 
-
-		switch($type) {
+		switch ($type) {
 			case 'img':
 				$path = $path . '/img/';
 				if (!is_dir($path) && $create) {
 					ilUtil::makeDirParents($path);
 				}
+
 				return $path;
 				break;
 			default:
 				if (!is_dir($path) && $create) {
 					ilUtil::makeDirParents($path);
 				}
+
 				return $path;
 		}
 	}
 
 
-	public static function storePicture($file_data,$grp_ref_id = 0){
+	/**
+	 * @param array  $file_data
+	 * @param int    $template_id
+	 * @param string $file_name
+	 *
+	 * @return string
+	 */
+	public static function storePicture(array $file_data, $template_id = 0, $file_name) {
 
-		if(is_file(ilParticipationCertificateConfig::returnPicturePath('absolute',$grp_ref_id))) {
-			unlink(ilParticipationCertificateConfig::returnPicturePath('absolute',$grp_ref_id));
-		}
+		self::deletePicture($template_id, $file_name);
 
-		$file_path = self::getFileStoragePath('img','absolute',$grp_ref_id,true);
-		ilUtil::moveUploadedFile($file_data['tmp_name'],'',$file_path.self::LOGO_FILE_NAME);
+		$file_path = self::getFileStoragePath('img', 'absolute', $template_id, true);
+		ilUtil::moveUploadedFile($file_data['tmp_name'], '', $file_path . $file_name);
+
+		return self::returnPicturePath("relative", $template_id, $file_name);
 	}
 
 
 	/**
-	 * @param string $path_type  absolute|relative
-	 * @param int $grp_ref_id
+	 * @param int    $template_id
+	 * @param string $file_name
+	 */
+	public static function deletePicture($template_id = 0, $file_name) {
+		$file_path = self::returnPicturePath('absolute', $template_id, $file_name);
+
+		if (is_file($file_path)) {
+			unlink($file_path);
+		}
+	}
+
+
+	/**
+	 * @param string $path_type absolute|relative
+	 * @param int    $grp_ref_id
 	 *
 	 * @return string
 	 */
-	public static function returnPicturePath($path_type = 'absolute',$grp_ref_id = 0) {
-		return self::getFileStoragePath('img',$path_type,$grp_ref_id).self::LOGO_FILE_NAME;
+	public static function returnPicturePath($path_type = 'absolute', $grp_ref_id = 0, $file_name) {
+		return self::getFileStoragePath('img', $path_type, $grp_ref_id, true) . $file_name;
 	}
 
 
@@ -256,6 +374,22 @@ class ilParticipationCertificateConfig extends ActiveRecord{
 	/**
 	 * @return int
 	 */
+	public function getGlobalConfigId() {
+		return $this->global_config_id;
+	}
+
+
+	/**
+	 * @param int $global_config_id
+	 */
+	public function setGlobalConfigId($global_config_id) {
+		$this->global_config_id = $global_config_id;
+	}
+
+
+	/**
+	 * @return int
+	 */
 	public function getOrderBy() {
 		return $this->order_by;
 	}
@@ -269,51 +403,18 @@ class ilParticipationCertificateConfig extends ActiveRecord{
 	}
 
 
-	public static function returnDefaultValues() {
-		return	array(
-			'page1_title' => 'Teilnahmebescheinigung',
-			'page1_introduction1' => '{{username}}, hat am Studienvorbereitungsprogramm mit Schwerpunkt „Mathematik“ auf der Lernplattform studienvorbereitung.dhbw.de teilgenommen.',
-			'page1_introduction2' => 'Die Teilnahme vor Studienbeginn an der DHBW Karlsruhe umfasste:',
-			'page1_box1_title' => 'Studienvorbereitung - Mathematik:',
-			'page1_box1_row1' => 'Abschluss Diagnostischer Einstiegstest Mathematik',
-			'page1_box1_row2' => 'Bearbeitung von empfohlenen Mathematik- Lernmodulen',
-			'page1_box2_title' => 'Studienvorbereitung -  eMentoring:',
-			'page1_box2_row1' => 'Aktive Teilnahme an Videokonferenzen',
-			'page1_box2_row2' => 'Bearbeitung der Aufgaben zu überfachlichen Themen:',
-			'page1_location_date' => 'Karlsruhe, den {{date}}',
-			'page1_issuer_name' => 'Max Mustermann',
-			'page1_issuer_title' => '(Education Support Center)',
-			'page2_title' => 'Erläuterungen zur Bescheinigung',
-			'page2_introduction1' => 'Das  Studienvorbereitungsprogramm  mit  Schwerpunkt  Mathematik  auf  der  Lernplattform studienstart.dhbw.de,  richtet  sich  an  Studienanfänger/-innen der  Wirtschaftsinformatik  der DHBW Karlsruhe. Die Teilnehmer/-innen des Programms erhalten die Möglichkeit sich bereits vor  Studienbeginn,  Studientechniken anzueignen  sowie  das  fehlende  Vorwissen  im  Fach  „Mathematik“  aufzuarbeiten.  Dadurch  haben Studierende  mehr  Zeit  ihre  Wissenslücken  in  Mathematik zu schließen und sich mit dem neuen Lernen auseinanderzusetzen.',
-			'page2_introduction2' => 'Ziel des Programms ist es,  Studienanfänger/-innen vor Studienbeginn auf das Fach Mathematik im Studium vorzubereiten. Neben der Vermittlung von mathematischen Inhalten, fördert der Online-Vorkurs  überfachliche  Kompetenzen  wie  Zeitmanagement  und  Lerntechniken  sowie  die Fähigkeit zum Selbststudium.',
-			'page2_introduction3' => '{{username}} hat im Rahmen des Studienvorbereitungsprogramms mit Schwerpunkt Mathematik mit folgenden Aufgabenstellungen teilgenommen:',
-			'page2_box1_title' => 'Studienvorbereitung – Mathematik',
-			'page2_box1_row1' => 'Abschluss Diagnostischer Einstiegstest Mathematik',
-			'page2_box1_row2' => 'Bearbeitung von empfohlenen Mathematik- Lernmodulen',
-			'page2_box2_title' => 'Studienvorbereitung – eMentoring',
-			'page2_box2_row1' => 'Aktive Teilnahme an Videokonferenzen',
-			'page2_box2_row2' => 'Bearbeitung der Aufgaben zu überfachlichen Themen:',
-			'percent_value' => '50',
+	public static function returnDefaultValuesTypeOther() {
+
+		return array(
+			'udf_firstname' => 0,
+			'udf_lastname' => 0,
+			'udf_gender' => 0,
+			'color' => '73B249',
 			'keyword' => 'Lerngruppe',
+			'Logo' => null,
 		);
 	}
 
 
-	/**
-	 * @param group_ref_id $
-	 * @param $config_type
-	 */
-	public static function returnTextValues($group_ref_id = 0,$config_type = self::CONFIG_TYPE_GLOBAL) {
-		$arr_config = ilParticipationCertificateConfig::where(array("config_type" => $config_type, "group_ref_id" =>$group_ref_id,'config_value_type' => ilParticipationCertificateConfig::CONFIG_VALUE_TYPE_CERT_TEXT ))->orderBy('order_by')->getArray('config_key','config_value');
-		if(count($arr_config) == 0) {
-			$arr_config = ilParticipationCertificateConfig::where(array("config_type" => ilParticipationCertificateConfig::CONFIG_TYPE_GLOBAL,'config_value_type' => ilParticipationCertificateConfig::CONFIG_VALUE_TYPE_CERT_TEXT))->orderBy('order_by')->getArray('config_key','config_value');
-		}
-		return $arr_config;
-	}
 
-	public static function returnStandardValue($group_ref_id = 0, $config_type = self::CONFIG_TYPE_GLOBAL){
-		$arr_config = ilParticipationCertificateConfig::where(array("config_type" => $config_type, "group_ref_id" => $group_ref_id, "config_value_type" => ilParticipationCertificateConfig::CONFIG_VALUE_TYPE_OTHER, 'config_key' => 'percent_value'))->first();
-		return $arr_config;
-	}
 }
-?>

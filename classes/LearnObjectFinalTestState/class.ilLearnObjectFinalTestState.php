@@ -1,5 +1,11 @@
 <?php
+
 class ilLearnObjectFinalTestState {
+
+    /**
+     * @var string
+     */
+    protected $locftest_learn_objective_title;
 	/**
 	 * @var int
 	 */
@@ -42,22 +48,43 @@ class ilLearnObjectFinalTestState {
 	 *
 	 * @var int
 	 */
-	protected $locftest_tries;
-	/**
-	 *
-	 * @var int
-	 */
-	protected $locftest_points;
-	/**
-	 *
-	 * @var int
-	 */
-	protected $locftest_maxpoints;
-	/**
-	 *
-	 * @var int
-	 */
 	protected $locftest_percentage;
+	/**
+	 *
+	 * @var int
+	 */
+	protected $locftest_qpls_required_percentage;
+	/**
+	 * @var bool
+	 */
+	protected  $objectives_all_completed;
+	/**
+	 * @var bool
+	 */
+	protected  $objectives_sug_completed;
+	/**
+	 * @var bool
+	 */
+	protected  $objectives_suggested;
+
+
+    /**
+     * @return string
+     */
+    public function getLocftestLearnObjectiveTitle() : string
+    {
+        return $this->locftest_learn_objective_title;
+    }
+
+
+    /**
+     * @param string $locftest_learn_objective_title
+     */
+    public function setLocftestLearnObjectiveTitle(string $locftest_learn_objective_title)
+    {
+        $this->locftest_learn_objective_title = $locftest_learn_objective_title;
+    }
+
 
 
 	/**
@@ -66,6 +93,7 @@ class ilLearnObjectFinalTestState {
 	public function getLocftestUsrId() {
 		return $this->locftest_usr_id;
 	}
+
 
 
 	/**
@@ -186,55 +214,6 @@ class ilLearnObjectFinalTestState {
 		$this->locftest_test_title = $locftest_test_title;
 	}
 
-
-	/**
-	 * @return int
-	 */
-	public function getLocftestTries() {
-		return $this->locftest_tries;
-	}
-
-
-	/**
-	 * @param int $locftest_tries
-	 */
-	public function setLocftestTries($locftest_tries) {
-		$this->locftest_tries = $locftest_tries;
-	}
-
-
-	/**
-	 * @return int
-	 */
-	public function getLocftestPoints() {
-		return $this->locftest_points;
-	}
-
-
-	/**
-	 * @param int $locftest_points
-	 */
-	public function setLocftestPoints($locftest_points) {
-		$this->locftest_points = $locftest_points;
-	}
-
-
-	/**
-	 * @return int
-	 */
-	public function getLocftestMaxpoints() {
-		return $this->locftest_maxpoints;
-	}
-
-
-	/**
-	 * @param int $locftest_maxpoints
-	 */
-	public function setLocftestMaxpoints($locftest_maxpoints) {
-		$this->locftest_maxpoints = $locftest_maxpoints;
-	}
-
-
 	/**
 	 * @return int
 	 */
@@ -249,5 +228,72 @@ class ilLearnObjectFinalTestState {
 	public function setLocftestPercentage($locftest_percentage) {
 		$this->locftest_percentage = $locftest_percentage;
 	}
+
+
+	/**
+	 * @return int
+	 */
+	public function getLocftestQplsRequiredPercentage() {
+		return $this->locftest_qpls_required_percentage;
+	}
+
+
+	/**
+	 * @param int $locftest_qpls_required_percentage
+	 */
+	public function setLocftestQplsRequiredPercentage($locftest_qpls_required_percentage) {
+		$this->locftest_qpls_required_percentage = $locftest_qpls_required_percentage;
+	}
+
+
+	/**
+	 * @return bool
+	 */
+	public function isObjectivesAllCompleted() {
+		return $this->objectives_all_completed;
+	}
+
+
+	/**
+	 * @param bool $objectives_all_completed
+	 */
+	public function setObjectivesAllCompleted($objectives_all_completed) {
+		$this->objectives_all_completed = $objectives_all_completed;
+	}
+
+
+	/**
+	 * @return bool
+	 */
+	public function isObjectivesSugCompleted() {
+		return $this->objectives_sug_completed;
+	}
+
+
+	/**
+	 * @param bool $objectives_sug_completed
+	 */
+	public function setObjectivesSugCompleted($objectives_sug_completed) {
+		$this->objectives_sug_completed = $objectives_sug_completed;
+	}
+
+
+	/**
+	 * @return bool
+	 */
+	public function getObjectivesSuggested() {
+		return $this->objectives_suggested;
+	}
+
+
+	/**
+	 * @param bool $objectives_suggested
+	 */
+	public function setObjectivesSuggested($objectives_suggested) {
+		$this->objectives_suggested = $objectives_suggested;
+	}
+
+
+
 }
 ?>

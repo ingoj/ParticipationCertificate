@@ -1,4 +1,6 @@
 <?php
+use srag\Plugins\UserDefaults\usrdefObj;
+
 class ilPartCertUserData {
 
 	/**
@@ -24,6 +26,10 @@ class ilPartCertUserData {
 	 * @var string
 	 */
 	protected $part_cert_salutation;
+	/**
+	 * @var string
+	 */
+	protected $part_cert_username;
 
 
 	/**
@@ -104,5 +110,20 @@ class ilPartCertUserData {
 	public function setPartCertSalutation($part_cert_salutation) {
 		$this->part_cert_salutation = $part_cert_salutation;
 	}
+
+
+	/**
+	 * @return string
+	 */
+	public function getPartCertUserName() {
+		return $this->part_cert_username;
+	}
+
+
+	/**
+	 * @param string $part_cert_username
+	 */
+	public function setPartCertUserName($part_cert_username) {
+		$this->part_cert_username = $part_cert_username;
+	}
 }
-?>

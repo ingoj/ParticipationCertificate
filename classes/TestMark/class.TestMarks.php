@@ -1,5 +1,5 @@
 <?php
-require_once './Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/ParticipationCertificate/classes/TestMark/class.TestMark.php';
+
 class TestMarks {
 
 	/**
@@ -8,8 +8,8 @@ class TestMarks {
 	 * @return ilIassState[]
 	 */
 	public static function getData($test_obj) {
-		global $ilDB;
-
+		global $DIC;
+		$ilDB = $DIC->database();
 		$result = $ilDB->query(self::getSQL($test_obj));
 		$mark_data = array();
 		while ($row = $ilDB->fetchAssoc($result)) {
@@ -29,13 +29,14 @@ class TestMarks {
 	 * @return string
 	 */
 	protected static function getSQL($test_obj) {
-		global $ilDB;
-
+		global $DIC;
+		$ilDB = $DIC->database();
 		$select = "Select passed, mark_id,minimum_level from tst_tests 
 					inner join tst_mark on tst_tests.test_id = tst_mark.test_fi
- 				WHERE passed = 1 AND obj_fi =".$ilDB->quote($test_obj, "integer");
+ 				WHERE passed = 1 AND obj_fi =" . $ilDB->quote($test_obj, "integer");
 
 		return $select;
 	}
 }
+
 ?>

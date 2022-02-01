@@ -22,7 +22,8 @@ firstname#:#Vorname
 lastname#:#Nachname
 usr_id#:#UserID
 list_overview#:#Alle Resultate anzeigen
-btn_reset#:#Textwerte für das Formular zurücksetzen
+btn_reset#:#Textwerte für das Formular fixiert übernehmen
+btn_modify#:#Textwerte für das Formular bearbeitbar übernehmen
 result_for#:#Alle Resultate für
 no_records_selected#:#Keine User ausgewählt
 upload_header #:# Laden Sie Ihren PDF Header hoch
@@ -42,3 +43,44 @@ success#:#Druck erfolgreich
 successForm#:#Formular erfolgreich zurückgesetzt
 successFormSave#:#Formular erfolgreich gespeichert
 pluginreader#:#Resultate Studienvorbereitung
+period#:#Zeitraum
+period_self_print#:#Zeitraum Selbstausdruck konfigurieren
+enable_self_print#:#Selbstausdruck aktivieren
+color#:#Farbe
+keyword#:#Keyword
+logo#:#Logo
+udf_percent_value#:#Schwellenwert Videokonferenzen (Prozent)
+placeholders#:#Folgende Platzhalter sind verfügbar:
+yes#:#Ja
+no#:#Nein
+no_tests#:#Keine Tests
+loginname#:#Benutzername
+add_config#:#Konfiguration hinzufügen
+save_order#:#Sortierung Speichern
+config_type#:#Konfigurationstyp
+title#:#Bezeichnung
+parent_title#:#Titel darüberliegendes Objekt
+active#:#Aktiv
+edit#:#Bearbeiten
+config_title#:#Bezeichnung
+order_by#:#Sortierung
+copy#:#Kopieren
+create_template#:#Vorlage erzeugen
+delete#:#Löschen
+configset_type_1#:#Zertifikatsvorlage
+configset_type_2#:#Zertifikatskonfiguration ILIAS Objekt
+configset_type_3#:#Globale Einstellungen
+go_to_object#:#Öffne ILIAS Objekt
+object_config_type_1#:#Vorlagenkonfiguration
+object_config_type_2#:#Gruppenspezfische Konfiguration
+origin_template#:#Ursprungsvorlage
+set_inactive#:#Deaktivieren
+set_active#:#Aktivieren
+reset_config#:#Konfiguration zurücksetzen
+confirm_reset_config#:#Wollen Sie wirklich die Konfiguration zurücksetzen. Sämtliche Zertifikatseinstellungen werden gelöscht.
+config_reseted#:#Die Konfiguration wurde zurückgesetzt
+calculation_by_points#:#Berechnung basierend auf Punkten
+calculation_by_completed_learning_objective#:#Berechnung aufgrund der Anzahl der erreichten Lernziele
+calculation_by_highest_value#:#Berechnung beider Varianten. Es gilt der jeweils bessere Wert.
+calculation_type_processing_state_suggested_objectives#:#Berechnungstyp 'Bearbeitung der empfohlenen Mathematik-Lernmodule'
+config_result_table#:#Konfiguration Zeitraum & Berechnungstyp
