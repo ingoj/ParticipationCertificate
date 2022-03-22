@@ -47,12 +47,13 @@ class ilParticipationCertificateUIHookGUI extends ilUIHookPluginGUI {
 			$this->pl = ilParticipationCertificatePlugin::getInstance();
 			$this->groupRefId = (int)$_GET['ref_id'];
 
-			if ($this->groupRefId == !0 && $this->groupRefId == !NULL) {
-				$this->learnGroup = ilObjectFactory::getInstanceByRefId($this->groupRefId);
-				$this->learnGroupTitle = $this->learnGroup->getTitle();
-			}
+            if ($this->groupRefId === 0 || ilObject::_lookupType($this->groupRefId, true) !== 'grp') {
+                return;
+            }
 
-
+            $this->learnGroup = ilObjectFactory::getInstanceByRefId($this->groupRefId);
+            $this->learnGroupTitle = $this->learnGroup->getTitle();
+            
 			$config = ilParticipationCertificateConfig::where(array(
 					'config_key' => 'keyword',
 					'config_type' => ilParticipationCertificateConfig::CONFIG_SET_TYPE_GLOBAL,
