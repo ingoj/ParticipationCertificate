@@ -41,6 +41,7 @@ class ilParticipationCertificateUIHookGUI extends ilUIHookPluginGUI {
 	public function __construct() {
 		global $DIC;
 
+        $this->keywords = [];
 
 		if($DIC->offsetExists('tpl')) {
 			$this->ctrl = $DIC->ctrl();
