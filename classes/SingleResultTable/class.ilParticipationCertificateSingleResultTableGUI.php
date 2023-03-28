@@ -73,6 +73,12 @@ class ilParticipationCertificateSingleResultTableGUI extends ilTable2GUI {
 		))->first();
 		$this->color = $config->getConfigValue();
 
+		$unsugg_config = ilParticipationCertificateConfig::where(array(
+			'config_key' => 'unsugg_color',
+			'config_type' => ilParticipationCertificateConfig::CONFIG_SET_TYPE_GLOBAL,
+		))->first();
+		$this->unsugg_color = $unsugg_config->getConfigValue();
+
 		$this->setPrefix('dhbw_part_cert_res');
 		$this->setFormName('dhbw_part_cert_res');
 		$this->setId('dhbw_part_cert_res');
@@ -334,6 +340,8 @@ class ilParticipationCertificateSingleResultTableGUI extends ilTable2GUI {
 					$this->tpl->setVariable('COURSE', '&nbsp;');
 					if ($this->searchForId($v['objective_id'], $this->sugg)) {
 						$this->tpl->setVariable('COLOR', $this->color);
+					} else {
+						$this->tpl->setVariable('COLOR', $this->unsugg_color);
 					}
 					$this->tpl->parseCurrentBlock();
 				}

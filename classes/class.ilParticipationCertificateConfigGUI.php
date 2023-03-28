@@ -235,6 +235,13 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI
         $config->setGlobalConfigId(0);
         $config->store();
 
+        $config->setConfigKey('unsugg_color');
+        $config->setConfigValue("000a35");
+        $config->setConfigType(ilParticipationCertificateConfig::CONFIG_SET_TYPE_GLOBAL);
+        $config->setConfigValueType(ilParticipationCertificateConfig::CONFIG_VALUE_TYPE_OTHER);
+        $config->setGlobalConfigId(0);
+        $config->store();
+
         //Config Template
         require_once "Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/ParticipationCertificate/vendor/autoload.php";
         $part_cert_default_config_set = new ilParticipationCertificateGlobalConfigSet();
@@ -409,6 +416,10 @@ $this->tpl->getStandardTemplate();
                     break;
                 case "color":
                     $input = new ilColorPickerInputGUI($this->pl->txt("color"), 'color');
+                    $input->setValue($config->getConfigValue());
+                    break;
+                case "unsugg_color":
+                    $input = new ilColorPickerInputGUI($this->pl->txt("unsugg_color"), 'unsugg_color');
                     $input->setValue($config->getConfigValue());
                     break;
                 case "keyword":

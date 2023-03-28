@@ -72,12 +72,18 @@ class ilParticipationCertificateResultTableGUI extends ilTable2GUI {
 		$this->setTitle($this->pl->txt('tbl_overview_results'));
 		$this->addColumns();
 		$this->setExportFormats(array( self::EXPORT_EXCEL, self::EXPORT_CSV ));
-
-		$this->initFilter();
+		if ($cert_access->hasCurrentUserWriteAccess()) {
+			$this->initFilter();
+		}
 		$this->setSelectAllCheckbox('record_ids');
 		if ($cert_access->hasCurrentUserPrintAccess()) {
 			$this->addMultiCommand(ilParticipationCertificateResultGUI::CMD_PRINT_SELECTED, $this->pl->txt('list_print'));
 			$this->addMultiCommand(ilParticipationCertificateResultGUI::CMD_PRINT_SELECTED_WITHOUTE_MENTORING, $this->pl->txt('list_print_without'));
+		} else {
+			print_r ($cert_access->isSelfPrintEnabled()); 
+			if ($cert_access->isSelfPrintEnabled()) {
+				ilUtil::sendFailure($this->pl->txt('noname_noprint'));
+			}
 		}
 		$this->addMultiCommand(ilParticipationCertificateMultipleResultGUI::CMD_SHOW_ALL_RESULTS, $this->pl->txt('list_overview'));
 		$this->setRowTemplate('tpl.default_row.html', $this->pl->getDirectory());
@@ -186,12 +192,12 @@ class ilParticipationCertificateResultTableGUI extends ilTable2GUI {
 			$row = array();
 			$row['usr_id'] = $usr_id;
 			$row['loginname'] = $arr_usr_data[$usr_id]->getPartCertUserName();
-			if ($row['firstname'] == $arr_usr_data[$usr_id]->getPartCertFirstname()  && $arr_usr_data[$usr_id]->getPartCertFirstname()  != NULL) {
+			if ($arr_usr_data[$usr_id]->getPartCertFirstname()  != NULL) {
 				$row['firstname'] = $arr_usr_data[$usr_id]->getPartCertFirstname();
 			} else {
 				$row['firstname'] = '';
 			}
-			if ($row['lastname'] == $arr_usr_data[$usr_id]->getPartCertLastname()&& $arr_usr_data[$usr_id]->getPartCertLastname() != NULL) {
+			if ($arr_usr_data[$usr_id]->getPartCertLastname() != NULL) {
 				$row['lastname'] = $arr_usr_data[$usr_id]->getPartCertLastname();
 			} else {
 				$row['lastname'] = '';

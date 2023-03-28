@@ -46,7 +46,7 @@ pluginreader#:#Resultate Studienvorbereitung
 period#:#Zeitraum
 period_self_print#:#Zeitraum Selbstausdruck konfigurieren
 enable_self_print#:#Selbstausdruck aktivieren
-color#:#Farbe
+color#:#Farbe empfohlene LZ
 keyword#:#Keyword
 logo#:#Logo
 udf_percent_value#:#Schwellenwert Videokonferenzen (Prozent)
@@ -84,3 +84,5 @@ calculation_by_completed_learning_objective#:#Berechnung aufgrund der Anzahl der
 calculation_by_highest_value#:#Berechnung beider Varianten. Es gilt der jeweils bessere Wert.
 calculation_type_processing_state_suggested_objectives#:#Berechnungstyp 'Bearbeitung der empfohlenen Mathematik-Lernmodule'
 config_result_table#:#Konfiguration Zeitraum & Berechnungstyp
+noname_noprint#:#Das Drucken der Teilnahmebescheinigung ist erst möglich wenn Sie Vor- und Nachname eingegeben haben. Nutzen Sie gerne <a href=./ilias.php?baseClass=ilObjPluginDispatchGUI&cmd=forward&ref_id=334&forwardCmd=index>Name aktualisieren</a>.
+unsugg_color#:#Farbe nicht empfohlene LZ

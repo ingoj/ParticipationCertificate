@@ -159,8 +159,8 @@ class ilParticipationCertificateResultGUI
 
             $this->ctrl->setParameterByClass(ilRepositoryGUI::class, 'ref_id', (int) $_GET['ref_id']);
             $this->tabs->setBackTarget($this->pl->txt('header_btn_back'), $this->ctrl->getLinkTargetByClass(array(
-                ilRepositoryGUI::class,
-                ilObjGroupGUI::class
+                ilRepositoryGUI::class//,
+                //ilObjGroupGUI::class
             )));
             $this->ctrl->saveParameterByClass(ilParticipationCertificateResultGUI::class, ['ref_id', 'group_id']);
             $this->ctrl->saveParameterByClass(ilParticipationCertificateGUI::class, 'ref_id');

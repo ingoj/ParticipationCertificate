@@ -42,16 +42,15 @@ class ilParticipationCertificateUIHookGUI extends ilUIHookPluginGUI {
 		global $DIC;
 
         $this->keywords = [];
-
 		if($DIC->offsetExists('tpl')) {
 			$this->ctrl = $DIC->ctrl();
 			$this->pl = ilParticipationCertificatePlugin::getInstance();
 			$this->groupRefId = (int)$_GET['ref_id'];
+			$this->objecttype = ilObject::_lookupType($this->groupRefId, true);
 
-            if ($this->groupRefId === 0 || ilObject::_lookupType($this->groupRefId, true) !== 'grp') {
+		if ($this->groupRefId === 0 || ( $this->objecttype !== 'crs' and $this->objecttype !== 'grp')) {
                 return;
             }
-
             $this->learnGroup = ilObjectFactory::getInstanceByRefId($this->groupRefId);
             $this->learnGroupTitle = $this->learnGroup->getTitle();
             
@@ -115,7 +114,12 @@ class ilParticipationCertificateUIHookGUI extends ilUIHookPluginGUI {
 	 */
 	function checkGroup() {
 		foreach ($this->ctrl->getCallHistory() as $GUIClassesArray) {
-			if ($GUIClassesArray['class'] == ilObjGroupGUI::class) {
+			if (($this->objecttype === 'crs') and ($GUIClassesArray['class'] == ilObjCourseGUI::class)) {
+				if ($this->strposa($this->learnGroupTitle, $this->keywords) !== false) {
+					return true;
+				}
+			}
+			if (($this->objecttype === 'grp') and ($GUIClassesArray['class'] == ilObjGroupGUI::class)) {
 				if ($this->strposa($this->learnGroupTitle, $this->keywords) !== false) {
 					return true;
 				}

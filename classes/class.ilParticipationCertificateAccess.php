@@ -55,7 +55,21 @@ class ilParticipationCertificateAccess {
 		if ($this->hasCurrentUserWriteAccess()) {
 			return true;
 		}
+		// find users data for firstname and lastname, return false if length = 0 for at least one
+		$usrdata = new ilPartCertUsersData;
+		$curr_user[] = $this->usr->id;
+		$first = $usrdata->getData($curr_user)[$curr_user[0]]->getPartCertFirstname();
+		$last = $usrdata->getData($curr_user)[$curr_user[0]]->getPartCertLastname();
 
+		if (strlen($first)*strlen($last) == 0) {
+			return false;
+		}	
+		// if user has data, check if selfprint is active (changed to a new function)
+		return ($this->isSelfPrintEnabled());
+	}
+
+	public function isSelfPrintEnabled() {
+		// formerly hasCurrentUserPrintAccess
 		$enable_self_print = boolval(ilParticipationCertificateConfig::getConfig("enable_self_print", $this->group_ref_id));
 
 		if ($enable_self_print) {
@@ -90,11 +104,14 @@ class ilParticipationCertificateAccess {
 
 	public function getUserIdsOfGroup() {
 		if ($this->hasCurrentUserWriteAccess() || $this->hasCurrentUserSpecialAccess()) {
+			$objecttype = ilObject::_lookupType($this->group_ref_id, true);
+			if ($objecttype != 'grp' and $objecttype != 'crs') {
+				$objecttype = 'grp';
+			}
 			$select = "select obj_members.usr_id from obj_members
-						inner join " . usrdefObj::TABLE_NAME . " as grp_obj on grp_obj.obj_id = obj_members.obj_id and grp_obj.type = 'grp'
+						inner join " . usrdefObj::TABLE_NAME . " as grp_obj on grp_obj.obj_id = obj_members.obj_id and grp_obj.type = '". $objecttype ."'
 						inner join object_reference as grp_ref on grp_ref.obj_id = obj_members.obj_id
 						where grp_ref.ref_id = " . $this->db->quote($this->group_ref_id, "integer") . " and obj_members.member = 1";
-
 			$result = $this->db->query($select);
 			$usr_data = array();
 			while ($row = $this->db->fetchAssoc($result)) {

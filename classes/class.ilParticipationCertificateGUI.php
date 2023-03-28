@@ -95,7 +95,7 @@ class ilParticipationCertificateGUI {
 			ilUtil::sendFailure($this->lng->txt('no_permission'), true);
 			ilUtil::redirect('login.php');
 		}
-
+		$this->objecttype = ilObject::_lookupType($this->groupRefId, true);
 		$this->pl = ilParticipationCertificatePlugin::getInstance();
 		$this->learnGroup = ilObjectFactory::getInstanceByRefId($this->groupRefId);
 		$this->ctrl->saveParameterByClass(ilParticipationCertificateResultGUI::class, [ 'ref_id', 'group_id' ]);
@@ -157,8 +157,8 @@ class ilParticipationCertificateGUI {
 
 		$this->ctrl->setParameterByClass(ilRepositoryGUI::class, 'ref_id', $this->groupRefId);
 		$this->tabs->setBackTarget($this->pl->txt('header_btn_back'), $this->ctrl->getLinkTargetByClass(array(
-			ilRepositoryGUI::class,
-			ilObjGroupGUI::class
+			ilRepositoryGUI::class//,
+			//ilObjGroupGUI::class
 		)));
 
 		$this->ctrl->saveParameterByClass(ilParticipationCertificateResultGUI::class, 'ref_id');
@@ -310,8 +310,11 @@ $this->tpl->show();
 
 			$form->addItem($input);
 		}
-
-		$this->ctrl->saveParameterByClass(ilObjGroup::class, 'ref_id');
+		if ($this->objecttype === 'grp') {
+			$this->ctrl->saveParameterByClass(ilObjGroup::class, 'ref_id');
+			} else {
+			$this->ctrl->saveParameterByClass(ilObjCourse::class, 'ref_id');
+		}
 		$form->addCommandButton(self::CMD_SAVE, $this->pl->txt('save'));
 
 		return $form;
