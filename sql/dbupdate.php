@@ -638,7 +638,7 @@ if(count($configs_type_cert_text) > 0) {
 <?php>
 require_once "Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/ParticipationCertificate/vendor/autoload.php";
 
-$config = ilParticipationCertificateConfig::where(array('config_key' =>  'unsugg_collor', 'config_type' => ilParticipationCertificateConfig::CONFIG_SET_TYPE_TEMPLATE, 'config_value_type' => ilParticipationCertificateConfig::CONFIG_VALUE_TYPE_OTHER, "group_ref_id" => 0))->first();
+$config = ilParticipationCertificateConfig::where(array('config_key' =>  'unsugg_color', 'config_type' => ilParticipationCertificateConfig::CONFIG_SET_TYPE_TEMPLATE, 'config_value_type' => ilParticipationCertificateConfig::CONFIG_VALUE_TYPE_OTHER, "group_ref_id" => 0))->first();
 if(!is_object($config)) {
 	$part_conf = new ilParticipationCertificateConfig();
 	$part_conf->setConfigType(ilParticipationCertificateConfig::CONFIG_SET_TYPE_GLOBAL);
