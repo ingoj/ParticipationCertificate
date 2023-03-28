@@ -634,3 +634,4 @@ if(count($configs_type_cert_text) > 0) {
     }
 }
 ?>
+// TODO: new entry for second color
