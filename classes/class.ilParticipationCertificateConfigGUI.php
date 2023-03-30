@@ -185,67 +185,73 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI
         //set global plugin configurations
         $config = ilParticipationCertificateConfig::where(["config_key" => 'udf_firstname'])->first();
         if (!is_object($config)) {
-            $config = new ilParticipationCertificateConfig();
-        }
-        $config->setConfigType(ilParticipationCertificateConfig::CONFIG_SET_TYPE_GLOBAL);
-        $config->setConfigKey('udf_firstname');
-        $config->setGlobalConfigId(0);
-        $config->setConfigValueType(ilParticipationCertificateConfig::CONFIG_VALUE_TYPE_OTHER);
-        $config->store();
+            	$config = new ilParticipationCertificateConfig();
+        	$config->setConfigType(ilParticipationCertificateConfig::CONFIG_SET_TYPE_GLOBAL);
+        	$config->setConfigKey('udf_firstname');
+        	$config->setGlobalConfigId(0);
+        	$config->setConfigValueType(ilParticipationCertificateConfig::CONFIG_VALUE_TYPE_OTHER);
+        	$config->setOrderBy(1);
+        	$config->store();
+        	}
 
         $config = ilParticipationCertificateConfig::where(["config_key" => 'udf_lastname'])->first();
         if (!is_object($config)) {
-            $config = new ilParticipationCertificateConfig();
-        }
-        $config->setConfigKey('udf_lastname');
-        $config->setConfigType(ilParticipationCertificateConfig::CONFIG_SET_TYPE_GLOBAL);
-        $config->setConfigValueType(ilParticipationCertificateConfig::CONFIG_VALUE_TYPE_OTHER);
-        $config->setGlobalConfigId(0);
-        $config->store();
+            	$config = new ilParticipationCertificateConfig();
+        	$config->setConfigKey('udf_lastname');
+        	$config->setConfigType(ilParticipationCertificateConfig::CONFIG_SET_TYPE_GLOBAL);
+        	$config->setConfigValueType(ilParticipationCertificateConfig::CONFIG_VALUE_TYPE_OTHER);
+        	$config->setGlobalConfigId(0);
+        	$config->setOrderBy(2);
+        	$config->store();
+		}
 
         $config = ilParticipationCertificateConfig::where(["config_key" => 'udf_gender'])->first();
         if (!is_object($config)) {
-            $config = new ilParticipationCertificateConfig();
-        }
-        $config->setConfigKey('udf_gender');
-        $config->setConfigType(ilParticipationCertificateConfig::CONFIG_SET_TYPE_GLOBAL);
-        $config->setConfigValueType(ilParticipationCertificateConfig::CONFIG_VALUE_TYPE_OTHER);
-        $config->setGlobalConfigId(0);
-        $config->store();
+            	$config = new ilParticipationCertificateConfig();
+        	$config->setConfigKey('udf_gender');
+        	$config->setConfigType(ilParticipationCertificateConfig::CONFIG_SET_TYPE_GLOBAL);
+        	$config->setConfigValueType(ilParticipationCertificateConfig::CONFIG_VALUE_TYPE_OTHER);
+        	$config->setGlobalConfigId(0);
+        	$config->setOrderBy(3);
+        	$config->store();
+		}
 
         $config = ilParticipationCertificateConfig::where(["config_key" => 'keyword'])->first();
         if (!is_object($config)) {
-            $config = new ilParticipationCertificateConfig();
-        }
-        $config->setConfigKey('keyword');
-        $config->setConfigValue("Lerngruppe");
-        $config->setConfigType(ilParticipationCertificateConfig::CONFIG_SET_TYPE_GLOBAL);
-        $config->setConfigValueType(ilParticipationCertificateConfig::CONFIG_VALUE_TYPE_OTHER);
-        $config->setGlobalConfigId(0);
-        $config->store();
+            	$config = new ilParticipationCertificateConfig();
+        	$config->setConfigKey('keyword');
+        	$config->setConfigValue("Lerngruppe");
+        	$config->setConfigType(ilParticipationCertificateConfig::CONFIG_SET_TYPE_GLOBAL);
+        	$config->setConfigValueType(ilParticipationCertificateConfig::CONFIG_VALUE_TYPE_OTHER);
+        	$config->setGlobalConfigId(0);
+        	$config->setOrderBy(0);
+        	$config->store();
+		}
 
         $config = ilParticipationCertificateConfig::where(["config_key" => 'color'])->first();
         if (!is_object($config)) {
-            $config = new ilParticipationCertificateConfig();
-        
-        $config->setConfigKey('color');
-        $config->setConfigValue("fff5ba");
-        $config->setConfigType(ilParticipationCertificateConfig::CONFIG_SET_TYPE_GLOBAL);
-        $config->setConfigValueType(ilParticipationCertificateConfig::CONFIG_VALUE_TYPE_OTHER);
-        $config->setGlobalConfigId(0);
-        $config->store();
-    	}
+            	$config = new ilParticipationCertificateConfig();
+        	$config->setConfigKey('color');
+        	$config->setConfigValue("fff5ba");
+        	$config->setConfigType(ilParticipationCertificateConfig::CONFIG_SET_TYPE_GLOBAL);
+        	$config->setConfigValueType(ilParticipationCertificateConfig::CONFIG_VALUE_TYPE_OTHER);
+        	$config->setGlobalConfigId(0);
+        	$config->setOrderBy(4);
+        	$config->store();
+		}
+
         $config = ilParticipationCertificateConfig::where(["config_key" => 'unsugg_color'])->first();
         if (!is_object($config)) {
-            $config = new ilParticipationCertificateConfig();
-        
-        $config->setConfigKey('unsugg_color');
-        $config->setConfigValue("000a35");
-        $config->setConfigType(ilParticipationCertificateConfig::CONFIG_SET_TYPE_GLOBAL);
-        $config->setConfigValueType(ilParticipationCertificateConfig::CONFIG_VALUE_TYPE_OTHER);
-        $config->setGlobalConfigId(0);
-        $config->store();
+            	$config = new ilParticipationCertificateConfig();
+        	$config->setConfigKey('unsugg_color');
+        	$config->setConfigValue("000a35");
+        	$config->setConfigType(ilParticipationCertificateConfig::CONFIG_SET_TYPE_GLOBAL);
+        	$config->setConfigValueType(ilParticipationCertificateConfig::CONFIG_VALUE_TYPE_OTHER);
+        	$config->setGlobalConfigId(0);
+        	$config->setOrderBy(5);
+		$config->store();
 	}
+
         //Config Template
         require_once "Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/ParticipationCertificate/vendor/autoload.php";
         $part_cert_default_config_set = new ilParticipationCertificateGlobalConfigSet();
