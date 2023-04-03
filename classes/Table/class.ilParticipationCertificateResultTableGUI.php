@@ -74,18 +74,37 @@ class ilParticipationCertificateResultTableGUI extends ilTable2GUI {
 		$this->setExportFormats(array( self::EXPORT_EXCEL, self::EXPORT_CSV ));
 		if ($cert_access->hasCurrentUserWriteAccess()) {
 			$this->initFilter();
-		}
+		//} //uncomment to use more options for mentees
 		$this->setSelectAllCheckbox('record_ids');
 		if ($cert_access->hasCurrentUserPrintAccess()) {
 			$this->addMultiCommand(ilParticipationCertificateResultGUI::CMD_PRINT_SELECTED, $this->pl->txt('list_print'));
 			$this->addMultiCommand(ilParticipationCertificateResultGUI::CMD_PRINT_SELECTED_WITHOUTE_MENTORING, $this->pl->txt('list_print_without'));
 		} else {
-			print_r ($cert_access->isSelfPrintEnabled()); 
 			if ($cert_access->isSelfPrintEnabled()) {
+				$global_config_sets = ilParticipationCertificateConfig::where(array("config_type"=>3, "global_config_id" => 0 ))->orderBy('order_by')->get();
+				foreach ($global_config_sets as $config) {
+					if ($config->getConfigKey() == "true_name_helper") {
+						$target_ref=$config->getConfigValue();
+					}
+				}
+				if (is_numeric($target_ref) and ($target_ref > 0) and (ilObject::_lookupType(ilObject::_lookupObjectId($target_ref),false) == 'xudf')) { 
+					$msgurl= ' <a href=./ilias.php?baseClass=ilObjPluginDispatchGUI&cmd=forward&ref_id=' . $target_ref . '>' .  $this->pl->txt('helper_name') . '</a>';
+					$msgadd= ' ' . $this->pl->txt('helper_action') . $msgurl;
+				} else {
+					$msgadd= "";
+				
+				}
 				ilUtil::sendFailure($this->pl->txt('noname_noprint'));
+				ilUtil::sendQuestion($msgadd);
+				//ilUtil::sendFailure($this->pl->txt('noname_noprint').$msgadd);
+				//Variants sendQuestion, send Info or unified. two same not possible
+				//ToDo Decite what to implement
+				//TODO Check if ilias generates ursl by itself
+				//$select=new ilRepositorySelectorExplorerGUI(0,"showTargetSelectionTree");
 			}
 		}
 		$this->addMultiCommand(ilParticipationCertificateMultipleResultGUI::CMD_SHOW_ALL_RESULTS, $this->pl->txt('list_overview'));
+		} // comment to use foll view for mentees
 		$this->setRowTemplate('tpl.default_row.html', $this->pl->getDirectory());
 		$this->setFormAction($this->ctrl->getFormAction($a_parent_obj));
 
@@ -103,7 +122,11 @@ class ilParticipationCertificateResultTableGUI extends ilTable2GUI {
 
 		$cols = array();
 		//$cols['usr_id'] = array( 'txt' => 'usr_id', 'default' => false, 'width' => 'auto', 'sort_field' => 'usr_id' );
-		$cols['loginname'] = array( 'txt' => $this->pl->txt('loginname'), 'default' => false, 'width' => 'auto', 'sort_field' => 'loginname' );
+		if ($cert_access->hasCurrentUserWriteAccess) {
+			$cols['loginname'] = array( 'txt' => $this->pl->txt('loginname'), 'default' => true, 'width' => 'auto', 'sort_field' => 'loginname' );
+		} else {
+			$cols['loginname'] = array( 'txt' => $this->pl->txt('loginname'), 'default' => false, 'width' => 'auto', 'sort_field' => 'loginname' );
+		}
 		$cols['firstname'] = array( 'txt' => $this->pl->txt('cols_firstname'), 'default' => true, 'width' => 'auto', 'sort_field' => 'firstname' );
 		$cols['lastname'] = array( 'txt' => $this->pl->txt('cols_lastname'), 'default' => true, 'width' => 'auto', 'sort_field' => 'lastname' );
 		$cols['initial_test_finished'] = array(
@@ -428,13 +451,15 @@ class ilParticipationCertificateResultTableGUI extends ilTable2GUI {
 
 		$cert_access = new ilParticipationCertificateAccess($_GET['ref_id']);
 		if ($cert_access->hasCurrentUserPrintAccess()) {
-			$this->ctrl->setParameterByClass(ilParticipationCertificateResultGUI::class, 'ementor', true);
-			$current_selection_list->addItem($this->pl->txt('list_print'), ilParticipationCertificateResultGUI::CMD_PRINT_PDF, $this->ctrl->getLinkTargetByClass(ilParticipationCertificateResultGUI::class, ilParticipationCertificateResultGUI::CMD_PRINT_PDF));
 			$this->ctrl->setParameterByClass(ilParticipationCertificateResultGUI::class, 'ementor', false);
 			$current_selection_list->addItem($this->pl->txt('list_print_without'), ilParticipationCertificateResultGUI::CMD_PRINT_PDF, $this->ctrl->getLinkTargetByClass(ilParticipationCertificateResultGUI::class, ilParticipationCertificateResultGUI::CMD_PRINT_PDF));
-			$current_selection_list->addItem($this->pl->txt('list_results'), ilParticipationCertificateResultModificationGUI::CMD_DISPLAY, $this->ctrl->getLinkTargetByClass(ilParticipationCertificateResultModificationGUI::class, ilParticipationCertificateResultModificationGUI::CMD_DISPLAY));
+			$this->ctrl->setParameterByClass(ilParticipationCertificateResultGUI::class, 'ementor', true);
+			$current_selection_list->addItem($this->pl->txt('list_print'), ilParticipationCertificateResultGUI::CMD_PRINT_PDF, $this->ctrl->getLinkTargetByClass(ilParticipationCertificateResultGUI::class, ilParticipationCertificateResultGUI::CMD_PRINT_PDF));
 		}
 		$current_selection_list->addItem($this->pl->txt('list_overview'), ilParticipationCertificateSingleResultGUI::CMD_DISPLAY, $this->ctrl->getLinkTargetByClass(ilParticipationCertificateSingleResultGUI::class, ilParticipationCertificateSingleResultGUI::CMD_DISPLAY)); // TODO: Call to undefined method ilParticipationCertificateResultGUI::display()
+		if ($cert_access->hasCurrentUserWriteAccess()) {
+			$current_selection_list->addItem($this->pl->txt('list_results'), ilParticipationCertificateResultModificationGUI::CMD_DISPLAY, $this->ctrl->getLinkTargetByClass(ilParticipationCertificateResultModificationGUI::class, ilParticipationCertificateResultModificationGUI::CMD_DISPLAY));
+			}
 
 		$this->tpl->setVariable('ACTIONS', $current_selection_list->getHTML());
 		$this->tpl->parseCurrentBlock();

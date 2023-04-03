@@ -646,6 +646,21 @@ if(!is_object($config)) {
 	$part_conf->setConfigKey('unsugg_color');
 	$part_conf->setConfigValue("14528e");
 	$part_conf->setGroupRefId(0);
+        $part_conf->setOrderBy(5);
+	$part_conf->store();
+}
+<#38>
+<?php>
+require_once "Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/ParticipationCertificate/vendor/autoload.php";
+
+$config = ilParticipationCertificateConfig::where(array('config_key' =>  'true_name_helper', 'config_type' => ilParticipationCertificateConfig::CONFIG_SET_TYPE_GLOBAL, 'config_value_type' => ilParticipationCertificateConfig::CONFIG_VALUE_TYPE_OTHER, "group_ref_id" => 0))->first();
+if(!is_object($config)) {
+	$part_conf = new ilParticipationCertificateConfig();
+	$part_conf->setConfigType(ilParticipationCertificateConfig::CONFIG_SET_TYPE_GLOBAL);
+	$part_conf->setConfigValueType(ilParticipationCertificateConfig::CONFIG_VALUE_TYPE_OTHER);
+	$part_conf->setConfigKey('true_name_helper');
+	$part_conf->setConfigValue("");
+	$part_conf->setGroupRefId(0);
         $part_conf->setOrderBy(6);
 	$part_conf->store();
 }

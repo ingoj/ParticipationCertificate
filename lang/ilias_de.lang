@@ -84,5 +84,10 @@ calculation_by_completed_learning_objective#:#Berechnung aufgrund der Anzahl der
 calculation_by_highest_value#:#Berechnung beider Varianten. Es gilt der jeweils bessere Wert.
 calculation_type_processing_state_suggested_objectives#:#Berechnungstyp 'Bearbeitung der empfohlenen Mathematik-Lernmodule'
 config_result_table#:#Konfiguration Zeitraum & Berechnungstyp
-noname_noprint#:#Das Drucken der Teilnahmebescheinigung ist erst möglich wenn Sie Vor- und Nachname eingegeben haben. Nutzen Sie gerne <a href=./ilias.php?baseClass=ilObjPluginDispatchGUI&cmd=forward&ref_id=334&forwardCmd=index>Name aktualisieren</a>.
+noname_noprint#:#Das Drucken der Teilnahmebescheinigung ist erst möglich wenn Sie Vor- und Nachname eingegeben haben. 
+helper_action#:#Hier können Sie Ihre
+helper_name#:#Einträge aktualisieren
 unsugg_color#:#Farbe nicht empfohlene LZ
+true_name_helper#:#UDF-Editor-Objekt für die Namenseingabe
+nonnumeric_ref#:#Die Eingabe für das UDF-Editor-Objekt muss die Ref-ID sein (numerisch oder leer, andere Zeichen sind nicht erlaubt).
+
