@@ -82,7 +82,6 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI
      * @var
      */
     public $gender;
-    public $err_helper;
     /**
      * ilParticipationCertificateConfigGUI constructor.
      */
