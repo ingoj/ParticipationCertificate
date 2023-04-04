@@ -74,37 +74,27 @@ class ilParticipationCertificateResultTableGUI extends ilTable2GUI {
 		$this->setExportFormats(array( self::EXPORT_EXCEL, self::EXPORT_CSV ));
 		if ($cert_access->hasCurrentUserWriteAccess()) {
 			$this->initFilter();
-		//} //uncomment to use more options for mentees
-		$this->setSelectAllCheckbox('record_ids');
-		if ($cert_access->hasCurrentUserPrintAccess()) {
+			$this->setSelectAllCheckbox('record_ids');
 			$this->addMultiCommand(ilParticipationCertificateResultGUI::CMD_PRINT_SELECTED, $this->pl->txt('list_print'));
 			$this->addMultiCommand(ilParticipationCertificateResultGUI::CMD_PRINT_SELECTED_WITHOUTE_MENTORING, $this->pl->txt('list_print_without'));
-		} else {
-			if ($cert_access->isSelfPrintEnabled()) {
-				$global_config_sets = ilParticipationCertificateConfig::where(array("config_type"=>3, "global_config_id" => 0 ))->orderBy('order_by')->get();
-				foreach ($global_config_sets as $config) {
-					if ($config->getConfigKey() == "true_name_helper") {
-						$target_ref=$config->getConfigValue();
-					}
+			$this->addMultiCommand(ilParticipationCertificateMultipleResultGUI::CMD_SHOW_ALL_RESULTS, $this->pl->txt('list_overview'));
+			}	
+       			
+		if ($cert_access->isSelfPrintEnabled() and !$cert_access->hasCurrentUserPrintAccess()) {
+			$global_config_sets = ilParticipationCertificateConfig::where(array("config_type"=>3, "global_config_id" => 0 ))->orderBy('order_by')->get();
+			foreach ($global_config_sets as $config) {
+				if ($config->getConfigKey() == "true_name_helper") {
+					$target_ref=$config->getConfigValue();
 				}
-				if (is_numeric($target_ref) and ($target_ref > 0) and (ilObject::_lookupType(ilObject::_lookupObjectId($target_ref),false) == 'xudf')) { 
-					$msgurl= ' <a href=./ilias.php?baseClass=ilObjPluginDispatchGUI&cmd=forward&ref_id=' . $target_ref . '>' .  $this->pl->txt('helper_name') . '</a>';
-					$msgadd= ' ' . $this->pl->txt('helper_action') . $msgurl;
-				} else {
-					$msgadd= "";
-				
-				}
-				ilUtil::sendFailure($this->pl->txt('noname_noprint'));
-				ilUtil::sendQuestion($msgadd);
-				//ilUtil::sendFailure($this->pl->txt('noname_noprint').$msgadd);
-				//Variants sendQuestion, send Info or unified. two same not possible
-				//ToDo Decite what to implement
-				//TODO Check if ilias generates ursl by itself
-				//$select=new ilRepositorySelectorExplorerGUI(0,"showTargetSelectionTree");
 			}
-		}
-		$this->addMultiCommand(ilParticipationCertificateMultipleResultGUI::CMD_SHOW_ALL_RESULTS, $this->pl->txt('list_overview'));
-		} // comment to use foll view for mentees
+			ilUtil::sendFailure($this->pl->txt('noname_noprint'));
+			if (is_numeric($target_ref) and ($target_ref > 0) and (ilObject::_lookupType(ilObject::_lookupObjectId($target_ref),false) == 'xudf')) { 
+				$msgurl= ' <a href=./ilias.php?baseClass=ilObjPluginDispatchGUI&cmd=forward&ref_id=' . $target_ref . '>' .  $this->pl->txt('helper_name') . '</a>';
+				$msgadd= $this->pl->txt('helper_action_pre') . $msgurl . $this->pl->txt('helper_action_post');
+				ilUtil::sendInfo($msgadd);
+				//Variants sendQuestion, send Info or unified Failure (with some codechange). two same not possible
+				}
+			}
 		$this->setRowTemplate('tpl.default_row.html', $this->pl->getDirectory());
 		$this->setFormAction($this->ctrl->getFormAction($a_parent_obj));
 

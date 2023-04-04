@@ -85,7 +85,8 @@ calculation_by_highest_value#:#Berechnung beider Varianten. Es gilt der jeweils 
 calculation_type_processing_state_suggested_objectives#:#Berechnungstyp 'Bearbeitung der empfohlenen Mathematik-Lernmodule'
 config_result_table#:#Konfiguration Zeitraum & Berechnungstyp
 noname_noprint#:#Das Drucken der Teilnahmebescheinigung ist erst möglich wenn Sie Vor- und Nachname eingegeben haben. 
-helper_action#:#Hier können Sie Ihre
+helper_action_pre#:#Hier können Sie Ihre
+helper_action_post#:# , um das Drucken freizuschalten!
 helper_name#:#Einträge aktualisieren
 unsugg_color#:#Farbe nicht empfohlene LZ
 true_name_helper#:#UDF-Editor-Objekt für die Namenseingabe
