@@ -168,7 +168,7 @@ class ilParticipationCertificateResultGUI
             $this->tabs->addTab(self::CMD_OVERVIEW, $this->pl->txt('header_overview'),
                 $this->ctrl->getLinkTargetByClass(self::class, self::CMD_CONTENT));
             $cert_access = new ilParticipationCertificateAccess($_GET['ref_id']);
-            if ($cert_access->hasCurrentUserWriteAccess()) {
+            if ($cert_access->hasCurrentUserAdminAccess()) {
                 $this->tabs->addTab(ilParticipationCertificateGUI::TAB_CONFIG, $this->pl->txt('header_config'),
                     $this->ctrl->getLinkTargetByClass(ilParticipationCertificateGUI::class,
                         ilParticipationCertificateGUI::CMD_CONFIG));

@@ -46,10 +46,21 @@ class ilParticipationCertificateAccess {
 		if ($this->access->checkAccess("write", "", $this->group_ref_id)) {
 			return true;
 		}
+		if ($this->access->checkAccess("read_learning_progress", "", $this->group_ref_id)) {
+			return true;
+		}
 
 		return false;
 	}
 
+
+	public function hasCurrentUserAdminAccess() {
+		if ($this->access->checkAccess("write", "", $this->group_ref_id)) {
+			return true;
+		}
+
+		return false;
+	}
 
 	public function hasCurrentUserPrintAccess() {
 		if ($this->hasCurrentUserWriteAccess()) {

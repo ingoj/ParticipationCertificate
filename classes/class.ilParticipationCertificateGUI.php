@@ -91,7 +91,7 @@ class ilParticipationCertificateGUI {
 
 		//Access
 		$cert_access = new ilParticipationCertificateAccess($this->groupRefId);
-		if (!$cert_access->hasCurrentUserWriteAccess()) {
+		if (!$cert_access->hasCurrentUserAdminAccess()) {
 			ilUtil::sendFailure($this->lng->txt('no_permission'), true);
 			ilUtil::redirect('login.php');
 		}

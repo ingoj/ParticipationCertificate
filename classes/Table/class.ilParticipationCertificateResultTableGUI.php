@@ -112,13 +112,27 @@ class ilParticipationCertificateResultTableGUI extends ilTable2GUI {
 
 		$cols = array();
 		//$cols['usr_id'] = array( 'txt' => 'usr_id', 'default' => false, 'width' => 'auto', 'sort_field' => 'usr_id' );
-		if ($cert_access->hasCurrentUserWriteAccess) {
-			$cols['loginname'] = array( 'txt' => $this->pl->txt('loginname'), 'default' => true, 'width' => 'auto', 'sort_field' => 'loginname' );
-		} else {
-			$cols['loginname'] = array( 'txt' => $this->pl->txt('loginname'), 'default' => false, 'width' => 'auto', 'sort_field' => 'loginname' );
-		}
-		$cols['firstname'] = array( 'txt' => $this->pl->txt('cols_firstname'), 'default' => true, 'width' => 'auto', 'sort_field' => 'firstname' );
-		$cols['lastname'] = array( 'txt' => $this->pl->txt('cols_lastname'), 'default' => true, 'width' => 'auto', 'sort_field' => 'lastname' );
+		//access-dependent defaults via $write_access
+		$write_access = $cert_access->hasCurrentUserWriteAccess;
+
+		$cols['loginname'] = array( 
+			'txt' => $this->pl->txt('loginname'), 
+			'default' => $write_access, 
+			'width' => 'auto', 
+			'sort_field' => 'loginname' 
+		);
+		$cols['firstname'] = array( 
+			'txt' => $this->pl->txt('cols_firstname'), 
+			'default' => true, 
+			'width' => 'auto', 
+			'sort_field' => 'firstname' 
+		);
+		$cols['lastname'] = array( 
+			'txt' => $this->pl->txt('cols_lastname'), 
+			'default' => true, 
+			'width' => 'auto', 
+			'sort_field' => 'lastname' 
+		);
 		$cols['initial_test_finished'] = array(
 			'txt' => $this->pl->txt('cols_initial_test_finished'),
 			'default' => true,
