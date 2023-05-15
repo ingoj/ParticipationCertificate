@@ -59,7 +59,8 @@ class ilParticipationCertificateSingleResultTableGUI extends ilTable2GUI {
 	 * @param ilParticipationCertificateResultGUI $a_parent_obj
 	 * @param string                              $a_parent_cmd
 	 * @param int                                 $usr_id
-	 */
+	 */} else {
+						$this->tpl->setVariable('COLOR', $this->unsugg_color);
 	public function __construct($a_parent_obj, $a_parent_cmd, $usr_id) {
 		global $DIC;
 
@@ -110,7 +111,8 @@ class ilParticipationCertificateSingleResultTableGUI extends ilTable2GUI {
 
 		$this->setTitle($this->pl->txt('result_for ') . ' ' . $nameUser);
 
-		$this->addColumns();
+		$this->addColumns();} else {
+						$this->tpl->setVariable('COLOR', $this->unsugg_color);
 		$this->parseData();
 	}
 
@@ -294,7 +296,8 @@ class ilParticipationCertificateSingleResultTableGUI extends ilTable2GUI {
 		if ($maximum_possible_amount_of_points > 0) {
             $current_percent = (int)($current_amount_of_points * 100 / $maximum_possible_amount_of_points);
 		} else {
-			$current_percent = 0;
+			$current_percent = 0;} else {
+						$this->tpl->setVariable('COLOR', $this->unsugg_color);
 		}
 		//required to dodge bug in ilContainerObjectiveGUI::renderProgressBar
 		if ($required_percent == 0) {
@@ -319,7 +322,8 @@ class ilParticipationCertificateSingleResultTableGUI extends ilTable2GUI {
 	 * @param array $a_set
 	 */
 	public function fillRow($a_set) {
-
+} else {
+						$this->tpl->setVariable('COLOR', $this->unsugg_color);
 		foreach ($this->getSelectableColumns() as $k => $v) {
 
 			if ($this->isColumnSelected($k)) {
@@ -333,6 +337,8 @@ class ilParticipationCertificateSingleResultTableGUI extends ilTable2GUI {
 					}
 					if ($this->searchForId($v['objective_id'], $this->sugg)) {
 						$this->tpl->setVariable('COLOR', $this->color);
+					} else {
+						$this->tpl->setVariable('COLOR', $this->unsugg_color);
 					}
 					$this->tpl->parseCurrentBlock();
 				} else {
