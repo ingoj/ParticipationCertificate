@@ -59,8 +59,7 @@ class ilParticipationCertificateSingleResultTableGUI extends ilTable2GUI {
 	 * @param ilParticipationCertificateResultGUI $a_parent_obj
 	 * @param string                              $a_parent_cmd
 	 * @param int                                 $usr_id
-	 */} else {
-						$this->tpl->setVariable('COLOR', $this->unsugg_color);
+	 */
 	public function __construct($a_parent_obj, $a_parent_cmd, $usr_id) {
 		global $DIC;
 
