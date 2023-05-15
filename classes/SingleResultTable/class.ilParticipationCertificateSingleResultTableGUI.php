@@ -110,8 +110,7 @@ class ilParticipationCertificateSingleResultTableGUI extends ilTable2GUI {
 
 		$this->setTitle($this->pl->txt('result_for ') . ' ' . $nameUser);
 
-		$this->addColumns();} else {
-						$this->tpl->setVariable('COLOR', $this->unsugg_color);
+		$this->addColumns();
 		$this->parseData();
 	}
 
@@ -295,8 +294,7 @@ class ilParticipationCertificateSingleResultTableGUI extends ilTable2GUI {
 		if ($maximum_possible_amount_of_points > 0) {
             $current_percent = (int)($current_amount_of_points * 100 / $maximum_possible_amount_of_points);
 		} else {
-			$current_percent = 0;} else {
-						$this->tpl->setVariable('COLOR', $this->unsugg_color);
+			$current_percent = 0;
 		}
 		//required to dodge bug in ilContainerObjectiveGUI::renderProgressBar
 		if ($required_percent == 0) {
@@ -321,8 +319,7 @@ class ilParticipationCertificateSingleResultTableGUI extends ilTable2GUI {
 	 * @param array $a_set
 	 */
 	public function fillRow($a_set) {
-} else {
-						$this->tpl->setVariable('COLOR', $this->unsugg_color);
+
 		foreach ($this->getSelectableColumns() as $k => $v) {
 
 			if ($this->isColumnSelected($k)) {
