@@ -524,9 +524,20 @@ $this->tpl->getStandardTemplate();
 
             $calculation_type_processing_state_suggested_objectives->setValue($value);
 
-        $form->addItem($calculation_type_processing_state_suggested_objectives);
+            $form->addItem($calculation_type_processing_state_suggested_objectives);
 
-		$form->addCommandButton(self::CMD_RESULT_TABLE_CONFIG, $this->pl->txt('save'));
+	    $ementoring = new ilCheckboxInputGUI($this->pl->txt('enable_ementoring'), 'enable_ementoring');
+	    $ementoring_setting = ilParticipationCertificateConfig::getConfig('enable_ementoring', $this->groupRefId);
+	    if ($ementoring_setting === NULL) {
+		    $ementoring_setting = true;
+	    	    } else {
+		    $ementopting_setting = boolval($ementoring_setting);
+	    	    }
+	    	$ementoring->setChecked($ementoring_setting);
+		$form->addItem($ementoring);
+
+	    $form->addCommandButton(self::CMD_RESULT_TABLE_CONFIG, $this->pl->txt('save'));
+
 
 		return $form;
 	}
@@ -544,9 +555,10 @@ $this->tpl->getStandardTemplate();
 		}
 
 		$period = $form->getInput('period');
+		$ementoring = $form->getInput('enable_ementoring');
 		ilParticipationCertificateConfig::setConfig('period_start', $period['start'], $this->groupRefId);
 		ilParticipationCertificateConfig::setConfig('period_end', $period['end'], $this->groupRefId);
-
+		ilParticipationCertificateConfig::setConfig('enable_ementoring', $ementoring, $this->groupRefId);
 
         $calculation_type_processing_state_suggested_objectives = $form->getInput('calculation_type_processing_state_suggested_objectives');
 

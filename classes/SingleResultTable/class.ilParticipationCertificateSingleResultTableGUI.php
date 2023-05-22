@@ -77,7 +77,11 @@ class ilParticipationCertificateSingleResultTableGUI extends ilTable2GUI {
 			'config_key' => 'unsugg_color',
 			'config_type' => ilParticipationCertificateConfig::CONFIG_SET_TYPE_GLOBAL,
 		))->first();
-		$this->unsugg_color = $unsugg_config->getConfigValue();
+		if (is_Object($unsugg_config)) { 
+			$this->unsugg_color = $unsugg_config->getConfigValue();
+		} else {
+			$this->unsugg_color = '909090';
+		}
 
 		$this->setPrefix('dhbw_part_cert_res');
 		$this->setFormName('dhbw_part_cert_res');
@@ -124,14 +128,13 @@ class ilParticipationCertificateSingleResultTableGUI extends ilTable2GUI {
 		$cols = array();
 
 		$finalTestsStates = ilLearnObjectFinalTestStates::getData([$this->usr_id ]);
-
 		$sorted = $this->sortColumns();
 		$i = 0;
 
 		/*print_r($sorted);
 		print_r($finalTestsStates);exit;*/
 
-		if (count($finalTestsStates[$this->usr_id])) {
+		if (count($finalTestsStates)) {
             foreach ($sorted as $sort_key => $sort_arr) {
                 if (array_key_exists($sort_key, $finalTestsStates[$this->usr_id])) {
                     /** @var ilLearnObjectFinalTestState $finalTestsState */
@@ -236,7 +239,7 @@ class ilParticipationCertificateSingleResultTableGUI extends ilTable2GUI {
 		$rec_array = array();
 
 
-		if (count($arr_FinalTestsStates[$usr_id])) {
+		if (count($arr_FinalTestsStates)) {
 
 			//build_row_key_s
 			foreach ($arr_FinalTestsStates[$usr_id] as $rec) {

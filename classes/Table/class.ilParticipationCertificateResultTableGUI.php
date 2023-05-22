@@ -68,6 +68,13 @@ class ilParticipationCertificateResultTableGUI extends ilTable2GUI {
 
 		parent::__construct($a_parent_obj, $a_parent_cmd);
 
+		$ementoring=ilParticipationCertificateConfig::getConfig('enable_ementoring', $_GET['ref_id']);
+		if ($ementoring === NULL) {
+			$ementoring = true;
+			} else {
+			$ementoring = boolval($ementoring);
+			}
+		$this->ementoring = $ementoring;
 		$this->getEnableHeader();
 		$this->setTitle($this->pl->txt('tbl_overview_results'));
 		$this->addColumns();
@@ -75,8 +82,12 @@ class ilParticipationCertificateResultTableGUI extends ilTable2GUI {
 		if ($cert_access->hasCurrentUserWriteAccess()) {
 			$this->initFilter();
 			$this->setSelectAllCheckbox('record_ids');
-			$this->addMultiCommand(ilParticipationCertificateResultGUI::CMD_PRINT_SELECTED, $this->pl->txt('list_print'));
-			$this->addMultiCommand(ilParticipationCertificateResultGUI::CMD_PRINT_SELECTED_WITHOUTE_MENTORING, $this->pl->txt('list_print_without'));
+			if ($this->ementoring) {
+				$this->addMultiCommand(ilParticipationCertificateResultGUI::CMD_PRINT_SELECTED, $this->pl->txt('list_print_with'));
+				$this->addMultiCommand(ilParticipationCertificateResultGUI::CMD_PRINT_SELECTED_WITHOUTE_MENTORING, $this->pl->txt('list_print_without'));
+			} else {
+				$this->addMultiCommand(ilParticipationCertificateResultGUI::CMD_PRINT_SELECTED_WITHOUTE_MENTORING, $this->pl->txt('list_print'));
+			}
 			$this->addMultiCommand(ilParticipationCertificateMultipleResultGUI::CMD_SHOW_ALL_RESULTS, $this->pl->txt('list_overview'));
 			}	
        			
@@ -114,7 +125,6 @@ class ilParticipationCertificateResultTableGUI extends ilTable2GUI {
 		//$cols['usr_id'] = array( 'txt' => 'usr_id', 'default' => false, 'width' => 'auto', 'sort_field' => 'usr_id' );
 		//access-dependent defaults via $write_access
 		$write_access = $cert_access->hasCurrentUserWriteAccess;
-
 		$cols['loginname'] = array( 
 			'txt' => $this->pl->txt('loginname'), 
 			'default' => $write_access, 
@@ -153,19 +163,19 @@ class ilParticipationCertificateResultTableGUI extends ilTable2GUI {
 		);
 		$cols['eMentoring_finished'] = array(
 			'txt' => $this->pl->txt('cols_eMentoring_finished'),
-			'default' => true,
+			'default' => $this->ementoring,
 			'width' => 'auto',
 			'sort_field' => 'eMentoring_finished'
 		);
 		$cols['eMentoring_homework'] = array(
 			'txt' => $this->pl->txt('cols_eMentoring_homework'),
-			'default' => true,
+			'default' => $this->ementoring,
 			'width' => 'auto',
 			'sort_field' => 'eMentoring_homework'
 		);
 		$cols['eMentoring_percentage'] = array(
 			'txt' => $this->pl->txt('cols_eMentoring_percentage'),
-			'default' => true,
+			'default' => $this->ementoring,
 			'width' => 'auto',
 			'sort_field' => 'eMentoring_percentage'
 		);
@@ -455,10 +465,15 @@ class ilParticipationCertificateResultTableGUI extends ilTable2GUI {
 
 		$cert_access = new ilParticipationCertificateAccess($_GET['ref_id']);
 		if ($cert_access->hasCurrentUserPrintAccess()) {
-			$this->ctrl->setParameterByClass(ilParticipationCertificateResultGUI::class, 'ementor', false);
-			$current_selection_list->addItem($this->pl->txt('list_print_without'), ilParticipationCertificateResultGUI::CMD_PRINT_PDF, $this->ctrl->getLinkTargetByClass(ilParticipationCertificateResultGUI::class, ilParticipationCertificateResultGUI::CMD_PRINT_PDF));
-			$this->ctrl->setParameterByClass(ilParticipationCertificateResultGUI::class, 'ementor', true);
-			$current_selection_list->addItem($this->pl->txt('list_print'), ilParticipationCertificateResultGUI::CMD_PRINT_PDF, $this->ctrl->getLinkTargetByClass(ilParticipationCertificateResultGUI::class, ilParticipationCertificateResultGUI::CMD_PRINT_PDF));
+			if ($this->ementoring) {
+				$this->ctrl->setParameterByClass(ilParticipationCertificateResultGUI::class, 'ementor', true);
+				$current_selection_list->addItem($this->pl->txt('list_print_with'), ilParticipationCertificateResultGUI::CMD_PRINT_PDF, $this->ctrl->getLinkTargetByClass(ilParticipationCertificateResultGUI::class, ilParticipationCertificateResultGUI::CMD_PRINT_PDF));
+				$this->ctrl->setParameterByClass(ilParticipationCertificateResultGUI::class, 'ementor', false);
+				$current_selection_list->addItem($this->pl->txt('list_print_without'), ilParticipationCertificateResultGUI::CMD_PRINT_PDF, $this->ctrl->getLinkTargetByClass(ilParticipationCertificateResultGUI::class, ilParticipationCertificateResultGUI::CMD_PRINT_PDF));
+				} else {
+				$this->ctrl->setParameterByClass(ilParticipationCertificateResultGUI::class, 'ementor', false);
+				$current_selection_list->addItem($this->pl->txt('list_print'), ilParticipationCertificateResultGUI::CMD_PRINT_PDF, $this->ctrl->getLinkTargetByClass(ilParticipationCertificateResultGUI::class, ilParticipationCertificateResultGUI::CMD_PRINT_PDF));
+			}
 		}
 		$current_selection_list->addItem($this->pl->txt('list_overview'), ilParticipationCertificateSingleResultGUI::CMD_DISPLAY, $this->ctrl->getLinkTargetByClass(ilParticipationCertificateSingleResultGUI::class, ilParticipationCertificateSingleResultGUI::CMD_DISPLAY)); // TODO: Call to undefined method ilParticipationCertificateResultGUI::display()
 		if ($cert_access->hasCurrentUserWriteAccess()) {
