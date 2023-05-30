@@ -17,7 +17,8 @@ header_config#:#Konfigurieren
 header_overview#:#Übersicht
 header_btn_back#:#Zurück
 header_btn_print#:#Bescheinigung Drucken
-header_btn_print_eMentoring#:#Bescheinigung Drucken (exkl. eMentoring)
+header_btn_print_no_eMentoring#:#Bescheinigung Drucken (exkl. eMentoring)
+header_btn_print_is_eMentoring#:#Bescheinigung Drucken (inkl. eMentoring)
 firstname#:#Vorname
 lastname#:#Nachname
 usr_id#:#UserID
@@ -37,7 +38,8 @@ mod_resultstest#:#Resultat qualifizierende Tests (Prozentwert)
 mod_conf#:#Bearbeitung der Aufgaben zu überfachlichen Themen (Ja(1)/Nein(0) )
 mod_homework#:#Bearbeitung der Aufgaben zu überfachlichen Themen (Prozentwert)
 print_pdf#:#PDF Drucken
-list_print_without#:#Drucken exkl.eMentoring
+list_print_with#:#Drucken inkl. eMentoring
+list_print_without#:#Drucken exkl. eMentoring
 plugin#:#Teilnahmebescheinigungen
 success#:#Druck erfolgreich
 successForm#:#Formular erfolgreich zurückgesetzt
@@ -46,7 +48,7 @@ pluginreader#:#Resultate Studienvorbereitung
 period#:#Zeitraum
 period_self_print#:#Zeitraum Selbstausdruck konfigurieren
 enable_self_print#:#Selbstausdruck aktivieren
-color#:#Farbe
+color#:#Farbe empfohlene LZ
 keyword#:#Keyword
 logo#:#Logo
 udf_percent_value#:#Schwellenwert Videokonferenzen (Prozent)
@@ -84,3 +86,12 @@ calculation_by_completed_learning_objective#:#Berechnung aufgrund der Anzahl der
 calculation_by_highest_value#:#Berechnung beider Varianten. Es gilt der jeweils bessere Wert.
 calculation_type_processing_state_suggested_objectives#:#Berechnungstyp 'Bearbeitung der empfohlenen Mathematik-Lernmodule'
 config_result_table#:#Konfiguration Zeitraum & Berechnungstyp
+noname_noprint#:#Das Drucken der Teilnahmebescheinigung ist erst möglich wenn Sie Vor- und Nachname eingegeben haben. 
+helper_action_pre#:#Hier können Sie Ihre
+helper_action_post#:# , um das Drucken freizuschalten!
+helper_name#:#Einträge aktualisieren
+unsugg_color#:#Farbe nicht empfohlene LZ
+true_name_helper#:#UDF-Editor-Objekt für die Namenseingabe
+nonnumeric_ref#:#Die Eingabe für das UDF-Editor-Objekt muss die Ref-ID sein (numerisch oder leer, andere Zeichen sind nicht erlaubt).
+enable_ementoring#:#Ementoring einblenden
+

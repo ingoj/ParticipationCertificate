@@ -65,8 +65,14 @@ class ilParticipationCertificateResultGUI
         $this->pl = ilParticipationCertificatePlugin::getInstance();
         $this->groupRefId = (int) $_GET['ref_id'];
         $this->learnGroup = ilObjectFactory::getInstanceByRefId($_GET['ref_id']);
-        $this->lng = $DIC->language();
-
+	$this->lng = $DIC->language();
+	$ementoring=ilParticipationCertificateConfig::getConfig('enable_ementoring',$this->groupRefId);
+	if ($ementoring === NULL) {
+		$ementoring=true;
+		}else {
+		$ementoring = boolval($ementoring);
+	}
+	$this->ementoring = $ementoring;
         /*Access
         $cert_access = new ilParticipationCertificateAccess($_GET['ref_id']);
         if (!$cert_access->hasCurrentUserWriteAccess()) {
@@ -126,18 +132,26 @@ class ilParticipationCertificateResultGUI
 
         $cert_access = new ilParticipationCertificateAccess($_GET['ref_id']);
 
-        if ($cert_access->hasCurrentUserPrintAccess()) {
-            $b_print = ilLinkButton::getInstance();
-            $b_print->setCaption($this->pl->txt('header_btn_print'), false);
-            $this->ctrl->setParameter($this, 'ementor', true);
-            $b_print->setUrl($this->ctrl->getLinkTarget($this, $this::CMD_PRINT_PDF));
-            $this->toolbar->addButtonInstance($b_print);
+	if ($cert_access->hasCurrentUserPrintAccess()) {
+	    if ($this->ementoring) {
+            	$b_print = ilLinkButton::getInstance();
+            	$b_print->setCaption($this->pl->txt('header_btn_print_is_ementoring'), false);
+            	$this->ctrl->setParameter($this, 'ementor', true);
+            	$b_print->setUrl($this->ctrl->getLinkTarget($this, $this::CMD_PRINT_PDF));
+            	$this->toolbar->addButtonInstance($b_print);
 
-            $b_print = ilLinkButton::getInstance();
-            $this->ctrl->setParameter($this, 'ementor', false);
-            $b_print->setCaption($this->pl->txt('header_btn_print_eMentoring'), false);
-            $b_print->setUrl($this->ctrl->getLinkTarget($this, $this::CMD_PRINT_PDF));
-            $this->toolbar->addButtonInstance($b_print);
+            	$b_print = ilLinkButton::getInstance();
+            	$this->ctrl->setParameter($this, 'ementor', false);
+            	$b_print->setCaption($this->pl->txt('header_btn_print_no_ementoring'), false);
+            	$b_print->setUrl($this->ctrl->getLinkTarget($this, $this::CMD_PRINT_PDF));
+	    	$this->toolbar->addButtonInstance($b_print);
+	    	} else {
+            	$b_print = ilLinkButton::getInstance();
+            	$this->ctrl->setParameter($this, 'ementor', false);
+            	$b_print->setCaption($this->pl->txt('header_btn_print'), false);
+            	$b_print->setUrl($this->ctrl->getLinkTarget($this, $this::CMD_PRINT_PDF));
+	    	$this->toolbar->addButtonInstance($b_print);
+            }
         }
 
         $this->initTable();
@@ -159,8 +173,8 @@ class ilParticipationCertificateResultGUI
 
             $this->ctrl->setParameterByClass(ilRepositoryGUI::class, 'ref_id', (int) $_GET['ref_id']);
             $this->tabs->setBackTarget($this->pl->txt('header_btn_back'), $this->ctrl->getLinkTargetByClass(array(
-                ilRepositoryGUI::class,
-                ilObjGroupGUI::class
+                ilRepositoryGUI::class//,
+                //ilObjGroupGUI::class
             )));
             $this->ctrl->saveParameterByClass(ilParticipationCertificateResultGUI::class, ['ref_id', 'group_id']);
             $this->ctrl->saveParameterByClass(ilParticipationCertificateGUI::class, 'ref_id');
@@ -168,7 +182,7 @@ class ilParticipationCertificateResultGUI
             $this->tabs->addTab(self::CMD_OVERVIEW, $this->pl->txt('header_overview'),
                 $this->ctrl->getLinkTargetByClass(self::class, self::CMD_CONTENT));
             $cert_access = new ilParticipationCertificateAccess($_GET['ref_id']);
-            if ($cert_access->hasCurrentUserWriteAccess()) {
+            if ($cert_access->hasCurrentUserAdminAccess()) {
                 $this->tabs->addTab(ilParticipationCertificateGUI::TAB_CONFIG, $this->pl->txt('header_config'),
                     $this->ctrl->getLinkTargetByClass(ilParticipationCertificateGUI::class,
                         ilParticipationCertificateGUI::CMD_CONFIG));

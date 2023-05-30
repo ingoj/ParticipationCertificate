@@ -163,23 +163,27 @@ $this->tpl->show();
 		$nameUser = $arr_usr_data[$usr_id]->getPartCertFirstname() . ' ' . $arr_usr_data[$usr_id]->getPartCertLastname();
 
 		$form = new ilPropertyFormGUI();
-		$form->setFormAction($this->ctrl->getFormAction($this));
-		$form->setTitle('Resultate für ' . $nameUser . ' bearbeiten');
+		$cert_access = new ilParticipationCertificateAccess($_GET['ref_id']);
+		if ($cert_access->hasCurrentUserWriteAccess()) {
+			$form->setFormAction($this->ctrl->getFormAction($this));
+			$form->setTitle('Resultate für ' . $nameUser . ' bearbeiten');
 
-		$initialtest = new ilTextInputGUI($this->pl->txt('mod_initial'), 'initial');
-		$form->addItem($initialtest);
+			$initialtest = new ilTextInputGUI($this->pl->txt('mod_initial'), 'initial');
+			$form->addItem($initialtest);
 
-		$resultstests = new ilTextInputGUI($this->pl->txt('mod_resultstest'), 'resultstest');
-		$form->addItem($resultstests);
+			$resultstests = new ilTextInputGUI($this->pl->txt('mod_resultstest'), 'resultstest');
+			$form->addItem($resultstests);
 
-		$conferences = new ilTextInputGUI($this->pl->txt('mod_conf'), 'conf');
-		$form->addItem($conferences);
+			$conferences = new ilTextInputGUI($this->pl->txt('mod_conf'), 'conf');
+			$form->addItem($conferences);
 
-		$homeworks = new ilTextInputGUI($this->pl->txt('mod_homework'), 'homework');
-		$form->addItem($homeworks);
+			$homeworks = new ilTextInputGUI($this->pl->txt('mod_homework'), 'homework');
+			$form->addItem($homeworks);
 
-		$form->addCommandButton(ilParticipationCertificateResultGUI::CMD_PRINT_PDF, $this->pl->txt('list_print'));
-
+			$form->addCommandButton(ilParticipationCertificateResultGUI::CMD_PRINT_PDF, $this->pl->txt('list_print'));
+		} else {
+			ilUtil::sendFailure("No Access Permissions");
+		}	
 		return $form;
 	}
 

@@ -91,11 +91,11 @@ class ilParticipationCertificateGUI {
 
 		//Access
 		$cert_access = new ilParticipationCertificateAccess($this->groupRefId);
-		if (!$cert_access->hasCurrentUserWriteAccess()) {
+		if (!$cert_access->hasCurrentUserAdminAccess()) {
 			ilUtil::sendFailure($this->lng->txt('no_permission'), true);
 			ilUtil::redirect('login.php');
 		}
-
+		$this->objecttype = ilObject::_lookupType($this->groupRefId, true);
 		$this->pl = ilParticipationCertificatePlugin::getInstance();
 		$this->learnGroup = ilObjectFactory::getInstanceByRefId($this->groupRefId);
 		$this->ctrl->saveParameterByClass(ilParticipationCertificateResultGUI::class, [ 'ref_id', 'group_id' ]);
@@ -157,8 +157,8 @@ class ilParticipationCertificateGUI {
 
 		$this->ctrl->setParameterByClass(ilRepositoryGUI::class, 'ref_id', $this->groupRefId);
 		$this->tabs->setBackTarget($this->pl->txt('header_btn_back'), $this->ctrl->getLinkTargetByClass(array(
-			ilRepositoryGUI::class,
-			ilObjGroupGUI::class
+			ilRepositoryGUI::class//,
+			//ilObjGroupGUI::class
 		)));
 
 		$this->ctrl->saveParameterByClass(ilParticipationCertificateResultGUI::class, 'ref_id');
@@ -310,8 +310,11 @@ $this->tpl->show();
 
 			$form->addItem($input);
 		}
-
-		$this->ctrl->saveParameterByClass(ilObjGroup::class, 'ref_id');
+		if ($this->objecttype === 'grp') {
+			$this->ctrl->saveParameterByClass(ilObjGroup::class, 'ref_id');
+			} else {
+			$this->ctrl->saveParameterByClass(ilObjCourse::class, 'ref_id');
+		}
 		$form->addCommandButton(self::CMD_SAVE, $this->pl->txt('save'));
 
 		return $form;
@@ -521,9 +524,20 @@ $this->tpl->getStandardTemplate();
 
             $calculation_type_processing_state_suggested_objectives->setValue($value);
 
-        $form->addItem($calculation_type_processing_state_suggested_objectives);
+            $form->addItem($calculation_type_processing_state_suggested_objectives);
 
-		$form->addCommandButton(self::CMD_RESULT_TABLE_CONFIG, $this->pl->txt('save'));
+	    $ementoring = new ilCheckboxInputGUI($this->pl->txt('enable_ementoring'), 'enable_ementoring');
+	    $ementoring_setting = ilParticipationCertificateConfig::getConfig('enable_ementoring', $this->groupRefId);
+	    if ($ementoring_setting === NULL) {
+		    $ementoring_setting = true;
+	    	    } else {
+		    $ementopting_setting = boolval($ementoring_setting);
+	    	    }
+	    	$ementoring->setChecked($ementoring_setting);
+		$form->addItem($ementoring);
+
+	    $form->addCommandButton(self::CMD_RESULT_TABLE_CONFIG, $this->pl->txt('save'));
+
 
 		return $form;
 	}
@@ -541,9 +555,10 @@ $this->tpl->getStandardTemplate();
 		}
 
 		$period = $form->getInput('period');
+		$ementoring = $form->getInput('enable_ementoring');
 		ilParticipationCertificateConfig::setConfig('period_start', $period['start'], $this->groupRefId);
 		ilParticipationCertificateConfig::setConfig('period_end', $period['end'], $this->groupRefId);
-
+		ilParticipationCertificateConfig::setConfig('enable_ementoring', $ementoring, $this->groupRefId);
 
         $calculation_type_processing_state_suggested_objectives = $form->getInput('calculation_type_processing_state_suggested_objectives');
 
