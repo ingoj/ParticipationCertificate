@@ -6,8 +6,10 @@ require_once __DIR__ . "./../../../autoload.php";
 
 use ilAdministrationGUI;
 use ilConfirmationGUI;
+use ilGlobalTemplateInterface;
 use ilObjComponentSettingsGUI;
 use ilSession;
+use ilTemplate;
 use ilUtil;
 use srag\DIC\DICStatic;
 use srag\DIC\DICTrait;
@@ -34,13 +36,17 @@ class RemovePluginDataConfirmCtrl
     const KEY_UNINSTALL_REMOVES_DATA = "uninstall_removes_data";
     const LANG_MODULE = "removeplugindataconfirm";
 
+    protected ilTemplate|ilGlobalTemplateInterface $tpl;
+
+
 
     /**
      * RemovePluginDataConfirmCtrl constructor
      */
     public function __construct()
     {
-
+        global $DIC;
+        $this->tpl = $DIC["tpl"];
     }
 
 
@@ -201,9 +207,7 @@ class RemovePluginDataConfirmCtrl
     protected function setKeepData()/*: void*/
     {
         self::setUninstallRemovesData(false);
-
-        ilUtil::sendInfo($this->txt("msg_kept_data"), true);
-
+        $this->tpl->setOnScreenMessage('info',$this->txt("msg_kept_data"), true);
         $this->redirectToPlugins("uninstallPlugin");
     }
 
@@ -214,9 +218,7 @@ class RemovePluginDataConfirmCtrl
     protected function setRemoveData()/*: void*/
     {
         self::setUninstallRemovesData(true);
-
-        ilUtil::sendInfo($this->txt("msg_removed_data"), true);
-
+        $this->tpl->setOnScreenMessage('info',$this->txt("msg_removed_data"), true);
         $this->redirectToPlugins("uninstallPlugin");
     }
 

@@ -138,10 +138,10 @@ class ilParticipationCertificateConfigSetTableGUI extends ilTable2GUI {
 						break;
 					case "active":
 						$factory = $DIC->ui()->factory();
-						if ($a_set[$k] == 1) {
-							$this->tpl->setVariable('VALUE',$DIC->ui()->renderer()->render($factory->image()->standard(  ilUtil::getImagePath("on.svg"), '')));
+						if ((int)$a_set[$k] === 1) {
+							$this->tpl->setVariable('VALUE',"active");
 						} else {
-							$this->tpl->setVariable('VALUE',$DIC->ui()->renderer()->render($factory->image()->standard( ilUtil::getImagePath("off.svg"), '')));
+							$this->tpl->setVariable('VALUE',"inactive");
 						}
 						break;
 					default:

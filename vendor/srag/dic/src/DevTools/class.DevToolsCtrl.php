@@ -81,14 +81,12 @@ class DevToolsCtrl
         return (defined("DEVMODE") && intval(DEVMODE) === 1);
     }
 
-
-    /**
-     *
-     */
-    public function executeCommand()/*:void*/
+    public function executeCommand():void
     {
         if (!self::isDevMode()) {
-            ilUtil::sendFailure($this->plugin->translate("no_dev_mode", self::LANG_MODULE), true);
+            global $DIC;
+            $tpl = $DIC["tpl"];
+            $tpl->setOnScreenMessage('failure',$this->plugin->translate("no_dev_mode", self::LANG_MODULE), true);
 
             self::dic()->ctrl()->redirectByClass([
                 ilAdministrationGUI::class,
@@ -151,7 +149,10 @@ class DevToolsCtrl
     {
         $this->plugin->reloadCtrlStructure();
 
-        ilUtil::sendSuccess($this->plugin->translate("reloaded_ctrl_structure", self::LANG_MODULE), true);
+        global $DIC;
+        $tpl = $DIC["tpl"];
+        $tpl->setOnScreenMessage('success',$this->plugin->translate("reloaded_ctrl_structure"), true);
+
 
         //self::dic()->ctrl()->redirect($this);
         self::dic()->ctrl()->redirectToURL(self::dic()->ctrl()->getTargetScript() . "?ref_id=" . (31) . "&admin_mode=settings&ctype=" . $this->plugin->getPluginObject()->getComponentType()
@@ -173,7 +174,10 @@ class DevToolsCtrl
     {
         $this->plugin->reloadDatabase();
 
-        ilUtil::sendSuccess($this->plugin->translate("reloaded_database", self::LANG_MODULE) . "<br><br>" . $this->plugin->getPluginObject()->message, true);
+        global $DIC;
+        $tpl = $DIC["tpl"];
+        $tpl->setOnScreenMessage('success',$this->plugin->translate("reloaded_database", self::LANG_MODULE) . "<br><br>" . $this->plugin->getPluginObject()->getMessage() , true);
+
 
         self::dic()->ctrl()->redirect($this);
     }
@@ -186,7 +190,10 @@ class DevToolsCtrl
     {
         $this->plugin->reloadLanguages();
 
-        ilUtil::sendSuccess($this->plugin->translate("reloaded_languages", self::LANG_MODULE), true);
+        global $DIC;
+        $tpl = $DIC["tpl"];
+        $tpl->setOnScreenMessage('success',$this->plugin->translate("reloaded_languages", self::LANG_MODULE) , true);
+
 
         self::dic()->ctrl()->redirect($this);
     }
@@ -199,7 +206,9 @@ class DevToolsCtrl
     {
         $this->plugin->reloadPluginXml();
 
-        ilUtil::sendSuccess($this->plugin->translate("reloaded_plugin_xml", self::LANG_MODULE), true);
+        global $DIC;
+        $tpl = $DIC["tpl"];
+        $tpl->setOnScreenMessage('success',$this->plugin->translate("reloaded_languages", self::LANG_MODULE) , true);
 
         self::dic()->ctrl()->redirect($this);
     }

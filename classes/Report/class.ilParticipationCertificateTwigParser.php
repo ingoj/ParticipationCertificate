@@ -16,11 +16,14 @@ class ilParticipationCertificateTwigParser {
 	protected bool $footer;
 	protected bool $edited;
 	protected ?array $array;
-	protected \Twig\TemplateWrapper|Twig_TemplateWrapper $twig_template;
+    public ilTemplate|ilGlobalTemplateInterface $tpl;
+
+    protected \Twig\TemplateWrapper|Twig_TemplateWrapper $twig_template;
 
 	public function __construct(int $group_ref_id, array $twig_options, int $usr_id, bool $ementor = true, bool $edited = false, array|null $array = NULL) {
-		$this->pl = ilParticipationCertificatePlugin::getInstance();
-
+		global $DIC;
+        $this->pl = ilParticipationCertificatePlugin::getInstance();
+        $this->tpl = $DIC->ui()->mainTemplate();
 		$this->group_ref_id = $group_ref_id;
 
 		$cert_access = new ilParticipationCertificateAccess($group_ref_id);
@@ -61,9 +64,9 @@ class ilParticipationCertificateTwigParser {
 
         if($global_config_id > 0) {
             $global_config_set = $global_config_sets->getConfigSetById($global_config_id);
-            ilUtil::sendInfo($this->pl->txt('configset_type_1').' '.$global_config_set->getTitle());
+            $this->tpl->setOnScreenMessage('info',$this->pl->txt('configset_type_1'). ' ' . $global_config_set->getTitle(), true);
         } else {
-            ilUtil::sendInfo($this->pl->txt('configset_type_2'));
+            $this->tpl->setOnScreenMessage('info',$this->pl->txt('configset_type_2'), true);
         }
 
         $arr_config_text = [];
@@ -77,9 +80,9 @@ class ilParticipationCertificateTwigParser {
 
         if($global_config_id > 0) {
             $global_config_set = $global_config_sets->getConfigSetById($global_config_id);
-            ilUtil::sendInfo($this->pl->txt('configset_type_1').' '.$global_config_set->getTitle());
+            $this->tpl->setOnScreenMessage('info',$this->pl->txt('configset_type_1').' '.$global_config_set->getTitle(), true);
         } else {
-            ilUtil::sendInfo($this->pl->txt('configset_type_2'));
+            $this->tpl->setOnScreenMessage('info',$this->pl->txt('configset_type_2'), true);
         }
 
 

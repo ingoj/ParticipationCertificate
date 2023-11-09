@@ -118,7 +118,6 @@ class ilParticipationCertificateSingleResultTableGUI extends ilTable2GUI {
                 $i = $i + 1;
 
                 if ($i == 10000) {
-                    //ilUtil::sendFailure("Der Aufruf ist Fehlgeschlagen");
                     break;
                 }
             }

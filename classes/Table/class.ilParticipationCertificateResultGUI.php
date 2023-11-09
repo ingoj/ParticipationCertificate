@@ -42,13 +42,6 @@ class ilParticipationCertificateResultGUI
             $ementoring = boolval($ementoring);
         }
         $this->ementoring = $ementoring;
-        /*Access
-        $cert_access = new ilParticipationCertificateAccess($_GET['ref_id']);
-        if (!$cert_access->hasCurrentUserWriteAccess()) {
-            ilUtil::sendFailure($lng->txt('no_permission'), true);
-            ilUtil::redirect('login.php');
-        }*/
-
         $this->ctrl->saveParameterByClass(ilParticipationCertificateResultGUI::class, ['ref_id', 'group_id']);
     }
 
@@ -175,7 +168,7 @@ class ilParticipationCertificateResultGUI
                 false);
             $twigParser->parseData();
         } else {
-            ilUtil::sendFailure($this->lng->txt('no_permission'), true);
+            $this->tpl->setOnScreenMessage('failure',$this->lng->txt('no_permission'), true);
             ilUtil::redirect('login.php');
         }
     }
@@ -185,7 +178,7 @@ class ilParticipationCertificateResultGUI
         $cert_access = new ilParticipationCertificateAccess($_GET['ref_id']);
         if ($cert_access->hasCurrentUserPrintAccess()) {
             if (!isset($_POST['record_ids']) || (isset($_POST['record_ids']) && !count($_POST['record_ids']))) {
-                ilUtil::sendFailure($this->pl->txt('no_records_selected'), true);
+                $this->tpl->setOnScreenMessage('failure',$this->lng->txt('no_records_selected'), true);
                 $this->ctrl->redirect($this, self::CMD_CONTENT);
             }
             $usr_id = $_POST['record_ids'];
@@ -193,7 +186,7 @@ class ilParticipationCertificateResultGUI
                 false);
             $twigParser->parseData();
         } else {
-            ilUtil::sendFailure($this->lng->txt('no_permission'), true);
+            $this->tpl->setOnScreenMessage('failure',$this->lng->txt('no_permission'), true);
             ilUtil::redirect('login.php');
         }
     }
@@ -203,7 +196,7 @@ class ilParticipationCertificateResultGUI
         $cert_access = new ilParticipationCertificateAccess($_GET['ref_id']);
         if ($cert_access->hasCurrentUserPrintAccess()) {
             if (!isset($_POST['record_ids']) || (isset($_POST['record_ids']) && !count($_POST['record_ids']))) {
-                ilUtil::sendFailure($this->pl->txt('no_records_selected'), true);
+                $this->tpl->setOnScreenMessage('failure',$this->lng->txt('no_records_selected'), true);
                 $this->ctrl->redirect($this, self::CMD_CONTENT);
             }
 
@@ -212,7 +205,7 @@ class ilParticipationCertificateResultGUI
                 false);
             $twigParser->parseData();
         } else {
-            ilUtil::sendFailure($this->lng->txt('no_permission'), true);
+            $this->tpl->setOnScreenMessage('failure',$this->lng->txt('no_permission'), true);
             ilUtil::redirect('login.php');
         }
     }

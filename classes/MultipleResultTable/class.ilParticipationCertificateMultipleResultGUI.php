@@ -45,7 +45,7 @@ class ilParticipationCertificateMultipleResultGUI
         $this->usr_ids = filter_input(INPUT_POST, 'record_ids', FILTER_DEFAULT, FILTER_FORCE_ARRAY);
 
         if (!is_array($this->usr_ids) || count($this->usr_ids) === 0) {
-            ilUtil::sendFailure($this->pl->txt('no_records_selected'), true);
+            $this->tpl->setOnScreenMessage('failure',$this->pl->txt('no_records_selected'), true);
             $this->ctrl->redirectByClass(ilParticipationCertificateResultGUI::class, ilParticipationCertificateResultGUI::CMD_CONTENT);
         };
 

@@ -168,7 +168,7 @@ class ilParticipationCertificateConfig extends ActiveRecord {
     {
         $path = match ($path_type) {
             "absolute" => CLIENT_WEB_DIR . '/dhbw_part_cert',
-            "relative" => ilUtil::getWebspaceDir() . '/dhbw_part_cert',
+            "relative" => ilFileUtils::getWebspaceDir() . '/dhbw_part_cert',
             default => CLIENT_WEB_DIR . '/dhbw_part_cert',
         };
 
@@ -180,14 +180,14 @@ class ilParticipationCertificateConfig extends ActiveRecord {
 			case 'img':
 				$path = $path . '/img/';
 				if (!is_dir($path) && $create) {
-					ilUtil::makeDirParents($path);
+					ilFileUtils::makeDirParents($path);
 				}
 
 				return $path;
 				break;
 			default:
 				if (!is_dir($path) && $create) {
-					ilUtil::makeDirParents($path);
+                    ilFileUtils::makeDirParents($path);
 				}
 
 				return $path;
@@ -200,7 +200,7 @@ class ilParticipationCertificateConfig extends ActiveRecord {
 		self::deletePicture($template_id, $file_name);
 
 		$file_path = self::getFileStoragePath('img', 'absolute', $template_id, true);
-		ilUtil::moveUploadedFile($file_data['tmp_name'], '', $file_path . $file_name);
+		ilFileUtils::moveUploadedFile($file_data['tmp_name'], '', $file_path . $file_name);
 
 		return self::returnPicturePath("relative", $template_id, $file_name);
 	}

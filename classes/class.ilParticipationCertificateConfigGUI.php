@@ -243,7 +243,8 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI
             $config->store();
         }
 
-        ilUtil::sendSuccess($this->pl->txt('config_reseted'), true);
+        $this->tpl->setOnScreenMessage('success',$this->pl->txt('config_reseted'), true);
+
         $DIC->ctrl()->redirect($this, self::CMD_CONFIGURE);
     }
 
@@ -327,10 +328,8 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI
      */
     public function saveOrder(): void
     {
-
         $configs = new ilParticipationCertificateGlobalConfigSets();
-        $configs->saveAndRearangeOrderBy($_POST['order_by']);
-
+        $configs->saveAndRearangeOrderBy((array)$_POST['order_by']);
         $this->ctrl->redirect($this, self::CMD_CONFIGURE);
     }
 
@@ -355,7 +354,7 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI
         $form = $this->initForm($id, $set_type);
 	    $this->tpl->setContent($form->getHTML());
         if ($id == 0 and $set_type == 3 and $err) {
-            ilUtil::sendFailure($this->pl->txt("nonnumeric_ref"));
+            $this->tpl->setOnScreenMessage('failure', $this->pl->txt("nonnumeric_ref"), true);
         }
     }
 

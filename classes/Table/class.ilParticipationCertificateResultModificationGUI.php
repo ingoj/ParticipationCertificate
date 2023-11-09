@@ -157,7 +157,7 @@ class ilParticipationCertificateResultModificationGUI
 
             $form->addCommandButton(ilParticipationCertificateResultGUI::CMD_PRINT_PDF, $this->pl->txt('list_print'));
         } else {
-            ilUtil::sendFailure("No Access Permissions");
+            $this->tpl->setOnScreenMessage('failure','No Access Permissions', true);
         }
         return $form;
     }

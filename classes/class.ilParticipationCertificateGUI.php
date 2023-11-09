@@ -62,7 +62,7 @@ class ilParticipationCertificateGUI
         //Access
         $cert_access = new ilParticipationCertificateAccess($this->groupRefId);
         if (!$cert_access->hasCurrentUserAdminAccess()) {
-            ilUtil::sendFailure($this->lng->txt('no_permission'), true);
+            $this->tpl->setOnScreenMessage('failure',$this->lng->txt('no_permission'), true);
             ilUtil::redirect('login.php');
         }
         $this->objecttype = ilObject::_lookupType($this->groupRefId, true);
@@ -197,9 +197,9 @@ class ilParticipationCertificateGUI
 
         if ($global_config_id > 0) {
             $global_config_set = $global_config_sets->getConfigSetById($global_config_id);
-            ilUtil::sendInfo($this->pl->txt('configset_type_1') . ' ' . $global_config_set->getTitle());
+            $this->tpl->setOnScreenMessage('info',$this->pl->txt('configset_type_1'). ' ' . $global_config_set->getTitle(), true);
         } else {
-            ilUtil::sendInfo($this->pl->txt('configset_type_2'));
+            $this->tpl->setOnScreenMessage('info',$this->pl->txt('configset_type_2'). ' ' . $global_config_set->getTitle(), true);
         }
 
 
@@ -349,9 +349,7 @@ class ilParticipationCertificateGUI
             $config->store();
         }
 
-
-        ilUtil::sendSuccess($this->pl->txt('successFormSave'), true);
-
+        $this->tpl->setOnScreenMessage('success',$this->pl->txt('successFormSave'), true);
         $this->ctrl->redirect($this, self::CMD_DISPLAY);
 
         return true;
@@ -379,7 +377,7 @@ class ilParticipationCertificateGUI
         $cert_configs = new ilParticipationCertificateConfigs();
         if ($global_template_id = filter_input(INPUT_POST, 'global_template_id')) {
             $cert_configs->setObjToUseCertTemplate($this->groupRefId, $global_template_id);
-            ilUtil::sendSuccess($this->pl->txt('successForm'), true);
+            $this->tpl->setOnScreenMessage('success',$this->pl->txt('successForm'), true);
         }
 
         $this->ctrl->redirect($this, self::CMD_DISPLAY);
@@ -390,7 +388,7 @@ class ilParticipationCertificateGUI
         $cert_configs = new ilParticipationCertificateConfigs();
         if ($global_template_id = filter_input(INPUT_POST, 'global_template_id')) {
             $cert_configs->setOwnCertConfigFromTemplate($this->groupRefId, $global_template_id);
-            ilUtil::sendSuccess($this->pl->txt('successForm'), true);
+            $this->tpl->setOnScreenMessage('success',$this->pl->txt('successForm'), true);
         }
 
         $this->ctrl->redirect($this, self::CMD_DISPLAY);
@@ -511,7 +509,7 @@ class ilParticipationCertificateGUI
         ilParticipationCertificateConfig::setConfig('calculation_type_processing_state_suggested_objectives', $calculation_type_processing_state_suggested_objectives, $this->groupRefId);
 
 
-        ilUtil::sendSuccess($this->pl->txt('successFormSave'), true);
+        $this->tpl->setOnScreenMessage('success',$this->pl->txt('successFormSave'), true);
 
         $this->ctrl->redirect($this, self::CMD_CONFIG_RESULT_TABLE);
     }
@@ -577,8 +575,7 @@ class ilParticipationCertificateGUI
         ilParticipationCertificateConfig::setConfig('self_print_start', $period['start'], $this->groupRefId);
         ilParticipationCertificateConfig::setConfig('self_print_end', $period['end'], $this->groupRefId);
 
-        ilUtil::sendSuccess($this->pl->txt('successFormSave'), true);
-
+        $this->tpl->setOnScreenMessage('success',$this->pl->txt('successFormSave'), true);
         $this->ctrl->redirect($this, self::CMD_SELF_PRINT);
     }
 }

@@ -92,7 +92,7 @@ class ilParticipationCertificateUIHookGUI extends ilUIHookPluginGUI {
 	function checkGroup(): bool
 	{
 		foreach ($this->ctrl->getCallHistory() as $GUIClassesArray) {
-			if (($this->objecttype === 'crs') and ($GUIClassesArray['class'] == ilObjCourseGUI::class)) {
+			if (($this->objecttype === 'crs') && array_key_exists('class', $GUIClassesArray) && ($GUIClassesArray['class'] == ilObjCourseGUI::class)) {
 				if ($this->strposa($this->learnGroupTitle, $this->keywords) !== false) {
 					return true;
 				}

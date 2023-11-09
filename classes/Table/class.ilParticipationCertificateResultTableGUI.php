@@ -70,11 +70,11 @@ class ilParticipationCertificateResultTableGUI extends ilTable2GUI {
 					$target_ref=$config->getConfigValue();
 				}
 			}
-			ilUtil::sendFailure($this->pl->txt('noname_noprint'));
+            $this->tpl->setOnScreenMessage('failure',$this->pl->txt('noname_noprint'), true);
 			if (is_numeric($target_ref) and ($target_ref > 0) and (ilObject::_lookupType(ilObject::_lookupObjectId($target_ref),false) == 'xudf')) { 
 				$msgurl= ' <a href=./ilias.php?baseClass=ilObjPluginDispatchGUI&cmd=forward&ref_id=' . $target_ref . '>' .  $this->pl->txt('helper_name') . '</a>';
 				$msgadd= $this->pl->txt('helper_action_pre') . $msgurl . $this->pl->txt('helper_action_post');
-				ilUtil::sendInfo($msgadd);
+                $this->tpl->setOnScreenMessage('info',$msgadd, true);
 				//Variants sendQuestion, send Info or unified Failure (with some codechange). two same not possible
 				}
 			}
