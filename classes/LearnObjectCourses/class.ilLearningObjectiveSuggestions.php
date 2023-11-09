@@ -5,11 +5,10 @@ use SRAG\ILIAS\Plugins\LearningObjectiveSuggestions\Suggestion\LearningObjective
 class ilLearningObjectiveSuggestions {
 
 	/**
-	 * @param array $arr_usr_ids
-	 *
 	 * @return ilLearningObjectivesMasterCrs[]
 	 */
-	public static function getData(array $arr_usr_ids = array()) {
+	public static function getData(array $arr_usr_ids = array()): array
+    {
 		global $DIC;
 		$ilDB = $DIC->database();
 		$result = $ilDB->query(self::getSQL($arr_usr_ids));
@@ -29,7 +28,8 @@ class ilLearningObjectiveSuggestions {
 	}
 
 
-	protected static function getSQL(array $arr_usr_ids = array()) {
+	protected static function getSQL(array $arr_usr_ids = array()): string
+    {
 		global $DIC;
 		$ilDB = $DIC->database();
 		$select = "SELECT 
@@ -55,7 +55,8 @@ class ilLearningObjectiveSuggestions {
 	 * @param array  $arr_usr_ids
 	 * @param string $table_name
 	 */
-	public static function createTemporaryTableLearnObjectSugg(array $arr_usr_ids = array(), $table_name = 'tmp_lo_sugg') {
+	public static function createTemporaryTableLearnObjectSugg(array $arr_usr_ids = array(), string $table_name = 'tmp_lo_sugg'): void
+    {
 		global $DIC;
 		$ilDB = $DIC->database();
 
@@ -64,5 +65,3 @@ class ilLearningObjectiveSuggestions {
 		$ilDB->query($sql);
 	}
 }
-
-?>

@@ -3,11 +3,10 @@ use srag\Plugins\UserDefaults\UserSearch\usrdefObj;
 class ilIassStates {
 
 	/**
-	 * @param array $arr_usr_ids
-	 *
 	 * @return ilIassState[]
 	 */
-	public static function getData(array $arr_usr_ids = array()) {
+	public static function getData(array $arr_usr_ids = array()): array
+    {
 		global $DIC;
 		$ilDB = $DIC->database();
 		$result = $ilDB->query(self::getSQL($arr_usr_ids));
@@ -29,12 +28,8 @@ class ilIassStates {
 	}
 
 
-	/**
-	 * @param array $arr_usr_ids
-	 *
-	 * @return string
-	 */
-	protected static function getSQL(array $arr_usr_ids = array()) {
+	protected static function getSQL(array $arr_usr_ids = array()): string
+    {
 		global $DIC;
 		$ilDB = $DIC->database();
 		$select = "SELECT 
@@ -60,5 +55,3 @@ class ilIassStates {
 		return $select;
 	}
 }
-
-?>

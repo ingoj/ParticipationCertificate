@@ -8,7 +8,8 @@ class ilCrsInitialTestStates {
 	 *
 	 * @return ilCrsInitialTestState[]
 	 */
-	public static function getData(array $arr_usr_ids = array()) {
+	public static function getData(array $arr_usr_ids = array()): array
+    {
 		global $DIC;
 		$ilDB = $DIC->database();
 		$result = $ilDB->query(self::getSQL($arr_usr_ids));
@@ -31,13 +32,8 @@ class ilCrsInitialTestStates {
 		return $crsitst_data;
 	}
 
-
-	/**
-	 * @param array $arr_usr_ids
-	 *
-	 * @return string
-	 */
-	protected static function getSQL(array $arr_usr_ids = array()) {
+	protected static function getSQL(array $arr_usr_ids = array()): string
+    {
 		global $DIC;
 		$ilDB = $DIC->database();
 		$select = "SELECT test_act.user_fi as crsitest_usr_id,

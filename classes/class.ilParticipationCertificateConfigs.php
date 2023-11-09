@@ -12,29 +12,29 @@ class ilParticipationCertificateConfigs {
 	}
 
 
-	/**
-	 * @param int $global_config_id
-	 *
-	 * @return ilParticipationCertificateConfig[]
-	 */
-	public function getGlobalConfigSet($global_config_id = 0) {
+    /**
+     * @return ilParticipationCertificateConfig[]
+     * @throws arException
+     */
+	public function getGlobalConfigSet(int $global_config_id = 0): array
+    {
 		return ilParticipationCertificateConfig::where(array( "global_config_id" => $global_config_id ))->orderBy('order_by')->get();
 	}
 
     /**
-     * @param int $obj_ref_id
-     *
      * @return ilParticipationCertificateConfig[]
+     * @throws arException
      */
-    public function getObjectConfigSet(int $obj_ref_id = 0) {
+    public function getObjectConfigSet(int $obj_ref_id = 0): array
+    {
         return ilParticipationCertificateConfig::where(array( "group_ref_id" => $obj_ref_id ))->orderBy('order_by')->get();
     }
 
-	/**
-	 * @param int group_ref_id
-	 * @param $config_type
-	 */
-	public function returnTextValues($group_ref_id = 0, $config_type = ilParticipationCertificateConfig::CONFIG_SET_TYPE_TEMPLATE) {
+    /**
+     * @throws arException
+     */
+    public function returnTextValues(int $group_ref_id = 0, int $config_type = ilParticipationCertificateConfig::CONFIG_SET_TYPE_TEMPLATE): array
+    {
 		$arr_config = ilParticipationCertificateConfig::where(array(
 			"config_type" => $config_type,
 			"group_ref_id" => $group_ref_id,
@@ -63,12 +63,8 @@ class ilParticipationCertificateConfigs {
 		return $arr_config;
 	}
 
-	/**
-	 * @param int $group_ref_id
-	 *
-	 * @return bool|string
-	 */
-	public function returnPercentValue($group_ref_id = 0) {
+	public function returnPercentValue(int $group_ref_id = 0): bool|string
+    {
 		/**
 		 * @var $config ilParticipationCertificateConfig
 		 */
@@ -87,12 +83,11 @@ class ilParticipationCertificateConfigs {
 
 
 	/**
-	 * @param int $obj_ref_id
-	 *
-	 * @return array|ilParticipationCertificateConfig[]
+	 * @return ilParticipationCertificateConfig[]
 	 * @throws arException
 	 */
-	public function getObjConfigSetIfNoneCreateDefaultAndCreateNewObjConfigValues($obj_ref_id) {
+	public function getObjConfigSetIfNoneCreateDefaultAndCreateNewObjConfigValues(int $obj_ref_id): array
+    {
 
 		$cert_obj_config = ilParticipationCertificateObjectConfigSet::where([ 'obj_ref_id' => $obj_ref_id ])->first();
 
@@ -130,14 +125,8 @@ class ilParticipationCertificateConfigs {
 		}
 	}
 
-
-	/**
-	 * @param int    $obj_ref_id
-	 * @param string $config_key
-	 *
-	 * @return ilParticipationCertificateConfig|bool
-	 */
-	private function getParticipationObjConfigValueByKey($obj_ref_id, $config_key) {
+	private function getParticipationObjConfigValueByKey(int $obj_ref_id, string $config_key): bool|ilParticipationCertificateConfig
+    {
 		if (ilParticipationCertificateConfig::where([
 			"config_type" => ilParticipationCertificateConfig::CONFIG_SET_TYPE_GROUP,
 			"config_key" => $config_key,
@@ -153,13 +142,8 @@ class ilParticipationCertificateConfigs {
 		return false;
 	}
 
-	/**
-	 * @param int    $global_config_id
-	 * @param string $config_key
-	 *
-	 * @return ilParticipationCertificateConfig|bool
-	 */
-	public function getParticipationTemplateConfigValueByKey($global_config_id, $config_key) {
+	public function getParticipationTemplateConfigValueByKey(int $global_config_id, string $config_key): bool|ilParticipationCertificateConfig
+    {
 		if (ilParticipationCertificateConfig::where([
 			"config_type" => ilParticipationCertificateConfig::CONFIG_SET_TYPE_TEMPLATE,
 			"config_key" => $config_key,
@@ -175,13 +159,8 @@ class ilParticipationCertificateConfigs {
 		return false;
 	}
 
-	/**
-	 * @param int    $global_config_id
-	 * @param string $config_key
-	 *
-	 * @return ilParticipationCertificateConfig|bool
-	 */
-	public function getParticipationGlobalConfigValueByKey($config_key) {
+	public function getParticipationGlobalConfigValueByKey(string $config_key): bool|ilParticipationCertificateConfig
+    {
 		if (ilParticipationCertificateConfig::where([
 			"config_type" => ilParticipationCertificateConfig::CONFIG_SET_TYPE_GLOBAL,
 			"config_key" => $config_key,
@@ -195,12 +174,8 @@ class ilParticipationCertificateConfigs {
 		return false;
 	}
 
-
-	/**
-	 * @param int                              $obj_ref_id
-	 * @param ilParticipationCertificateConfig $global_config_value
-	 */
-	private function createParticipationObjConfigValueByGlobalConfigValue($obj_ref_id, ilParticipationCertificateConfig $global_config_value) {
+	private function createParticipationObjConfigValueByGlobalConfigValue(int $obj_ref_id, ilParticipationCertificateConfig $global_config_value): void
+    {
 		$part_cert_obj_config_value = $global_config_value;
 		$part_cert_obj_config_value->setConfigType(ilParticipationCertificateConfig::CONFIG_SET_TYPE_GROUP);
 		$part_cert_obj_config_value->setGroupRefId($obj_ref_id);
@@ -208,12 +183,8 @@ class ilParticipationCertificateConfigs {
 		$part_cert_obj_config_value->create();
 	}
 
-
-	/**
-	 * @param int $obj_ref_id
-	 * @param int $global_template_id
-	 */
-	public function setObjToUseCertTemplate($obj_ref_id, $global_template_id) {
+	public function setObjToUseCertTemplate(int $obj_ref_id, int $global_template_id): void
+    {
 
 		$this->deleteObjConfigSet($obj_ref_id);
 		/**
@@ -229,12 +200,8 @@ class ilParticipationCertificateConfigs {
 		$part_cert_config->store();
 	}
 
-
-	/**
-	 * @param int $obj_ref_id
-	 * @param int $global_template_id
-	 */
-	public function setOwnCertConfigFromTemplate($obj_ref_id, $global_template_id) {
+	public function setOwnCertConfigFromTemplate(int $obj_ref_id, int $global_template_id): void
+    {
 		$part_cert_config = ilParticipationCertificateObjectConfigSet::where([ 'obj_ref_id' => $obj_ref_id ])->first();
 		if (!is_object($part_cert_config)) {
 			$part_cert_config = new ilParticipationCertificateObjectConfigSet();
@@ -248,12 +215,8 @@ class ilParticipationCertificateConfigs {
 		$this->createOrUpdateObjConfigSetFromTemplate($obj_ref_id, $global_template_id);
 	}
 
-
-	/**
-	 * @param int $obj_ref_id
-	 * @param int $global_template_id $
-	 */
-	private function createOrUpdateObjConfigSetFromTemplate($obj_ref_id, $global_template_id) {
+	private function createOrUpdateObjConfigSetFromTemplate(int $obj_ref_id, int $global_template_id): void
+    {
 		$this->deleteObjConfigSet($obj_ref_id);
 		foreach (ilParticipationCertificateConfig::where([
 			'config_type' => ilParticipationCertificateObjectConfigSet::CONFIG_TYPE_TEMPLATE,
@@ -294,11 +257,8 @@ class ilParticipationCertificateConfigs {
 		}
 	}
 
-
-	/**
-	 * @param int $obj_ref_id
-	 */
-	private function deleteObjConfigSet($obj_ref_id) {
+	private function deleteObjConfigSet(int $obj_ref_id): void
+    {
 		$arr_config = ilParticipationCertificateConfig::where([ "group_ref_id" => $obj_ref_id ])->get();
 		if (count($arr_config)) {
 			foreach ($arr_config as $config) {
@@ -330,7 +290,8 @@ class ilParticipationCertificateConfigs {
 	/**
 	 * @return ilParticipationCertificateConfig[]
 	 */
-	public function returnCertTextDefaultValues() {
+	public function returnCertTextDefaultValues(): array
+    {
 
 		$arr_configs = [];
 

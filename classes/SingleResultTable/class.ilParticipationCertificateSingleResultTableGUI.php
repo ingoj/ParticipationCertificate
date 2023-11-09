@@ -11,56 +11,22 @@ class ilParticipationCertificateSingleResultTableGUI extends ilTable2GUI {
 	const SUCCESSFUL_PROGRESS_CSS_CLASS = "ilCourseObjectiveProgressBarCompleted";
 	const NON_SUCCESSFUL_PROGRESS_CSS_CLASS = "ilCourseObjectiveProgressBarNeutral";
 	const FAILED_PROGRESS_CSS_CLASS = "ilCourseObjectiveProgressBarFailed";
-	/**
-	 * @var ilTabsGUI
-	 */
-	protected $tabs;
-	/**
-	 * @var ilCtrl
-	 */
-	protected $ctrl;
-	/**
-	 * @var ilParticipationCertificateResultGUI
-	 */
-	protected $parent_obj;
-	/**
-	 * @var ilParticipationCertificatePlugin
-	 */
-	protected $pl;
-	/**
-	 * @var array
-	 */
-	protected $filter = array();
-	/**
-	 * @var
-	 */
-	protected $usr_id;
-	/**
-	 * @var array
-	 */
-	protected $marks = array();
-	/**
-	 * @var string
-	 */
-	protected $color;
-	/**
-	 * @var array
-	 */
-	protected $usr_ids;
+	protected ilTabsGUI $tabs;
+	protected ilCtrl $ctrl;
+	protected ?object $parent_obj;
+	protected ilParticipationCertificatePlugin $pl;
+	protected array $filter = array();
+	protected int $usr_id;
+	protected array $marks = array();
+	protected string $color;
+	protected array $usr_ids;
 	/**
 	 * @var ilLearningObjectivesMasterCrs[]
 	 */
-	protected $sugg;
+	protected array $sugg;
 
 
-	/**
-	 * ilParticipationCertificateResultGUI constructor.
-	 *
-	 * @param ilParticipationCertificateResultGUI $a_parent_obj
-	 * @param string                              $a_parent_cmd
-	 * @param int                                 $usr_id
-	 */
-	public function __construct($a_parent_obj, $a_parent_cmd, $usr_id) {
+	public function __construct(ilParticipationCertificateMultipleResultGUI|ilParticipationCertificateResultGUI $a_parent_obj, string $a_parent_cmd, int $usr_id) {
 		global $DIC;
 
 		$this->ctrl = $DIC->ctrl();
@@ -118,13 +84,8 @@ class ilParticipationCertificateSingleResultTableGUI extends ilTable2GUI {
 		$this->parseData();
 	}
 
-
-	/**
-	 * Get selectable columns
-	 *
-	 * @return array    key: column id, val: true/false -> default on/off
-	 */
-	function getSelectableColumns() {
+	function getSelectableColumns(): array
+    {
 		$cols = array();
 
 		$finalTestsStates = ilLearnObjectFinalTestStates::getData([$this->usr_id ]);
@@ -167,11 +128,8 @@ class ilParticipationCertificateSingleResultTableGUI extends ilTable2GUI {
 		return $cols;
 	}
 
-
-	/**
-	 * @return array
-	 */
-	function sortColumns() {
+	function sortColumns(): array
+    {
 		//First sort scores
 		$scores = NewLearningObjectiveScores::getData($this->usr_id);
 		//if the scores are equal, sort because of the weight value
@@ -196,26 +154,11 @@ class ilParticipationCertificateSingleResultTableGUI extends ilTable2GUI {
 			];
 		}
 
-
-		//sort the array first for the score. Second argument is the weight.
-	/*
-		$scored = array();
-		$weighting = array();
-		foreach ($sorting as $key => $item) {
-			$scored[$key] = $item['score'];
-			$weighting[$key] = $item['weight'];
-		}
-		array_multisort($scored, SORT_DESC, $weighting, SORT_DESC, $sorting);
-		print_r($sorting);exit;
-	*/
 		return $sorting;
 	}
 
-
-	/**
-	 *
-	 */
-	private function addColumns() {
+	private function addColumns(): void
+    {
 		foreach ($this->getSelectableColumns() as $k => $v) {
 			if ($this->isColumnSelected($k)) {
 				if (isset($v['sort_field'])) {
@@ -228,11 +171,8 @@ class ilParticipationCertificateSingleResultTableGUI extends ilTable2GUI {
 		}
 	}
 
-
-	/**
-	 * @return array
-	 */
-	public function parseData() {
+	public function parseData(): array
+    {
 
 		$arr_FinalTestsStates = ilLearnObjectFinalTestStates::getData([$this->usr_id]);
 		$usr_id = $this->usr_id;
@@ -279,15 +219,8 @@ class ilParticipationCertificateSingleResultTableGUI extends ilTable2GUI {
 		return $rec_array;
 	}
 
-
-	/**
-	 * @param object $points
-	 * @param int $req_percentage
-	 * @param object $tries
-	 *
-	 * @return string
-	 */
-	protected function buildProgressBar($points, $required_percent = 0, $tries) {
+	protected function buildProgressBar($points, int $required_percent, object $tries): string
+    {
 		$points = $points[0];
 		$tooltip_id = "prg_";
 
@@ -300,7 +233,7 @@ class ilParticipationCertificateSingleResultTableGUI extends ilTable2GUI {
 			$current_percent = 0;
 		}
 		//required to dodge bug in ilContainerObjectiveGUI::renderProgressBar
-		if ($required_percent == 0) {
+		if ($required_percent === 0) {
 			$required_percent = 0.1;
 		}
 
@@ -317,11 +250,8 @@ class ilParticipationCertificateSingleResultTableGUI extends ilTable2GUI {
 		return ilContainerObjectiveGUI::renderProgressBar($current_percent, $required_percent, $css_class, '', NULL, $tooltip_id, '');
 	}
 
-
-	/**
-	 * @param array $a_set
-	 */
-	public function fillRow($a_set) {
+	public function fillRow(array $a_set): void
+    {
 
 		foreach ($this->getSelectableColumns() as $k => $v) {
 
@@ -354,14 +284,8 @@ class ilParticipationCertificateSingleResultTableGUI extends ilTable2GUI {
 		}
 	}
 
-
-	/**
-	 * @param int $id
-	 * @param array $array
-	 *
-	 * @return bool
-	 */
-	function searchForId($id, $array) {
+	function searchForId(int $id, array $array): bool
+    {
 		foreach ($array as $key => $val) {
 			if ($val->getSuggObjectiveId() == $id) {
 				return true;

@@ -1,90 +1,61 @@
 <?php
 
-class NewLearningObjectiveScore {
+class NewLearningObjectiveScore
+{
 
-	protected $course_obj_id;
-	protected $user_id;
-	protected $score;
-	protected $objectiveId;
-	protected $title;
+    protected int $course_obj_id;
+    protected int $user_id;
+    protected int $score;
+    protected int $objectiveId;
+    protected string $title;
 
+    public function getCourseObjId(): int
+    {
+        return $this->course_obj_id;
+    }
 
-	/**
-	 * @return mixed
-	 */
-	public function getCourseObjId() {
-		return $this->course_obj_id;
-	}
+    public function setCourseObjId(int $course_obj_id): void
+    {
+        $this->course_obj_id = $course_obj_id;
+    }
 
+    public function getUserId(): int
+    {
+        return $this->user_id;
+    }
 
-	/**
-	 * @param mixed $course_obj_id
-	 */
-	public function setCourseObjId($course_obj_id) {
-		$this->course_obj_id = $course_obj_id;
-	}
+    public function setUserId(int $user_id): void
+    {
+        $this->user_id = $user_id;
+    }
 
+    public function getScore(): int
+    {
+        return $this->score;
+    }
 
-	/**
-	 * @return mixed
-	 */
-	public function getUserId() {
-		return $this->user_id;
-	}
+    public function setScore(int $score): void
+    {
+        $this->score = $score;
+    }
 
+    public function getObjectiveId(): int
+    {
+        return $this->objectiveId;
+    }
 
-	/**
-	 * @param mixed $user_id
-	 */
-	public function setUserId($user_id) {
-		$this->user_id = $user_id;
-	}
+    public function setObjectiveId(int $objectiveId): void
+    {
+        $this->objectiveId = $objectiveId;
+    }
 
+    public function getTitle(): string
+    {
+        return $this->title;
+    }
 
-	/**
-	 * @return mixed
-	 */
-	public function getScore() {
-		return $this->score;
-	}
-
-
-	/**
-	 * @param mixed $score
-	 */
-	public function setScore($score) {
-		$this->score = $score;
-	}
-
-
-	/**
-	 * @return mixed
-	 */
-	public function getObjectiveId() {
-		return $this->objectiveId;
-	}
-
-
-	/**
-	 * @param mixed $objectiveId
-	 */
-	public function setObjectiveId($objectiveId) {
-		$this->objectiveId = $objectiveId;
-	}
-
-
-	/**
-	 * @return mixed
-	 */
-	public function getTitle() {
-		return $this->title;
-	}
-
-
-	/**
-	 * @param mixed $title
-	 */
-	public function setTitle($title) {
-		$this->title = $title;
-	}
+    public function setTitle(string $title): void
+    {
+        $this->title = $title;
+    }
 }

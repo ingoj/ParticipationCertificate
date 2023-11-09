@@ -4,7 +4,8 @@ use SRAG\ILIAS\Plugins\LearningObjectiveSuggestions\Score\LearningObjectiveScore
 
 class NewLearningObjectiveScores {
 
-	public static function getData($usr_id) {
+	public static function getData(int $usr_id): array
+    {
 		global $DIC;
 		$ilDB = $DIC->database();
 		$result = $ilDB->query(self::getSQL($usr_id));
@@ -24,7 +25,8 @@ class NewLearningObjectiveScores {
 	}
 
 
-	protected static function getSQL($usr_id) {
+	protected static function getSQL(int $usr_id): string
+    {
 		global $DIC;
 		$ilDB = $DIC->database();
 		$select = "select * from " . LearningObjectiveScore::TABLE_NAME . "

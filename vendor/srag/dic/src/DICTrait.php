@@ -11,9 +11,7 @@ use srag\DIC\Version\VersionInterface;
 /**
  * Trait DICTrait
  *
- * @package srag\DIC
- *
- * @author  studer + raimann ag - Team Custom 1 <support-custom1@studer-raimann.ch>
+ * @package srag\DIC\AttendanceList
  */
 trait DICTrait
 {
@@ -80,7 +78,7 @@ trait DICTrait
     /**
      * @throws DICException Your class needs to implement the PLUGIN_CLASS_NAME constant!
      */
-    private static final function checkPluginClassNameConst()/*: void*/
+    private static function checkPluginClassNameConst() : void
     {
         if (!defined("static::PLUGIN_CLASS_NAME") || empty(static::PLUGIN_CLASS_NAME)) {
             throw new DICException("Your class needs to implement the PLUGIN_CLASS_NAME constant!", DICException::CODE_MISSING_CONST_PLUGIN_CLASS_NAME);

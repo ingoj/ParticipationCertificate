@@ -18,20 +18,13 @@ class ilParticipationCertificateConfig extends ActiveRecord {
 	const CONFIG_VALUE_TYPE_CERT_TEXT = 1;
 	const CONFIG_VALUE_TYPE_OTHER = 2;
 
-
-	/**
-	 * @return string
-	 */
-	public function getConnectorContainerName() {
+	public function getConnectorContainerName(): string
+    {
 		return self::TABLE_NAME;
 	}
 
-
-	/**
-	 * @return string
-	 * @deprecated
-	 */
-	public static function returnDbTableName() {
+	public static function returnDbTableName(): string
+    {
 		return self::TABLE_NAME;
 	}
 
@@ -39,17 +32,8 @@ class ilParticipationCertificateConfig extends ActiveRecord {
 		parent::__construct($primary_key, $connector);
 	}
 
-
-	/**
-	 * @param string      $config_key
-	 * @param int         $group_ref_id
-	 * @param int         $config_type
-	 * @param int         $config_value_type
-	 * @param string|null $default
-	 *
-	 * @return string|null
-	 */
-	static function getConfig($config_key, $group_ref_id = 0, $config_type = self::CONFIG_SET_TYPE_GROUP, $config_value_type = self::CONFIG_VALUE_TYPE_OTHER, $default = NULL) {
+	static function getConfig(string $config_key, int $group_ref_id = 0, int $config_type = self::CONFIG_SET_TYPE_GROUP, int $config_value_type = self::CONFIG_VALUE_TYPE_OTHER, ?string $default = NULL): ?string
+    {
 		/**
 		 * @var ilParticipationCertificateConfig|null $config
 		 */
@@ -68,16 +52,8 @@ class ilParticipationCertificateConfig extends ActiveRecord {
 		}
 	}
 
-
-	/**
-	 * @param string      $config_key
-	 * @param string|null $config_value
-	 * @param int         $group_ref_id
-	 * @param int         $config_type
-	 * @param int         $config_value_type
-	 * @param int         $group_ref_id
-	 */
-	static function setConfig($config_key, $config_value, $group_ref_id = 0, $config_type = self::CONFIG_SET_TYPE_GROUP, $config_value_type = self::CONFIG_VALUE_TYPE_OTHER) {
+	static function setConfig(string $config_key, ?string $config_value, int $group_ref_id = 0, int $config_type = self::CONFIG_SET_TYPE_GROUP, int $config_value_type = self::CONFIG_VALUE_TYPE_OTHER): void
+    {
 		/**
 		 * @var ilParticipationCertificateConfig|null $config
 		 */
@@ -120,7 +96,7 @@ class ilParticipationCertificateConfig extends ActiveRecord {
 	 * @db_is_primary   true
 	 * @db_sequence     true
 	 */
-	protected $id = 0;
+	protected ?int $id = 0;
 	/**
 	 * @var int
 	 *
@@ -129,7 +105,7 @@ class ilParticipationCertificateConfig extends ActiveRecord {
 	 * @con_is_notnull  true
 	 * @db_length       8
 	 */
-	protected $config_type;
+	protected int $config_type;
 	/**
 	 * @var int
 	 *
@@ -138,7 +114,7 @@ class ilParticipationCertificateConfig extends ActiveRecord {
 	 * @con_is_notnull  true
 	 * @db_length       8
 	 */
-	protected $group_ref_id = 0;
+	protected int $group_ref_id = 0;
 	/**
 	 * @var int
 	 *
@@ -147,7 +123,7 @@ class ilParticipationCertificateConfig extends ActiveRecord {
 	 * @con_is_notnull  true
 	 * @db_length       8
 	 */
-	protected $global_config_id = 0;
+	protected int $global_config_id = 0;
 	/**
 	 * @var int
 	 *
@@ -156,7 +132,7 @@ class ilParticipationCertificateConfig extends ActiveRecord {
 	 * @con_is_notnull  true
 	 * @db_length       8
 	 */
-	protected $config_value_type;
+	protected int $config_value_type;
 	/**
 	 * @var string
 	 *
@@ -165,7 +141,7 @@ class ilParticipationCertificateConfig extends ActiveRecord {
 	 * @con_is_notnull  true
 	 * @db_length       1024
 	 */
-	protected $config_key;
+	protected string $config_key;
 	/**
 	 * @var string
 	 *
@@ -173,7 +149,7 @@ class ilParticipationCertificateConfig extends ActiveRecord {
 	 * @db_fieldtype    text
 	 * @db_length       1024
 	 */
-	protected $config_value;
+	protected string $config_value = "";
 	/**
 	 * @var int
 	 *
@@ -182,33 +158,19 @@ class ilParticipationCertificateConfig extends ActiveRecord {
 	 * @con_is_notnull  true
 	 * @db_length       8
 	 */
-	protected $order_by = 0;
+	protected int $order_by = 0;
 
 
 	/**
 	 * Get a path where the template layout file and static assets are stored
-	 *
-	 * @param string $type
-	 * @param string $path_type absolute|relative
-	 * @param int    $grp_ref_id
-	 * @param bool   $create
-	 *
-	 * @return string
 	 */
-	public static function getFileStoragePath($type = 'img', $path_type = "absolute", $grp_ref_id = 0, $create = false) {
-
-
-		switch ($path_type) {
-			case "absolute":
-				$path = CLIENT_WEB_DIR . '/dhbw_part_cert';
-				break;
-			case "relative":
-				$path = ilUtil::getWebspaceDir() . '/dhbw_part_cert';
-				break;
-			default:
-				$path = CLIENT_WEB_DIR . '/dhbw_part_cert';
-				break;
-		}
+	public static function getFileStoragePath(string $type = 'img', string $path_type = "absolute", int $grp_ref_id = 0, bool $create = false): string
+    {
+        $path = match ($path_type) {
+            "absolute" => CLIENT_WEB_DIR . '/dhbw_part_cert',
+            "relative" => ilUtil::getWebspaceDir() . '/dhbw_part_cert',
+            default => CLIENT_WEB_DIR . '/dhbw_part_cert',
+        };
 
 		if ($grp_ref_id) {
 			$path = $path . '/' . $grp_ref_id;
@@ -232,15 +194,8 @@ class ilParticipationCertificateConfig extends ActiveRecord {
 		}
 	}
 
-
-	/**
-	 * @param array  $file_data
-	 * @param int    $template_id
-	 * @param string $file_name
-	 *
-	 * @return string
-	 */
-	public static function storePicture(array $file_data, $template_id = 0, $file_name) {
+	public static function storePicture(array $file_data, int $template_id, string $file_name): string
+    {
 
 		self::deletePicture($template_id, $file_name);
 
@@ -250,12 +205,8 @@ class ilParticipationCertificateConfig extends ActiveRecord {
 		return self::returnPicturePath("relative", $template_id, $file_name);
 	}
 
-
-	/**
-	 * @param int    $template_id
-	 * @param string $file_name
-	 */
-	public static function deletePicture($template_id = 0, $file_name) {
+	public static function deletePicture(int $template_id, string $file_name): void
+    {
 		$file_path = self::returnPicturePath('absolute', $template_id, $file_name);
 
 		if (is_file($file_path)) {
@@ -270,140 +221,94 @@ class ilParticipationCertificateConfig extends ActiveRecord {
 	 *
 	 * @return string
 	 */
-	public static function returnPicturePath($path_type = 'absolute', $grp_ref_id = 0, $file_name) {
+	public static function returnPicturePath(string $path_type, int $grp_ref_id, $file_name): string
+    {
 		return self::getFileStoragePath('img', $path_type, $grp_ref_id, true) . $file_name;
 	}
 
-
-	/**
-	 * @return int
-	 */
-	public function getId() {
+	public function getId(): int
+    {
 		return $this->id;
 	}
 
-
-	/**
-	 * @param int $id
-	 */
-	public function setId($id) {
+	public function setId(int $id): void
+    {
 		$this->id = $id;
 	}
 
-
-	/**
-	 * @return string
-	 */
-	public function getConfigKey() {
+	public function getConfigKey(): string
+    {
 		return $this->config_key;
 	}
 
-
-	/**
-	 * @param string $config_key
-	 */
-	public function setConfigKey($config_key) {
+	public function setConfigKey(string $config_key): void
+    {
 		$this->config_key = $config_key;
 	}
 
-
-	/**
-	 * @return string
-	 */
-	public function getConfigValue() {
+	public function getConfigValue(): string
+    {
 		return $this->config_value;
 	}
 
 
-	/**
-	 * @param string $config_value
-	 */
-	public function setConfigValue($config_value) {
+	public function setConfigValue(string $config_value): void
+    {
 		$this->config_value = $config_value;
 	}
 
-
-	/**
-	 * @return int
-	 */
-	public function getConfigType() {
+	public function getConfigType(): int
+    {
 		return $this->config_type;
 	}
 
-
-	/**
-	 * @param int $config_type
-	 */
-	public function setConfigType($config_type) {
+	public function setConfigType(int $config_type): void
+    {
 		$this->config_type = $config_type;
 	}
 
-
-	/**
-	 * @return int
-	 */
-	public function getConfigValueType() {
+	public function getConfigValueType(): int
+    {
 		return $this->config_value_type;
 	}
 
-
-	/**
-	 * @param int $config_value_type
-	 */
-	public function setConfigValueType($config_value_type) {
+	public function setConfigValueType(int $config_value_type): void
+    {
 		$this->config_value_type = $config_value_type;
 	}
 
-
-	/**
-	 * @return int
-	 */
-	public function getGroupRefId() {
+	public function getGroupRefId(): int
+    {
 		return $this->group_ref_id;
 	}
 
-
-	/**
-	 * @param int $group_ref_id
-	 */
-	public function setGroupRefId($group_ref_id) {
+	public function setGroupRefId(int $group_ref_id): void
+    {
 		$this->group_ref_id = $group_ref_id;
 	}
 
-
-	/**
-	 * @return int
-	 */
-	public function getGlobalConfigId() {
+	public function getGlobalConfigId(): int
+    {
 		return $this->global_config_id;
 	}
 
-
-	/**
-	 * @param int $global_config_id
-	 */
-	public function setGlobalConfigId($global_config_id) {
+	public function setGlobalConfigId(int $global_config_id): void
+    {
 		$this->global_config_id = $global_config_id;
 	}
 
-
-	/**
-	 * @return int
-	 */
-	public function getOrderBy() {
+	public function getOrderBy(): int
+    {
 		return $this->order_by;
 	}
 
-
-	/**
-	 * @param int $order
-	 */
-	public function setOrderBy($order_by) {
+	public function setOrderBy(int $order_by): void
+    {
 		$this->order_by = $order_by;
 	}
 
-
-	public static function returnDefaultValuesTypeOther() {
+	public static function returnDefaultValuesTypeOther(): array
+    {
 
 		return array(
 			'udf_firstname' => 0,
@@ -414,7 +319,4 @@ class ilParticipationCertificateConfig extends ActiveRecord {
 			'Logo' => null,
 		);
 	}
-
-
-
 }

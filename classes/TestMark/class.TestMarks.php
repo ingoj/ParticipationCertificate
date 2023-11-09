@@ -3,11 +3,10 @@
 class TestMarks {
 
 	/**
-	 * @param array $arr_usr_ids
-	 *
 	 * @return ilIassState[]
 	 */
-	public static function getData($test_obj) {
+	public static function getData(int $test_obj): array
+    {
 		global $DIC;
 		$ilDB = $DIC->database();
 		$result = $ilDB->query(self::getSQL($test_obj));
@@ -21,14 +20,8 @@ class TestMarks {
 
 		return $mark_data;
 	}
-
-
-	/**
-	 * @param array $arr_usr_ids
-	 *
-	 * @return string
-	 */
-	protected static function getSQL($test_obj) {
+	protected static function getSQL(int $test_obj): string
+    {
 		global $DIC;
 		$ilDB = $DIC->database();
 		$select = "Select passed, mark_id,minimum_level from tst_tests 
@@ -38,5 +31,3 @@ class TestMarks {
 		return $select;
 	}
 }
-
-?>

@@ -4,7 +4,8 @@ use SRAG\ILIAS\Plugins\LearningObjectiveSuggestions\Config\CourseConfig;
 
 class getFineWeights {
 
-	public static function getData() {
+	public static function getData(): getFineWeight
+    {
 		global $DIC;
 		$ilDB = $DIC->database();
 		$result = $ilDB->query(self::getSQL());
@@ -49,8 +50,8 @@ class getFineWeights {
 		return $weights;
 	}
 
-
-	protected static function getSQL() {
+	protected static function getSQL(): string
+    {
 		$select = "select * from " . CourseConfig::TABLE_NAME;
 
 		return $select;

@@ -7,6 +7,7 @@ require_once __DIR__ . "/../vendor/autoload.php";
 /**
  * Class ilParticipationCertificateConfigGUI
  * @author       Silas Stulz <sst@studer-raimann.ch>
+ * @ilCtrl_IsCalledBy  ilParticipationCertificateConfigGUI: ilObjComponentSettingsGUI
  * @ilCtrl_Calls ilParticipationCertificateConfigGUI: ilParticipationCertificatePDFGenerator
  */
 class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI
@@ -26,62 +27,20 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI
     const CMD_SAVE = 'save';
     const CMD_SAVE_ORDER = 'saveOrder';
     const CMD_CANCEL = 'cancel';
-    /**
-     * @var ilParticipationCertificateConfig
-     */
-    protected $object;
-    /**
-     * @var ilParticipationCertificatePlugin
-     */
-    protected $pl;
-    /**
-     * @var ilTemplate
-     */
-    protected $tpl;
-    /**
-     * @var ilCtrl
-     */
-    protected $ctrl;
-    /**
-     * @var ilParticipationCertificateConfigSetTableGUI
-     */
-    protected $table;
-    /**
-     * @var ilTabsGUI
-     */
-    protected $tabs;
-    /**
-     * @var ilToolbarGUI
-     */
-    protected $ilToolbar;
-    /**
-     * @var ilGroupParticipants
-     */
-    protected $learnGroupParticipants;
-    /**
-     * @var ilObjCourse
-     */
-    protected $courseobject;
-    /**
-     * @var ilDB
-     */
-    protected $db;
-    /**
-     * @var mixed
-     */
-    public $dropValues;
-    /**
-     * @var
-     */
-    public $surname;
-    /**
-     * @var
-     */
-    public $lastname;
-    /**
-     * @var
-     */
-    public $gender;
+    protected ilParticipationCertificateConfig $object;
+    protected ilParticipationCertificatePlugin $pl;
+    protected ilTemplate|ilGlobalTemplateInterface $tpl;
+    protected ilCtrl|ilCtrlInterface $ctrl;
+    protected ilParticipationCertificateConfigSetTableGUI $table;
+    protected ilTabsGUI $tabs;
+    protected ilToolbarGUI $ilToolbar;
+    protected ilGroupParticipants $learnGroupParticipants;
+    protected ilObjCourse $courseobject;
+    protected ilDBInterface $db;
+    public mixed $dropValues;
+    public string $surname;
+    public string $lastname;
+    public string $gender;
     /**
      * ilParticipationCertificateConfigGUI constructor.
      */
@@ -96,10 +55,7 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI
         $this->pl = ilParticipationCertificatePlugin::getInstance();
     }
 
-    /**
-     * @param string $cmd
-     */
-    function performCommand($cmd)
+    function performCommand(string $cmd): void
     {
         switch ($cmd) {
             default:
@@ -121,7 +77,7 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI
         }
     }
 
-    public function addConfig()
+    public function addConfig(): void
     {
         $gl_configs = new ilParticipationCertificateGlobalConfigSets();
         $gl_config = $gl_configs->getDefaultConfig();
@@ -134,7 +90,7 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI
         $this->ctrl->redirect($this, self::CMD_SHOW_FORM);
     }
 
-    public function createTemplateFromLocalConfig()
+    public function createTemplateFromLocalConfig(): void
     {
         $grp_ref_id = (int) filter_input(INPUT_GET, 'grp_ref_id');
 
@@ -151,7 +107,10 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI
         $this->ctrl->redirect($this, self::CMD_SHOW_FORM);
     }
 
-    public function copyConfig()
+    /**
+     * @throws ilCtrlException
+     */
+    public function copyConfig(): void
     {
         $id = (int) filter_input(INPUT_GET, 'id');
 
@@ -166,10 +125,9 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI
         $this->ctrl->setParameter($this, "id", $new_config_set->getId());
         $this->ctrl->setParameter($this, "set_type", ilParticipationCertificateConfig::CONFIG_SET_TYPE_TEMPLATE);
         $this->ctrl->redirect($this, self::CMD_SHOW_FORM);
-
     }
 
-    public function resetConfig()
+    public function resetConfig(): void
     {
         global $DIC;
 
@@ -287,10 +245,12 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI
 
         ilUtil::sendSuccess($this->pl->txt('config_reseted'), true);
         $DIC->ctrl()->redirect($this, self::CMD_CONFIGURE);
-
     }
 
-    public function confirm_reset_config()
+    /**
+     * @throws ilCtrlException
+     */
+    public function confirm_reset_config(): void
     {
         global $DIC;
 
@@ -306,7 +266,10 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI
         $DIC->ui()->mainTemplate()->setContent($confirmation->getHTML());
     }
 
-    public function deleteConfig()
+    /**
+     * @throws ilCtrlException
+     */
+    public function deleteConfig(): void
     {
         $id = filter_input(INPUT_GET, 'id');
 
@@ -326,7 +289,10 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI
         $this->ctrl->redirect($this, self::CMD_CONFIGURE);
     }
 
-    public function setActive()
+    /**
+     * @throws ilCtrlException
+     */
+    public function setActive(): void
     {
         $id = filter_input(INPUT_GET, 'id');
 
@@ -337,7 +303,10 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI
         $this->ctrl->redirect($this, self::CMD_CONFIGURE);
     }
 
-    public function setInactive()
+    /**
+     * @throws ilCtrlException
+     */
+    public function setInactive(): void
     {
         $id = filter_input(INPUT_GET, 'id');
 
@@ -352,7 +321,11 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI
         $this->ctrl->redirect($this, self::CMD_CONFIGURE);
     }
 
-    public function saveOrder()
+    /**
+     * @throws ilCtrlException
+     * @throws Exception
+     */
+    public function saveOrder(): void
     {
 
         $configs = new ilParticipationCertificateGlobalConfigSets();
@@ -361,44 +334,36 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI
         $this->ctrl->redirect($this, self::CMD_CONFIGURE);
     }
 
-    /**
-     * Configure
-     */
-    public function showErrForm()
+    public function showErrForm(): void
     {
 	    self::showForm(true);
     }
 
-    /**
-     * Show Form
-     */
 
-    public function showForm($err=false)
+    /**
+     * @throws arException
+     * @throws ilCtrlException
+     */
+    public function showForm(bool $err=false): void
     {
         $id = filter_input(INPUT_GET, 'id');
         $set_type = filter_input(INPUT_GET, 'set_type');
 
         $this->ctrl->setParameter($this, "id", $id);
-        if (method_exists($this->tpl, 'loadStandardTemplate')) {
-            	$this->tpl->loadStandardTemplate();
-        	} else {
-		$this->tpl->getStandardTemplate();
-	}
+        $this->tpl->loadStandardTemplate();
 
         $form = $this->initForm($id, $set_type);
-	$this->tpl->setContent($form->getHTML());
-	if ($id == 0 and $set_type == 3 and $err) {
-		ilUtil::sendFailure($this->pl->txt("nonnumeric_ref"));
-	}
+	    $this->tpl->setContent($form->getHTML());
+        if ($id == 0 and $set_type == 3 and $err) {
+            ilUtil::sendFailure($this->pl->txt("nonnumeric_ref"));
+        }
     }
 
     /**
      * @throws arException
-     * @param int $configset_type
-     * @return ilPropertyFormGUI
-     * @param int $global_config_id
+     * @throws ilCtrlException
      */
-    public function initForm($global_config_id = 0, $configset_type)
+    public function initForm(int $global_config_id, int $configset_type): ilPropertyFormGUI
     {
         global $DIC;
 
@@ -505,10 +470,7 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI
         return $form;
     }
 
-    /**
-     * @return array
-     */
-    protected function getUdfDropdownValues()
+    protected function getUdfDropdownValues(): array
     {
 
         $sql = "SELECT * FROM udf_definition";
@@ -524,9 +486,10 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI
     }
 
     /**
-     * @return bool
+     * @throws arException
+     * @throws ilCtrlException
      */
-    public function save()
+    public function save(): bool
     {
         global $DIC;
         $global_config_id = filter_input(INPUT_GET, 'id');
@@ -627,21 +590,17 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI
                 }
                 break;
         }
-	if ($this->err_helper) {
-		$this->ctrl->redirect($this, self::CMD_SHOW_FORM_ERR);
+	    if ($this->err_helper) {
+		    $this->ctrl->redirect($this, self::CMD_SHOW_FORM_ERR);
 		} else {
         	$this->ctrl->redirect($this, self::CMD_CONFIGURE);
 		}
-	return true;
+	    return true;
     }
 
-    public function configure()
+    public function configure(): void
     {
-        if (method_exists($this->tpl, 'loadStandardTemplate')) {
-            $this->tpl->loadStandardTemplate();
-        } else {
-$this->tpl->getStandardTemplate();
-}
+        $this->tpl->loadStandardTemplate();
 
         $this->initTable();
 

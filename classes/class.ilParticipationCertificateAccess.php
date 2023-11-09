@@ -4,35 +4,17 @@ require_once __DIR__ . "/../vendor/autoload.php";
 use srag\Plugins\UserDefaults\UserSearch\usrdefObj;
 
 class ilParticipationCertificateAccess {
-
-	/**
-	 * @var ilParticipationCertificatePlugin
-	 */
-	protected $pl;
-	/**
-	 * @var int
-	 */
-	protected $group_ref_id;
-	/**
-	 * @var ilAccessHandler
-	 */
-	protected $access;
-	/**
-	 * @var ilObjUser
-	 */
-	protected $usr;
-	/**
-	 * @var ilDB
-	 */
-	protected $db;
+	protected ilParticipationCertificatePlugin $pl;
+	protected int $group_ref_id;
+	protected ilAccessHandler $access;
+	protected ilObjUser $usr;
+	protected ilDBInterface $db;
 
 
 	/**
 	 * ilParticipationCertificateAccess constructor.
-	 *
-	 * @param int $group_ref_id
 	 */
-	public function __construct($group_ref_id) {
+	public function __construct(int $group_ref_id) {
 		global $DIC;
 		$this->pl = ilParticipationCertificatePlugin::getInstance();
 		$this->group_ref_id = $group_ref_id;
@@ -42,7 +24,8 @@ class ilParticipationCertificateAccess {
 	}
 
 
-	public function hasCurrentUserWriteAccess() {
+	public function hasCurrentUserWriteAccess(): bool
+	{
 		if ($this->access->checkAccess("write", "", $this->group_ref_id)) {
 			return true;
 		}
@@ -54,7 +37,8 @@ class ilParticipationCertificateAccess {
 	}
 
 
-	public function hasCurrentUserAdminAccess() {
+	public function hasCurrentUserAdminAccess(): bool
+	{
 		if ($this->access->checkAccess("write", "", $this->group_ref_id)) {
 			return true;
 		}
@@ -62,13 +46,17 @@ class ilParticipationCertificateAccess {
 		return false;
 	}
 
-	public function hasCurrentUserPrintAccess() {
+	/**
+	 * @throws Exception
+	 */
+	public function hasCurrentUserPrintAccess(): bool
+	{
 		if ($this->hasCurrentUserWriteAccess()) {
 			return true;
 		}
 		// find users data for firstname and lastname, return false if length = 0 for at least one
 		$usrdata = new ilPartCertUsersData;
-		$curr_user[] = $this->usr->id;
+		$curr_user[] = $this->usr->getId();
 		$first = $usrdata->getData($curr_user)[$curr_user[0]]->getPartCertFirstname();
 		$last = $usrdata->getData($curr_user)[$curr_user[0]]->getPartCertLastname();
 
@@ -79,7 +67,11 @@ class ilParticipationCertificateAccess {
 		return ($this->isSelfPrintEnabled());
 	}
 
-	public function isSelfPrintEnabled() {
+	/**
+	 * @throws Exception
+	 */
+	public function isSelfPrintEnabled(): bool
+	{
 		// formerly hasCurrentUserPrintAccess
 		$enable_self_print = boolval(ilParticipationCertificateConfig::getConfig("enable_self_print", $this->group_ref_id));
 
@@ -95,7 +87,8 @@ class ilParticipationCertificateAccess {
 	}
 
 
-	public function hasCurrentUserReadAccess() {
+	public function hasCurrentUserReadAccess(): bool
+	{
 		if ($this->access->checkAccess("read", "", $this->group_ref_id)) {
 			return true;
 		}
@@ -104,7 +97,8 @@ class ilParticipationCertificateAccess {
 	}
 
 
-	public function hasCurrentUserSpecialAccess() {
+	public function hasCurrentUserSpecialAccess(): bool
+	{
 		if ($this->access->checkAccess("read_learning_progress", "", $this->group_ref_id)) {
 			return true;
 		}
@@ -113,7 +107,8 @@ class ilParticipationCertificateAccess {
 	}
 
 
-	public function getUserIdsOfGroup() {
+	public function getUserIdsOfGroup(): array
+	{
 		if ($this->hasCurrentUserWriteAccess() || $this->hasCurrentUserSpecialAccess()) {
 			$objecttype = ilObject::_lookupType($this->group_ref_id, true);
 			if ($objecttype != 'grp' and $objecttype != 'crs') {
@@ -140,5 +135,3 @@ class ilParticipationCertificateAccess {
 		return array();
 	}
 }
-
-?>

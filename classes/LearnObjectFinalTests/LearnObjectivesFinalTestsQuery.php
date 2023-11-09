@@ -1,15 +1,17 @@
 <?php
 
-class LearnObjectivesFinalTestsQuery {
+class LearnObjectivesFinalTestsQuery
+{
 
-	const DEFAULT_TMP_TABLE_NAME = 'tmp_learn_objectives_final_tests';
+    const DEFAULT_TMP_TABLE_NAME = 'tmp_learn_objectives_final_tests';
 
 
-	public function getSQL() {
+    public function getSQL(): string
+    {
 
-		$this->createTemporaryTableReqPercentage();
+        $this->createTemporaryTableReqPercentage();
 
-		return "SELECT 
+        return "SELECT 
     crs_objectives.crs_id,
     object_crs.title AS crs_title,
     crs_objectives.objective_id AS crs_objective_id,
@@ -31,42 +33,39 @@ FROM
         LEFT JOIN
     tmp_req_percentage ON tmp_req_percentage.container_id =  crs_objectives.crs_id and tmp_req_percentage.objective_id = crs_objectives.objective_id
 ";
-	}
+    }
+
+    public function createTemporaryTable(string $table_name = self::DEFAULT_TMP_TABLE_NAME): void
+    {
+        global $DIC;
+        $ilDB = $DIC->database();
 
 
-	/**
-	 * @param string $table_name
-	 */
-	public function createTemporaryTable($table_name = self::DEFAULT_TMP_TABLE_NAME) {
-		global $DIC;
-		$ilDB = $DIC->database();
+        $sql = "CREATE Temporary Table IF NOT Exists $table_name  (INDEX cob (crs_id, crs_objective_id)) (" . $this->getSQL() . ")";
+        //echo $sql."; ";
+        $ilDB->query($sql);
+    }
+
+    private function createTemporaryTableReqPercentage(): void
+    {
+        global $DIC;
+        $ilDB = $DIC->database();
+
+        $sql = "CREATE Temporary Table IF NOT Exists tmp_req_percentage  (INDEX obi (objective_id)) (" . $this->getSqlReqPercentage() . ")";
+
+        //echo $sql . "; ";
+        $ilDB->query($sql);
+    }
 
 
-		$sql = "CREATE Temporary Table IF NOT Exists $table_name  (INDEX cob (crs_id, crs_objective_id)) (" . $this->getSQL() . ")";
-		//echo $sql."; ";
-		$ilDB->query($sql);
-	}
-
-
-	private function createTemporaryTableReqPercentage($table_name = "tmp_req_percentage") {
-
-		global $DIC;
-		$ilDB = $DIC->database();
-
-		$sql = "CREATE Temporary Table IF NOT Exists $table_name  (INDEX obi (objective_id)) (" . $this->getSqlReqPercentage() . ")";
-
-		//echo $sql . "; ";
-		$ilDB->query($sql);
-	}
-
-
-	private function getSqlReqPercentage() {
-		return "SELECT tst_id, 
+    private function getSqlReqPercentage(): string
+    {
+        return "SELECT tst_id, 
 objective_id, 
 container_id, 
 percentage, 
 max(qp_seq) 
 from loc_rnd_qpl 
 group by tst_id, objective_id, container_id,percentage";
-	}
+    }
 }

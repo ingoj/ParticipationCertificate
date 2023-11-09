@@ -1,192 +1,102 @@
 <?php
 
 class ilCrsInitialTestState {
+	protected int $crsitest_usr_id;
+	protected int $crsitest_crs_obj_id;
+	protected int $crsitest_crs_ref_id;
+	protected string $crsitest_crs_title;
+	protected int $crsitest_itest_ref_id;
+	protected int $crsitest_itest_obj_id;
+	protected string $crsitest_itest_title;
+	protected int $crsitest_itest_tries;
+	protected int $crsitest_itest_submitted;
 
-	/**
-	 * @var int
-	 */
-	protected $crsitest_usr_id;
-	/**
-	 *
-	 * @var int
-	 */
-	protected $crsitest_crs_obj_id;
-	/**
-	 *
-	 * @var int
-	 */
-	protected $crsitest_crs_ref_id;
-	/**
-	 * @var string
-	 */
-	protected $crsitest_crs_title;
-	/**
-	 *
-	 * @var int
-	 */
-	protected $crsitest_itest_ref_id;
-	/**
-	 *
-	 * @var int
-	 */
-	protected $crsitest_itest_obj_id;
-	/**
-	 *
-	 * @var string
-	 */
-	protected $crsitest_itest_title;
-	/**
-	*
-	* @var int
-	*/
-	protected $crsitest_itest_tries;
-	/**
-	 *
-	 * @var int
-	 */
-	protected $crsitest_itest_submitted;
-
-
-	/**
-	 * @return int
-	 */
-	public function getCrsitestUsrId() {
+	public function getCrsitestUsrId(): int
+    {
 		return $this->crsitest_usr_id;
 	}
 
-
-	/**
-	 * @param int $crsitest_usr_id
-	 */
-	public function setCrsitestUsrId($crsitest_usr_id) {
+	public function setCrsitestUsrId(int $crsitest_usr_id): void
+    {
 		$this->crsitest_usr_id = $crsitest_usr_id;
 	}
 
-
-	/**
-	 * @return int
-	 */
-	public function getCrsitestCrsObjId() {
+	public function getCrsitestCrsObjId(): int
+    {
 		return $this->crsitest_crs_obj_id;
 	}
 
-
-	/**
-	 * @param int $crsitest_crs_obj_id
-	 */
-	public function setCrsitestCrsObjId($crsitest_crs_obj_id) {
+	public function setCrsitestCrsObjId(int $crsitest_crs_obj_id): void
+    {
 		$this->crsitest_crs_obj_id = $crsitest_crs_obj_id;
 	}
 
-
-	/**
-	 * @return int
-	 */
 	public function getCrsitestCrsRefId():int {
 		return $this->crsitest_crs_ref_id;
 	}
 
-
-	/**
-	 * @param int $crsitest_crs_ref_id
-	 */
-	public function setCrsitestCrsRefId($crsitest_crs_ref_id) {
+	public function setCrsitestCrsRefId(int $crsitest_crs_ref_id): void
+    {
 		$this->crsitest_crs_ref_id = $crsitest_crs_ref_id;
 	}
 
-
-	/**
-	 * @return string
-	 */
-	public function getCrsitestCrsTitle() {
+	public function getCrsitestCrsTitle(): string
+    {
 		return $this->crsitest_crs_title;
 	}
 
-
-	/**
-	 * @param string $crsitest_crs_title
-	 */
-	public function setCrsitestCrsTitle($crsitest_crs_title) {
+	public function setCrsitestCrsTitle(string $crsitest_crs_title): void
+    {
 		$this->crsitest_crs_title = $crsitest_crs_title;
 	}
 
-
-	/**
-	 * @return int
-	 */
-	public function getCrsitestItestRefId() {
+	public function getCrsitestItestRefId(): int
+    {
 		return $this->crsitest_itest_ref_id;
 	}
 
-
-	/**
-	 * @param int $crsitest_itest_ref_id
-	 */
-	public function setCrsitestItestRefId($crsitest_itest_ref_id) {
+	public function setCrsitestItestRefId(int $crsitest_itest_ref_id): void
+    {
 		$this->crsitest_itest_ref_id = $crsitest_itest_ref_id;
 	}
 
-
-	/**
-	 * @return int
-	 */
-	public function getCrsitestItestObjId() {
+	public function getCrsitestItestObjId(): int
+    {
 		return $this->crsitest_itest_obj_id;
 	}
 
-
-	/**
-	 * @param int $crsitest_itest_obj_id
-	 */
-	public function setCrsitestItestObjId($crsitest_itest_obj_id) {
+	public function setCrsitestItestObjId(int $crsitest_itest_obj_id): void
+    {
 		$this->crsitest_itest_obj_id = $crsitest_itest_obj_id;
 	}
 
-
-	/**
-	 * @return string
-	 */
-	public function getCrsitestItestTitle() {
+	public function getCrsitestItestTitle(): string
+    {
 		return $this->crsitest_itest_title;
 	}
 
-
-	/**
-	 * @param string $crsitest_itest_title
-	 */
-	public function setCrsitestItestTitle($crsitest_itest_title) {
+	public function setCrsitestItestTitle(string $crsitest_itest_title): void
+    {
 		$this->crsitest_itest_title = $crsitest_itest_title;
 	}
 
-
-	/**
-	 * @return int
-	 */
-	public function getCrsitestItestTries() {
+	public function getCrsitestItestTries(): int
+    {
 		return $this->crsitest_itest_tries;
 	}
 
-
-	/**
-	 * @param int $crsitest_itest_tries
-	 */
-	public function setCrsitestItestTries($crsitest_itest_tries) {
+	public function setCrsitestItestTries(int $crsitest_itest_tries): void
+    {
 		$this->crsitest_itest_tries = $crsitest_itest_tries;
 	}
 
-
-	/**
-	 * @return int
-	 */
-	public function getCrsitestItestSubmitted() {
+	public function getCrsitestItestSubmitted(): int
+    {
 		return $this->crsitest_itest_submitted;
 	}
 
-
-	/**
-	 * @param int $crsitest_itest_submitted
-	 */
-	public function setCrsitestItestSubmitted($crsitest_itest_submitted) {
+	public function setCrsitestItestSubmitted(int $crsitest_itest_submitted): void
+    {
 		$this->crsitest_itest_submitted = $crsitest_itest_submitted;
 	}
 }

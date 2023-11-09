@@ -8,56 +8,17 @@
  * @ilCtrl_isCalledBy ilParticipationCertificateTwigParser: ilParticipationCertificateGUI, ilParticipationCertificateResultGUI
  */
 class ilParticipationCertificateTwigParser {
+    protected ilParticipationCertificatePlugin $pl;
+    protected int $group_ref_id;
+	protected array $usr_ids;
+	protected int $usr_id;
+	protected bool $ementor;
+	protected bool $footer;
+	protected bool $edited;
+	protected ?array $array;
+	protected \Twig\TemplateWrapper|Twig_TemplateWrapper $twig_template;
 
-	/**
-	 * @var ilParticipationCertificatePlugin
-	 */
-	protected $pl;
-	/**
-	 * @var int
-	 */
-	protected $group_ref_id;
-	/**
-	 * @var array
-	 */
-	protected $usr_ids;
-	/**
-	 * @var array
-	 */
-	protected $usr_id;
-	/**
-	 * @var bool
-	 */
-	protected $ementor;
-	/**
-	 * @var bool
-	 */
-	protected $footer;
-	/**
-	 * @var bool
-	 */
-	protected $edited;
-	/**
-	 * @var array
-	 */
-	protected $array;
-	/**
-	 * @var Twig_TemplateWrapper
-	 */
-	protected $twig_template;
-
-
-	/**
-	 * ilParticipationCertificateTwigParser constructor.
-	 *
-	 * @param int   $group_ref_id
-	 * @param array $twig_options
-	 * @param bool  $ementor
-	 * @param int   $usr_id
-	 * @param bool  $edited
-	 * @param array $array
-	 */
-	public function __construct($group_ref_id = 0, $twig_options = array(), $usr_id, $ementor = true, $edited = false, $array = NULL) {
+	public function __construct(int $group_ref_id, array $twig_options, int $usr_id, bool $ementor = true, bool $edited = false, array|null $array = NULL) {
 		$this->pl = ilParticipationCertificatePlugin::getInstance();
 
 		$this->group_ref_id = $group_ref_id;
@@ -88,9 +49,8 @@ class ilParticipationCertificateTwigParser {
 	}
 
 
-	public function parseData() {
-
-
+	public function parseData(): void
+    {
         $cert_configs = new ilParticipationCertificateConfigs();
         $arr_config = $cert_configs->getObjConfigSetIfNoneCreateDefaultAndCreateNewObjConfigValues($this->group_ref_id);
 
@@ -260,11 +220,8 @@ class ilParticipationCertificateTwigParser {
 		}
 	}
 
-
-	/**
-	 * Bootstrap twig engine
-	 */
-	protected function loadTwig() {
+	protected function loadTwig(): void
+    {
 		static $loaded = false;
 		if (!$loaded) {
 			Twig_Autoloader::register();
@@ -272,5 +229,3 @@ class ilParticipationCertificateTwigParser {
 		}
 	}
 }
-
-?>

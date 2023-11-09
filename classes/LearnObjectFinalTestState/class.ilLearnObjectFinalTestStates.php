@@ -6,17 +6,11 @@ require_once "./Customizing/global/plugins/Services/UIComponent/UserInterfaceHoo
 
 class ilLearnObjectFinalTestStates {
 
-
-
 	/**
-	 * @param array $arr_usr_ids
-	 *
 	 * @return ilLearnObjectFinalTestState[][]
 	 */
-	public static function getData(array $arr_usr_ids = array()) {
-
-
-
+	public static function getData(array $arr_usr_ids = array()): array
+    {
 		global $DIC;
 		$ilDB = $DIC->database();
 		$result = $ilDB->query(self::getSQL($arr_usr_ids));
@@ -45,14 +39,8 @@ class ilLearnObjectFinalTestStates {
 		return $locftst_data;
 	}
 
-
-
-	/**
-	 * @param array $arr_usr_ids
-	 *
-	 * @return string
-	 */
-	protected static function getSQL(array $arr_usr_ids = array()) {
+	protected static function getSQL(array $arr_usr_ids = array()): string
+    {
 		global $DIC;
 		$ilDB = $DIC->database();
 
@@ -66,8 +54,6 @@ class ilLearnObjectFinalTestStates {
 		$learn_objectives_courses_query = new LearnObjectivesCoursesQuery();
 		$learn_objectives_final_tests_query = new LearnObjectivesFinalTestsQuery();
 		$learn_objectives_final_tests_query->createTemporaryTable();
-
-
 
 		$select = "SELECT
 					learn_objective_crs.master_crs_id,
@@ -118,11 +104,8 @@ class ilLearnObjectFinalTestStates {
 		return $select;
 	}
 
-
-	/**
-	 * @param string $table_name
-	 */
-	protected static function createTemporaryTableTestMaxResult($table_name = 'tmp_test_max_result') {
+	protected static function createTemporaryTableTestMaxResult(string $table_name = 'tmp_test_max_result'): void
+    {
 		global $DIC;
 		$ilDB = $DIC->database();
 
@@ -131,12 +114,8 @@ class ilLearnObjectFinalTestStates {
 		$ilDB->query($sql);
 	}
 
-
-	/**
-	 * @param array  $arr_usr_ids
-	 * @param string $table_name
-	 */
-	public static function createTemporaryTableLearnObjectFinalTest(array $arr_usr_ids = array(), $table_name = 'tmp_lo_fin_test') {
+	public static function createTemporaryTableLearnObjectFinalTest(array $arr_usr_ids = array(), string $table_name = 'tmp_lo_fin_test'): void
+    {
 		global $DIC;
 		$ilDB = $DIC->database();
 
@@ -148,5 +127,3 @@ class ilLearnObjectFinalTestStates {
 		$ilDB->query($sql);
 	}
 }
-
-?>

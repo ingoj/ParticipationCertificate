@@ -18,68 +18,57 @@ class ilParticipationCertificatePlugin extends ilUserInterfaceHookPlugin {
 	const PLUGIN_NAME = "ParticipationCertificate";
 	const PLUGIN_CLASS_NAME = self::class;
 	const REMOVE_PLUGIN_DATA_CONFIRM_CLASS_NAME = ParticipationCertificateRemoveDataConfirm::class;
+	protected static ?ilParticipationCertificatePlugin $instance = null;
 
 
-	/**
-	 * @var ilParticipationCertificatePlugin
-	 */
-	protected static $instance;
-
-
-	/**
-	 * @return string
-	 */
-	public function getPluginName() {
+    public function getPluginName(): string
+    {
 		return self::PLUGIN_NAME;
 	}
-
-
-	/**
-	 * @return ilParticipationCertificatePlugin
-	 */
-	public static function getInstance() {
+	public static function getInstance(): ilParticipationCertificatePlugin
+    {
+        global $DIC;
 		if (is_null(self::$instance)) {
-			self::$instance = new self();
+            /** @var $component_factory ilComponentFactory */
+            $component_factory = $DIC['component.factory'];
+            /** @var $plugin ilParticipationCertificatePlugin */
+            $plugin = $component_factory->getPlugin(ilParticipationCertificatePlugin::PLUGIN_ID);
+            self::$instance  = $plugin;
 		}
 
 		return self::$instance;
 	}
+	protected ilDBInterface $db;
 
+    public function __construct(
+        ilDBInterface $db,
+        ilComponentRepositoryWrite $component_repository,
+        string $id
+    ) {
+        global $DIC;
+        parent::__construct($db, $component_repository, $id);
 
-	/**
-	 * @var ilDB
-	 */
-	protected $db;
+        $this->db = $DIC->database();
+    }
 
-
-	/**
-	 *
-	 */
-	public function __construct() {
-		parent::__construct();
-
-		global $DIC;
-
-		$this->db = $DIC->database();
-	}
-
-
-	/**
-	 *
-	 */
-	protected function init() {
+	protected function init(): void
+    {
 		parent::init();
-		require_once __DIR__ . "/../../../../Cron/CronHook/LearningObjectiveSuggestions/vendor/autoload.php";
-		require_once __DIR__ . "/../../../../EventHandling/EventHook/UserDefaults/vendor/autoload.php";
-		require_once __DIR__ . "/../../../../UIComponent/UserInterfaceHook/LearningObjectiveSuggestionsUI/vendor/autoload.php";
+        if(file_exists(__DIR__ . "/../../../../Cron/CronHook/LearningObjectiveSuggestions/vendor/autoload.php")) {
+            require_once __DIR__ . "/../../../../Cron/CronHook/LearningObjectiveSuggestions/vendor/autoload.php";
+        }
+        if(file_exists(__DIR__ . "/../../../../EventHandling/EventHook/UserDefaults/vendor/autoload.php")) {
+            require_once __DIR__ . "/../../../../EventHandling/EventHook/UserDefaults/vendor/autoload.php";
+        }
+        if(file_exists(__DIR__ . "/../../../../UIComponent/UserInterfaceHook/LearningObjectiveSuggestionsUI/vendor/autoload.php")) {
+            require_once __DIR__ . "/../../../../UIComponent/UserInterfaceHook/LearningObjectiveSuggestionsUI/vendor/autoload.php";
+        }
 	}
 
-
-
-	/**
-	 * @inheritdoc
-	 */
-	protected function deleteData()/*: void*/ {
+    /**
+     * @throws \srag\DIC\Exception\DICException
+     */
+    protected function deleteData(): void {
 
 		self::dic()->database()->dropTable(ilParticipationCertificateGlobalConfigSet::TABLE_NAME, false);
 		self::dic()->database()->dropTable(ilParticipationCertificateObjectConfigSet::TABLE_NAME, false);
@@ -91,10 +80,9 @@ class ilParticipationCertificatePlugin extends ilUserInterfaceHookPlugin {
 		self::dic()->database()->dropTable(ilParticipationCertificateConfig::TABLE_NAME, false);
 	}
 
-	/**
-	 * @inheritdoc
-	 */
-	public function updateLanguages($a_lang_keys = null) {
+
+	public function updateLanguages(?array $a_lang_keys = null): void
+    {
 		parent::updateLanguages($a_lang_keys);
 
 		LibraryLanguageInstaller::getInstance()->withPlugin(self::plugin())->withLibraryLanguageDirectory(__DIR__ . "/../vendor/srag/removeplugindataconfirm/lang")

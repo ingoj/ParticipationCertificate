@@ -5,11 +5,10 @@ use SRAG\ILIAS\Plugins\LearningObjectiveSuggestions\Suggestion\LearningObjective
 class getLearnSuggs {
 
 	/**
-	 * @param array $arr_usr_ids
-	 *
 	 * @return ilLearningObjectivesMasterCrs[]
 	 */
-	public static function getData($usr_id) {
+	public static function getData(int $usr_id): array
+    {
 		global $DIC;
 		$ilDB = $DIC->database();
 		$result = $ilDB->query(self::getSQL($usr_id));
@@ -27,7 +26,8 @@ class getLearnSuggs {
 	}
 
 
-	protected static function getSQL($usr_id) {
+	protected static function getSQL(int $usr_id): string
+    {
 		global $DIC;
 		$ilDB = $DIC->database();
 		$select = "SELECT 
@@ -44,5 +44,3 @@ class getLearnSuggs {
 		return $select;
 	}
 }
-
-?>

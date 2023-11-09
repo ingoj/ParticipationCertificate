@@ -10,9 +10,8 @@ class ilParticipationCertificateConfigSets {
 	public function __construct() {
 
 	}
-
-
-	public function getAllConfigSets() {
+	public function getAllConfigSets(): array
+    {
 		global $DIC;
 
 		$q = "SELECT  * from

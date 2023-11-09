@@ -1,36 +1,37 @@
 <?php
+
 use srag\Plugins\UserDefaults\UserSearch\usrdefObj;
 
-class ilLearningObjectivesMasterCrs {
+class ilLearningObjectivesMasterCrs
+{
 
-	/**
-	 * @param array $arr_usr_ids
-	 *
-	 *
-	 * @return ilLearningObjectiveMasterCrs[]
-	 */
-	public static function getData(array $arr_usr_ids = array()) {
-		global $DIC;
-		$ilDB = $DIC->database();
-		$result = $ilDB->query(self::getSQL($arr_usr_ids));
+    /**
+     * @return ilLearningObjectiveMasterCrs[]
+     */
+    public static function getData(array $arr_usr_ids = array()): array
+    {
+        global $DIC;
+        $ilDB = $DIC->database();
+        $result = $ilDB->query(self::getSQL($arr_usr_ids));
 
-		$lo_master_data = array();
-		while ($row = $ilDB->fetchAssoc($result)) {
-			$lo_master = new ilLearningObjectiveMasterCrs();
-			$lo_master->setLoMasterObjectiveTitle($row['lo_master_objective_title']);
-			$lo_master->setLoMasterUsrId($row['lo_master_usr_id']);
+        $lo_master_data = array();
+        while ($row = $ilDB->fetchAssoc($result)) {
+            $lo_master = new ilLearningObjectiveMasterCrs();
+            $lo_master->setLoMasterObjectiveTitle($row['lo_master_objective_title']);
+            $lo_master->setLoMasterUsrId($row['lo_master_usr_id']);
 
-			$lo_master_data[$row['lo_master_usr_id']][] = $lo_master;
-		}
+            $lo_master_data[$row['lo_master_usr_id']][] = $lo_master;
+        }
 
-		return $lo_master_data;
-	}
+        return $lo_master_data;
+    }
 
 
-	protected static function getSQL(array $arr_usr_ids = array()) {
-		global $DIC;
-		$ilDB = $DIC->database();
-		$select = "SELECT 
+    protected static function getSQL(array $arr_usr_ids = array()): string
+    {
+        global $DIC;
+        $ilDB = $DIC->database();
+        $select = "SELECT 
 					DISTINCT 
 					crso.title as lo_master_objective_title,
 					crs_memb.usr_id as lo_master_usr_id
@@ -42,8 +43,6 @@ class ilLearningObjectivesMasterCrs {
 					inner join alo_crs_config as alp_crs on alp_crs.course_obj_id = crs_obj.obj_id
 					WHERE " . $ilDB->in('crs_memb.usr_id', $arr_usr_ids, false, 'integer');
 
-		return $select;
-	}
+        return $select;
+    }
 }
-
-?>

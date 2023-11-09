@@ -6,47 +6,16 @@
  * @author Martin Studer <ms@studer-raimann.ch>
  */
 class ilParticipationCertificateConfigSetTableGUI extends ilTable2GUI {
+	protected ilTabsGUI $tabs;
+    protected ilCtrl $ctrl;
+	protected ?object $parent_obj;
+	protected ilParticipationCertificatePlugin $pl;
+	protected array $filter = array();
+	protected array $custom_export_formats = array();
+	protected array $custom_export_generators = array();
+	protected array $usr_ids;
 
-	/**
-	 * @var ilTabsGUI
-	 */
-	protected $tabs;
-	/**
-	 * @var ilCtrl
-	 */
-	protected $ctrl;
-	/**
-	 * @var ilParticipationCertificateConfigSetTableGUI
-	 */
-	protected $parent_obj;
-	/**
-	 * @var ilParticipationCertificatePlugin
-	 */
-	protected $pl;
-	/**
-	 * @var array
-	 */
-	protected $filter = array();
-	/**
-	 * @var array
-	 */
-	protected $custom_export_formats = array();
-	/**
-	 * @var array
-	 */
-	protected $custom_export_generators = array();
-	/**
-	 * @var array
-	 */
-	protected $usr_ids;
-
-
-	/**
-	 *
-	 * @param ilParticipationCertificateConfigGUI $a_parent_obj
-	 * @param string                              $a_parent_cmd
-	 */
-	public function __construct($a_parent_obj, $a_parent_cmd) {
+	public function __construct(ilParticipationCertificateConfigGUI $a_parent_obj, string $a_parent_cmd) {
 		global $DIC;
 
 		$this->ctrl = $DIC->ctrl();
@@ -83,10 +52,9 @@ class ilParticipationCertificateConfigSetTableGUI extends ilTable2GUI {
 
 	/**
 	 * Get selectable columns
-	 *
-	 * @return array    key: column id, val: true/false -> default on/off
 	 */
-	function getSelectableColumns() {
+	function getSelectableColumns(): array
+    {
 		$cols = array();
 		$cols['order_by'] = array( 'txt' => $this->pl->txt('order_by'), 'default' => false, 'width' => 'auto' );
 		$cols['configset_type'] = array( 'txt' => $this->pl->txt('config_type'), 'default' => true, 'width' => 'auto' );
@@ -97,18 +65,15 @@ class ilParticipationCertificateConfigSetTableGUI extends ilTable2GUI {
 		return $cols;
 	}
 
-
-	/**
-	 *
-	 */
-	private function addColumns() {
+	private function addColumns(): void
+    {
 		//$this->addColumn('', '', '', true);
 		foreach ($this->getSelectableColumns() as $k => $v) {
 			if ($this->isColumnSelected($k)) {
 				if (isset($v['sort_field'])) {
 					$sort = $v['sort_field'];
 				} else {
-					$sort = NULL;
+					$sort = "";
 				}
 				$this->addColumn($v['txt'], $sort, $v['width']);
 			}
@@ -118,17 +83,14 @@ class ilParticipationCertificateConfigSetTableGUI extends ilTable2GUI {
 		}
 	}
 
-
-	public function parseData() {
+	public function parseData(): void
+    {
 		$global_configs = new ilParticipationCertificateConfigSets();
 		$this->setData($global_configs->getAllConfigSets());
 	}
 
-
-	/**
-	 * @param array $a_set
-	 */
-	public function fillRow($a_set) {
+	public function fillRow(array $a_set): void
+    {
 		global $DIC;
 		foreach ($this->getSelectableColumns() as $k => $v) {
 
@@ -177,9 +139,9 @@ class ilParticipationCertificateConfigSetTableGUI extends ilTable2GUI {
 					case "active":
 						$factory = $DIC->ui()->factory();
 						if ($a_set[$k] == 1) {
-							$this->tpl->setVariable('VALUE',$DIC->ui()->renderer()->render($factory->image()->standard($this->pl->getImagePath("on.svg"), '')));
+							$this->tpl->setVariable('VALUE',$DIC->ui()->renderer()->render($factory->image()->standard(  ilUtil::getImagePath("on.svg"), '')));
 						} else {
-							$this->tpl->setVariable('VALUE',$DIC->ui()->renderer()->render($factory->image()->standard($this->pl->getImagePath("off.svg"), '')));
+							$this->tpl->setVariable('VALUE',$DIC->ui()->renderer()->render($factory->image()->standard( ilUtil::getImagePath("off.svg"), '')));
 						}
 						break;
 					default:
@@ -193,7 +155,9 @@ class ilParticipationCertificateConfigSetTableGUI extends ilTable2GUI {
 
 		$action_list = new ilAdvancedSelectionListGUI();
 		$action_list->setListTitle($this->pl->txt('list_actions'));
-		$action_list->setId('_actions' . $a_set['id']);
+        if(array_key_exists('id', $a_set)) {
+            $action_list->setId('_actions' . $a_set['id']);
+        }
 		$action_list->setUseImages(false);
 
 
@@ -270,10 +234,8 @@ class ilParticipationCertificateConfigSetTableGUI extends ilTable2GUI {
 		$a_csv->addRow();
 	}*/
 
-	/**
-	 *
-	 */
-	public function initFilter() {
+	public function initFilter(): void
+    {
 		/*$firstname = new ilTextInputGUI($this->pl->txt('firstname'), 'firstname');
 		$lastname = new ilTextInputGUI($this->pl->txt('lastname'), 'lastname');
 
@@ -301,10 +263,8 @@ class ilParticipationCertificateConfigSetTableGUI extends ilTable2GUI {
 	}
 
 
-	/**
-	 * @param array $formats
-	 */
-	public function setExportFormats(array $formats) {
+	public function setExportFormats(array $formats): void
+    {
 		/*parent::setExportFormats($formats);
 
 		$custom_fields = array_diff($formats, $this->export_formats);
@@ -316,12 +276,8 @@ class ilParticipationCertificateConfigSetTableGUI extends ilTable2GUI {
 		}*/
 	}
 
-
-	/**
-	 * @param int  $format
-	 * @param bool $send
-	 */
-	public function exportData($format, $send = false) {
+	public function exportData(int $format, bool $send = false): void
+    {
 		/*if (array_key_exists($format, $this->custom_export_formats)) {
 			if ($this->dataExists()) {
 

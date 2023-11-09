@@ -9,20 +9,16 @@ class ilParticipationCertificateGlobalConfigSet extends ActiveRecord {
 
 	const TABLE_NAME = 'dhbw_part_cert_gl_conf';
 
-
-	/**
-	 * @return string
-	 */
-	public function getConnectorContainerName() {
+	public function getConnectorContainerName(): string
+    {
 		return self::TABLE_NAME;
 	}
 
-
 	/**
-	 * @return string
 	 * @deprecated
 	 */
-	public static function returnDbTableName() {
+	public static function returnDbTableName(): string
+    {
 		return self::TABLE_NAME;
 	}
 
@@ -36,7 +32,7 @@ class ilParticipationCertificateGlobalConfigSet extends ActiveRecord {
 	 * @db_is_primary   true
 	 * @db_sequence     true
 	 */
-	protected $id = 0;
+	protected ?int $id = 0;
 	/**
 	 * @var int
 	 *
@@ -45,7 +41,7 @@ class ilParticipationCertificateGlobalConfigSet extends ActiveRecord {
 	 * @con_is_notnull  true
 	 * @db_length       8
 	 */
-	protected $order_by = 0;
+	protected int $order_by = 0;
 	/**
 	 * @var int
 	 *
@@ -54,7 +50,7 @@ class ilParticipationCertificateGlobalConfigSet extends ActiveRecord {
 	 * @con_is_notnull  true
 	 * @db_length       1
 	 */
-	protected $active = 0;
+	protected int $active = 0;
 	/**
 	 * @var string
 	 *
@@ -62,79 +58,53 @@ class ilParticipationCertificateGlobalConfigSet extends ActiveRecord {
 	 * @db_fieldtype    text
 	 * @db_length       1024
 	 */
-	protected $title = "untitled";
+	protected string $title = "untitled";
 
-
-	/**
-	 * @return int
-	 */
-	public function getId() {
+	public function getId(): int
+    {
 		return $this->id;
 	}
 
-
-	/**
-	 * @param int $id
-	 */
-	public function setId($id) {
+	public function setId(int $id): void
+    {
 		$this->id = $id;
 	}
 
-
-	/**
-	 * @return int
-	 */
-	public function getOrderBy() {
+	public function getOrderBy(): int
+    {
 		return $this->order_by;
 	}
 
-
-	/**
-	 * @param int $order
-	 */
-	public function setOrderBy($order_by) {
+	public function setOrderBy(int $order_by): void
+    {
 		$this->order_by = $order_by;
 	}
 
-
-	/**
-	 * @return string
-	 */
-	public function getTitle() {
+	public function getTitle(): string
+    {
 		return $this->title;
 	}
 
-
-	/**
-	 * @param string $title
-	 */
-	public function setTitle($title) {
+	public function setTitle(string $title): void
+    {
 		$this->title = $title;
 	}
 
-
-	/**
-	 * @return int
-	 */
-	public function getActive() {
+	public function getActive(): int
+    {
 		return $this->active;
 	}
 
-
-	/**
-	 * @param int $active
-	 */
-	public function setActive($active) {
+	public function setActive(int $active): void
+    {
 		$this->active = $active;
 	}
 
-
     /**
      * @param ilParticipationCertificateConfig[] $part_cert_configs
-     *
-     * @return ilParticipationCertificateGlobalConfigSet
      */
-	public static function createNewFromConfigs(array $part_cert_configs) {
+	public static function createNewFromConfigs(array $part_cert_configs): ilParticipationCertificateGlobalConfigSet
+    {
 
 		$gl_configs = new ilParticipationCertificateGlobalConfigSets();
 		$gl_config = $gl_configs->addNewConfig();

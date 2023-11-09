@@ -7,7 +7,8 @@ class ilIassStatesMulti {
 	 *
 	 * @return ilIassStateMulti[]
 	 */
-	public static function getData(array $arr_usr_ids = array(), int $group_ref_id) {
+	public static function getData(array $arr_usr_ids, int $group_ref_id): array
+    {
 		global $DIC;
 		$ilDB = $DIC->database();
 		$result = $ilDB->query(self::getSQL($arr_usr_ids));
@@ -43,7 +44,8 @@ class ilIassStatesMulti {
 	 *
 	 * @return string
 	 */
-	protected static function getSQL(array $arr_usr_ids = array()) {
+	protected static function getSQL(array $arr_usr_ids = array()): string
+    {
 		global $DIC;
 		$ilDB = $DIC->database();
 		$select = "SELECT 
@@ -69,5 +71,3 @@ class ilIassStatesMulti {
 		return $select;
 	}
 }
-
-?>

@@ -12,30 +12,12 @@ require_once __DIR__ . "/../vendor/autoload.php";
 class ilParticipationCertificateUIHookGUI extends ilUIHookPluginGUI {
 
 	const TAB_CERTIFICATES = "certificates";
-	/**
-	 * @var ilCtrl
-	 */
-	protected $ctrl;
-	/**
-	 * @var ilParticipationCertificatePlugin
-	 */
-	protected $pl;
-	/**
-	 * @var int
-	 */
-	protected $groupRefId;
-	/**
-	 * @var
-	 */
-	protected $learnGroup;
-	/**
-	 * @var string
-	 */
-	protected $learnGroupTitle;
-	/**
-	 * @var array
-	 */
-	protected $keywords;
+	protected ilCtrl|ilCtrlInterface $ctrl;
+	protected ilParticipationCertificatePlugin $pl;
+	protected int $groupRefId;
+	protected ?ilObject $learnGroup;
+	protected string $learnGroupTitle;
+	protected array $keywords;
 
 
 	public function __construct() {
@@ -70,15 +52,11 @@ class ilParticipationCertificateUIHookGUI extends ilUIHookPluginGUI {
 
 
 	/**
-	 *
 	 * Modify GUI objects, before they generate output
-	 *
-	 * @param string $a_comp
-	 * @param string $a_part
-	 * @param array  $a_par
+	 * @throws ilCtrlException
 	 */
-
-	function modifyGUI($a_comp, $a_part, $a_par = array()) {
+	function modifyGUI(string $a_comp, string $a_part, array $a_par = array()): void
+	{
 		if ($a_part == 'tabs' && $this->checkGroup()) {
 
 			$cert_access = new ilParticipationCertificateAccess($_GET['ref_id']);
@@ -109,10 +87,10 @@ class ilParticipationCertificateUIHookGUI extends ilUIHookPluginGUI {
 
 
 	/**
-	 * @return bool
 	 * check if tab should be displayed, only displayed in groups!
 	 */
-	function checkGroup() {
+	function checkGroup(): bool
+	{
 		foreach ($this->ctrl->getCallHistory() as $GUIClassesArray) {
 			if (($this->objecttype === 'crs') and ($GUIClassesArray['class'] == ilObjCourseGUI::class)) {
 				if ($this->strposa($this->learnGroupTitle, $this->keywords) !== false) {
@@ -125,11 +103,10 @@ class ilParticipationCertificateUIHookGUI extends ilUIHookPluginGUI {
 				}
 			}
 		}
-
 		return false;
 	}
 
-	private function strposa($haystack, $needles=array(), $offset=0) {
+	private function strposa($haystack, $needles=array(), int $offset=0): mixed {
 		$chr = array();
 		foreach($needles as $needle) {
 			$res = strpos($haystack, $needle, $offset);
@@ -139,5 +116,3 @@ class ilParticipationCertificateUIHookGUI extends ilUIHookPluginGUI {
 		return min($chr);
 	}
 }
-
-?>

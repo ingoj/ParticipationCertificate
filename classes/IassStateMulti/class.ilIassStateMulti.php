@@ -1,150 +1,81 @@
 <?php
 class ilIassStateMulti {
 
-	/**
-	 * @var string
-	 */
-	protected $iass_obj_title;
-	/**
-	 *
-	 * @var int
-	 */
-	protected $iass_obj_id;
-	/**
-	 * @var int
-	 */
-	protected $iass_ref_id;
-	/**
-	 *
-	 * @var int
-	 */
-	protected $total;
-	/**
-	 *
-	 * @var int
-	 */
-	protected $passed;
-	/**
-	 *
-	 * @var int
-	 */
-	protected $passed_percentage;
-	/**
-	*
-	* @var int
-	*/
-	protected $usr_id;
+	protected string $iass_obj_title;
+	protected int $iass_obj_id;
+	protected int $iass_ref_id;
+	protected int $total;
+	protected int $passed;
+	protected int $passed_percentage;
+	protected int $usr_id;
 
-
-	/**
-	 * @return string
-	 */
-	public function getIassObjTitle() {
+	public function getIassObjTitle(): string
+    {
 		return $this->iass_obj_title;
 	}
 
-
-	/**
-	 * @param string $iass_obj_title
-	 */
-	public function setIassObjTitle($iass_obj_title) {
+	public function setIassObjTitle(string $iass_obj_title): void
+    {
 		$this->iass_obj_title = $iass_obj_title;
 	}
 
-
-	/**
-	 * @return int
-	 */
-	public function getIassObjId() {
+	public function getIassObjId(): int
+    {
 		return $this->iass_obj_id;
 	}
 
-
-	/**
-	 * @param int $iass_obj_id
-	 */
-	public function setIassObjId($iass_obj_id) {
+	public function setIassObjId(int $iass_obj_id): void
+    {
 		$this->iass_obj_id = $iass_obj_id;
 	}
 
-
-	/**
-	 * @return int
-	 */
-	public function getIassRefId() {
+	public function getIassRefId(): int
+    {
 		return $this->iass_ref_id;
 	}
 
-
-	/**
-	 * @param int $iass_ref_id
-	 */
-	public function setIassRefId($iass_ref_id) {
+	public function setIassRefId(int $iass_ref_id): void
+    {
 		$this->iass_ref_id = $iass_ref_id;
 	}
 
-
-	/**
-	 * @return int
-	 */
-	public function getTotal() {
+	public function getTotal(): int
+    {
 		return $this->total;
 	}
 
-
-	/**
-	 * @param int $total
-	 */
-	public function setTotal($total) {
+	public function setTotal(int $total): void
+    {
 		$this->total = $total;
 	}
 
-
-	/**
-	 * @return int
-	 */
-	public function getPassed() {
+	public function getPassed(): int
+    {
 		return $this->passed;
 	}
 
-
-	/**
-	 * @param int $passed
-	 */
-	public function setPassed($passed) {
+	public function setPassed(int $passed): void
+    {
 		$this->passed = $passed;
 	}
 
-
-	/**
-	 * @return int
-	 */
-	public function getPassedPercentage() {
+	public function getPassedPercentage(): int
+    {
 		return $this->passed_percentage;
 	}
 
-
-	/**
-	 * @param int $passed_percentage
-	 */
-	public function setPassedPercentage($passed_percentage) {
+	public function setPassedPercentage(int $passed_percentage): void
+    {
 		$this->passed_percentage = $passed_percentage;
 	}
 
-
-	/**
-	 * @return int
-	 */
-	public function getUsrId() {
+	public function getUsrId(): int
+    {
 		return $this->usr_id;
 	}
 
-
-	/**
-	 * @param int $usr_id
-	 */
-	public function setUsrId($usr_id) {
+	public function setUsrId(int $usr_id): void
+    {
 		$this->usr_id = $usr_id;
 	}
 }
-?>

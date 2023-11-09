@@ -4,7 +4,8 @@ class LearnObjectivesCoursesQuery {
 
 	const DEFAULT_TMP_TABLE_NAME = 'tmp_learn_objectives_courses';
 
-	public function getSQL() {
+	public function getSQL(): string
+    {
 		return "SELECT  crs_objectives.crs_id as master_crs_id, 
 		master_crs_obj.title as master_crs_title,
 		crs_objectives.title as learn_objective_title,
@@ -24,7 +25,8 @@ class LearnObjectivesCoursesQuery {
 	/**
 	 * @param string $table_name
 	 */
-	public function createTemporaryTable($table_name =  self::DEFAULT_TMP_TABLE_NAME) {
+	public function createTemporaryTable(string $table_name =  self::DEFAULT_TMP_TABLE_NAME): void
+    {
 		global $DIC;
 		$ilDB = $DIC->database();
 

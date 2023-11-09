@@ -2,15 +2,11 @@
 use srag\Plugins\UserDefaults\UserSearch\usrdefUser;
 
 class ilPartCertUsersData {
-
-
-
 	/**
-	 * @param array $arr_usr_ids
-	 *
 	 * @return ilPartCertUserData[]
 	 */
-	public static function getData(array $arr_usr_ids = array()) {
+	public static function getData(array $arr_usr_ids = array()): array
+    {
 		global $DIC;
 		$ilDB = $DIC->database();
 		$result = $ilDB->query(self::getSQL($arr_usr_ids));
@@ -29,14 +25,8 @@ class ilPartCertUsersData {
 
 		return $usr_data;
 	}
-
-
-	/**
-	 * @param array $arr_usr_ids
-	 *
-	 * @return string
-	 */
-	protected static function getSQL(array $arr_usr_ids = array()) {
+	protected static function getSQL(array $arr_usr_ids = array()): string
+    {
 		global $DIC;
 		$ilDB = $DIC->database();
 		$select = "select 
@@ -56,14 +46,8 @@ class ilPartCertUsersData {
 
 		return $select;
 	}
-
-
-	/**
-	 * @param string $gender
-	 *
-	 * @return string
-	 */
-	public static function returnSalutation($gender) {
+	public static function returnSalutation(string $gender): string
+    {
 		switch ($gender) {
 			case 'Männlich': // TODO lang
 				return "Herr"; // TODO lang

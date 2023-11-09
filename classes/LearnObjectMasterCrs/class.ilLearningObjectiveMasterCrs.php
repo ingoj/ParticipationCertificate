@@ -1,46 +1,25 @@
 <?php
 class ilLearningObjectiveMasterCrs {
+	protected string $lo_master_objective_title;
+	protected int $lo_master_usr_id;
 
-	/**
-	 * @var string
-	 */
-	protected $lo_master_objective_title;
-	/**
-	 *
-	 * @var int
-	 */
-	protected $lo_master_usr_id;
-
-
-
-	/**
-	 * @return string
-	 */
-	public function getLoMasterObjectiveTitle() {
+	public function getLoMasterObjectiveTitle(): string
+    {
 		return $this->lo_master_objective_title;
 	}
 
-
-	/**
-	 * @param string $lo_master_objective_title
-	 */
-	public function setLoMasterObjectiveTitle($lo_master_objective_title) {
+	public function setLoMasterObjectiveTitle(string $lo_master_objective_title): void
+    {
 		$this->lo_master_objective_title = $lo_master_objective_title;
 	}
 
-	/**
-	 * @return int
-	 */
-	public function getLoMasterUsrId() {
+	public function getLoMasterUsrId(): int
+    {
 		return $this->lo_master_usr_id;
 	}
 
-
-	/**
-	 * @param int $lo_master_usr_id
-	 */
-	public function setLoMasterUsrId($lo_master_usr_id) {
+	public function setLoMasterUsrId(int $lo_master_usr_id): void
+    {
 		$this->lo_master_usr_id = $lo_master_usr_id;
 	}
 }
-?>

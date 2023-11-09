@@ -2,13 +2,10 @@
 
 class xaliStates
 {
-
     /**
-     * @param array $arr_usr_ids
-     *
      * @return xaliState[]
      */
-    public static function getData(array $arr_usr_ids = array(), int $group_ref_id)
+    public static function getData(array $arr_usr_ids, int $group_ref_id): array
     {
         global $DIC;
 

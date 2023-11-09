@@ -11,28 +11,21 @@ class ilParticipationCertificateGlobalConfigSets {
 
 	}
 
-	public function getAllConfigsAsArray() {
+	public function getAllConfigsAsArray(): array
+    {
 		return ilParticipationCertificateGlobalConfigSet::orderBy('order_by')->getArray();
 	}
 
-
-	/**
-	 * @return ilParticipationCertificateGlobalConfigSet
-	 */
-	public function addNewConfig() {
+	public function addNewConfig(): ilParticipationCertificateGlobalConfigSet
+    {
 			$gl_config = new ilParticipationCertificateGlobalConfigSet();
 			$gl_config->setOrderBy($this->getUnreservedOrderByValue());
 			$gl_config->store();
 			return $gl_config;
 	}
 
-
-	/**
-	 * @param int $id
-	 *
-	 * @return ilParticipationCertificateGlobalConfigSet
-	 */
-	public function getConfigSetById($id) {
+	public function getConfigSetById(int $id): ilParticipationCertificateGlobalConfigSet
+    {
 		/**
 		 * @var ilParticipationCertificateGlobalConfigSet $gl_config
 		 */
@@ -40,10 +33,8 @@ class ilParticipationCertificateGlobalConfigSets {
 		return $gl_config;
 	}
 
-	/**
-	 * @return ilParticipationCertificateGlobalConfigSet
-	 */
-	public function getDefaultConfig() {
+	public function getDefaultConfig(): ilParticipationCertificateGlobalConfigSet
+    {
 		/**
 		 * @var ilParticipationCertificateGlobalConfigSet $gl_config
 		 */
@@ -51,13 +42,8 @@ class ilParticipationCertificateGlobalConfigSets {
 		return $gl_config;
 	}
 
-
-	/**
-	 * @param $config_key
-	 *
-	 * @return bool|string
-	 */
-	public function getDefaultConfigSetValue($config_key) {
+	public function getDefaultConfigSetValue(string $config_key): bool|string
+    {
 		$gl_config = $this->getDefaultConfig();
 
 		$participation_configs = new ilParticipationCertificateConfigs();
@@ -68,13 +54,8 @@ class ilParticipationCertificateGlobalConfigSets {
 		return false;
 	}
 
-
-	/**
-	 * @param array $arr_order_by
-	 *
-	 * @throws Exception
-	 */
-	public function saveAndRearangeOrderBy($arr_order_by = array()) {
+	public function saveAndRearangeOrderBy(array $arr_order_by = array()): void
+    {
 		$arr_reserved = [];
 
 		asort($arr_order_by);
@@ -107,11 +88,8 @@ class ilParticipationCertificateGlobalConfigSets {
 
 	}
 
-
-	/**
-	 * @return int
-	 */
-	public function getUnreservedOrderByValue() {
+	public function getUnreservedOrderByValue(): int
+    {
 		/**
 		 * @var ilParticipationCertificateGlobalConfigSet $config
 		 */
@@ -119,7 +97,8 @@ class ilParticipationCertificateGlobalConfigSets {
 		return $config->getOrderBy() + 1;
 	}
 
-	public function getSelectOptions() {
+	public function getSelectOptions(): array
+    {
 
 		$arr_select_options = [0 => '--'];
 

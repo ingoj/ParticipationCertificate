@@ -4,7 +4,8 @@ class LearnObjectivesSuggCoursesQuery {
 
 	const DEFAULT_TMP_TABLE_NAME = 'tmp_learn_objectives_sugg_courses';
 
-	public function getSQL() {
+	public function getSQL(): string
+    {
 		return "SELECT sugg.user_id, real_sugg_crs.target_obj_id, sugg.objective_id from crs_objectives
 				/* suggested courses -> course links */
 				inner join crs_objective_lm as objective_crsr on objective_crsr.objective_id = crs_objectives.objective_id and objective_crsr.type = 'crsr'
@@ -13,10 +14,8 @@ class LearnObjectivesSuggCoursesQuery {
 				inner join container_reference as real_sugg_crs on real_sugg_crs.obj_id = objective_crsr.obj_id";
 	}
 
-	/**
-	 * @param string $table_name
-	 */
-	public function createTemporaryTable($table_name =  self::DEFAULT_TMP_TABLE_NAME) {
+	public function createTemporaryTable(string $table_name =  self::DEFAULT_TMP_TABLE_NAME): void
+    {
 		global $DIC;
 		$ilDB = $DIC->database();
 

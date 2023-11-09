@@ -2,12 +2,8 @@
 
 class ilLearnObjectSuggResults {
 
-	/**
-	 * @param array $arr_usr_ids
-	 *
-	 * @return ilLearnObjectSuggResult[]
-	 */
-	public static function getData(array $arr_usr_ids = array()) {
+	public static function getData(array $arr_usr_ids = array()): array
+    {
 		global $DIC;
 		$ilDB = $DIC->database();
 		$result = $ilDB->query(self::getSQL($arr_usr_ids));
@@ -38,15 +34,8 @@ class ilLearnObjectSuggResults {
 		return $reached_percentage_data;
 	}
 
-
-	/**
-	 * @param array $arr_usr_ids
-	 *
-	 * @return string
-	 */
-	protected static function getSQL(array $arr_usr_ids = array()) {
-
-
+	protected static function getSQL(array $arr_usr_ids = array()): string
+    {
 		ilLearnObjectFinalTestStates::createTemporaryTableLearnObjectFinalTest($arr_usr_ids, 'tmp_lo_fin_test');
 
 		/*
@@ -72,5 +61,3 @@ class ilLearnObjectSuggResults {
 		return $select;
 	}
 }
-
-?>
