@@ -1,9 +1,6 @@
 <?php
 
 /**
- * Class ilParticipationCertificateSingleResultGUI
- *
- * @author            Silas Stulz <sst@studer-raimann.ch>
  * @ilCtrl_isCalledBy ilParticipationCertificateSingleResultGUI: ilUIPluginRouterGUI
  */
 class ilParticipationCertificateSingleResultGUI

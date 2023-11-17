@@ -1,9 +1,4 @@
 <?php
-
-require_once "./Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/ParticipationCertificate/classes/LearnObjectSuggCourses/LearnObjectivesSuggCoursesQuery.php";
-require_once "./Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/ParticipationCertificate/classes/LearnObjectFinalTests/LearnObjectivesFinalTestsQuery.php";
-require_once "./Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/ParticipationCertificate/classes/LearnObjectCourses/LearnObjectivesCoursesQuery.php";
-
 class ilLearnObjectFinalTestStates {
 
 	/**

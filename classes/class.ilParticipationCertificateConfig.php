@@ -1,10 +1,4 @@
 <?php
-
-/**
- * Class ilParticipationCertificate
- *
- * @author Silas Stulz <sst@studer-raimann.ch>
- */
 class ilParticipationCertificateConfig extends ActiveRecord {
 
 	const TABLE_NAME = 'dhbw_part_cert_conf';

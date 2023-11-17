@@ -5,8 +5,6 @@ require_once __DIR__ . "/../vendor/autoload.php";
 /**
  * Class ilParticipationCertificateUIHookGUI
  *
- * @author       Silas Stulz <sst@studer-raimann.ch>
- *
  * @ilCtrl_Calls ilParticipationCertificateUIHookGUI: ilParticipationCertificateGUI
  */
 class ilParticipationCertificateUIHookGUI extends ilUIHookPluginGUI {

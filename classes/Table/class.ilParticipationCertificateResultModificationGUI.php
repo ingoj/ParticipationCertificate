@@ -3,7 +3,6 @@
 /**
  * Class ilParticipationCertificateResultModificationGUI
  *
- * @author            Silas Stulz <sst@studer-raimann.ch>
  * @ilCtrl_isCalledBy ilParticipationCertificateResultModificationGUI: ilUIPluginRouterGUI
  * @ilCtrl_Calls      ilParticipationCertificateResultModificationGUI: ilParticipationCertificateResultGUI
  */

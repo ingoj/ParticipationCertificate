@@ -5,8 +5,6 @@ use Mpdf\Mpdf;
 /**
  * Class ilParticipationCertificatePDFGenerator
  *
- * @author            Silas Stulz <sst@studer-raimann.ch>
- *
  * @ilCtrl_isCalledBy ilParticipationCertificatePDFGenerator: ilParticipationCertificateGUI, ilParticipationCertificateTwigParser
  */
 class ilParticipationCertificatePDFGenerator

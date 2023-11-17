@@ -1,8 +1,5 @@
 <?php
 
-use srag\DIC\Util\LibraryLanguageInstaller;
-use srag\RemovePluginDataConfirm\PluginUninstallTrait;
-
 require_once __DIR__ . "/../vendor/autoload.php";
 
 /**
@@ -12,12 +9,9 @@ require_once __DIR__ . "/../vendor/autoload.php";
  */
 class ilParticipationCertificatePlugin extends ilUserInterfaceHookPlugin {
 
-	use PluginUninstallTrait;
-
 	const PLUGIN_ID = "dhbwparticipationpdf";
 	const PLUGIN_NAME = "ParticipationCertificate";
 	const PLUGIN_CLASS_NAME = self::class;
-	const REMOVE_PLUGIN_DATA_CONFIRM_CLASS_NAME = ParticipationCertificateRemoveDataConfirm::class;
 	protected static ?ilParticipationCertificatePlugin $instance = null;
 
 
@@ -65,36 +59,25 @@ class ilParticipationCertificatePlugin extends ilUserInterfaceHookPlugin {
         }
 	}
 
-    /**
-     * @throws \srag\DIC\Exception\DICException
-     */
-    protected function deleteData(): void {
-
-		self::dic()->database()->dropTable(ilParticipationCertificateGlobalConfigSet::TABLE_NAME, false);
-		self::dic()->database()->dropTable(ilParticipationCertificateObjectConfigSet::TABLE_NAME, false);
-
-
-		self::dic()->database()->manipulateF('DELETE FROM ctrl_classfile WHERE comp_prefix=%s', [ ilDBConstants::T_TEXT ], [ $this->getPrefix() ]);
-		self::dic()->database()->manipulateF('DELETE FROM ctrl_calls WHERE comp_prefix=%s', [ ilDBConstants::T_TEXT ], [ $this->getPrefix() ]);
-
-		self::dic()->database()->dropTable(ilParticipationCertificateConfig::TABLE_NAME, false);
-	}
-
-
-	public function updateLanguages(?array $a_lang_keys = null): void
+    protected function uninstallCustom(): void
     {
-		parent::updateLanguages($a_lang_keys);
+        $this->db->dropTable('participationcert', false);
+        $this->db->dropTable('dhbw_part_cert_ob_conf', false);
+        $this->db->dropTable('dhbw_part_cert_conf', false);
+        $this->db->dropTable('dhbw_part_cert_gl_conf', false);
 
-		LibraryLanguageInstaller::getInstance()->withPlugin(self::plugin())->withLibraryLanguageDirectory(__DIR__ . "/../vendor/srag/removeplugindataconfirm/lang")
-			->updateLanguages();
-	}
-
-
-    /**
-     * @return bool
-     */
-    protected function shouldUseOneUpdateStepOnly() : bool
-    {
-        return false;
+        $sequences = [
+            'participationcert',
+            'dhbw_part_cert_conf',
+            'dhbw_part_cert_gl_conf'
+        ];
+        foreach ($sequences as $sequence) {
+            try {
+                $this->db->dropSequence($sequence);
+            }catch (Exception $e){
+                //ignore
+            }
+        }
     }
+
 }

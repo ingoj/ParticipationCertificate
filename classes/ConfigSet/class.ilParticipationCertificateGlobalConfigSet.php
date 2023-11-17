@@ -1,10 +1,4 @@
 <?php
-
-/**
- * Class ilParticipationCertificateGlobalConfig
- *
- * @author Martin Studer <ms@studer-raimann.ch>
- */
 class ilParticipationCertificateGlobalConfigSet extends ActiveRecord {
 
 	const TABLE_NAME = 'dhbw_part_cert_gl_conf';

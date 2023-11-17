@@ -1,5 +1,4 @@
 <?php
-
 class xaliStates
 {
     /**
@@ -37,8 +36,6 @@ class xaliStates
             $state->setTotal($xali_state['total']);
             $data[$usr_id] = $state;
         }
-
-
         return $data;
     }
 }

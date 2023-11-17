@@ -2,8 +2,6 @@
 
 /**
  * Class ilParticipationCertificateResultGUI
- *
- * @author Silas Stulz <sst@studer-raimann.ch>
  */
 class ilParticipationCertificateResultTableGUI extends ilTable2GUI {
 
