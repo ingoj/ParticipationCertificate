@@ -59,7 +59,7 @@ class ilParticipationCertificatePlugin extends ilUserInterfaceHookPlugin {
         }
 	}
 
-    protected function uninstallCustom(): void
+    protected function afterUninstall(): void
     {
         $this->db->dropTable('participationcert', false);
         $this->db->dropTable('dhbw_part_cert_ob_conf', false);
