@@ -68,6 +68,7 @@ class ilParticipationCertificatePlugin extends ilUserInterfaceHookPlugin {
 
         $sequences = [
             'participationcert',
+            'dhbw_part_cert_ob_conf',
             'dhbw_part_cert_conf',
             'dhbw_part_cert_gl_conf'
         ];
