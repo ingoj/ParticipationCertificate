@@ -1,11 +1,8 @@
 <?php
-
 require_once __DIR__ . "/../vendor/autoload.php";
 
 /**
  * Class ilParticipationCertificateGUI
- *
- * @author            Silas Stulz <sst@studer-raimann.ch>
  *
  * @ilCtrl_Calls      ilParticipationCertificateGUI: ilParticipationCertificateResultGUI
  */

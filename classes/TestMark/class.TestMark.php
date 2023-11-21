@@ -1,6 +1,4 @@
 <?php
-
-
 class TestMark{
 	private int $mark_id;
 	private bool $passed;

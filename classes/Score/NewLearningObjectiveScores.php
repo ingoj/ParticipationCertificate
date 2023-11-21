@@ -1,7 +1,5 @@
 <?php
-
 use SRAG\ILIAS\Plugins\LearningObjectiveSuggestions\Score\LearningObjectiveScore;
-
 class NewLearningObjectiveScores {
 
 	public static function getData(int $usr_id): array

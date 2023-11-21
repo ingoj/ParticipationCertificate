@@ -1,6 +1,4 @@
 <?php
-use srag\Plugins\UserDefaults\usrdefObj;
-
 class ilPartCertUserData {
 	protected int $part_cert_usr_id;
 	protected string $part_cert_firstname;

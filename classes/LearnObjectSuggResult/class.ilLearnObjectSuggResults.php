@@ -1,5 +1,4 @@
 <?php
-
 class ilLearnObjectSuggResults {
 
 	public static function getData(array $arr_usr_ids = array()): array
@@ -37,16 +36,6 @@ class ilLearnObjectSuggResults {
 	protected static function getSQL(array $arr_usr_ids = array()): string
     {
 		ilLearnObjectFinalTestStates::createTemporaryTableLearnObjectFinalTest($arr_usr_ids, 'tmp_lo_fin_test');
-
-		/*
-		global $ilDB;
-        $select = "SELECT * from tmp_lo_fin_test";
-        $result = $ilDB->query($select);
-        $reached_percentage_data = array();
-        while ($row = $ilDB->fetchAssoc($result)) {
-            $reached_percentage_data[] = $row;
-        }
-        print_r($reached_percentage_data);exit;*/
 
         $select = "SELECT round((SUM(objectives_sug_percentage) / SUM(suggested)),0) as points_as_percentage,
 					usr_id, 

@@ -1,10 +1,4 @@
 <?php
-
-/**
- * Class ilParticipationCertificateConfigSets
- *
- * @author Martin Studer <ms@studer-raimann.ch>
- */
 class ilParticipationCertificateConfigSets {
 
 	public function __construct() {

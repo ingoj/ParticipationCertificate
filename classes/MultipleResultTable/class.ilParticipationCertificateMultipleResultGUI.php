@@ -1,7 +1,5 @@
 <?php
-
 /**
- * Class ilParticipationCertificateMultipleResultGUI
  * @ilCtrl_isCalledBy ilParticipationCertificateMultipleResultGUI: ilUIPluginRouterGUI
  */
 class ilParticipationCertificateMultipleResultGUI

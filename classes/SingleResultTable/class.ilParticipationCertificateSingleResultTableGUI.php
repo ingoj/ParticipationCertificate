@@ -1,10 +1,4 @@
 <?php
-
-/**
- * Class ilParticipationCertificateResultGUI
- *
- * @author Silas Stulz <sst@studer-raimann.ch>
- */
 class ilParticipationCertificateSingleResultTableGUI extends ilTable2GUI {
 
 	const IDENTIFIER = 'usr_id';

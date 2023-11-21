@@ -2,8 +2,7 @@
   "require": {
     "php": ">=7.2",
     "mpdf/mpdf": "^8.0",
-    "twig/twig": "~2.15",
-    "srag/removeplugindataconfirm": ">=0.1.0"
+    "twig/twig": "~2.15"
   },
   "autoload": {
     "classmap": [
@@ -11,7 +10,6 @@
       "../../../../../../../Modules/Course/classes/class.ilObjCourseGUI.php",
       "../../../../../../../Modules/Group/classes/class.ilGroupParticipants.php",
       "../../../../../../../Services/ActiveRecord/class.ActiveRecord.php",
-      "../../../../../../../Services/Container/classes/class.ilContainerObjectiveGUI.php",
       "../../../../../../../Services/Form/classes/class.ilDateDurationInputGUI.php",
       "../../../../../../../Services/Form/classes/class.ilPropertyFormGUI.php",
       "../../../../../../../Services/Object/classes/class.ilObjectListGUIFactory.php",

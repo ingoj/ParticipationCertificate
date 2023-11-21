@@ -1,7 +1,4 @@
 <?php
-
-use srag\Plugins\UserDefaults\UserSearch\usrdefObj;
-
 class ilLearningObjectivesMasterCrs
 {
 
@@ -36,7 +33,7 @@ class ilLearningObjectivesMasterCrs
 					crso.title as lo_master_objective_title,
 					crs_memb.usr_id as lo_master_usr_id
 					from crs_objectives as crso
-					inner join " . usrdefObj::TABLE_NAME . " as crs_obj on crs_obj.obj_id = crso.crs_id
+					inner join object_data as crs_obj on crs_obj.obj_id = crso.crs_id
 					inner join object_reference as crs_ref on crs_ref.obj_id = crs_obj.obj_id
 					inner join loc_settings on loc_settings.obj_id = crs_obj.obj_id and loc_settings.itest > 0
 					inner join obj_members as crs_memb on crs_memb.obj_id = crs_obj.obj_id

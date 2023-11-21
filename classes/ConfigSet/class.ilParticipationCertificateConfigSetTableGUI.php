@@ -1,10 +1,4 @@
 <?php
-
-/**
- * Class ilParticipationCertificateResultTableGUI
- *
- * @author Martin Studer <ms@studer-raimann.ch>
- */
 class ilParticipationCertificateConfigSetTableGUI extends ilTable2GUI {
 	protected ilTabsGUI $tabs;
     protected ilCtrl $ctrl;

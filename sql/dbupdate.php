@@ -34,11 +34,11 @@
 <?php
 global $DIC;
 $ilDB = $DIC->database();
-if ($ilDB->tableExists(ilParticipationCert::TABLE_NAME)) {
-    $ilDB->dropTable(ilParticipationCert::TABLE_NAME);
+if ($ilDB->tableExists("participationcert")) {
+    $ilDB->dropTable("participationcert");
 }
-if ($ilDB->tableExists(ilParticipationCert::TABLE_NAME . '_seq')) {
-    $ilDB->dropTable(ilParticipationCert::TABLE_NAME . '_seq');
+if ($ilDB->tableExists("participationcert" . '_seq')) {
+    $ilDB->dropTable("participationcert" . '_seq');
 }
 ?>
 <#10>

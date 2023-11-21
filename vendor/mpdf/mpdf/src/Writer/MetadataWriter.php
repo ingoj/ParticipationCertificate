@@ -3,10 +3,10 @@
 namespace Mpdf\Writer;
 
 use Mpdf\Strict;
-
 use Mpdf\Form;
 use Mpdf\Mpdf;
 use Mpdf\Pdf\Protection;
+use Mpdf\PsrLogAwareTrait\PsrLogAwareTrait;
 use Mpdf\Utils\PdfDate;
 
 use Psr\Log\LoggerInterface;
@@ -15,6 +15,7 @@ class MetadataWriter implements \Psr\Log\LoggerAwareInterface
 {
 
 	use Strict;
+	use PsrLogAwareTrait;
 
 	/**
 	 * @var \Mpdf\Mpdf
@@ -35,11 +36,6 @@ class MetadataWriter implements \Psr\Log\LoggerAwareInterface
 	 * @var \Mpdf\Pdf\Protection
 	 */
 	private $protection;
-
-	/**
-	 * @var \Psr\Log\LoggerInterface
-	 */
-	private $logger;
 
 	public function __construct(Mpdf $mpdf, BaseWriter $writer, Form $form, Protection $protection, LoggerInterface $logger)
 	{
@@ -303,7 +299,7 @@ class MetadataWriter implements \Psr\Log\LoggerAwareInterface
 			if ($file['mime']) {
 				$this->writer->write('/Subtype /' . $this->writer->escapeSlashes($file['mime']));
 			}
-			$this->writer->write('/Length '.strlen($filestream));
+			$this->writer->write('/Length ' . strlen($filestream));
 			$this->writer->write('/Filter /FlateDecode');
 			if (isset($file['path'])) {
 				$this->writer->write('/Params <</ModDate '.$this->writer->string('D:' . PdfDate::format(filemtime($file['path']))).' >>');
@@ -332,6 +328,12 @@ class MetadataWriter implements \Psr\Log\LoggerAwareInterface
 	{
 		$this->writer->write('/Type /Catalog');
 		$this->writer->write('/Pages 1 0 R');
+
+		if (is_string($this->mpdf->currentLang)) {
+			$this->writer->write(sprintf('/Lang (%s)', $this->mpdf->currentLang));
+		} elseif (is_string($this->mpdf->default_lang)) {
+			$this->writer->write(sprintf('/Lang (%s)', $this->mpdf->default_lang));
+		}
 
 		if ($this->mpdf->ZoomMode === 'fullpage') {
 			$this->writer->write('/OpenAction [3 0 R /Fit]');
@@ -455,23 +457,29 @@ class MetadataWriter implements \Psr\Log\LoggerAwareInterface
 		}
 
 		if ($this->mpdf->hasOC || count($this->mpdf->layers)) {
+
 			$p = $v = $h = $l = $loff = $lall = $as = '';
+
 			if ($this->mpdf->hasOC) {
+
 				if (($this->mpdf->hasOC & 1) === 1) {
 					$p = $this->mpdf->n_ocg_print . ' 0 R';
 				}
+
 				if (($this->mpdf->hasOC & 2) === 2) {
 					$v = $this->mpdf->n_ocg_view . ' 0 R';
 				}
+
 				if (($this->mpdf->hasOC & 4) === 4) {
 					$h = $this->mpdf->n_ocg_hidden . ' 0 R';
 				}
+
 				$as = "<</Event /Print /OCGs [$p $v $h] /Category [/Print]>> <</Event /View /OCGs [$p $v $h] /Category [/View]>>";
 			}
 
 			if (count($this->mpdf->layers)) {
 				foreach ($this->mpdf->layers as $k => $layer) {
-					if (strtolower($this->mpdf->layerDetails[$k]['state']) === 'hidden') {
+					if (isset($this->mpdf->layerDetails[$k]) && strtolower($this->mpdf->layerDetails[$k]['state']) === 'hidden') {
 						$loff .= $layer['n'] . ' 0 R ';
 					} else {
 						$l .= $layer['n'] . ' 0 R ';
@@ -479,11 +487,14 @@ class MetadataWriter implements \Psr\Log\LoggerAwareInterface
 					$lall .= $layer['n'] . ' 0 R ';
 				}
 			}
+
 			$this->writer->write("/OCProperties <</OCGs [$p $v $h $lall] /D <</ON [$p $l] /OFF [$v $h $loff] ");
 			$this->writer->write("/Order [$v $p $h $lall] ");
+
 			if ($as) {
 				$this->writer->write("/AS [$as] ");
 			}
+
 			$this->writer->write('>>>>');
 		}
 	}
@@ -792,11 +803,6 @@ class MetadataWriter implements \Psr\Log\LoggerAwareInterface
 			$uniqid = md5(time() . $this->mpdf->buffer);
 			$this->writer->write('/ID [<' . $uniqid . '> <' . $uniqid . '>]');
 		}
-	}
-
-	public function setLogger(LoggerInterface $logger)
-	{
-		$this->logger = $logger;
 	}
 
 	private function getVersionString()

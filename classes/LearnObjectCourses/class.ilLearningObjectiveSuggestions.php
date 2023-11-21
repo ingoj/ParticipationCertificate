@@ -1,5 +1,4 @@
 <?php
-use srag\Plugins\UserDefaults\UserSearch\usrdefObj;
 use SRAG\ILIAS\Plugins\LearningObjectiveSuggestions\Suggestion\LearningObjectiveSuggestion;
 
 class ilLearningObjectiveSuggestions {
@@ -42,7 +41,7 @@ class ilLearningObjectiveSuggestions {
 					loc_user_results.limit_perc AS limit_perc
 					FROM " . LearningObjectiveSuggestion::TABLE_NAME . " as sugg
 					inner join crs_objectives as crso on crso.crs_id = sugg.course_obj_id and crso.objective_id = sugg.objective_id
-					inner join " . usrdefObj::TABLE_NAME . " as crs_obj on crs_obj.obj_id = crso.crs_id
+					inner join object_data as crs_obj on crs_obj.obj_id = crso.crs_id
 					 LEFT JOIN loc_user_results ON loc_user_results.objective_id = crso.objective_id and learn_objective_crs.master_crs_objective_id
         AND loc_user_results.user_id =  sugg.user_id
 	                where " . $ilDB->in('sugg.user_id', $arr_usr_ids, false, 'integer');

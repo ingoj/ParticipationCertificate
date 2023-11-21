@@ -1,5 +1,4 @@
 <?php
-
 class getLearnSugg
 {
     private string $sugg_obj_title;

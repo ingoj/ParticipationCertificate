@@ -3,8 +3,6 @@
 /**
  * Class ilParticipationCertificateTwigParser
  *
- * @author            Martin Studer <ms@studer-raimann.ch>
- *
  * @ilCtrl_isCalledBy ilParticipationCertificateTwigParser: ilParticipationCertificateGUI, ilParticipationCertificateResultGUI
  */
 class ilParticipationCertificateTwigParser {

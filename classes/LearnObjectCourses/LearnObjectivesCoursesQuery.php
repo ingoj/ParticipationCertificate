@@ -1,5 +1,4 @@
 <?php
-
 class LearnObjectivesCoursesQuery {
 
 	const DEFAULT_TMP_TABLE_NAME = 'tmp_learn_objectives_courses';
