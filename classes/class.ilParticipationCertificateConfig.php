@@ -143,7 +143,7 @@ class ilParticipationCertificateConfig extends ActiveRecord {
 	 * @db_fieldtype    text
 	 * @db_length       1024
 	 */
-	protected string $config_value = "";
+	protected ?string $config_value = "";
 	/**
 	 * @var int
 	 *
