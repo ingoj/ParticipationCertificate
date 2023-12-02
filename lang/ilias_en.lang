@@ -1,0 +1,96 @@
+tbl_overview_results#:#Overview of Results
+cols_userid#:#UserID
+cols_firstname#:#First Name
+cols_lastname#:#Last Name
+cols_initial_test_finished#:#Initial Test Completed
+cols_results_qualifying#:#Processing of Recommended Mathematics Learning Modules
+cols_result_qualifying#:#Results of Completed Tests of Recommended Mathematics Learning Modules
+cols_eMentoring_finished#:#Active Participation in Video Conferences
+cols_eMentoring_homework#:#Processing of Cross-Disciplinary Homework (Count)
+cols_eMentoring_percentage#:#Processing of Cross-Disciplinary Homework in Percentage
+cols_actions#:#Action
+list_actions#:#Actions
+list_results#:#Adjust Results for Printing
+list_print#:#Print
+filter_name#:#Name
+header_config#:#Configure
+header_overview#:#Overview
+header_btn_back#:#Back
+header_btn_print#:#Print Certificate
+header_btn_print_no_eMentoring#:#Print Certificate (excluding eMentoring)
+header_btn_print_is_eMentoring#:#Print Certificate (including eMentoring)
+firstname#:#First Name
+lastname#:#Last Name
+usr_id#:#UserID
+list_overview#:#Show All Results
+btn_reset#:#Apply Text Values for the Form (Fixed)
+btn_modify#:#Apply Text Values for the Form (Editable)
+result_for#:#Results for
+no_records_selected#:#No Users Selected
+upload_header #:# Upload Your PDF Header
+save#:#Save
+udf_gender#:#Custom Field Gender
+udf_lastname#:#Custom Field Last Name
+udf_firstname#:#Custom Field First Name
+config_plugin#:#Configuration Certificate of Participation
+mod_initial#:#Initial Test Completed (Yes(1)/No(0))
+mod_resultstest#:#Result Qualifying Tests (Percentage)
+mod_conf#:#Processing of Cross-Disciplinary Homework (Yes(1)/No(0))
+mod_homework#:#Processing of Cross-Disciplinary Homework (Percentage)
+print_pdf#:#Print PDF
+list_print_with#:#Print with eMentoring
+list_print_without#:#Print without eMentoring
+plugin#:#Participation Certificates
+success#:#Print Successful
+successForm#:#Form Successfully Reset
+successFormSave#:#Form Successfully Saved
+pluginreader#:#Results Study Preparation
+period#:#Period
+period_self_print#:#Configure Self-Printing Period
+enable_self_print#:#Enable Self-Printing
+color#:#Color Recommended LZ
+keyword#:#Keyword
+logo#:#Logo
+udf_percent_value#:#Threshold for Video Conferences (Percentage)
+placeholders#:#The following placeholders are available:
+yes#:#Yes
+no#:#No
+no_tests#:#No Tests
+loginname#:#Username
+add_config#:#Add Configuration
+save_order#:#Save Sorting
+config_type#:#Configuration Type
+title#:#Label
+parent_title#:#Title of Parent Object
+active#:#Active
+edit#:#Edit
+config_title#:#Label
+order_by#:#Sort By
+copy#:#Copy
+create_template#:#Generate Template
+delete#:#Delete
+configset_type_1#:#Certificate Template
+configset_type_2#:#Certificate Configuration ILIAS Object
+configset_type_3#:#Global Settings
+go_to_object#:#Open ILIAS Object
+object_config_type_1#:#Template Configuration
+object_config_type_2#:#Group-Specific Configuration
+origin_template#:#Original Template
+set_inactive#:#Deactivate
+set_active#:#Activate
+reset_config#:#Reset Configuration
+confirm_reset_config#:#Do you really want to reset the configuration? All certificate settings will be deleted.
+config_reseted#:#The configuration has been reset
+calculation_by_points#:#Calculation Based on Points
+calculation_by_completed_learning_objective#:#Calculation Based on the Number of Achieved Learning Objectives
+calculation_by_highest_value#:#Calculation of Both Variants. The Better Value is Applied.
+calculation_type_processing_state_suggested_objectives#:#Calculation Type 'Processing of Recommended Mathematics Learning Modules'
+config_result_table#:#Configuration Period & Calculation Type
+noname_noprint#:#Printing the Certificate of Participation is only possible if you have entered both First and Last Name.
+helper_action_pre#:#You can update your
+helper_action_post#:# to enable printing!
+helper_name#:#Update Entries
+unsugg_color#:#Color Not Recommended LZ
+true_name_helper#:#UDF Editor Object for Name Entry
+nonnumeric_ref#:#Input for the UDF Editor Object must be the Ref ID (numeric or empty, other characters are not allowed).
+enable_ementoring#:#Show eMentoring
