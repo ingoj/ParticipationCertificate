@@ -119,7 +119,7 @@ class ilParticipationCertificateConfigSetTableGUI extends ilTable2GUI {
 									$arr_type[] = $this->pl->txt('object_config_type_' . $a_set['object_config_type']);
 									$template = new ilParticipationCertificateGlobalConfigSet($a_set['object_gl_conf_template_id']);
 									$arr_type[] = $this->pl->txt('origin_template') . ": " . $template->getTitle();
-									$this->tpl->setVariable('VALUE', implode($arr_type, "<br/>"));
+									$this->tpl->setVariable('VALUE', implode("<br/>", $arr_type));
 									break;
 								default:
 									$this->tpl->setVariable('VALUE', $this->pl->txt('configset_type_' . $a_set[$k]));
