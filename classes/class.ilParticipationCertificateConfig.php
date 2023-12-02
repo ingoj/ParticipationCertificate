@@ -240,7 +240,7 @@ class ilParticipationCertificateConfig extends ActiveRecord {
 		$this->config_key = $config_key;
 	}
 
-	public function getConfigValue(): string
+	public function getConfigValue(): ?string
     {
 		return $this->config_value;
 	}

@@ -33,7 +33,7 @@ class ilPartCertUsersData {
 					udf_firstname.value as firstname,   
 					udf_lastname.value as lastname,   
 					udf_gender.value as gender
-					from object_data
+					from usr_data
 					inner join " . ilParticipationCertificateConfig::TABLE_NAME . " as conf_udf_firstname on conf_udf_firstname.config_key = 'udf_firstname'
 					left join udf_text as udf_firstname on udf_firstname.field_id = conf_udf_firstname.config_value and udf_firstname.usr_id = usr_data.usr_id
 					inner join " . ilParticipationCertificateConfig::TABLE_NAME . " as conf_udf_lastname on conf_udf_lastname.config_key = 'udf_lastname'

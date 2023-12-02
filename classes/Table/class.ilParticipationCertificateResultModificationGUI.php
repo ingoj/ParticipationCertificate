@@ -175,22 +175,22 @@ class ilParticipationCertificateResultModificationGUI
     {
         $usr_id = $_GET[self::IDENTIFIER];
 
-        if (is_object($this->arr_initial_test_states[$usr_id])) {
+        if (key_exists($usr_id, $this->arr_initial_test_states) && is_object($this->arr_initial_test_states[$usr_id])) {
             $array['initial'] = $this->arr_initial_test_states[$usr_id]->getCrsitestItestSubmitted();
         } else {
             $array['initial'] = 0;
         }
-        if (is_object($this->arr_learn_reached_percentages[$usr_id])) {
+        if (key_exists($usr_id, $this->arr_learn_reached_percentages) && is_object($this->arr_learn_reached_percentages[$usr_id])) {
             $array['resultstest'] = $this->arr_learn_reached_percentages[$usr_id]->getAveragePercentage(ilParticipationCertificateConfig::getConfig('calculation_type_processing_state_suggested_objectives', $_GET['ref_id']));
         } else {
             $array['resultstest'] = 0;
         }
-        if (is_object($this->arr_iass_states[$usr_id])) {
+        if (key_exists($usr_id, $this->arr_iass_states) && is_object($this->arr_iass_states[$usr_id])) {
             $array['conf'] = $this->arr_iass_states[$usr_id]->getPassed();
         } else {
             $array['conf'] = 0;
         }
-        if (is_object($this->arr_excercise_states[$usr_id])) {
+        if (key_exists($usr_id, $this->arr_excercise_states) && is_object($this->arr_excercise_states[$usr_id])) {
             $array['homework'] = $this->arr_excercise_states[$usr_id]->getPassedPercentage();
         } else {
             $array['homework'] = 0;

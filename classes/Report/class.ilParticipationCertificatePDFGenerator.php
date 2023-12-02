@@ -25,7 +25,7 @@ class ilParticipationCertificatePDFGenerator
         $this->pl = ilParticipationCertificatePlugin::getInstance();
 
         if ($tempCount == 0) {
-            $tempFile = $this->temp = ilUtil::ilTempnam();
+            $tempFile = $this->temp = ilFileUtils::ilTempnam();
             $tempCount++;
         }
     }

@@ -41,6 +41,8 @@ class ilParticipationCertificateUIHookGUI extends ilUIHookPluginGUI {
 					"group_ref_id" => 0
 			))->first();
 
+
+
 			if(is_object($config)) {
 				$this->keywords = explode(",",$config->getConfigValue());
 			}
@@ -90,12 +92,12 @@ class ilParticipationCertificateUIHookGUI extends ilUIHookPluginGUI {
 	function checkGroup(): bool
 	{
 		foreach ($this->ctrl->getCallHistory() as $GUIClassesArray) {
-			if (($this->objecttype === 'crs') && key_exists('class', $GUIClassesArray) && ($GUIClassesArray['class'] == ilObjCourseGUI::class)) {
+			if (($this->objecttype === 'crs') && key_exists('cmdClass', $GUIClassesArray) && ($GUIClassesArray['cmdClass'] == ilObjCourseGUI::class)) {
 				if ($this->strposa($this->learnGroupTitle, $this->keywords) !== false) {
 					return true;
 				}
 			}
-			if (($this->objecttype === 'grp') && key_exists('class',$GUIClassesArray) &&  ($GUIClassesArray['class'] == ilObjGroupGUI::class)) {
+			if (($this->objecttype === 'grp') && key_exists('cmdClass',$GUIClassesArray) &&  ($GUIClassesArray['cmdClass'] == ilObjGroupGUI::class)) {
 				if ($this->strposa($this->learnGroupTitle, $this->keywords) !== false) {
 					return true;
 				}

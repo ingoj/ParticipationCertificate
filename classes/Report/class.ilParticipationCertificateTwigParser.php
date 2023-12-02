@@ -9,16 +9,16 @@ class ilParticipationCertificateTwigParser {
     protected ilParticipationCertificatePlugin $pl;
     protected int $group_ref_id;
 	protected array $usr_ids;
-	protected int $usr_id;
-	protected bool $ementor;
-	protected bool $footer;
-	protected bool $edited;
+	protected null|int|array $usr_id;
+	protected bool $ementor = false;
+	protected bool $footer = false;
+	protected bool $edited = false;
 	protected ?array $array;
     public ilTemplate|ilGlobalTemplateInterface $tpl;
 
     protected \Twig\TemplateWrapper|Twig_TemplateWrapper $twig_template;
 
-	public function __construct(int $group_ref_id, array $twig_options, int $usr_id, bool $ementor = true, bool $edited = false, array|null $array = NULL) {
+	public function __construct(int $group_ref_id, array $twig_options, int $usr_id = null, bool $ementor = true, bool $edited = false, array|null $array = NULL) {
 		global $DIC;
         $this->pl = ilParticipationCertificatePlugin::getInstance();
         $this->tpl = $DIC->ui()->mainTemplate();
@@ -121,6 +121,9 @@ class ilParticipationCertificateTwigParser {
 		}
 
 		foreach ($this->usr_id as $usr_id) {
+            $percentage = 0;
+
+
 			//quickfix, wenn man user auswählt kann es sein, das $usr_id ein array bleibt. Das führt weiter unten zum crash. So wird das array aufgelöst.
 			if (is_array($usr_id)) {
 				$usr_id = $usr_id[0];
@@ -131,11 +134,12 @@ class ilParticipationCertificateTwigParser {
 			//Preprocess text values
 			foreach ($arr_config_text as $key => $value) {
 				$twig = new \Twig_Environment(new \Twig_Loader_String());
-				$peparsed_value = $twig->render($value, array(
+				$peparsed_value = $twig->render((string)$value, array(
 					"username" => ($arr_usr_data[$usr_id]->getPartCertSalutation() ? $arr_usr_data[$usr_id]->getPartCertSalutation() . ' ' : '')
 						. $arr_usr_data[$usr_id]->getPartCertFirstname() . ' ' . $arr_usr_data[$usr_id]->getPartCertLastname(),
 					'date' => $date->get(IL_CAL_FKT_DATE, 'd.m.Y')
 				));
+
 				$processed_arr_text_values[$key] = $peparsed_value;
 			}
 
@@ -153,25 +157,25 @@ class ilParticipationCertificateTwigParser {
 
 				//Initial Test
 				$initial_test_state = 0;
-				if (is_object($arr_initial_test_states[$usr_id])) {
+				if (key_exists($usr_id, $arr_initial_test_states) && is_object($arr_initial_test_states[$usr_id])) {
 					$initial_test_state = $arr_initial_test_states[$usr_id]->getCrsitestItestSubmitted();
 				}
 				//Percentage final tests of suggested modules
 				$learn_sugg_result = 0;
-				if (is_object($arr_learn_sugg_results[$usr_id])) {
+				if (key_exists($usr_id, $arr_learn_sugg_results) && is_object($arr_learn_sugg_results[$usr_id])) {
 					$learn_sugg_result = $arr_learn_sugg_results[$usr_id]->getAveragePercentage(ilParticipationCertificateConfig::getConfig('calculation_type_processing_state_suggested_objectives',$_GET['ref_id']),true);
 				}
 				/*Video Conferences */
                 $countPassed = 0;
                 $countTests = 0;
-                if (is_array($arr_new_iass_states[$usr_id])) {
+                if (key_exists($usr_id, $arr_new_iass_states) && is_array($arr_new_iass_states[$usr_id])) {
                     foreach ($arr_new_iass_states[$usr_id] as $item) {
                         $countPassed = $countPassed + $item->getPassed();
                         $countTests = $countTests + $item->getTotal();
                     }
                 }
 
-                if (is_object($arr_xali_states[$usr_id])) {
+                if (key_exists($usr_id, $arr_xali_states) &&  is_object($arr_xali_states[$usr_id])) {
                     $countPassed = $countPassed + $arr_xali_states[$usr_id]->getPassed();
                     $countTests = $countTests + $arr_xali_states[$usr_id]->getTotal();
                 }
@@ -197,7 +201,7 @@ class ilParticipationCertificateTwigParser {
 
 				//Home Work
 				$excercise_percentage = 0;
-				if (is_object($arr_excercise_states[$usr_id])) {
+				if (key_exists($usr_id, $arr_excercise_states) && is_object($arr_excercise_states[$usr_id])) {
 					$excercise_percentage = $arr_excercise_states[$usr_id]->getPassedPercentage();
 				}
 			}

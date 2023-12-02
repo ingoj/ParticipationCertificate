@@ -9,6 +9,7 @@ class xaliStates
         global $DIC;
 
         $items = $DIC->repositoryTree()->getChildIds($group_ref_id);
+        $data = [];
 
         $arr_xali_status = [];
         foreach ($items as $ref_id) {

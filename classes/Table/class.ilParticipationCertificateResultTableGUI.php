@@ -21,6 +21,7 @@ class ilParticipationCertificateResultTableGUI extends ilTable2GUI {
 	protected array $custom_export_formats = array();
 	protected array $custom_export_generators = array();
 	protected array $usr_ids;
+    protected ?string $ementoring = null;
 
 	public function __construct(ilParticipationCertificateResultGUI $a_parent_obj, string $a_parent_cmd) {
 		global $DIC;
@@ -87,7 +88,8 @@ class ilParticipationCertificateResultTableGUI extends ilTable2GUI {
 		$cols = array();
 		//$cols['usr_id'] = array( 'txt' => 'usr_id', 'default' => false, 'width' => 'auto', 'sort_field' => 'usr_id' );
 		//access-dependent defaults via $write_access
-		$write_access = $cert_access->hasCurrentUserWriteAccess;
+        $cert_access = new ilParticipationCertificateAccess($_GET["ref_id"]);
+		$write_access = $cert_access->hasCurrentUserWriteAccess();
 		$cols['loginname'] = array( 
 			'txt' => $this->pl->txt('loginname'), 
 			'default' => $write_access, 
@@ -195,7 +197,7 @@ class ilParticipationCertificateResultTableGUI extends ilTable2GUI {
 				$row['lastname'] = '';
 			}
 
-			if (is_object($arr_initial_test_states[$usr_id])) {
+			if (key_exists($usr_id, $arr_initial_test_states) && is_object($arr_initial_test_states[$usr_id])) {
 				$row['initial_test_finished'] = $arr_initial_test_states[$usr_id]->getCrsitestItestSubmitted();
 				if ($row['initial_test_finished'] == 1) {
 					$row['initial_test_finished'] = $this->pl->txt("yes");
@@ -251,14 +253,14 @@ class ilParticipationCertificateResultTableGUI extends ilTable2GUI {
 
 			$countPassed = 0;
 			$countTests = 0;
-			if (is_array($arr_new_iass_states[$usr_id])) {
+			if (key_exists($usr_id, $arr_new_iass_states) && is_array($arr_new_iass_states[$usr_id])) {
                 foreach ($arr_new_iass_states[$usr_id] as $item) {
                     $countPassed = $countPassed + $item->getPassed();
                     $countTests = $countTests + $item->getTotal();
                 }
             }
 
-            if (is_object($arr_xali_states[$usr_id])) {
+            if (key_exists($usr_id, $arr_xali_states) && is_object($arr_xali_states[$usr_id])) {
                 $countPassed = $countPassed + $arr_xali_states[$usr_id]->getPassed();
                 $countTests = $countTests + $arr_xali_states[$usr_id]->getTotal();
             }
@@ -284,7 +286,7 @@ class ilParticipationCertificateResultTableGUI extends ilTable2GUI {
 						$row['eMentoring_finished'] = ilUtil::img($this->pl->getImagePath("not_attempted.svg"));
 			}
 
-			if (is_object($arr_excercise_states[$usr_id])) {
+			if (key_exists($usr_id, $arr_excercise_states) && is_object($arr_excercise_states[$usr_id])) {
 				$row['eMentoring_homework'] = $arr_excercise_states[$usr_id]->getPassed();
 				//$row['eMentoring_percentage'] = $arr_excercise_states[$usr_id]->getPassedPercentage() . '%';
 				$row['eMentoring_percentage'] = $this->buildProgressBar($arr_excercise_states[$usr_id]->getPassedPercentage(),0);

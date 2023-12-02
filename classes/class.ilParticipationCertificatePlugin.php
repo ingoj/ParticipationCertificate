@@ -81,4 +81,8 @@ class ilParticipationCertificatePlugin extends ilUserInterfaceHookPlugin {
         }
     }
 
+    public function getImagePath(string $imageName): string {
+        return $this->getDirectory()."/templates/images/".$imageName;
+    }
+
 }

@@ -20,7 +20,7 @@ class ilParticipationCertificateSingleResultTableGUI extends ilTable2GUI {
 	protected array $sugg;
 
 
-	public function __construct(ilParticipationCertificateMultipleResultGUI|ilParticipationCertificateResultGUI $a_parent_obj, string $a_parent_cmd, int $usr_id) {
+	public function __construct(ilParticipationCertificateMultipleResultGUI|ilParticipationCertificateResultGUI|ilParticipationCertificateSingleResultGUI $a_parent_obj, string $a_parent_cmd, int $usr_id) {
 		global $DIC;
 
 		$this->ctrl = $DIC->ctrl();
