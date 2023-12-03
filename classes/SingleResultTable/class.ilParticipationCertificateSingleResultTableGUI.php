@@ -152,6 +152,7 @@ class ilParticipationCertificateSingleResultTableGUI extends ilTable2GUI {
 
 	private function addColumns(): void
     {
+
 		foreach ($this->getSelectableColumns() as $k => $v) {
 			if ($this->isColumnSelected($k)) {
 				if (isset($v['sort_field'])) {
@@ -170,7 +171,6 @@ class ilParticipationCertificateSingleResultTableGUI extends ilTable2GUI {
 		$arr_FinalTestsStates = ilLearnObjectFinalTestStates::getData([$this->usr_id]);
 		$usr_id = $this->usr_id;
 		$rec_array = array();
-
 
 		if (count($arr_FinalTestsStates)) {
 

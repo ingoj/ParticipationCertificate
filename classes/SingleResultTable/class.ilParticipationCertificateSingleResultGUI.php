@@ -80,11 +80,7 @@ class ilParticipationCertificateSingleResultGUI
 
     public function display(): void
     {
-        if (method_exists($this->tpl, 'loadStandardTemplate')) {
-            $this->tpl->loadStandardTemplate();
-        } else {
-            $this->tpl->getStandardTemplate();
-        }
+
         $this->tpl->addCss($this->pl->getDirectory() . '/Templates/css/table.css');
         $this->initHeader();
 

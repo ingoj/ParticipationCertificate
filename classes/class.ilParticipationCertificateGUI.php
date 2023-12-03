@@ -196,7 +196,8 @@ class ilParticipationCertificateGUI
             $global_config_set = $global_config_sets->getConfigSetById($global_config_id);
             $this->tpl->setOnScreenMessage('info',$this->pl->txt('configset_type_1'). ' ' . $global_config_set->getTitle(), true);
         } else {
-            $this->tpl->setOnScreenMessage('info',$this->pl->txt('configset_type_2'). ' ' . $global_config_set->getTitle(), true);
+            //$this->tpl->setOnScreenMessage('info',$this->pl->txt('configset_type_2'). ' ' . $global_config_set->getTitle(), true);
+            $this->tpl->setOnScreenMessage('info',$this->pl->txt('configset_type_2'), true);
         }
 
 
@@ -321,7 +322,7 @@ class ilParticipationCertificateGUI
                 case "page1_issuer_signature":
                     //Picture
                     $file_data = $form->getInput('page1_issuer_signature');
-                    if ($file_data['tmp_name']) {
+                    if (key_exists('tmp_name', $file_data) && $file_data['tmp_name']) {
                         $input = ilParticipationCertificateConfig::storePicture($file_data, $this->groupRefId, ilParticipationCertificateConfig::ISSUER_SIGNATURE_FILE_NAME);
                     } else {
                         // Previous upload
@@ -331,7 +332,7 @@ class ilParticipationCertificateGUI
                 case 'logo':
                     //Picture
                     $file_data = $form->getInput('logo');
-                    if ($file_data['tmp_name']) {
+                    if (key_exists('tmp_name', $file_data) && $file_data['tmp_name']) {
                         $input = ilParticipationCertificateConfig::storePicture($file_data, $this->groupRefId, ilParticipationCertificateConfig::LOGO_FILE_NAME);
                     } else {
                         // Previous upload

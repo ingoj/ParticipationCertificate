@@ -246,7 +246,7 @@ class ilParticipationCertificateConfig extends ActiveRecord {
 	}
 
 
-	public function setConfigValue(string $config_value): void
+	public function setConfigValue(?string $config_value): void
     {
 		$this->config_value = $config_value;
 	}
