@@ -149,7 +149,7 @@ class ilParticipationCertificateResultTableGUI extends ilTable2GUI {
 	}
 	private function addColumns(): void
     {
-		$this->addColumn('', '', '', true);
+		$this->addColumn('invisible', '', 'invisible', true);
 		foreach ($this->getSelectableColumns() as $k => $v) {
 			if ($this->isColumnSelected($k)) {
 				if (isset($v['sort_field'])) {
@@ -207,7 +207,7 @@ class ilParticipationCertificateResultTableGUI extends ilTable2GUI {
 			} else {
 				$row['initial_test_finished'] = $this->pl->txt("no");
 			}
-			if (is_object($arr_learn_reached_percentages[$usr_id])) {
+			if ((key_exists($usr_id, $arr_learn_reached_percentages)) && (is_object($arr_learn_reached_percentages[$usr_id]))) {
 
 
 				$row['result_qualifing_tests'] = $this->buildProgressBar($arr_learn_reached_percentages[$usr_id]->getAveragePercentage(ilParticipationCertificateConfig::getConfig('calculation_type_processing_state_suggested_objectives',$_GET['ref_id'])
@@ -222,7 +222,7 @@ class ilParticipationCertificateResultTableGUI extends ilTable2GUI {
 			$rec_array = [];
 			$array_results = [];
 
-			if (is_array($arr_final_tests[$usr_id])) {
+			if (key_exists($usr_id, $arr_final_tests) && (is_array($arr_final_tests[$usr_id]))) {
 
 				foreach ($arr_final_tests[$usr_id] as $usr_objectives) {
 
@@ -296,11 +296,11 @@ class ilParticipationCertificateResultTableGUI extends ilTable2GUI {
 				$row['eMentoring_percentage'] = $this->buildProgressBar(0,0);
 			}
 
-			if ($this->filter['firstname'] != false) {
+			if ((key_exists('firstname',$this->filter) && ($this->filter['firstname'] != false)) {
 				if (strtolower($row['firstname']) == strtolower($this->filter['firstname'])) {
 					$rows[] = $row;
 				}
-			} elseif ($this->filter['lastname'] != false) {
+			} elseif ((key_exists('lastname',$this->filter)) &&($this->filter['lastname'] != false)) {
 				if (strtolower($row['lastname']) == strtolower($this->filter['lastname'])) {
 					$rows[] = $row;
 				}
