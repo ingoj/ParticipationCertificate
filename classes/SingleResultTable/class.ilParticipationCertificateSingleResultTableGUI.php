@@ -137,13 +137,19 @@ class ilParticipationCertificateSingleResultTableGUI extends ilTable2GUI {
 			 * @var NewLearningObjectiveScore $score
 			 */
 
+			if (key_exists('weight_fine_'.$score->getObjectiveId(),$newWeights)) {
+				$fine = $newWeights['weight_fine_'.$score->getObjectiveId()];
+			} else {
+				//fallback
+				$fine = 1;
+			}
 
 			$sorting[$score->getObjectiveId()] = [
 				'title' => $score->getTitle(),
 				'score' => $score->getScore(),
 				'obj_id' => $score->getCourseObjId(),
 				'objective_id' => $score->getObjectiveId(),
-				'weight' => $newWeights['weight_fine_' . $score->getObjectiveId()]
+				'weight' => $fine
 			];
 		}
 
@@ -158,7 +164,7 @@ class ilParticipationCertificateSingleResultTableGUI extends ilTable2GUI {
 				if (isset($v['sort_field'])) {
 					$sort = $v['sort_field'];
 				} else {
-					$sort = NULL;
+					$sort = '';
 				}
 				$this->addColumn($v['txt'], $sort, $v['width']);
 			}
@@ -212,7 +218,7 @@ class ilParticipationCertificateSingleResultTableGUI extends ilTable2GUI {
 		return $rec_array;
 	}
 
-	protected function buildProgressBar($points, int $required_percent, object $tries): string
+	protected function buildProgressBar($points, ?int $required_percent, ?int $tries): string
     {
 		$points = $points[0];
 		$tooltip_id = "prg_";
@@ -226,7 +232,7 @@ class ilParticipationCertificateSingleResultTableGUI extends ilTable2GUI {
 			$current_percent = 0;
 		}
 		//required to dodge bug in ilContainerObjectiveGUI::renderProgressBar
-		if ($required_percent === 0) {
+		if ($required_percent == 0) {
 			$required_percent = 0.1;
 		}
 
@@ -238,9 +244,9 @@ class ilParticipationCertificateSingleResultTableGUI extends ilTable2GUI {
 			$css_class = self::FAILED_PROGRESS_CSS_CLASS;
 		}
 
-		require_once("Services/Container/classes/class.ilContainerObjectiveGUI.php");
+		//require_once("Services/Container/classes/class.ilContainerObjectiveGUI.php");
 
-		return ilContainerObjectiveGUI::renderProgressBar($current_percent, $required_percent, $css_class, '', NULL, $tooltip_id, '');
+		return \ilContainerObjectiveGUI::renderProgressBar($current_percent, $required_percent, $css_class, '', NULL, $tooltip_id, '');
 	}
 
 	public function fillRow(array $a_set): void
