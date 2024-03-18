@@ -4,7 +4,7 @@ use SRAG\ILIAS\Plugins\LearningObjectiveSuggestions\Config\CourseConfig;
 
 class getFineWeights {
 
-	public static function getData(): getFineWeight
+	public static function getData(): array
     {
 		global $DIC;
 		$ilDB = $DIC->database();
@@ -13,6 +13,13 @@ class getFineWeights {
 		$weights = new getFineWeight();
 
 		while ($row = $ilDB->fetchAssoc($result)) {
+			// just read out the objectives and values from the cfg_key
+			if (str_starts_with($row['cfg_key'],'weight_fine_')) {
+				$weight[$row['cfg_key']] = row['value'];
+			}
+			// the complete switch clause may be obsolete
+			// this seems to have been broken for a while, since it trelies on 10 fixed objective-IDs
+			
 			switch ($row['cfg_key']) {
 				case 'weight_fine_90':
 					$weights->setWeightFine90($row['value']);
@@ -47,7 +54,7 @@ class getFineWeights {
 			}
 		}
 
-		return $weights;
+		return $weight;
 	}
 
 	protected static function getSQL(): string
