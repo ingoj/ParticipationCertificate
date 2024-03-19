@@ -296,7 +296,7 @@ class ilParticipationCertificateResultTableGUI extends ilTable2GUI {
 				$row['eMentoring_percentage'] = $this->buildProgressBar(0,0);
 			}
 
-			if ((key_exists('firstname',$this->filter) && ($this->filter['firstname'] != false)) {
+			if ((key_exists('firstname',$this->filter)) && ($this->filter['firstname'] != false)) {
 				if (strtolower($row['firstname']) == strtolower($this->filter['firstname'])) {
 					$rows[] = $row;
 				}
