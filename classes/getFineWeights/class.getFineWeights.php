@@ -15,7 +15,7 @@ class getFineWeights {
 		while ($row = $ilDB->fetchAssoc($result)) {
 			// just read out the objectives and values from the cfg_key
 			if (str_starts_with($row['cfg_key'],'weight_fine_')) {
-				$weight[$row['cfg_key']] = row['value'];
+				$weight[$row['cfg_key']] = $row['value'];
 			}
 			// the complete switch clause may be obsolete
 			// this seems to have been broken for a while, since it trelies on 10 fixed objective-IDs
