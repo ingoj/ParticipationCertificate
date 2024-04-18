@@ -18,7 +18,7 @@ class ilParticipationCertificateTwigParser {
 
     protected \Twig\TemplateWrapper|Twig_TemplateWrapper $twig_template;
 
-	public function __construct(int $group_ref_id, array $twig_options, int $usr_id = null, bool $ementor = true, bool $edited = false, array|null $array = NULL) {
+	public function __construct(int $group_ref_id, array $twig_options, array $usr_id = null, bool $ementor = true, bool $edited = false, array|null $array = NULL) {
 		global $DIC;
         $this->pl = ilParticipationCertificatePlugin::getInstance();
         $this->tpl = $DIC->ui()->mainTemplate();
