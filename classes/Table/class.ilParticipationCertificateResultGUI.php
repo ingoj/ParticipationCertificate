@@ -163,7 +163,7 @@ class ilParticipationCertificateResultGUI
         $cert_access = new ilParticipationCertificateAccess($_GET['ref_id']);
         if ($cert_access->hasCurrentUserPrintAccess()) {
             $ementor = $_GET['ementor'];
-            $usr_id = $_GET['usr_id'];
+            $usr_id[] = $_GET['usr_id'];
             $twigParser = new ilParticipationCertificateTwigParser($this->groupRefId, array(), $usr_id, $ementor,
                 false);
             $twigParser->parseData();
@@ -181,9 +181,14 @@ class ilParticipationCertificateResultGUI
                 $this->tpl->setOnScreenMessage('failure',$this->lng->txt('no_records_selected'), true);
                 $this->ctrl->redirect($this, self::CMD_CONTENT);
             }
-            $usr_id = $_POST['record_ids'];
-            $twigParser = new ilParticipationCertificateTwigParser($this->groupRefId, array(), $usr_id, true, false,
-                false);
+            $usr_ids = $_POST['record_ids'];
+            if (!is_array($usr_ids)) {
+                $usr_id[] = $usr_ids;
+            } else {
+                $usr_id = $usr_ids;
+            }
+            $twigParser = new ilParticipationCertificateTwigParser($this->groupRefId, array(), (array) $usr_id, true, false);
+                
             $twigParser->parseData();
         } else {
             $this->tpl->setOnScreenMessage('failure',$this->lng->txt('no_permission'), true);
@@ -200,9 +205,13 @@ class ilParticipationCertificateResultGUI
                 $this->ctrl->redirect($this, self::CMD_CONTENT);
             }
 
-            $usr_id = $_POST['record_ids'];
-            $twigParser = new ilParticipationCertificateTwigParser($this->groupRefId, array(), $usr_id, false, false,
-                false);
+            $usr_ids = $_POST['record_ids'];
+            if (!is_array($usr_ids)) {
+                $usr_id[] = $usr_ids;
+            } else {
+                $usr_id = $usr_ids;
+            }
+            $twigParser = new ilParticipationCertificateTwigParser($this->groupRefId, array(), $usr_id, false, false);
             $twigParser->parseData();
         } else {
             $this->tpl->setOnScreenMessage('failure',$this->lng->txt('no_permission'), true);
