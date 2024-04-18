@@ -25,7 +25,7 @@ class ilParticipationCertificateUIHookGUI extends ilUIHookPluginGUI {
 		if($DIC->offsetExists('tpl')) {
 			$this->ctrl = $DIC->ctrl();
 			$this->pl = ilParticipationCertificatePlugin::getInstance();
-			if (isset($_GET['ref_id']) {
+			if (isset($_GET['ref_id'])) {
 				$this->groupRefId = (int)$_GET['ref_id'];
 			} else {
 				$this->groupRefId = 0;
