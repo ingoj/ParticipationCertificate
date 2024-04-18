@@ -18,7 +18,7 @@ class ilParticipationCertificateMultipleResultGUI
     /**
      * @var int[]
      */
-    protected array $usr_ids;
+    protected ?array $usr_ids;
     /**
      * @var int
      */
