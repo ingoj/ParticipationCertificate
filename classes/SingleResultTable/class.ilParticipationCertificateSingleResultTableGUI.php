@@ -255,7 +255,7 @@ class ilParticipationCertificateSingleResultTableGUI extends ilTable2GUI {
 		foreach ($this->getSelectableColumns() as $k => $v) {
 
 			if ($this->isColumnSelected($k)) {
-				if ($a_set[$k]) {
+				if isset(($a_set[$k])) {
 					$this->tpl->setCurrentBlock('td');
 					if (is_array($a_set[$k])) {
 
