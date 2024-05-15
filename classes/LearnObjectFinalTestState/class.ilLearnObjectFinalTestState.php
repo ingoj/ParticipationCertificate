@@ -97,7 +97,7 @@ class ilLearnObjectFinalTestState {
 
 	public function setLocftestMasterCrsId(?int $locftest_master_crs_id): void
 		{
-			$this->locftest_master_crs_id = $locftest_master_crs_id);
+			$this->locftest_master_crs_id = $locftest_master_crs_id;
 		}
 
 	public function getLocftestMasterCrsTitle() : ?string
