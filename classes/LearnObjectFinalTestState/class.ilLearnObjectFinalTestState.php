@@ -1,11 +1,14 @@
 <?php
 class ilLearnObjectFinalTestState {
-    protected ?string $locftest_learn_objective_title;
+        protected ?string $locftest_learn_objective_title;
 	protected ?int $locftest_usr_id;
 	protected ?int $locftest_crs_obj_id = null;
+	protected ?int $locftest_master_crs_id = null;
+	protected ?string $locftest_master_crs_title;
 	protected ?string $locftest_crs_title;
 	protected ?int $locftest_objective_id = null;
 	protected ?string $locftest_objective_title;
+	protected ?int $locftest_master_objective_id = null;
 	protected ?int $locftest_test_ref_id = null;
 	protected ?int $locftest_test_obj_id = null;
 	protected ?string $locftest_test_title;
@@ -14,6 +17,16 @@ class ilLearnObjectFinalTestState {
 	protected bool $objectives_all_completed;
 	protected bool $objectives_sug_completed;
 	protected bool $objectives_suggested;
+
+    public function getLocftestMasterObjectiveId: ?int
+    {
+	return $this->locftest_master_objective_id;
+    }
+
+    public function setLocftestMasterObjectiveId ( ?int $locftest_master_objective_id ): void
+    {
+    	$this->locftest_master_objective_id = $locftest_master_objective_id;
+    }
 
     public function getLocftestLearnObjectiveTitle() : ?string
     {
@@ -77,15 +90,34 @@ class ilLearnObjectFinalTestState {
 		$this->locftest_objective_title = $locftest_objective_title;
 	}
 
+	public function getLocftestMasterCrsId(): ?int
+		{
+			return $this->locftest_master_crs_id;
+		}
+
+	public function setLocftestMasterCrsId(?int $locftest_master_crs_id): void
+		{
+			$this->locftest_master_crs_id = $locftest_master_crs_id);
+		}
+
+	public function getLocftestMasterCrsTitle() : ?string
+		{
+			return $this->locftest_master_crs_title;
+		}
+
+	public function setLocftestMasterCrsTitle(?string $locftest_master_crs_title): void
+		{
+			$this->locftest_master_crs_title = $locftest_master_crs_title;
+		}
 	public function getLocftestTestRefId(): ?int
-    {
-		return $this->locftest_test_ref_id;
-	}
+    		{
+			return $this->locftest_test_ref_id;
+		}
 
 	public function setLocftestTestRefId(?int $locftest_test_ref_id): void
-    {
-		$this->locftest_test_ref_id = $locftest_test_ref_id;
-	}
+    		{
+			$this->locftest_test_ref_id = $locftest_test_ref_id;
+		}
 
 	public function getLocftestTestObjId(): ?int
     {
