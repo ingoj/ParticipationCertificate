@@ -15,9 +15,10 @@ class ilLearnObjectFinalTestStates {
 			$locftst_state = new ilLearnObjectFinalTestState();
 			$locftst_state->setLocftestUsrId($row['usr_id']);
 			$locftst_state->setLocftestCrsObjId($row['learn_objective_crs_obj_id']);
-            $locftst_state->setLocftestLearnObjectiveTitle($row['learn_objective_title']);
+            		$locftst_state->setLocftestLearnObjectiveTitle($row['learn_objective_title']);
 			$locftst_state->setLocftestCrsTitle($row['learn_objective_crs_title']);
-			$locftst_state->setLocftestObjectiveId($row['master_crs_objective_id']);
+			$locftst_state->setLocftestMasterObjectiveId($row['master_crs_objective_id'])
+			$locftst_state->setLocftestObjectiveId($row['crs_objective_id']);
 			$locftst_state->setLocftestObjectiveTitle($row['crs_objective_title']);
 			$locftst_state->setLocftestTestObjId($row['tst_obj_id']);
 			$locftst_state->setLocftestTestRefId($row['tst_ref_id']);
@@ -27,6 +28,8 @@ class ilLearnObjectFinalTestStates {
 			$locftst_state->setObjectivesSugCompleted($row['objectives_sug_completed']);
 			$locftst_state->setObjectivesSuggested($row['suggested']);
 			$locftst_state->setLocftestQplsRequiredPercentage($row['tst_req_percentage']);
+			$locftst_state->setLocftestMasterCrsId($row['master_crs_id']);
+			$locftst_state->setLocftestMasterCrsTitle($row['master_crs_title']);
 
 			$locftst_data[$row['usr_id']][$row['master_crs_objective_id']][] = $locftst_state;
 		}
