@@ -5,7 +5,8 @@ class ilCrsInitialTestStates {
 
 	/**
 	 * @param array $arr_usr_ids
-	 *
+	 * @param int crsRefId (defaults to 0=
+  	 *
 	 * @return ilCrsInitialTestState[]
 	 */
 	public static function getData(array $arr_usr_ids = array(), int $crsRefId = 0): array
