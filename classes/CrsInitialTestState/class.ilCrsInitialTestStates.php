@@ -8,7 +8,7 @@ class ilCrsInitialTestStates {
 	 *
 	 * @return ilCrsInitialTestState[]
 	 */
-	public static function getData(array $arr_usr_ids = array()): array
+	public static function getData(array $arr_usr_ids = array(), int $crsRefId = 0): array
     {
 		global $DIC;
 		$ilDB = $DIC->database();
@@ -26,7 +26,9 @@ class ilCrsInitialTestStates {
 			$crsitst_state->setCrsitestItestTries($row['crsitest_itest_tries']);
 			$crsitst_state->setCrsitestItestSubmitted($row['crsitest_itest_submitted']);
 
-			$crsitst_data[$row['crsitest_usr_id']] = $crsitst_state;
+			if (( $crsRefId == 0 ) || ( $crsRefId == (int) $row['crsitest_crs_ref_id'] )) {
+				$crsitst_data[$row['crsitest_usr_id']] = $crsitst_state;
+			}
 		}
 
 		return $crsitst_data;
