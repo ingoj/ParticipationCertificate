@@ -18,7 +18,7 @@ class ilLearnObjectFinalTestState {
 	protected bool $objectives_sug_completed;
 	protected bool $objectives_suggested;
 
-    public function getLocftestMasterObjectiveId: ?int
+    public function getLocftestMasterObjectiveId(): ?int
     {
 	return $this->locftest_master_objective_id;
     }
