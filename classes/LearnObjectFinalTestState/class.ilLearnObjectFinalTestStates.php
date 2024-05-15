@@ -17,7 +17,7 @@ class ilLearnObjectFinalTestStates {
 			$locftst_state->setLocftestCrsObjId($row['learn_objective_crs_obj_id']);
             		$locftst_state->setLocftestLearnObjectiveTitle($row['learn_objective_title']);
 			$locftst_state->setLocftestCrsTitle($row['learn_objective_crs_title']);
-			$locftst_state->setLocftestMasterObjectiveId($row['master_crs_objective_id'])
+			$locftst_state->setLocftestMasterObjectiveId($row['master_crs_objective_id']);
 			$locftst_state->setLocftestObjectiveId($row['crs_objective_id']);
 			$locftst_state->setLocftestObjectiveTitle($row['crs_objective_title']);
 			$locftst_state->setLocftestTestObjId($row['tst_obj_id']);
