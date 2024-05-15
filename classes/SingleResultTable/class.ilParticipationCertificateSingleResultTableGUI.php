@@ -177,6 +177,7 @@ class ilParticipationCertificateSingleResultTableGUI extends ilTable2GUI {
 		$arr_FinalTestsStates = ilLearnObjectFinalTestStates::getData([$this->usr_id]);
 		$usr_id = $this->usr_id;
 		$rec_array = array();
+	    	$processed = array();
 
 		if (count($arr_FinalTestsStates)) {
 
@@ -194,19 +195,28 @@ class ilParticipationCertificateSingleResultTableGUI extends ilTable2GUI {
 				 */
 
 				foreach($rec_final_tests as $key => $value) {
-                    if ($value->getLocftestCrsObjId()) {
-                        //first line - title lp
-                        $rec_array[$row_key[$value->getLocftestCrsObjId()]][$value->getLocftestCrsObjId()] = $value->getLocftestObjectiveTitle();
+                    			if ($value->getLocftestCrsObjId()) {
+						// check if data already exists
+						$crs_obj_id = $value->getLocftestCrsObjId();
+						$crs_objective_id = $value->getLocftestObjectiveId();
+						if (isset($processed[$crs_obj_id])) {
+							if (isset($processed[$crs_obj_id][$crs_objective_id])) {
+								continue;
+							}
+						}
+                        			//first line - title lp
+                        			$rec_array[$row_key[$value->getLocftestCrsObjId()]][$value->getLocftestCrsObjId()] = $value->getLocftestObjectiveTitle();
 
-                        $row_key[$value->getLocftestCrsObjId()] += 1;
-                        //second line - array progressbar
-                        $rec_array[$row_key[$value->getLocftestCrsObjId()]][$value->getLocftestCrsObjId()][0] = $value->getLocftestPercentage();
-                        $rec_array[$row_key[$value->getLocftestCrsObjId()]][$value->getLocftestCrsObjId()][1] = $value->getLocftestQplsRequiredPercentage();
-                        $rec_array[$row_key[$value->getLocftestCrsObjId()]][$value->getLocftestCrsObjId()][2] = 1;
+                        			$row_key[$value->getLocftestCrsObjId()] += 1;
+                        			//second line - array progressbar
+                        			$rec_array[$row_key[$value->getLocftestCrsObjId()]][$value->getLocftestCrsObjId()][0] = $value->getLocftestPercentage();
+                        			$rec_array[$row_key[$value->getLocftestCrsObjId()]][$value->getLocftestCrsObjId()][1] = $value->getLocftestQplsRequiredPercentage();
+                        			$rec_array[$row_key[$value->getLocftestCrsObjId()]][$value->getLocftestCrsObjId()][2] = 1;
 
-                        $row_key[$value->getLocftestCrsObjId()] += 1;
-                    }
-                }
+                        			$row_key[$value->getLocftestCrsObjId()] += 1;
+						$processed[$crs_obj_id][$crs_objective_id]=$usr_id;
+                    			}
+                		}
 
 
 
