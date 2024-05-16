@@ -30,7 +30,7 @@ class NewLearningObjectiveScores {
 		$select = "select * from " . LearningObjectiveScore::TABLE_NAME . "
 					inner join crs_objectives on " . LearningObjectiveScore::TABLE_NAME . ".objective_id = crs_objectives.objective_id 
 					where user_id =" . $ilDB->quote($usr_id, "integer") . "
-					order by score DESC";
+					order by course_obj_id, score DESC";
 
 		return $select;
 	}
