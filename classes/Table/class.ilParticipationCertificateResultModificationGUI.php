@@ -137,6 +137,7 @@ class ilParticipationCertificateResultModificationGUI
         $nameUser = $arr_usr_data[$usr_id]->getPartCertFirstname() . ' ' . $arr_usr_data[$usr_id]->getPartCertLastname();
 
         $form = new ilPropertyFormGUI();
+        $form->setPreventDoubleSubmission(false);
         $cert_access = new ilParticipationCertificateAccess($_GET['ref_id']);
         if ($cert_access->hasCurrentUserWriteAccess()) {
             $form->setFormAction($this->ctrl->getFormAction($this));
@@ -207,7 +208,7 @@ class ilParticipationCertificateResultModificationGUI
         $array = array($form->getInput('initial'), $form->getInput('resultstest'), $form->getInput('conf'), $form->getInput('homework'));
         $ementor = $_GET['ementor'];
         $edited = $_GET['edited'];
-        $usr_id = $this->usr_id;
+        $usr_id[] = $this->usr_id;
         $twigParser = new ilParticipationCertificateTwigParser($this->groupRefId, array(), $usr_id, $ementor, $edited, $array);
         $twigParser->parseData();
     }

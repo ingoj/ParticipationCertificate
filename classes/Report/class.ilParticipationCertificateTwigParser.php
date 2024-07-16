@@ -30,7 +30,7 @@ class ilParticipationCertificateTwigParser {
 
 		$this->usr_id = $usr_id;
 		//wenn keine $usr_id übegeben wird, werden alle in der Gruppe gedruckt
-		if ($usr_id == NULL) {
+		if ($usr_id[0] == NULL || $usr_id == NULL) {
 			$this->usr_id = $this->usr_ids;
 		}
 		$this->ementor = $ementor;
@@ -165,46 +165,46 @@ class ilParticipationCertificateTwigParser {
 				if (key_exists($usr_id, $arr_learn_sugg_results) && is_object($arr_learn_sugg_results[$usr_id])) {
 					$learn_sugg_result = $arr_learn_sugg_results[$usr_id]->getAveragePercentage(ilParticipationCertificateConfig::getConfig('calculation_type_processing_state_suggested_objectives',$_GET['ref_id']),true);
 				}
-				/*Video Conferences */
-                $countPassed = 0;
-                $countTests = 0;
-                if (key_exists($usr_id, $arr_new_iass_states) && is_array($arr_new_iass_states[$usr_id])) {
-                    foreach ($arr_new_iass_states[$usr_id] as $item) {
-                        $countPassed = $countPassed + $item->getPassed();
-                        $countTests = $countTests + $item->getTotal();
-                    }
-                }
-
-                if (key_exists($usr_id, $arr_xali_states) &&  is_object($arr_xali_states[$usr_id])) {
-                    $countPassed = $countPassed + $arr_xali_states[$usr_id]->getPassed();
-                    $countTests = $countTests + $arr_xali_states[$usr_id]->getTotal();
-                }
-
-                if($countTests > 0) {
-                    $percentage = $countPassed / $countTests * 100;
-
-                    switch ($countTests) {
-                        case 1:
-                            if ($countPassed == 1) {
-                                $iass_states = "<img alt='' src=" . ILIAS_ABSOLUTE_PATH . substr($this->pl->getImagePath("passed_s.png"), 1) . ">";
-                            } else {
-                                $iass_states = "<img alt='' src=" . ILIAS_ABSOLUTE_PATH . substr($this->pl->getImagePath("failed_s.png"), 1) . ">";
-                            }
-                            break;
-                        default:
-                            $iass_states = $countPassed . "/" . $countTests;
-                            break;
-                    }
-                } else {
-                    $iass_states =  "<img alt='' src=" . ILIAS_ABSOLUTE_PATH . substr($this->pl->getImagePath("not_attempted_s.png"), 1) . ">";
-                }
-
 				//Home Work
 				$excercise_percentage = 0;
 				if (key_exists($usr_id, $arr_excercise_states) && is_object($arr_excercise_states[$usr_id])) {
 					$excercise_percentage = $arr_excercise_states[$usr_id]->getPassedPercentage();
 				}
 			}
+
+            /*Video Conferences */
+            $countPassed = 0;
+            $countTests = 0;
+            if (key_exists($usr_id, $arr_new_iass_states) && is_array($arr_new_iass_states[$usr_id])) {
+                foreach ($arr_new_iass_states[$usr_id] as $item) {
+                    $countPassed = $countPassed + $item->getPassed();
+                    $countTests = $countTests + $item->getTotal();
+                }
+            }
+
+            if (key_exists($usr_id, $arr_xali_states) &&  is_object($arr_xali_states[$usr_id])) {
+                $countPassed = $countPassed + $arr_xali_states[$usr_id]->getPassed();
+                $countTests = $countTests + $arr_xali_states[$usr_id]->getTotal();
+            }
+
+            if($countTests > 0) {
+                $percentage = $countPassed / $countTests * 100;
+
+                switch ($countTests) {
+                    case 1:
+                        if ($countPassed == 1) {
+                            $iass_states = "<img alt='' src=" . ILIAS_ABSOLUTE_PATH . substr($this->pl->getImagePath("passed_s.png"), 1) . ">";
+                        } else {
+                            $iass_states = "<img alt='' src=" . ILIAS_ABSOLUTE_PATH . substr($this->pl->getImagePath("failed_s.png"), 1) . ">";
+                        }
+                        break;
+                    default:
+                        $iass_states = $countPassed . "/" . $countTests;
+                        break;
+                }
+            } else {
+                $iass_states =  "<img alt='' src=" . ILIAS_ABSOLUTE_PATH . substr($this->pl->getImagePath("not_attempted_s.png"), 1) . ">";
+            }
 
 			$arr_render = array(
 				'text_values' => $processed_arr_text_values,
