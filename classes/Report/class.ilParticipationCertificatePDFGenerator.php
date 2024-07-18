@@ -42,7 +42,7 @@ class ilParticipationCertificatePDFGenerator
         }
     }
 
-    public function generatePDF(bool $rendered, int $total_users): void
+    public function generatePDF(string $rendered, int $total_users): void
     {
         global $printCount, $tempFile;
 
