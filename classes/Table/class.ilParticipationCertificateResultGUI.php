@@ -162,7 +162,11 @@ class ilParticipationCertificateResultGUI
     {
         $cert_access = new ilParticipationCertificateAccess($_GET['ref_id']);
         if ($cert_access->hasCurrentUserPrintAccess()) {
-            $ementor = $_GET['ementor'];
+            if ($_GET['ementor'] == 'true') {
+                $ementor = true;
+                } else {
+                $ementor = false;
+                }
             $usr_id[] = $_GET['usr_id'];
             $twigParser = new ilParticipationCertificateTwigParser($this->groupRefId, array(), $usr_id, $ementor,
                 false);
