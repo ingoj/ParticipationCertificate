@@ -62,21 +62,7 @@ class ilParticipationCertificateResultTableGUI extends ilTable2GUI {
 			$this->addMultiCommand(ilParticipationCertificateMultipleResultGUI::CMD_SHOW_ALL_RESULTS, $this->pl->txt('list_overview'));
 			}	
        			
-		if ($cert_access->isSelfPrintEnabled() and !$cert_access->hasCurrentUserPrintAccess()) {
-			$global_config_sets = ilParticipationCertificateConfig::where(array("config_type"=>3, "global_config_id" => 0 ))->orderBy('order_by')->get();
-			foreach ($global_config_sets as $config) {
-				if ($config->getConfigKey() == "true_name_helper") {
-					$target_ref=$config->getConfigValue();
-				}
-			}
-            $this->tpl->setOnScreenMessage('failure',$this->pl->txt('noname_noprint'), true);
-			if (is_numeric($target_ref) and ($target_ref > 0) and (ilObject::_lookupType(ilObject::_lookupObjectId($target_ref),false) == 'xudf')) { 
-				$msgurl= ' <a href=./ilias.php?baseClass=ilObjPluginDispatchGUI&cmd=forward&ref_id=' . $target_ref . '>' .  $this->pl->txt('helper_name') . '</a>';
-				$msgadd= $this->pl->txt('helper_action_pre') . $msgurl . $this->pl->txt('helper_action_post');
-                $this->tpl->setOnScreenMessage('info',$msgadd, true);
-				//Variants sendQuestion, send Info or unified Failure (with some codechange). two same not possible
-				}
-			}
+		
 		$this->setRowTemplate('tpl.default_row.html', $this->pl->getDirectory());
 		$this->setFormAction($this->ctrl->getFormAction($a_parent_obj));
 
