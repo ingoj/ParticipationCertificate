@@ -1,7 +1,9 @@
 tbl_overview_results#:#Übersicht der Resultate
 cols_userid#:#UserID
-cols_firstname#:#Vorname
-cols_lastname#:#Nachname
+cols_firstname#:#Vorname (Druck)
+cols_lastname#:#Nachname (Druck)
+cols_alias_firstname#:#Vorname (sichtbar)
+cols_alias_lastname#:#Nachname (sichtbar)
 cols_initial_test_finished#:#Einstiegstest abgeschlossen
 cols_results_qualifying#:#Bearbeitung der empfohlenen Mathematik-Lernmodule
 cols_result_qualifying#:#Resultate der durchgeführten Tests der empfohlenen Mathematik-Lernmodule
@@ -29,9 +31,9 @@ result_for#:#Alle Resultate für
 no_records_selected#:#Keine User ausgewählt
 upload_header #:# Laden Sie Ihren PDF Header hoch
 save#:#Speichern
-udf_gender#:#Benutzerdefiniertes Feld Geschlecht
-udf_lastname#:#Benutzerdefiniertes Feld Nachnamen
-udf_firstname#:#Benutzerdefiniertes Feld Vornamen
+udf_gender#:#Benutzerdefiniertes Feld Anrade
+udf_lastname#:#Benutzerdefiniertes Feld Nachname
+udf_firstname#:#Benutzerdefiniertes Feld Vorname
 config_plugin#:#Konfiguration Teilnahmebescheinigung
 mod_initial#:#Einstiegstest abgeschlossen (Ja(1)/Nein(0) )
 mod_resultstest#:#Resultat qualifizierende Tests (Prozentwert)
