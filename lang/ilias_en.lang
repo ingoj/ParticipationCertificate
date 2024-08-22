@@ -1,7 +1,9 @@
 tbl_overview_results#:#Overview of Results
 cols_userid#:#UserID
-cols_firstname#:#First Name
-cols_lastname#:#Last Name
+cols_firstname#:#First Name (Print)
+cols_lastname#:#Last Name (Print)
+cols_alias_firstname#:#First Name (public)
+cols_alias_lastname#:#Last Name (public) 
 cols_initial_test_finished#:#Initial Test Completed
 cols_results_qualifying#:#Processing of Recommended Mathematics Learning Modules
 cols_result_qualifying#:#Results of Completed Tests of Recommended Mathematics Learning Modules
@@ -88,7 +90,7 @@ calculation_type_processing_state_suggested_objectives#:#Calculation Type 'Proce
 config_result_table#:#Configuration Period & Calculation Type
 noname_noprint#:#Printing the Certificate of Participation is only possible if you have entered both First and Last Name.
 helper_action_pre#:#You can update your
-helper_action_post#:# to enable printing!
+helper_action_post#:#&nbspto enable printing!
 helper_name#:#Update Entries
 unsugg_color#:#Color Not Recommended LZ
 true_name_helper#:#UDF Editor Object for Name Entry
