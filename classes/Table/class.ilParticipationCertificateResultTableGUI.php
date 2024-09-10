@@ -101,13 +101,13 @@ class ilParticipationCertificateResultTableGUI extends ilTable2GUI {
 			'sort_field' => 'initial_test_finished'
 		);
 		$cols['result_qualifing_tests'] = array(
-			'txt' => $this->pl->txt('cols_results_qualifying'),
+			'txt' => $this->pl->txt('cols_result_qualifying'),
 			'default' => true,
 			'width' => 'auto',
 			'sort_field' => 'result_qualifing_tests'
 		);
 		$cols['results_qualifing_tests'] = array(
-			'txt' => $this->pl->txt('cols_result_qualifying'),
+			'txt' => $this->pl->txt('cols_results_qualifying'),
 			'default' => false,
 			'width' => 'auto',
 			'sort_field' => 'result_qualifing_tests'
