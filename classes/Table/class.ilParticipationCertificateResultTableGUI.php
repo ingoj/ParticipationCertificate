@@ -143,6 +143,10 @@ class ilParticipationCertificateResultTableGUI extends ilTable2GUI {
 				} else {
 					$sort = NULL;
 				}
+				if ($sort == 'results_qualifying_tests') 
+				{
+					$sort = 'result_qualifying_tests';
+				}
 				$this->addColumn($v['txt'], $sort, $v['width']);
 			}
 		}
