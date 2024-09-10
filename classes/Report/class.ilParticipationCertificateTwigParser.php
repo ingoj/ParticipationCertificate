@@ -193,9 +193,9 @@ class ilParticipationCertificateTwigParser {
                 switch ($countTests) {
                     case 1:
                         if ($countPassed == 1) {
-                            $iass_states = "<img alt='' src=" . ILIAS_ABSOLUTE_PATH . substr($this->pl->getImagePath("passed_s.png"), 1) . ">";
+                            $iass_states = "<img alt='' src=" . ILIAS_ABSOLUTE_PATH . "/" . $this->pl->getImagePath("passed_s.png") . ">";
                         } else {
-                            $iass_states = "<img alt='' src=" . ILIAS_ABSOLUTE_PATH . substr($this->pl->getImagePath("failed_s.png"), 1) . ">";
+                            $iass_states = "<img alt='' src=" . ILIAS_ABSOLUTE_PATH . "/" . $this->pl->getImagePath("failed_s.png") . ">";
                         }
                         break;
                     default:
@@ -203,7 +203,7 @@ class ilParticipationCertificateTwigParser {
                         break;
                 }
             } else {
-                $iass_states =  "<img alt='' src=" . ILIAS_ABSOLUTE_PATH . substr($this->pl->getImagePath("not_attempted_s.png"), 1) . ">";
+                $iass_states =  "<img alt='' src=" . ILIAS_ABSOLUTE_PATH . "/" . $this->pl->getImagePath("not_attempted_s.png") . ">";
             }
 
 			$arr_render = array(
