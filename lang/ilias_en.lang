@@ -5,8 +5,8 @@ cols_lastname#:#Last Name (Print)
 cols_alias_firstname#:#First Name (public)
 cols_alias_lastname#:#Last Name (public) 
 cols_initial_test_finished#:#Initial Test Completed
-cols_results_qualifying#:#Processing of Recommended Mathematics Learning Modules
-cols_result_qualifying#:#Results of Completed Tests of Recommended Mathematics Learning Modules
+cols_result_qualifying#:#Processing of Recommended Mathematics Learning Modules
+cols_results_qualifying#:#Results of Completed Tests of Recommended Mathematics Learning Modules
 cols_eMentoring_finished#:#Active Participation in Video Conferences
 cols_eMentoring_homework#:#Processing of Cross-Disciplinary Homework (Count)
 cols_eMentoring_percentage#:#Processing of Cross-Disciplinary Homework in Percentage

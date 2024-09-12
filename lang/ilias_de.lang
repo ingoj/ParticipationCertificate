@@ -5,8 +5,8 @@ cols_lastname#:#Nachname (Druck)
 cols_alias_firstname#:#Vorname (sichtbar)
 cols_alias_lastname#:#Nachname (sichtbar)
 cols_initial_test_finished#:#Einstiegstest abgeschlossen
-cols_results_qualifying#:#Bearbeitung der empfohlenen Mathematik-Lernmodule
-cols_result_qualifying#:#Resultate der durchgeführten Tests der empfohlenen Mathematik-Lernmodule
+cols_result_qualifying#:#Bearbeitung der empfohlenen Mathematik-Lernmodule
+cols_results_qualifying#:#Resultate der durchgeführten Tests der empfohlenen Mathematik-Lernmodule
 cols_eMentoring_finished#:#Aktive Teilnahme an Videokonferenzen
 cols_eMentoring_homework#:#Bearbeitung der Aufgaben zu überfachlichen Themen (Anzahl)
 cols_eMentoring_percentage#:#Bearbeitung der Aufgaben zu überfachlichen Themen in Prozent

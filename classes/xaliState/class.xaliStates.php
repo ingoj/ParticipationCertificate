@@ -28,13 +28,13 @@ class xaliStates
             $total_checklist = xaliChecklist::where(['obj_id' => $object_id])->count();
 
             foreach ($arr_usr_ids as $usr_id) {
-                    $xaliUserStatus = xaliUserStatus::getInstance($usr_id, $object_id);
-                    $arr_xali_status[$usr_id]['present'] = (int) $arr_xali_status[$usr_id]['present'] + $xaliUserStatus->getAttendanceStatuses(xaliChecklistEntry::STATUS_PRESENT);
-                    $arr_xali_status[$usr_id]['total'] = $arr_xali_status[$usr_id]['total'] + 
-                        $xaliUserStatus->getAttendanceStatuses(xaliChecklistEntry::STATUS_ABSENT_UNEXCUSED) +
-                        // Do not count excused absences
-                        // $xaliUserStatus->getAttendanceStatuses(xaliChecklistEntry::STATUS_ABSENT_EXCUSED) + 
-                        $xaliUserStatus->getAttendanceStatuses(xaliChecklistEntry::STATUS_PRESENT);
+                $xaliUserStatus = xaliUserStatus::getInstance($usr_id, $object_id);
+                $arr_xali_status[$usr_id]['present'] = (int) $arr_xali_status[$usr_id]['present'] + $xaliUserStatus->getAttendanceStatuses(xaliChecklistEntry::STATUS_PRESENT);
+                $arr_xali_status[$usr_id]['total'] = $arr_xali_status[$usr_id]['total'] + 
+                    $xaliUserStatus->getAttendanceStatuses(xaliChecklistEntry::STATUS_ABSENT_UNEXCUSED) + 
+                    $xaliUserStatus->getAttendanceStatuses(xaliChecklistEntry::STATUS_ABSENT_EXCUSED) + 
+                    $xaliUserStatus->getAttendanceStatuses(xaliChecklistEntry::STATUS_PRESENT);
+                
             }
         }
 
