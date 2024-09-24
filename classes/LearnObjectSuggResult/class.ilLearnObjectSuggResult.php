@@ -64,7 +64,7 @@ class ilLearnObjectSuggResult
         $this->objective_as_percentage = $objective_as_percentage;
     }
 
-    public function getObjectiveAsFractionString(): int
+    public function getObjectiveAsFractionString(): string
     {
         return $this->objective_as_fraction_string;
     }
