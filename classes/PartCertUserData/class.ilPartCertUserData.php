@@ -21,7 +21,7 @@ class ilPartCertUserData {
 	{
 		return $this->part_cert_alias_firstname;
 	}
-	public function setPartCertAliasFirstname (?string part_cert_alias_firstname): void
+	public function setPartCertAliasFirstname(?string $part_cert_alias_firstname): void
 	{
 		$this->part_cert_alias_firstname = $part_cert_alias_firstname;
 	}
