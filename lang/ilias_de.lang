@@ -58,7 +58,7 @@ placeholders#:#Folgende Platzhalter sind verfügbar:
 yes#:#Ja
 no#:#Nein
 no_tests#:#Keine Tests
-loginname#:#Benutzername
+loginname#:#Anmeldename
 add_config#:#Konfiguration hinzufügen
 save_order#:#Sortierung Speichern
 config_type#:#Konfigurationstyp
