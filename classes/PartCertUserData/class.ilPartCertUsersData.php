@@ -12,6 +12,8 @@ class ilPartCertUsersData {
 		while ($row = $ilDB->fetchAssoc($result)) {
 			$usr = new ilPartCertUserData();
 			$usr->setPartCertUsrId($row['usr_id']);
+			$usr->setPartCertAliasFirstname($row['alias_firstname']);
+			$usr->setPartCertAliasLastname($row['alias_lastname']);
 			$usr->setPartCertUserName($row['login']);
 			$usr->setPartCertFirstname($row['firstname']);
 			$usr->setPartCertLastname($row['lastname']);
@@ -30,6 +32,8 @@ class ilPartCertUsersData {
 		$select = "select 
 					usr_data.usr_id,
 					usr_data.login,
+     					usr_data.firstname as alias_firstname,
+	  				usr_data.lastname as alias_lastname,
 					udf_firstname.value as firstname,   
 					udf_lastname.value as lastname,   
 					udf_gender.value as gender
@@ -40,7 +44,7 @@ class ilPartCertUsersData {
 					left join udf_text as udf_lastname on udf_lastname.field_id = conf_udf_lastname.config_value and udf_lastname.usr_id = usr_data.usr_id
 					inner join " . ilParticipationCertificateConfig::TABLE_NAME . " as conf_udf_gender on conf_udf_gender.config_key = 'udf_gender'
 					left join udf_text as udf_gender on udf_gender.field_id = conf_udf_gender.config_value and udf_gender.usr_id = usr_data.usr_id
-	                where " . $ilDB->in('usr_data.usr_id', $arr_usr_ids, false, 'integer');
+	                where " . $ilDB->in('usr_data.usr_id', $arr_usr_ids, false, 'integer') . " group by usr_data.usr_id";
 
 		return $select;
 	}
