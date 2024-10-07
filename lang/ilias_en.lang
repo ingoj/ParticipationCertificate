@@ -1,7 +1,7 @@
 tbl_overview_results#:#Overview of Results
 cols_userid#:#UserID
-cols_firstname#:#First Name (Print)
-cols_lastname#:#Last Name (Print)
+cols_firstname#:#First Name (print)
+cols_lastname#:#Last Name (print)
 cols_alias_firstname#:#First Name (public)
 cols_alias_lastname#:#Last Name (public) 
 cols_initial_test_finished#:#Initial Test Completed
@@ -31,7 +31,7 @@ result_for#:#Results for
 no_records_selected#:#No Users Selected
 upload_header #:# Upload Your PDF Header
 save#:#Save
-udf_gender#:#Custom Field Gender
+udf_gender#:#Custom Field Salutation
 udf_lastname#:#Custom Field Last Name
 udf_firstname#:#Custom Field First Name
 config_plugin#:#Configuration Certificate of Participation
