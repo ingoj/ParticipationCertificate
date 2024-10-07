@@ -1,6 +1,8 @@
 <?php
 class ilPartCertUserData {
 	protected int $part_cert_usr_id;
+	protected ?string $part_cert_alias_firstname;
+	protected ?string $part_cert_alias_lastname;
 	protected ?string $part_cert_firstname;
 	protected ?string $part_cert_lastname;
 	protected ?string $part_cert_gender;
@@ -14,6 +16,22 @@ class ilPartCertUserData {
 	public function setPartCertUsrId(int $part_cert_usr_id): void
     {
 		$this->part_cert_usr_id = $part_cert_usr_id;
+	}
+	public function getPartCertAliasFirstname(): ?string
+	{
+		return $this->part_cert_alias_firstname;
+	}
+	public function setPartCertAliasFirstname (?string part_cert_alias_firstname): void
+	{
+		$this->part_cert_alias_firstname = $part_cert_alias_firstname;
+	}
+	public function getPartCertAliasLastname(): ?string
+	{
+		return $this->part_cert_alias_lastname;
+	}
+	public function setPartCertAliasLastname(?string $part_cert_alias_lastname): void
+	{
+		$this->part_cert_alias_lastname = $part_cert_alias_lastname;
 	}
 	public function getPartCertFirstname(): ?string
     {
