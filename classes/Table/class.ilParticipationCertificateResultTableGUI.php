@@ -94,6 +94,20 @@ class ilParticipationCertificateResultTableGUI extends ilTable2GUI {
 			'width' => 'auto', 
 			'sort_field' => 'lastname' 
 		);
+	        if ($write_access) {
+	    		$cols['alias_firstname'] = array(
+				'txt' => $this->pl->txt('cols_alias_firstname'),
+				'default' => false,
+				'width' => 'auto',
+   				'sort_field' => 'alias_firstname'
+      			);
+	 		$cols['alias_lastname'] = array(
+    				'txt' => $this->pl->txt('cols_alias_lastname'),
+				'default' => false,
+				'width' => 'auto',
+    				'sort_field' => 'alias_lastname'
+			);
+		}
 		$cols['initial_test_finished'] = array(
 			'txt' => $this->pl->txt('cols_initial_test_finished'),
 			'default' => true,
@@ -186,6 +200,8 @@ class ilParticipationCertificateResultTableGUI extends ilTable2GUI {
 			} else {
 				$row['lastname'] = '';
 			}
+			$row['alias_firstname'] = $arr_usr_data[$usr_id]->getPartCertAliasFirstname();
+			$row['alias_lastname']  = $arr_usr_data[$usr_id]->getPartCertAliasLastname();
 
 			if (key_exists($usr_id, $arr_initial_test_states) && is_object($arr_initial_test_states[$usr_id])) {
 				$row['initial_test_finished'] = $arr_initial_test_states[$usr_id]->getCrsitestItestSubmitted();
