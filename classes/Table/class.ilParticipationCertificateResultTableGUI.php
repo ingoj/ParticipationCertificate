@@ -225,16 +225,20 @@ class ilParticipationCertificateResultTableGUI extends ilTable2GUI {
                                     $rec_array[$rec->getLocftestObjectiveId()] = $rec->getLocftestLearnObjectiveTitle() . '<br/>';
                                 }
 
+                                $locTestPercentage = $rec->getLocftestPercentage();
+                                $percentageText = ($locTestPercentage !== null) ? round($locTestPercentage, 0) . '%' : '0%';
+
                                 /**
                                  * @var ilLearnObjectFinalTestState $rec
                                  */
-                                $rec_array[$rec->getLocftestObjectiveId()] .= '- ' . round($rec->getLocftestPercentage(),
-                                        0) . '% ' . $rec->getLocftestObjectiveTitle() . '<br/>';
+                                $rec_array[$rec->getLocftestObjectiveId()] .= '- ' . $percentageText .
+                                    ' ' . $rec->getLocftestObjectiveTitle() . '<br/>';
                             }
                         }
                     }
 
 				}
+
 				$array_results = $rec_array;
 				$row['results_qualifing_tests'] = $array_results;
 			} else {
