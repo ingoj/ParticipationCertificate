@@ -269,7 +269,7 @@ class ilParticipationCertificateSingleResultTableGUI extends ilTable2GUI {
 					$this->tpl->setCurrentBlock('td');
 					if (is_array($a_set[$k])) {
 
-						$this->tpl->setVariable('COURSE', $this->buildProgressBar(explode('%', $a_set[$k][0]), $a_set[$k][1], $a_set[$k][2]));
+						$this->tpl->setVariable('COURSE', $this->buildProgressBar(explode('%', $a_set[$k][0]  ?? ''), $a_set[$k][1], $a_set[$k][2]));
 					} else {
 						$this->tpl->setVariable('COURSE', $a_set[$k]);
 					}
