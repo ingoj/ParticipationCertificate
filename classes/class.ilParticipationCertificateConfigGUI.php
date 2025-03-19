@@ -1,7 +1,5 @@
 <?php
 
-require_once __DIR__ . "/../vendor/autoload.php";
-
 //TODO Refactoring - find a better way to save and display the form
 
 /**
