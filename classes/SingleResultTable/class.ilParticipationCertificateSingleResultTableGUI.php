@@ -242,9 +242,10 @@ class ilParticipationCertificateSingleResultTableGUI extends ilTable2GUI {
 			$current_percent = 0;
 		}
 		//required to dodge bug in ilContainerObjectiveGUI::renderProgressBar
-		if ($required_percent == 0) {
-			$required_percent = 0.1;
-		}
+        if ($required_percent == 0) {
+            // TODO here there is problem with parameter $required_percent in renderProgressBar(). It can't be float|string
+            //$required_percent = 0.1; // TODO ask and test this
+        }
 
 		if ($current_percent >= $required_percent) {
 			$css_class = self::SUCCESSFUL_PROGRESS_CSS_CLASS;
@@ -256,7 +257,15 @@ class ilParticipationCertificateSingleResultTableGUI extends ilTable2GUI {
 
 		//require_once("Services/Container/classes/class.ilContainerObjectiveGUI.php");
 
-		return \ilContainerObjectiveGUI::renderProgressBar($current_percent, $required_percent, $css_class, '', NULL, $tooltip_id, '');
+		return \ilContainerObjectiveGUI::renderProgressBar(
+            $current_percent,
+            $required_percent,
+            $css_class,
+            '',
+            NULL,
+            $tooltip_id,
+            ''
+        );
 	}
 
 	public function fillRow(array $a_set): void
