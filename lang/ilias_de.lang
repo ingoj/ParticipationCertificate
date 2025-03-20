@@ -96,4 +96,5 @@ unsugg_color#:#Farbe nicht empfohlene LZ
 true_name_helper#:#UDF-Editor-Objekt für die Namenseingabe
 nonnumeric_ref#:#Die Eingabe für das UDF-Editor-Objekt muss die Ref-ID sein (numerisch oder leer, andere Zeichen sind nicht erlaubt).
 enable_ementoring#:#Ementoring einblenden
+back#:#Zurück
 

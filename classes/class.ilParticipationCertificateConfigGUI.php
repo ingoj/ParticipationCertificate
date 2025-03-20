@@ -53,8 +53,15 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI
         $this->pl = ilParticipationCertificatePlugin::getInstance();
     }
 
+    /**
+     * @throws ilCtrlException
+     */
     function performCommand(string $cmd): void
     {
+        if ($cmd !== 'configure') {
+            $this->addTabs();
+        }
+
         switch ($cmd) {
             default:
             case self::CMD_ADD_CONFIG:
@@ -354,6 +361,24 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI
         if ($id == 0 and $set_type == 3 and $err) {
             $this->tpl->setOnScreenMessage('failure', $this->pl->txt("nonnumeric_ref"), true);
         }
+    }
+
+    /**
+     * @throws ilCtrlException
+     */
+    protected function addTabs() : void
+    {
+        $this->tabs->addTab('return-back', $this->plugin_object->txt('back'),
+            $this->ctrl->getLinkTarget($this, 'returnBack'));
+    }
+
+    /**
+     * @return void
+     * @throws ilCtrlException
+     */
+    private function returnBack()
+    {
+        $this->ctrl->redirectByClass(self::class, 'configure');
     }
 
     /**
