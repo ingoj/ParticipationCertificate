@@ -42,9 +42,10 @@ class ilParticipationCertificateTwigParser {
 		//$array sind die abgeänderten werte
 		$this->array = $array;
 
-		$this->loadTwig();
-		$loader = new Twig\Loader\FilesystemLoader($this->pl->getDirectory() . '/templates/report/');
-		$twig = new Twig\Environment($loader, $twig_options);
+        $loader = new Twig\Loader\FilesystemLoader($this->pl->getDirectory() . '/templates/report/');
+        $twig = new Twig\Environment($loader, [
+            'cache' => false,
+        ]);
 
 		$this->twig_template = $twig->load('certificate.html');
 	}
@@ -132,16 +133,21 @@ class ilParticipationCertificateTwigParser {
 
 			$processed_arr_text_values = $arr_config_text;
 			//Preprocess text values
-			foreach ($arr_config_text as $key => $value) {
-				$twig = new \Twig_Environment(new \Twig_Loader_String());
-				$peparsed_value = $twig->render((string)$value, array(
-					"username" => ($arr_usr_data[$usr_id]->getPartCertSalutation() ? $arr_usr_data[$usr_id]->getPartCertSalutation() . ' ' : '')
-						. $arr_usr_data[$usr_id]->getPartCertFirstname() . ' ' . $arr_usr_data[$usr_id]->getPartCertLastname(),
-					'date' => $date->get(IL_CAL_FKT_DATE, 'd.m.Y')
-				));
+            foreach ($arr_config_text as $key => $value) {
+                $twig = new Twig\Environment(new Twig\Loader\ArrayLoader());
 
-				$processed_arr_text_values[$key] = $peparsed_value;
-			}
+                $template = $twig->createTemplate((string)$value);
+
+                $peparsed_value = $template->render([
+                    "username" => ($arr_usr_data[$usr_id]->getPartCertSalutation() ?
+                            $arr_usr_data[$usr_id]->getPartCertSalutation() . ' ' : '') .
+                        $arr_usr_data[$usr_id]->getPartCertFirstname() . ' ' .
+                        $arr_usr_data[$usr_id]->getPartCertLastname(),
+                    'date' => $date->get(IL_CAL_FKT_DATE, 'd.m.Y')
+                ]);
+
+                $processed_arr_text_values[$key] = $peparsed_value;
+            }
 
 			//Learning Objective Master Course
 			$arr_usr_lo_master_crs = array();
@@ -222,15 +228,6 @@ class ilParticipationCertificateTwigParser {
 			);
 
 			$part_pdf->generatePDF($this->twig_template->render($arr_render), count($this->usr_id));
-		}
-	}
-
-	protected function loadTwig(): void
-    {
-		static $loaded = false;
-		if (!$loaded) {
-			Twig_Autoloader::register();
-			$loaded = true;
 		}
 	}
 }
