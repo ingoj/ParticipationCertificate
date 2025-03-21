@@ -666,3 +666,14 @@ if (!is_object($config)) {
     $part_conf->store();
 }
 ?>
+
+<#39>
+<?php
+require_once "Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/ParticipationCertificate/vendor/autoload.php";
+
+$config = ilParticipationCertificateConfig::where(["config_key" => 'udf_gender'])->first();
+if (!is_object($config)) {
+    $config = new ilParticipationCertificateConfig();
+}
+$config->delete();
+?>
