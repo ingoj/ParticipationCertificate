@@ -139,9 +139,7 @@ class ilParticipationCertificateTwigParser {
                 $template = $twig->createTemplate((string)$value);
 
                 $peparsed_value = $template->render([
-                    "username" => ($arr_usr_data[$usr_id]->getPartCertSalutation() ?
-                            $arr_usr_data[$usr_id]->getPartCertSalutation() . ' ' : '') .
-                        $arr_usr_data[$usr_id]->getPartCertFirstname() . ' ' .
+                    "username" => $arr_usr_data[$usr_id]->getPartCertFirstname() . ' ' .
                         $arr_usr_data[$usr_id]->getPartCertLastname(),
                     'date' => $date->get(IL_CAL_FKT_DATE, 'd.m.Y')
                 ]);

@@ -31,7 +31,6 @@ result_for#:#Results for
 no_records_selected#:#No Users Selected
 upload_header #:# Upload Your PDF Header
 save#:#Save
-udf_gender#:#Custom Field Gender
 udf_lastname#:#Custom Field Last Name
 udf_firstname#:#Custom Field First Name
 config_plugin#:#Configuration Certificate of Participation

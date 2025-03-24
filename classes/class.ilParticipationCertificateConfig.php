@@ -307,7 +307,6 @@ class ilParticipationCertificateConfig extends ActiveRecord {
 		return array(
 			'udf_firstname' => 0,
 			'udf_lastname' => 0,
-			'udf_gender' => 0,
 			'color' => '73B249',
 			'keyword' => 'Lerngruppe',
 			'Logo' => null,

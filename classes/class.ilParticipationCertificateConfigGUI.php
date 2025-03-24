@@ -396,7 +396,7 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI
         $form->setFormAction($this->ctrl->getFormAction($this));
         $form->setTitle($this->pl->txt('config_plugin'));
         $form->setDescription($this->pl->txt("placeholders") . ' <br>
-		&lbrace;&lbrace;username&rbrace;&rbrace;: Anrede Vorname Nachname <br>
+		&lbrace;&lbrace;username&rbrace;&rbrace;: Vorname Nachname <br>
 		&lbrace;&lbrace;date&rbrace;&rbrace;: Datum
 		');
 
