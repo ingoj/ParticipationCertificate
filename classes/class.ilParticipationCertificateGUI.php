@@ -3,6 +3,7 @@
 /**
  * Class ilParticipationCertificateGUI
  *
+ * @ilCtrl_isCalledBy ilParticipationCertificateGUI: ilUIPluginRouterGUI
  * @ilCtrl_Calls      ilParticipationCertificateGUI: ilParticipationCertificateResultGUI
  */
 class ilParticipationCertificateGUI
@@ -118,8 +119,16 @@ class ilParticipationCertificateGUI
             //ilObjGroupGUI::class
         )));
 
+
         $this->ctrl->saveParameterByClass(ilParticipationCertificateResultGUI::class, 'ref_id');
-        $this->tabs->addTab(ilParticipationCertificateResultGUI::CMD_OVERVIEW, $this->pl->txt('header_overview'), $this->ctrl->getLinkTargetByClass(ilParticipationCertificateResultGUI::class, ilParticipationCertificateResultGUI::CMD_CONTENT));
+        $this->tabs->addTab(
+            ilParticipationCertificateResultGUI::CMD_OVERVIEW,
+            $this->pl->txt('header_overview'),
+            $this->ctrl->getLinkTargetByClass(
+                [ilUIPluginRouterGUI::class, ilParticipationCertificateResultGUI::class],
+                ilParticipationCertificateResultGUI::CMD_CONTENT
+            )
+        );
 
         //$this->tabs->addTab(ilParticipationCertificateResultGUI::CMD_OVERVIEW,$this->pl->txt('header_overview'),$this->ctrl->getLinkTargetByClass(ilParticipationCertificateResultGUI::class,ilParticipationCertificateResultGUI::CMD_CONTENT));
         $this->tabs->addTab(self::TAB_CONFIG, $this->pl->txt('header_config'), $this->ctrl->getLinkTargetByClass(self::class, self::CMD_CONFIG));
