@@ -80,8 +80,7 @@ class ilParticipationCertificateSingleResultGUI
 
     public function display(): void
     {
-
-        $this->tpl->addCss($this->pl->getDirectory() . '/Templates/css/table.css');
+        $this->tpl->addCss($this->pl->getDirectory() . '/templates/css/participation-certificate.css');
         $this->initHeader();
 
         $this->initTable();
