@@ -49,6 +49,7 @@ class ilParticipationCertificateResultTableGUI extends ilTable2GUI {
 		$this->getEnableHeader();
 		$this->setTitle($this->pl->txt('tbl_overview_results'));
 		$this->addColumns();
+        $this->setPreventDoubleSubmission(false);
 		$this->setExportFormats(array( self::EXPORT_EXCEL, self::EXPORT_CSV ));
 		if ($cert_access->hasCurrentUserWriteAccess()) {
 			$this->initFilter();
