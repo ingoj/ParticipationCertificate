@@ -85,6 +85,8 @@ class ilParticipationCertificateResultGUI
 
     public function content(): void
     {
+        $this->tpl->addCss($this->pl->getDirectory() . '/templates/css/participation-certificate.css');
+
         if (method_exists($this->tpl, 'loadStandardTemplate')) {
             $this->tpl->loadStandardTemplate();
         } else {
