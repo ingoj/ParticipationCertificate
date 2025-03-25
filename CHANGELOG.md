@@ -1,4 +1,6 @@
 # Changelog
+## [1.2.0]
+* Update for ilias9
 ## [1.1.0]
 * fixes in permission handling
 ## [0.1.5]
