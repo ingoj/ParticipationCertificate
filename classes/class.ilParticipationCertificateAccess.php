@@ -59,9 +59,9 @@ class ilParticipationCertificateAccess {
 		$first = $usrdata->getData($curr_user)[$curr_user[0]]->getPartCertFirstname();
 		$last = $usrdata->getData($curr_user)[$curr_user[0]]->getPartCertLastname();
 
-		if (strlen($first)*strlen($last) == 0) {
-			return false;
-		}	
+        if (strlen($first ?? '') * strlen($last ?? '') == 0) {
+            return false;
+        }
 		// if user has data, check if selfprint is active (changed to a new function)
 		return ($this->isSelfPrintEnabled());
 	}
