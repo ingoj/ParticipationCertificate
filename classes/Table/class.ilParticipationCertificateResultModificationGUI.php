@@ -70,7 +70,7 @@ class ilParticipationCertificateResultModificationGUI
         $usr_id = $_GET[self::IDENTIFIER];
         $this->usr_id = $usr_id;
 
-        $this->arr_usr_data = ilPartCertUsersData::getData($this->usr_ids);
+        $this->arr_usr_data = ilPartCertUsersData::getData($this->pl, $this->usr_ids);
         $this->arr_initial_test_states = ilCrsInitialTestStates::getData($this->usr_ids);
         $this->arr_learn_reached_percentages = ilLearnObjectSuggResults::getData($this->usr_ids);
         $this->arr_iass_states = ilIassStates::getData($this->usr_ids);
@@ -133,7 +133,7 @@ class ilParticipationCertificateResultModificationGUI
     public function initForm(): ilPropertyFormGUI
     {
         $usr_id = $_GET[self::IDENTIFIER];
-        $arr_usr_data = ilPartCertUsersData::getData($this->usr_ids);
+        $arr_usr_data = ilPartCertUsersData::getData($this->pl, $this->usr_ids);
         $nameUser = $arr_usr_data[$usr_id]->getPartCertFirstname() . ' ' . $arr_usr_data[$usr_id]->getPartCertLastname();
 
         $form = new ilPropertyFormGUI();

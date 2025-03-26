@@ -66,7 +66,7 @@ class ilParticipationCertificateSingleResultTableGUI extends ilTable2GUI {
 		$this->setRowTemplate('tpl.default_row_single.html', $this->pl->getDirectory());
 		$this->setFormAction($this->ctrl->getFormAction($a_parent_obj));
 
-		$arr_usr_data = ilPartCertUsersData::getData($this->usr_ids);
+		$arr_usr_data = ilPartCertUsersData::getData($this->pl, $this->usr_ids);
 		$nameUser = $arr_usr_data[$usr_id]->getPartCertFirstname() . ' ' . $arr_usr_data[$usr_id]->getPartCertLastname();
 		if ($nameUser == ' ') {
 			$nameUser = $this->pl->txt('loginname') . ' ' . $arr_usr_data[$usr_id]->getPartCertUserName();
