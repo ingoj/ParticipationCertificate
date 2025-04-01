@@ -68,4 +68,24 @@ class ilPartCertUserData {
     {
         $this->part_cert_salutation = $part_cert_salutation;
     }
+
+    /**
+     * @param string $salutation
+     * @param string $firstname
+     * @param string $lastname
+     * @return bool
+     */
+    public function checkIfUserDataFilled(
+        string $salutation,
+        string $firstname,
+        string $lastname
+    ): bool {
+        if (empty($salutation) &&
+            empty($firstname) &&
+            empty($lastname)
+        ) {
+            return false;
+        }
+        return true;
+    }
 }

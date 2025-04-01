@@ -176,6 +176,9 @@ class ilParticipationCertificateResultGUI
         $this->table = new ilParticipationCertificateResultTableGUI($this, self::CMD_CONTENT);
     }
 
+    /**
+     * @throws ilCtrlException
+     */
     public function printPdf(): void
     {
         $cert_access = new ilParticipationCertificateAccess($_GET['ref_id']);
@@ -187,21 +190,19 @@ class ilParticipationCertificateResultGUI
                 }
             $usr_id[] = $_GET['usr_id'];
 
-
             $arr_usr_data = ilPartCertUsersData::getData($this->pl, $usr_id);
-
-            if(!$this->checkIfUserDataFilled(
+            $user_data = new ilPartCertUserData();
+            if(!$user_data->checkIfUserDataFilled(
                 $arr_usr_data[$usr_id[0]]->getPartCertSalutation(),
                 $arr_usr_data[$usr_id[0]]->getPartCertFirstname(),
                 $arr_usr_data[$usr_id[0]]->getPartCertLastname()
             )) {
-                $this->tpl->setOnScreenMessage('failure',$this->lng->txt('user_data_missing'), true);
-                $this->ctrl->redirect($this, self::CMD_CONTENT);
+                $this->redirectWithError(self::CMD_CONTENT, $this->pl->txt('user_data_missing'));
             }
 
             $twigParser = new ilParticipationCertificateTwigParser($this->groupRefId, array(), $usr_id, $ementor,
                 false);
-            $twigParser->parseData();
+            $twigParser->parseData($arr_usr_data);
         } else {
             $this->tpl->setOnScreenMessage('failure',$this->lng->txt('no_permission'), true);
             ilUtil::redirect('login.php');
@@ -224,21 +225,10 @@ class ilParticipationCertificateResultGUI
             }
 
             $arr_usr_data = ilPartCertUsersData::getData($this->pl, $usr_id);
-
-            foreach ($usr_id as $key => $id) {
-                if(!$this->checkIfUserDataFilled(
-                    $arr_usr_data[$id]->getPartCertSalutation(),
-                    $arr_usr_data[$id]->getPartCertFirstname(),
-                    $arr_usr_data[$id]->getPartCertLastname()
-                )) {
-                    unset($usr_id[$key]);
-                }
-            }
-            $usr_id = array_values($usr_id);
+            $usr_id = $this->excludeUserIfDataMissing($usr_id, $arr_usr_data);
 
             $twigParser = new ilParticipationCertificateTwigParser($this->groupRefId, array(), (array) $usr_id, true, false);
-                
-            $twigParser->parseData();
+            $twigParser->parseData($arr_usr_data);
         } else {
             $this->tpl->setOnScreenMessage('failure',$this->lng->txt('no_permission'), true);
             ilUtil::redirect('login.php');
@@ -262,20 +252,10 @@ class ilParticipationCertificateResultGUI
             }
 
             $arr_usr_data = ilPartCertUsersData::getData($this->pl, $usr_id);
-
-            foreach ($usr_id as $key => $id) {
-                if(!$this->checkIfUserDataFilled(
-                    $arr_usr_data[$id]->getPartCertSalutation(),
-                    $arr_usr_data[$id]->getPartCertFirstname(),
-                    $arr_usr_data[$id]->getPartCertLastname()
-                )) {
-                    unset($usr_id[$key]);
-                }
-            }
-            $usr_id = array_values($usr_id);
+            $usr_id = $this->excludeUserIfDataMissing($usr_id, $arr_usr_data);
 
             $twigParser = new ilParticipationCertificateTwigParser($this->groupRefId, array(), $usr_id, false, false);
-            $twigParser->parseData();
+            $twigParser->parseData($arr_usr_data);
         } else {
             $this->tpl->setOnScreenMessage('failure',$this->lng->txt('no_permission'), true);
             ilUtil::redirect('login.php');
@@ -299,22 +279,34 @@ class ilParticipationCertificateResultGUI
     }
 
     /**
-     * @param string $salutation
-     * @param string $firstname
-     * @param string $lastname
-     * @return bool
+     * @param string $cmd
+     * @param string $msg
+     * @return void
+     * @throws ilCtrlException
      */
-    private function checkIfUserDataFilled(
-        string $salutation,
-        string $firstname,
-        string $lastname
-    ): bool {
-        if (empty($salutation) &&
-            empty($firstname) &&
-            empty($lastname)
-        ) {
-            return false;
+    private function redirectWithError(string $cmd, string $msg): void
+    {
+        $this->tpl->setOnScreenMessage('failure', $msg, true);
+        $this->ctrl->redirect($this, $cmd);
+    }
+
+    /**
+     * @param array $usr_id
+     * @param array $arr_usr_data
+     * @return array
+     */
+    private function excludeUserIfDataMissing(array $usr_id, array $arr_usr_data)
+    {
+        $user_data = new ilPartCertUserData();
+        foreach ($usr_id as $key => $id) {
+            if(!$user_data->checkIfUserDataFilled(
+                $arr_usr_data[$id]->getPartCertSalutation(),
+                $arr_usr_data[$id]->getPartCertFirstname(),
+                $arr_usr_data[$id]->getPartCertLastname()
+            )) {
+                unset($usr_id[$key]);
+            }
         }
-        return true;
+        return array_values($usr_id);
     }
 }

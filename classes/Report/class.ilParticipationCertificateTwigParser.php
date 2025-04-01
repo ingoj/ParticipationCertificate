@@ -50,8 +50,15 @@ class ilParticipationCertificateTwigParser {
 		$this->twig_template = $twig->load('certificate.html');
 	}
 
-
-	public function parseData(): void
+    /**
+     * @param array $arr_usr_data
+     * @return void
+     * @throws \Twig\Error\LoaderError
+     * @throws \Twig\Error\SyntaxError
+     * @throws arException
+     * @throws ilDateTimeException
+     */
+	public function parseData(array $arr_usr_data): void
     {
         $cert_configs = new ilParticipationCertificateConfigs();
         $arr_config = $cert_configs->getObjConfigSetIfNoneCreateDefaultAndCreateNewObjConfigValues($this->group_ref_id);
@@ -88,8 +95,7 @@ class ilParticipationCertificateTwigParser {
         $arr_new_iass_states = ilIassStatesMulti::getData($this->usr_ids,$_GET['ref_id']);
         $arr_xali_states = xaliStates::getData($this->usr_ids,$_GET['ref_id']);
 
-		$arr_usr_data = ilPartCertUsersData::getData($this->pl, $this->usr_ids);
-		$arr_lo_master_crs = ilLearningObjectivesMasterCrs::getData($this->usr_ids);
+        $arr_lo_master_crs = ilLearningObjectivesMasterCrs::getData($this->usr_ids);
 		$arr_initial_test_states = ilCrsInitialTestStates::getData($this->usr_ids);
 		$arr_excercise_states = ilExcerciseStates::getData($this->usr_ids,$this->group_ref_id);
 		$arr_iass_states = ilIassStates::getData($this->usr_ids);

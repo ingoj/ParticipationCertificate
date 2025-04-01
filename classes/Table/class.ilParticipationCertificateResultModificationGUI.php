@@ -199,6 +199,9 @@ class ilParticipationCertificateResultModificationGUI
         $form->setValuesbyArray($array);
     }
 
+    /**
+     * @throws ilCtrlException
+     */
     public function printPDF(): void
     {
         $form = $this->initForm();
@@ -211,37 +214,28 @@ class ilParticipationCertificateResultModificationGUI
         $usr_id[] = $this->usr_id;
 
         $arr_usr_data = ilPartCertUsersData::getData($this->pl, $usr_id);
-
-        if(!$this->checkIfUserDataFilled(
+        $user_data = new ilPartCertUserData();
+        if(!$user_data->checkIfUserDataFilled(
             $arr_usr_data[$usr_id[0]]->getPartCertSalutation(),
             $arr_usr_data[$usr_id[0]]->getPartCertFirstname(),
             $arr_usr_data[$usr_id[0]]->getPartCertLastname()
         )) {
-            $this->tpl->setOnScreenMessage('failure',$this->pl->txt('user_data_missing'), true);
-            $this->ctrl->redirect($this, self::CMD_DISPLAY);
+            $this->redirectWithError(self::CMD_DISPLAY, $this->pl->txt('user_data_missing'));
         }
 
         $twigParser = new ilParticipationCertificateTwigParser($this->groupRefId, array(), $usr_id, $ementor, $edited, $array);
-        $twigParser->parseData();
+        $twigParser->parseData($arr_usr_data);
     }
 
     /**
-     * @param string $salutation
-     * @param string $firstname
-     * @param string $lastname
-     * @return bool
+     * @param string $cmd
+     * @param string $msg
+     * @return void
+     * @throws ilCtrlException
      */
-    private function checkIfUserDataFilled(
-        string $salutation,
-        string $firstname,
-        string $lastname
-    ): bool {
-        if (empty($salutation) &&
-            empty($firstname) &&
-            empty($lastname)
-        ) {
-            return false;
-        }
-        return true;
+    private function redirectWithError(string $cmd, string $msg): void
+    {
+        $this->tpl->setOnScreenMessage('failure', $msg, true);
+        $this->ctrl->redirect($this, $cmd);
     }
 }
