@@ -190,10 +190,11 @@ class ilParticipationCertificateResultGUI
 
             $arr_usr_data = ilPartCertUsersData::getData($this->pl, $usr_id);
 
-            if (empty($arr_usr_data[$usr_id[0]]->getPartCertSalutation()) &&
-                empty($arr_usr_data[$usr_id[0]]->getPartCertFirstname()) &&
-                empty($arr_usr_data[$usr_id[0]]->getPartCertLastname())
-            ) {
+            if(!$this->checkIfUserDataFilled(
+                $arr_usr_data[$usr_id[0]]->getPartCertSalutation(),
+                $arr_usr_data[$usr_id[0]]->getPartCertFirstname(),
+                $arr_usr_data[$usr_id[0]]->getPartCertLastname()
+            )) {
                 $this->tpl->setOnScreenMessage('failure',$this->lng->txt('no_permission'), true);
                 $this->ctrl->redirect($this, self::CMD_CONTENT);
             }
@@ -221,6 +222,20 @@ class ilParticipationCertificateResultGUI
             } else {
                 $usr_id = $usr_ids;
             }
+
+            $arr_usr_data = ilPartCertUsersData::getData($this->pl, $usr_id);
+
+            foreach ($usr_id as $key => $id) {
+                if(!$this->checkIfUserDataFilled(
+                    $arr_usr_data[$id]->getPartCertSalutation(),
+                    $arr_usr_data[$id]->getPartCertFirstname(),
+                    $arr_usr_data[$id]->getPartCertLastname()
+                )) {
+                    unset($usr_id[$key]);
+                }
+            }
+            $usr_id = array_values($usr_id);
+
             $twigParser = new ilParticipationCertificateTwigParser($this->groupRefId, array(), (array) $usr_id, true, false);
                 
             $twigParser->parseData();
@@ -245,6 +260,20 @@ class ilParticipationCertificateResultGUI
             } else {
                 $usr_id = $usr_ids;
             }
+
+            $arr_usr_data = ilPartCertUsersData::getData($this->pl, $usr_id);
+
+            foreach ($usr_id as $key => $id) {
+                if(!$this->checkIfUserDataFilled(
+                    $arr_usr_data[$id]->getPartCertSalutation(),
+                    $arr_usr_data[$id]->getPartCertFirstname(),
+                    $arr_usr_data[$id]->getPartCertLastname()
+                )) {
+                    unset($usr_id[$key]);
+                }
+            }
+            $usr_id = array_values($usr_id);
+
             $twigParser = new ilParticipationCertificateTwigParser($this->groupRefId, array(), $usr_id, false, false);
             $twigParser->parseData();
         } else {
@@ -267,5 +296,25 @@ class ilParticipationCertificateResultGUI
         $table->resetOffset();
         $table->resetFilter();
         $this->ctrl->redirect($this, self::CMD_CONTENT);
+    }
+
+    /**
+     * @param string $salutation
+     * @param string $firstname
+     * @param string $lastname
+     * @return bool
+     */
+    private function checkIfUserDataFilled(
+        string $salutation,
+        string $firstname,
+        string $lastname
+    ): bool {
+        if (empty($salutation) &&
+            empty($firstname) &&
+            empty($lastname)
+        ) {
+            return false;
+        }
+        return true;
     }
 }
