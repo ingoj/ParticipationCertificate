@@ -46,6 +46,8 @@ class ilParticipationCertificatePDFGenerator
     {
         global $printCount, $tempFile;
 
+        require_once __DIR__ . '/../../vendor/autoload.php';
+
         //mPDF Instanz wird erzeugt. Mit Margin-Left-Right:20.
         $mpdf = new Mpdf(['tempDir' => '/tmp/mpdf']);
         //Css file wird geladen

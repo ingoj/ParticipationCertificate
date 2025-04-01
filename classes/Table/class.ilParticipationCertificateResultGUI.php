@@ -186,6 +186,18 @@ class ilParticipationCertificateResultGUI
                 $ementor = false;
                 }
             $usr_id[] = $_GET['usr_id'];
+
+
+            $arr_usr_data = ilPartCertUsersData::getData($this->pl, $usr_id);
+
+            if (empty($arr_usr_data[$usr_id[0]]->getPartCertSalutation()) &&
+                empty($arr_usr_data[$usr_id[0]]->getPartCertFirstname()) &&
+                empty($arr_usr_data[$usr_id[0]]->getPartCertLastname())
+            ) {
+                $this->tpl->setOnScreenMessage('failure',$this->lng->txt('no_permission'), true);
+                $this->ctrl->redirect($this, self::CMD_CONTENT);
+            }
+
             $twigParser = new ilParticipationCertificateTwigParser($this->groupRefId, array(), $usr_id, $ementor,
                 false);
             $twigParser->parseData();

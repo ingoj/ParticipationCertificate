@@ -98,4 +98,5 @@ enable_ementoring#:#Ementoring einblenden
 back#:#Zurück
 Mr#:#Herr
 Ms#:#Frau
+no_salutation#:#Benutzerdatenfelder sind nicht ausgefüllt. Bitte geben Sie einen Wert ein, bevor das Zertifikat generiert wird.
 
