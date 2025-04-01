@@ -209,6 +209,13 @@ class ilParticipationCertificateResultGUI
         }
     }
 
+    /**
+     * @throws arException
+     * @throws \Twig\Error\SyntaxError
+     * @throws ilCtrlException
+     * @throws \Twig\Error\LoaderError
+     * @throws ilDateTimeException
+     */
     public function printSelected(): void
     {
         $cert_access = new ilParticipationCertificateAccess($_GET['ref_id']);
@@ -224,8 +231,13 @@ class ilParticipationCertificateResultGUI
                 $usr_id = $usr_ids;
             }
 
+
             $arr_usr_data = ilPartCertUsersData::getData($this->pl, $usr_id);
             $usr_id = $this->excludeUserIfDataMissing($usr_id, $arr_usr_data);
+
+            if(empty($usr_id)) {
+                $this->redirectWithError(self::CMD_CONTENT, $this->pl->txt('all_user_data_missing'));
+            }
 
             $twigParser = new ilParticipationCertificateTwigParser($this->groupRefId, array(), (array) $usr_id, true, false);
             $twigParser->parseData($arr_usr_data);
@@ -235,6 +247,13 @@ class ilParticipationCertificateResultGUI
         }
     }
 
+    /**
+     * @throws arException
+     * @throws ilCtrlException
+     * @throws \Twig\Error\SyntaxError
+     * @throws ilDateTimeException
+     * @throws \Twig\Error\LoaderError
+     */
     public function printSelectedWithouteMentoring(): void
     {
         $cert_access = new ilParticipationCertificateAccess($_GET['ref_id']);
@@ -253,6 +272,10 @@ class ilParticipationCertificateResultGUI
 
             $arr_usr_data = ilPartCertUsersData::getData($this->pl, $usr_id);
             $usr_id = $this->excludeUserIfDataMissing($usr_id, $arr_usr_data);
+
+            if(empty($usr_id)) {
+                $this->redirectWithError(self::CMD_CONTENT, $this->pl->txt('all_user_data_missing'));
+            }
 
             $twigParser = new ilParticipationCertificateTwigParser($this->groupRefId, array(), $usr_id, false, false);
             $twigParser->parseData($arr_usr_data);

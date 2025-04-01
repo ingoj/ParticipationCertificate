@@ -99,3 +99,4 @@ back#:#Back
 Mr#:#Mr
 Ms#:#Ms
 user_data_missing#:#User data fields are not filled. Please provide a value before generating the certificate.
+all_user_data_missing#:#Users' data fields are not filled. Please provide a value before generating the certificate.
