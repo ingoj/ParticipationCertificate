@@ -348,7 +348,7 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI
      * @throws arException
      * @throws ilCtrlException
      */
-    public function showForm(bool $err=false): void
+    public function showFormOld(bool $err=false): void
     {
         $id = filter_input(INPUT_GET, 'id');
         $set_type = filter_input(INPUT_GET, 'set_type');
@@ -361,6 +361,126 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI
         if ($id == 0 and $set_type == 3 and $err) {
             $this->tpl->setOnScreenMessage('failure', $this->pl->txt("nonnumeric_ref"), true);
         }
+    }
+
+    /**
+     * @throws ilCtrlException
+     */
+    public function showForm(bool $err=false): void
+    {
+        $id = filter_input(INPUT_GET, 'id');
+        $set_type = filter_input(INPUT_GET, 'set_type');
+
+        $this->ctrl->setParameter($this, 'id', $id);
+
+        global $DIC;
+        $ui = $DIC->ui()->factory();
+        $renderer = $DIC->ui()->renderer();
+
+        //Step 1: Define the text input field
+
+        $inputFields = [];
+
+        switch ($set_type) {
+            case ilParticipationCertificateConfig::CONFIG_SET_TYPE_TEMPLATE:
+                // TODO
+        }
+
+        foreach (ilParticipationCertificateConfig::where(array(
+            'config_type' => $set_type,
+            'global_config_id' => $id
+        ))->orderBy('order_by')->get() as $config) {
+            /**
+             * @var ilParticipationCertificateConfig $config
+             */
+            switch ($config->getConfigKey()) {
+                case 'udf_firstname':
+                case 'udf_lastname':
+                case 'udf_gender':
+
+                $options = $this->getUdfDropdownValues();
+                $inputFields[$config->getConfigKey()] = $ui->input()->field()->select(
+                    $this->pl->txt($config->getConfigKey()),
+                    $options,
+                    ''
+                )->withValue($config->getConfigValue())->withRequired(true);
+
+                    break;
+
+                case 'color':
+                    $inputFields[$config->getConfigKey()] = $ui->input()->field()->colorpicker(
+                        $this->pl->txt('color'),
+                        ''
+                    )->withValue('#' . $config->getConfigValue());
+                    break;
+                case 'unsugg_color':
+                    $inputFields[$config->getConfigKey()] = $ui->input()->field()->colorpicker(
+                        $this->pl->txt('unsugg_color'),
+                        ''
+                    )->withValue($config->getConfigValue());
+                    break;
+
+                case 'keyword':
+                    $inputFields[$config->getConfigKey()] = $ui->input()->field()->text(
+                        $this->pl->txt('keyword')
+                    )->withValue($config->getConfigValue());
+
+                    break;
+
+                case 'logo':
+
+                    // TODO ilUIDemoFileUploadHandlerGUI ????
+                    $inputFields[$config->getConfigKey()] = $ui->input()->field()->file(
+                        new \ilUIDemoFileUploadHandlerGUI(),
+                        $this->pl->txt('logo')
+                    );
+
+                    break;
+
+                case 'page1_issuer_signature':
+                    $inputFields[$config->getConfigKey()] = $ui->input()->field()->file(
+                        new \ilUIDemoFileUploadHandlerGUI(),
+                        $config->getConfigKey()
+                    );
+
+                    break;
+
+                case 'true_name_helper':
+                    $inputFields[$config->getConfigKey()] = $ui->input()->field()->textarea(
+                        $this->pl->txt('true_name_helper')
+                    )->withValue($config->getConfigValue());
+
+                    break;
+
+                default:
+                    $inputFields[$config->getConfigKey()] = $ui->input()->field()->textarea(
+                        $config->getConfigKey()
+                    )->withValue($config->getConfigValue());
+
+                    break;
+
+            }
+        }
+
+        $section = $ui->input()->field()->section(
+            $inputFields,
+            $this->pl->txt('config_plugin'),
+            $this->pl->txt("placeholders") . ' <br>
+		&lbrace;&lbrace;username&rbrace;&rbrace;: Anrede Vorname Nachname <br>
+		&lbrace;&lbrace;date&rbrace;&rbrace;: Datum
+		'
+        );
+
+        //Step 2: Define the form and attach the section.
+        $form = $ui->input()->container()->form()->standard(
+            '#'/*$this->ctrl->getFormAction($this)*/,
+            ['test' => $section]
+        );
+
+        // TODO It doesn't work
+        //$form->withDedicatedName('test-form');
+
+        $this->tpl->setContent($renderer->render($form));
     }
 
     /**
@@ -385,7 +505,7 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI
      * @throws arException
      * @throws ilCtrlException
      */
-    public function initForm(int $global_config_id, int $configset_type): ilPropertyFormGUI
+    /*public function initForm(int $global_config_id, int $configset_type): ilPropertyFormGUI
     {
         global $DIC;
 
@@ -404,7 +524,7 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI
             case ilParticipationCertificateConfig::CONFIG_SET_TYPE_TEMPLATE:
                 /**
                  * @var ilParticipationCertificateGlobalConfigSet $global_config
-                 */
+
                 $global_config = ilParticipationCertificateGlobalConfigSet::findOrGetInstance($global_config_id);
                 $input = new ilTextInputGUI($this->pl->txt("config_title"), "config_title");
                 $input->setRequired(true);
@@ -419,12 +539,12 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI
         ))->orderBy('order_by')->get() as $config) {
             /**
              * @var ilParticipationCertificateConfig $config
-             */
+
             switch ($config->getConfigKey()) {
                 /*case "page1_issuer_signature":
                     // Skip
                     $input = NULL;
-                    break;*/
+                    break;
                 case "udf_firstname":
                 case "udf_lastname":
                 case "udf_gender":
@@ -490,7 +610,7 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI
         $form->addCommandButton(ilParticipationCertificateConfigGUI::CMD_SAVE, $this->pl->txt("save"));
 
         return $form;
-    }
+    }*/
 
     protected function getUdfDropdownValues(): array
     {
