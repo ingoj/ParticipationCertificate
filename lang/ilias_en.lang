@@ -98,4 +98,4 @@ enable_ementoring#:#Show eMentoring
 back#:#Back
 Mr#:#Mr
 Ms#:#Ms
-no_salutation#:#User data fields are not filled. Please provide a value before generating the certificate.
+user_data_missing#:#User data fields are not filled. Please provide a value before generating the certificate.

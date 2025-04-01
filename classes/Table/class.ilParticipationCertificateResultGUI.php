@@ -195,7 +195,7 @@ class ilParticipationCertificateResultGUI
                 $arr_usr_data[$usr_id[0]]->getPartCertFirstname(),
                 $arr_usr_data[$usr_id[0]]->getPartCertLastname()
             )) {
-                $this->tpl->setOnScreenMessage('failure',$this->lng->txt('no_permission'), true);
+                $this->tpl->setOnScreenMessage('failure',$this->lng->txt('user_data_missing'), true);
                 $this->ctrl->redirect($this, self::CMD_CONTENT);
             }
 

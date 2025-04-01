@@ -209,7 +209,39 @@ class ilParticipationCertificateResultModificationGUI
         $ementor = $_GET['ementor'];
         $edited = $_GET['edited'];
         $usr_id[] = $this->usr_id;
+
+        $arr_usr_data = ilPartCertUsersData::getData($this->pl, $usr_id);
+
+        if(!$this->checkIfUserDataFilled(
+            $arr_usr_data[$usr_id[0]]->getPartCertSalutation(),
+            $arr_usr_data[$usr_id[0]]->getPartCertFirstname(),
+            $arr_usr_data[$usr_id[0]]->getPartCertLastname()
+        )) {
+            $this->tpl->setOnScreenMessage('failure',$this->pl->txt('user_data_missing'), true);
+            $this->ctrl->redirect($this, self::CMD_DISPLAY);
+        }
+
         $twigParser = new ilParticipationCertificateTwigParser($this->groupRefId, array(), $usr_id, $ementor, $edited, $array);
         $twigParser->parseData();
+    }
+
+    /**
+     * @param string $salutation
+     * @param string $firstname
+     * @param string $lastname
+     * @return bool
+     */
+    private function checkIfUserDataFilled(
+        string $salutation,
+        string $firstname,
+        string $lastname
+    ): bool {
+        if (empty($salutation) &&
+            empty($firstname) &&
+            empty($lastname)
+        ) {
+            return false;
+        }
+        return true;
     }
 }
