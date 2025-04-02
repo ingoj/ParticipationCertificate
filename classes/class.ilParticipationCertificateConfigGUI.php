@@ -39,6 +39,7 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI
     public string $surname;
     public string $lastname;
     public string $gender;
+
     /**
      * ilParticipationCertificateConfigGUI constructor.
      */
@@ -374,20 +375,33 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI
         $this->ctrl->setParameter($this, 'id', $id);
 
         global $DIC;
-        $ui = $DIC->ui()->factory();
         $renderer = $DIC->ui()->renderer();
+        $form = $this->buildForm();
 
-        //Step 1: Define the text input field
+        $this->tpl->setContent($renderer->render($form));
+    }
+
+    /**
+     * @throws arException
+     * @throws ilCtrlException
+     */
+    private function buildForm()
+    {
+        global $DIC;
+        $ui = $DIC->ui()->factory();
+
+        $id = filter_input(INPUT_GET, 'id');
+        $setType = filter_input(INPUT_GET, 'set_type');
 
         $inputFields = [];
 
-        switch ($set_type) {
+        switch ($setType) {
             case ilParticipationCertificateConfig::CONFIG_SET_TYPE_TEMPLATE:
                 // TODO
         }
 
         foreach (ilParticipationCertificateConfig::where(array(
-            'config_type' => $set_type,
+            'config_type' => $setType,
             'global_config_id' => $id
         ))->orderBy('order_by')->get() as $config) {
             /**
@@ -398,12 +412,12 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI
                 case 'udf_lastname':
                 case 'udf_gender':
 
-                $options = $this->getUdfDropdownValues();
-                $inputFields[$config->getConfigKey()] = $ui->input()->field()->select(
-                    $this->pl->txt($config->getConfigKey()),
-                    $options,
-                    ''
-                )->withValue($config->getConfigValue())->withRequired(true);
+                    $options = $this->getUdfDropdownValues();
+                    $inputFields[$config->getConfigKey()] = $ui->input()->field()->select(
+                        $this->pl->txt($config->getConfigKey()),
+                        $options,
+                        ''
+                    )->withValue($config->getConfigValue())->withRequired(true);
 
                     break;
 
@@ -470,17 +484,43 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI
 		&lbrace;&lbrace;date&rbrace;&rbrace;: Datum
 		'
         );
-
+        $formAction = $DIC->ctrl()->getFormActionByClass(
+            self::class,
+            'save'
+        );
+        //$formAction = $DIC->ctrl()->getLinkTargetByClass( self::class, 'save');
         //Step 2: Define the form and attach the section.
         $form = $ui->input()->container()->form()->standard(
-            '#'/*$this->ctrl->getFormAction($this)*/,
-            ['test' => $section]
+            $formAction,
+            ['config' => $section]
         );
 
-        // TODO It doesn't work
-        //$form->withDedicatedName('test-form');
+        /*$request = $DIC->http()->request();
+        if ($request->getMethod() == 'POST') {
+            $form = $form->withRequest($request);
+            $result = $form->getData()[0] ?? "";
+        } else {
+            $result = "No result yet.";
+        }*/
 
-        $this->tpl->setContent($renderer->render($form));
+        return $form ;
+    }
+
+    /**
+     * @throws arException
+     * @throws ilCtrlException
+     */
+    public function save(): bool
+    {
+        global $DIC;
+
+        $form  = $this->buildForm();
+        $form  = $form->withRequest($DIC->http()->request());
+        $form_data = $form->getData();
+
+        dd($form_data);
+
+        return true;
     }
 
     /**
@@ -505,7 +545,7 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI
      * @throws arException
      * @throws ilCtrlException
      */
-    /*public function initForm(int $global_config_id, int $configset_type): ilPropertyFormGUI
+    public function initForm(int $global_config_id, int $configset_type): ilPropertyFormGUI
     {
         global $DIC;
 
@@ -524,7 +564,7 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI
             case ilParticipationCertificateConfig::CONFIG_SET_TYPE_TEMPLATE:
                 /**
                  * @var ilParticipationCertificateGlobalConfigSet $global_config
-
+                 */
                 $global_config = ilParticipationCertificateGlobalConfigSet::findOrGetInstance($global_config_id);
                 $input = new ilTextInputGUI($this->pl->txt("config_title"), "config_title");
                 $input->setRequired(true);
@@ -539,9 +579,9 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI
         ))->orderBy('order_by')->get() as $config) {
             /**
              * @var ilParticipationCertificateConfig $config
-
+             */
             switch ($config->getConfigKey()) {
-                /*case "page1_issuer_signature":
+                case "page1_issuer_signature":
                     // Skip
                     $input = NULL;
                     break;
@@ -610,7 +650,7 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI
         $form->addCommandButton(ilParticipationCertificateConfigGUI::CMD_SAVE, $this->pl->txt("save"));
 
         return $form;
-    }*/
+    }
 
     protected function getUdfDropdownValues(): array
     {
@@ -631,7 +671,7 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI
      * @throws arException
      * @throws ilCtrlException
      */
-    public function save(): bool
+    public function saveOld(): bool
     {
         global $DIC;
         $global_config_id = filter_input(INPUT_GET, 'id');

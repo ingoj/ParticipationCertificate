@@ -49,11 +49,14 @@ class ilParticipationCertificateResultModificationGUI
      */
     protected array $array_obj_ids;
 
+    private $dic;
+
 
     public function __construct()
     {
         global $DIC;
 
+        $this->dic = $DIC;
         $this->toolbar = $DIC->toolbar();
         $this->ctrl = $DIC->ctrl();
         $this->tabs = $DIC->tabs();
@@ -98,22 +101,29 @@ class ilParticipationCertificateResultModificationGUI
         }
     }
 
+    /**
+     * @throws ilTemplateException
+     * @throws ilCtrlException
+     */
     public function display(): void
     {
-        if (method_exists($this->tpl, 'loadStandardTemplate')) {
+        $cert_access = new ilParticipationCertificateAccess($_GET['ref_id']);
+        if ($cert_access->hasCurrentUserWriteAccess()) {
+            $renderer = $this->dic->ui()->renderer();
             $this->tpl->loadStandardTemplate();
-        } else {
-            $this->tpl->getStandardTemplate();
-        }
-        $this->initHeader();
-        $form = $this->initForm();
-        $this->fillForm($form);
+            $this->initHeader();
 
-        $this->tpl->setContent($form->getHTML());
-        if (method_exists($this->tpl, 'printToStdout')) {
-            $this->tpl->printToStdout();
+            $form = $this->initForm();
+
+            $this->tpl->setContent($renderer->render($form));
+            if (method_exists($this->tpl, 'printToStdout')) {
+                $this->tpl->printToStdout();
+            } else {
+                $this->tpl->show();
+            }
         } else {
-            $this->tpl->show();
+            // TODO Test this
+            $this->ctrl->redirect(new ilParticipationCertificateResultGUI(), 'content');
         }
     }
 
@@ -130,52 +140,68 @@ class ilParticipationCertificateResultModificationGUI
         ), ilParticipationCertificateResultGUI::CMD_CONTENT));
     }
 
-    public function initForm(): ilPropertyFormGUI
+    /**
+     * @throws ilCtrlException
+     */
+    public function initForm()
     {
+        $ui = $this->dic->ui()->factory();
+
         $usr_id = $_GET[self::IDENTIFIER];
         $arr_usr_data = ilPartCertUsersData::getData($this->pl, $this->usr_ids);
-        $nameUser = $arr_usr_data[$usr_id]->getPartCertFirstname() . ' ' . $arr_usr_data[$usr_id]->getPartCertLastname();
+        $name_user = $arr_usr_data[$usr_id]->getPartCertFirstname() . ' ' . $arr_usr_data[$usr_id]->getPartCertLastname();
 
-        $form = new ilPropertyFormGUI();
-        $form->setPreventDoubleSubmission(false);
+        $form_data = $this->getFormData();
+
         $cert_access = new ilParticipationCertificateAccess($_GET['ref_id']);
         if ($cert_access->hasCurrentUserWriteAccess()) {
-            $form->setFormAction($this->ctrl->getFormAction($this));
-            $form->setTitle('Resultate für ' . $nameUser . ' bearbeiten');
+            $inputFields['initial'] = $ui->input()->field()->text(
+                $this->pl->txt('mod_initial')
+            )->withValue((string) $form_data['initial'] ?? '');
 
-            $initialtest = new ilTextInputGUI($this->pl->txt('mod_initial'), 'initial');
-            $form->addItem($initialtest);
+            $inputFields['mod_resultstest'] = $ui->input()->field()->text(
+                $this->pl->txt('mod_resultstest')
+            )->withValue((string) $form_data['resultstest'] ?? '');
 
-            $resultstests = new ilTextInputGUI($this->pl->txt('mod_resultstest'), 'resultstest');
-            $form->addItem($resultstests);
+            $inputFields['conf'] = $ui->input()->field()->text(
+                $this->pl->txt('mod_conf')
+            )->withValue((string) $form_data['conf'] ?? '');
 
-            $conferences = new ilTextInputGUI($this->pl->txt('mod_conf'), 'conf');
-            $form->addItem($conferences);
+            $inputFields['homework'] = $ui->input()->field()->text(
+                $this->pl->txt('mod_homework')
+            )->withValue((string) $form_data['homework'] ?? '');
 
-            $homeworks = new ilTextInputGUI($this->pl->txt('mod_homework'), 'homework');
-            $form->addItem($homeworks);
+            $section = $ui->input()->field()->section(
+                $inputFields,
+                'Resultate für ' . $name_user . ' bearbeiten'
+            );
+            $formAction = $this->ctrl->getFormActionByClass(
+                self::class,
+                ilParticipationCertificateResultGUI::CMD_PRINT_PDF,
+                $this->pl->txt('list_print')
+            );
 
-            $form->addCommandButton(ilParticipationCertificateResultGUI::CMD_PRINT_PDF, $this->pl->txt('list_print'));
-        } else {
-            $this->tpl->setOnScreenMessage('failure','No Access Permissions', true);
+            //Step 2: Define the form and attach the section.
+             $form = $ui->input()->container()->form()->standard(
+                 $formAction,
+                 ['config' => $section]
+             );
+             return $form;
         }
-        return $form;
+        $this->tpl->setOnScreenMessage('failure', 'No Access Permissions', true);
+
+        $this->ctrl->redirectByClass(ilParticipationCertificateResultGUI::class, 'content');
+        //$this->redirectWithError(self::CMD_DISPLAY, 'No Access Permissions');
     }
 
-    public function save(): void
-    {
-        $form = $this->initForm();
-
-        if (!$form->checkInput()) {
-            //TODO error message plus redirect
-            return;
-        }
-    }
-
-    public function fillForm(&$form): void
+    /**
+     * @return array
+     */
+    public function getFormData(): array
     {
         $usr_id = $_GET[self::IDENTIFIER];
 
+        $array = [];
         if (key_exists($usr_id, $this->arr_initial_test_states) && is_object($this->arr_initial_test_states[$usr_id])) {
             $array['initial'] = $this->arr_initial_test_states[$usr_id]->getCrsitestItestSubmitted();
         } else {
@@ -196,7 +222,7 @@ class ilParticipationCertificateResultModificationGUI
         } else {
             $array['homework'] = 0;
         }
-        $form->setValuesbyArray($array);
+        return $array;
     }
 
     /**
@@ -204,11 +230,18 @@ class ilParticipationCertificateResultModificationGUI
      */
     public function printPDF(): void
     {
-        $form = $this->initForm();
-        $form->setValuesByPost();
-        $form->checkInput();
+        global $DIC;
 
-        $array = array($form->getInput('initial'), $form->getInput('resultstest'), $form->getInput('conf'), $form->getInput('homework'));
+        $form = $this->initForm();
+        $form  = $form ->withRequest($DIC->http()->request());
+        $data = $form->getData()['config'];
+
+        $array = [
+            $data['initial'],
+            $data['mod_resultstest'],
+            $data['conf'],
+            $data['homework']
+        ];
         $ementor = $_GET['ementor'];
         $edited = $_GET['edited'];
         $usr_id[] = $this->usr_id;
