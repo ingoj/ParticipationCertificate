@@ -153,45 +153,38 @@ class ilParticipationCertificateResultModificationGUI
 
         $form_data = $this->getFormData();
 
-        $cert_access = new ilParticipationCertificateAccess($_GET['ref_id']);
-        if ($cert_access->hasCurrentUserWriteAccess()) {
-            $inputFields['initial'] = $ui->input()->field()->text(
-                $this->pl->txt('mod_initial')
-            )->withValue((string) $form_data['initial'] ?? '');
+        $inputFields['initial'] = $ui->input()->field()->text(
+            $this->pl->txt('mod_initial')
+        )->withValue((string) $form_data['initial'] ?? '');
 
-            $inputFields['mod_resultstest'] = $ui->input()->field()->text(
-                $this->pl->txt('mod_resultstest')
-            )->withValue((string) $form_data['resultstest'] ?? '');
+        $inputFields['mod_resultstest'] = $ui->input()->field()->text(
+            $this->pl->txt('mod_resultstest')
+        )->withValue((string) $form_data['resultstest'] ?? '');
 
-            $inputFields['conf'] = $ui->input()->field()->text(
-                $this->pl->txt('mod_conf')
-            )->withValue((string) $form_data['conf'] ?? '');
+        $inputFields['conf'] = $ui->input()->field()->text(
+            $this->pl->txt('mod_conf')
+        )->withValue((string) $form_data['conf'] ?? '');
 
-            $inputFields['homework'] = $ui->input()->field()->text(
-                $this->pl->txt('mod_homework')
-            )->withValue((string) $form_data['homework'] ?? '');
+        $inputFields['homework'] = $ui->input()->field()->text(
+            $this->pl->txt('mod_homework')
+        )->withValue((string) $form_data['homework'] ?? '');
 
-            $section = $ui->input()->field()->section(
-                $inputFields,
-                'Resultate für ' . $name_user . ' bearbeiten'
-            );
-            $formAction = $this->ctrl->getFormActionByClass(
-                self::class,
-                ilParticipationCertificateResultGUI::CMD_PRINT_PDF,
-                $this->pl->txt('list_print')
-            );
+        $section = $ui->input()->field()->section(
+            $inputFields,
+            'Resultate für ' . $name_user . ' bearbeiten'
+        );
+        $formAction = $this->ctrl->getFormActionByClass(
+            self::class,
+            ilParticipationCertificateResultGUI::CMD_PRINT_PDF,
+            $this->pl->txt('list_print')
+        );
 
-            //Step 2: Define the form and attach the section.
-             $form = $ui->input()->container()->form()->standard(
-                 $formAction,
-                 ['config' => $section]
-             );
-             return $form;
-        }
-        $this->tpl->setOnScreenMessage('failure', 'No Access Permissions', true);
-
-        $this->ctrl->redirectByClass(ilParticipationCertificateResultGUI::class, 'content');
-        //$this->redirectWithError(self::CMD_DISPLAY, 'No Access Permissions');
+        //Step 2: Define the form and attach the section.
+         $form = $ui->input()->container()->form()->standard(
+             $formAction,
+             ['config' => $section]
+         );
+         return $form;
     }
 
     /**
@@ -233,6 +226,8 @@ class ilParticipationCertificateResultModificationGUI
         global $DIC;
 
         $form = $this->initForm();
+
+        dd($form->getInputs());
         $form  = $form ->withRequest($DIC->http()->request());
         $data = $form->getData()['config'];
 
