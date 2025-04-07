@@ -627,11 +627,6 @@ class ilParticipationCertificateGUI
 
         $dataFactory = new \ILIAS\Data\Factory();
 
-        /*$user_format = $this->activeUser->getDateFormat();
-        $format = $data_factory->dateFormat()->withTime24($user_format);*/
-
-        //$format = $dataFactory->dateFormat()->withTime24($user_format);
-
         $periodStart = ilParticipationCertificateConfig::getConfig('period_start', $this->groupRefId);
         $startDate = !empty($periodStart) ? DateTimeImmutable::createFromFormat('d.m.Y', $periodStart) : null;
 
@@ -646,7 +641,7 @@ class ilParticipationCertificateGUI
                 ->withLabels($this->pl->txt('start'), $this->pl->txt('end'))
                 ->withFormat($dataFactory->dateFormat()->germanShort())
                 ->withMinValue($startDate)
-                ->withMaxValue($startDate);
+                ->withMaxValue($endDate);
         }else {
             $period = $durationInput
                 ->withTimezone('Europe/Berlin')
@@ -738,6 +733,10 @@ class ilParticipationCertificateGUI
 
     protected function selfPrint(): void
     {
+        global $DIC;
+
+        $renderer = $DIC->ui()->renderer();
+
         if (method_exists($this->tpl, 'loadStandardTemplate')) {
             $this->tpl->loadStandardTemplate();
         } else {
@@ -750,7 +749,9 @@ class ilParticipationCertificateGUI
 
         $form = $this->initSelfPrintForm();
 
-        $this->tpl->setContent($form->getHTML());
+      /*  $this->tpl->setContent($form->getHTML());*/
+
+        $this->tpl->setContent($renderer->render($form));
         if (method_exists($this->tpl, 'printToStdout')) {
             $this->tpl->printToStdout();
         } else {
@@ -758,8 +759,55 @@ class ilParticipationCertificateGUI
         }
     }
 
-    protected function initSelfPrintForm(): ilPropertyFormGUI
+    protected function initSelfPrintForm()
     {
+        global $DIC;
+
+        $ui = $DIC->ui()->factory();
+
+
+        $dataFactory = new \ILIAS\Data\Factory();
+
+        $periodStart = ilParticipationCertificateConfig::getConfig('self_print_start', $this->groupRefId);
+        $startDate = !empty($periodStart) ? DateTimeImmutable::createFromFormat('d.m.Y', $periodStart) : null;
+
+        $periodEnd = ilParticipationCertificateConfig::getConfig('self_print_end', $this->groupRefId);
+        $endDate = !empty($periodEnd) ? DateTimeImmutable::createFromFormat('d.m.Y', $periodEnd) : null;
+
+
+        $durationInput = $ui->input()->field()->duration($this->pl->txt('period'));
+        $period = $durationInput
+            ->withTimezone('Europe/Berlin')
+            ->withUseTime(false)
+            ->withLabels($this->pl->txt('start'), $this->pl->txt('end'))
+            ->withFormat($dataFactory->dateFormat()->germanShort())
+            ->withMinValue($startDate)
+            ->withMaxValue($endDate);
+
+        $inputFields['enable-self-printing'] = $ui->input()->field()->optionalGroup(
+            [
+                'period' => $period
+            ],
+            $this->pl->txt('period')
+        );
+
+        $section = $ui->input()->field()->section(
+            $inputFields,
+            $this->pl->txt('period_self_print')
+        );
+        $formAction = $this->ctrl->getFormActionByClass(
+            self::class,
+            self::CMD_SELF_PRINT_SAVE,
+            $this->pl->txt('save')
+        );
+
+        //Step 2: Define the form and attach the section.
+        $form = $ui->input()->container()->form()->standard(
+            $formAction,
+            ['config' => $section]
+        );
+        return $form;
+
         $form = new ilPropertyFormGUI();
 
         $form->setFormAction($this->ctrl->getFormAction($this));
@@ -780,9 +828,46 @@ class ilParticipationCertificateGUI
         return $form;
     }
 
+    /*protected function initSelfPrintForm(): ilPropertyFormGUI
+    {
+        $form = new ilPropertyFormGUI();
+
+        $form->setFormAction($this->ctrl->getFormAction($this));
+
+        $form->setTitle($this->pl->txt('period_self_print'));
+
+        $enable = new ilCheckboxInputGUI($this->pl->txt('enable_self_print'), 'enable_self_print');
+        $enable->setChecked(boolval(ilParticipationCertificateConfig::getConfig('enable_self_print', $this->groupRefId)));
+        $form->addItem($enable);
+
+        $period = new ilDateDurationInputGUI($this->pl->txt('period'), 'period_self_print');
+        $period->setStart(new ilDateTime(ilParticipationCertificateConfig::getConfig('self_print_start', $this->groupRefId), IL_CAL_DATE));
+        $period->setEnd(new ilDateTime(ilParticipationCertificateConfig::getConfig('self_print_end', $this->groupRefId), IL_CAL_DATE));
+        $enable->addSubItem($period);
+
+        $form->addCommandButton(self::CMD_SELF_PRINT_SAVE, $this->pl->txt('save'));
+
+        return $form;
+    }*/
+
     protected function saveSelfPrint(): void
     {
+        global $DIC;
+
         $form = $this->initSelfPrintForm();
+
+
+        $form  = $form->withRequest($DIC->http()->request());
+        $formData = $form->getData();
+
+        // TODO implement this, in other files as well
+        if ($form->getError()) {
+            $this->tpl->setOnScreenMessage(ilGlobalTemplateInterface::MESSAGE_TYPE_FAILURE, $form->getError());
+            /*$this->configure();*/
+            return;
+        }
+
+        dd($formData);
 
         if (!$form->checkInput()) {
             //TODO error message plus redirect
