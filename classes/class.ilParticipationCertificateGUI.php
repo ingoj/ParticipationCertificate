@@ -144,8 +144,17 @@ class ilParticipationCertificateGUI
         $this->tabs->addSubTab(self::TAB_CONFIG_DISPLAY, $this->pl->txt('plugin'), $this->ctrl->getLinkTarget($this, self::CMD_DISPLAY));
     }
 
+    /**
+     * @throws arException
+     * @throws ilCtrlException
+     * @throws ilTemplateException
+     */
     protected function display(): void
     {
+        global $DIC;
+
+        $renderer = $DIC->ui()->renderer();
+
         if (method_exists($this->tpl, 'loadStandardTemplate')) {
             $this->tpl->loadStandardTemplate();
         } else {
@@ -158,7 +167,7 @@ class ilParticipationCertificateGUI
 
         $form = $this->initform();
 
-        $this->tpl->setContent($form->getHTML());
+        $this->tpl->setContent($renderer->render($form));
         if (method_exists($this->tpl, 'printToStdout')) {
             $this->tpl->printToStdout();
         } else {
@@ -166,7 +175,168 @@ class ilParticipationCertificateGUI
         }
     }
 
-    public function initForm(): ilPropertyFormGUI
+    /**
+     * @throws arException
+     * @throws ilCtrlException
+     */
+    public function initForm(): Standard
+    {
+        global $DIC;
+        $ui = $DIC->ui()->factory();
+
+
+        $this->toolbar->setFormAction($this->ctrl->getFormAction($this, self::CMD_CONFIG));
+
+        $inputFields = [];
+
+        $cert_global_configs = new ilParticipationCertificateGlobalConfigSets();
+        $options_template = $cert_global_configs->getSelectOptions();
+        $select = $ui->input()->field()->select('', $options_template);
+        $this->toolbar->addComponent($select);
+
+        $button_fixed_form = $ui->button()->standard($this->pl->txt('btn_reset'), self::CMD_SET_CERT_TEMPLATE);
+        $button_editable_form = $ui->button()->standard($this->pl->txt('btn_modify'), self::CMD_SET_OWN_CERT_TEXT_FROM_TEMPLATE);
+
+        $this->toolbar->addComponent($button_fixed_form);
+        $this->toolbar->addComponent($button_editable_form);
+
+        $cert_configs = new ilParticipationCertificateConfigs();
+        $arr_config = $cert_configs->getObjConfigSetIfNoneCreateDefaultAndCreateNewObjConfigValues($this->groupRefId);
+
+        $global_config_sets = new ilParticipationCertificateGlobalConfigSets();
+        if (count($arr_config) > 0) {
+            $global_config_id = reset($arr_config)->getGlobalConfigId();
+        }
+
+        if ($global_config_id > 0) {
+            $global_config_set = $global_config_sets->getConfigSetById($global_config_id);
+            $this->tpl->setOnScreenMessage('info',$this->pl->txt('configset_type_1'). ' ' . $global_config_set->getTitle(), true);
+        } else {
+            $this->tpl->setOnScreenMessage('info',$this->pl->txt('configset_type_2'), true);
+        }
+
+        foreach ($arr_config as $config) {
+            $disbaled = false;
+            if ($config->getConfigType() == ilParticipationCertificateConfig::CONFIG_SET_TYPE_TEMPLATE) {
+                $disbaled = true;
+            }
+
+            /**
+             * @var ilParticipationCertificateConfig $config
+             */
+            switch ($config->getConfigKey()) {
+                case 'logo':
+                    if ($disbaled) {
+                        /*$input = new ilFileInputGUI($this->pl->txt("logo"), 'logo');
+                        if (is_file(ilParticipationCertificateConfig::returnPicturePath('absolute', $global_config_id, ilParticipationCertificateConfig::LOGO_FILE_NAME))) {
+                            $input->setInfo('<img src="'
+                                . ilParticipationCertificateConfig::returnPicturePath('relative', $global_config_id, ilParticipationCertificateConfig::LOGO_FILE_NAME) . '" />');
+                        }*/
+
+                        // TODO ilUIDemoFileUploadHandlerGUI ????
+                        $inputFields[$config->getConfigKey()] = $ui->input()->field()->file(
+                            new \ilUIDemoFileUploadHandlerGUI(),
+                            $this->pl->txt('logo'),
+                            ''
+                        )->withDisabled(true);
+
+                        break;
+
+                    } else {
+                        /*$input = new ilFileInputGUI($this->pl->txt("logo"), 'logo');
+                        $input->setSuffixes(array('png'));
+                        if (is_file(ilParticipationCertificateConfig::returnPicturePath('absolute', $this->groupRefId, ilParticipationCertificateConfig::LOGO_FILE_NAME))) {
+                            $input->setInfo('<img src="'
+                                . ilParticipationCertificateConfig::returnPicturePath('relative', $this->groupRefId, ilParticipationCertificateConfig::LOGO_FILE_NAME) . '" />');
+                        }*/
+
+                        // TODO ilUIDemoFileUploadHandlerGUI ????
+                        $inputFields[$config->getConfigKey()] = $ui->input()->field()->file(
+                            new \ilUIDemoFileUploadHandlerGUI(),
+                            $this->pl->txt('logo')
+                        );
+
+                    }
+                    break;
+                case 'page1_issuer_signature':
+                    if ($disbaled) {
+                        /*$input = new ilFileInputGUI("page1_issuer_signature", 'page1_issuer_signature');
+                        if (is_file(ilParticipationCertificateConfig::returnPicturePath('absolute', $global_config_id, ilParticipationCertificateConfig::ISSUER_SIGNATURE_FILE_NAME))) {
+                            $input->setInfo('<img src="'
+                                . ilParticipationCertificateConfig::returnPicturePath('relative', $global_config_id, ilParticipationCertificateConfig::ISSUER_SIGNATURE_FILE_NAME) . '" />');
+                        }*/
+
+                        // TODO ilUIDemoFileUploadHandlerGUI ????
+                        $inputFields[$config->getConfigKey()] = $ui->input()->field()->file(
+                            new \ilUIDemoFileUploadHandlerGUI(),
+                            $this->pl->txt('page1_issuer_signature')
+                        )->withDisabled(true);
+
+                    } else {
+                        /*$input = new ilFileInputGUI("page1_issuer_signature", 'page1_issuer_signature');
+                        $input->setSuffixes(array('png'));
+                        if (is_file(ilParticipationCertificateConfig::returnPicturePath('absolute', $this->groupRefId, ilParticipationCertificateConfig::ISSUER_SIGNATURE_FILE_NAME))) {
+                            $input->setInfo('<img src="'
+                                . ilParticipationCertificateConfig::returnPicturePath('relative', $this->groupRefId, ilParticipationCertificateConfig::ISSUER_SIGNATURE_FILE_NAME) . '" />');
+                        }*/
+
+                        // TODO ilUIDemoFileUploadHandlerGUI ????
+                        $inputFields[$config->getConfigKey()] = $ui->input()->field()->file(
+                            new \ilUIDemoFileUploadHandlerGUI(),
+                            $this->pl->txt('page1_issuer_signature')
+                        );
+                    }
+                    break;
+
+                default:
+                    /*$input = new ilTextAreaInputGUI($config->getConfigKey(), $config->getConfigKey());
+                    $input->setRows(3);
+                    $input->setValue($config->getConfigValue());*/
+
+                    if($disbaled){
+                        $inputFields[$config->getConfigKey()] = $ui->input()->field()->textarea(
+                            $config->getConfigKey()
+                        )->withValue($config->getConfigValue() ?? '')
+                         ->withDisabled(true);
+                    } else {
+                        $inputFields[$config->getConfigKey()] = $ui->input()->field()->textarea(
+                            $config->getConfigKey()
+                        )->withValue($config->getConfigValue() ?? '');
+                    }
+
+                    break;
+            }
+        }
+
+        $section = $ui->input()->field()->section(
+            $inputFields,
+            $this->pl->txt('config_plugin'),
+            $this->pl->txt("placeholders") . ' <br>
+		&lbrace;&lbrace;username&rbrace;&rbrace;: Anrede Vorname Nachname <br>
+		&lbrace;&lbrace;date&rbrace;&rbrace;: Datum
+		'
+        );
+
+        $formAction = $DIC->ctrl()->getFormActionByClass(
+            self::class,
+            self::CMD_SAVE
+        );
+
+        $form = $ui->input()->container()->form()->standard(
+            $formAction,
+            ['config' => $section]
+        );
+
+        if ($this->objecttype === 'grp') {
+            $this->ctrl->saveParameterByClass(ilObjGroup::class, 'ref_id');
+        } else {
+            $this->ctrl->saveParameterByClass(ilObjCourse::class, 'ref_id');
+        }
+
+        return $form;
+    }
+
+    public function initFormOld(): ilPropertyFormGUI
     {
         $form = new ilPropertyFormGUI();
 

@@ -373,12 +373,14 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI
      */
     public function showForm(bool $err=false): void
     {
+        global $DIC;
+
         $id = filter_input(INPUT_GET, 'id');
         $set_type = filter_input(INPUT_GET, 'set_type');
 
         $this->ctrl->setParameter($this, 'id', $id);
 
-        global $DIC;
+
         $renderer = $DIC->ui()->renderer();
         $form = $this->buildForm($id, $set_type);
 
