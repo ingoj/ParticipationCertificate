@@ -165,7 +165,7 @@ class ilParticipationCertificateGUI
         $this->initConfTabs();
         $this->tabs->activateSubTab(self::TAB_CONFIG_DISPLAY);
 
-        $form = $this->initform();
+        $form = $this->initForm();
 
         $this->tpl->setContent($renderer->render($form));
         if (method_exists($this->tpl, 'printToStdout')) {
@@ -194,8 +194,14 @@ class ilParticipationCertificateGUI
         $select = $ui->input()->field()->select('', $options_template);
         $this->toolbar->addComponent($select);
 
-        $button_fixed_form = $ui->button()->standard($this->pl->txt('btn_reset'), self::CMD_SET_CERT_TEMPLATE);
-        $button_editable_form = $ui->button()->standard($this->pl->txt('btn_modify'), self::CMD_SET_OWN_CERT_TEXT_FROM_TEMPLATE);
+        $button_fixed_form = $ui->button()->standard(
+            $this->pl->txt('btn_reset'),
+            $DIC->ctrl()->getLinkTarget($this, self::CMD_SET_CERT_TEMPLATE)
+        );
+        $button_editable_form = $ui->button()->standard(
+            $this->pl->txt('btn_modify'),
+            $DIC->ctrl()->getLinkTarget($this, self::CMD_SET_OWN_CERT_TEXT_FROM_TEMPLATE)
+        );
 
         $this->toolbar->addComponent($button_fixed_form);
         $this->toolbar->addComponent($button_editable_form);
