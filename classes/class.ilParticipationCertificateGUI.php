@@ -1,5 +1,7 @@
 <?php
 
+use ILIAS\UI\Component\Input\Container\Form\Standard;
+
 /**
  * Class ilParticipationCertificateGUI
  *
@@ -406,6 +408,8 @@ class ilParticipationCertificateGUI
      */
     public function configResultTable(): void
     {
+        global $DIC;
+
         if (method_exists($this->tpl, 'loadStandardTemplate')) {
             $this->tpl->loadStandardTemplate();
         } else {
@@ -418,7 +422,12 @@ class ilParticipationCertificateGUI
 
         $form = $this->initConfigResultTableForm();
 
-        $this->tpl->setContent($form->getHTML());
+
+
+
+        /*$this->tpl->setContent($form->getHTML());*/
+        $renderer = $DIC->ui()->renderer();
+        $this->tpl->setContent($renderer->render($form));
 
         if (method_exists($this->tpl, 'printToStdout')) {
             $this->tpl->printToStdout();
@@ -427,99 +436,126 @@ class ilParticipationCertificateGUI
         }
     }
 
-    protected function initConfigResultTableForm(): ilPropertyFormGUI
+    /**
+     * @return Standard
+     * @throws ilCtrlException
+     */
+    protected function initConfigResultTableForm()
     {
-        $form = new ilPropertyFormGUI();
+        global $DIC;
 
-        $form->setFormAction($this->ctrl->getFormAction($this));
+        $ui = $DIC->ui()->factory();
 
-        $form->setTitle($this->pl->txt('period'));
+        $dataFactory = new \ILIAS\Data\Factory();
 
-        $period = new ilDateDurationInputGUI($this->pl->txt('period'), 'period');
-        $period->setStart(new ilDateTime(ilParticipationCertificateConfig::getConfig('period_start', $this->groupRefId), IL_CAL_DATE));
-        $period->setEnd(new ilDateTime(ilParticipationCertificateConfig::getConfig('period_end', $this->groupRefId), IL_CAL_DATE));
-        $form->addItem($period);
+        /*$user_format = $this->activeUser->getDateFormat();
+        $format = $data_factory->dateFormat()->withTime24($user_format);*/
 
-        $calculation_type_processing_state_suggested_objectives = new ilRadioGroupInputGUI(
-            $this->pl->txt('calculation_type_processing_state_suggested_objectives'),
-            'calculation_type_processing_state_suggested_objectives'
-        );
-        $option = new ilRadioOption(
-            $this->pl->txt('calculation_by_points'),
-            ilLearnObjectSuggResult::CALC_TYPE_BY_POINTS
-        );
-        $calculation_type_processing_state_suggested_objectives->addOption($option);
+        //$format = $dataFactory->dateFormat()->withTime24($user_format);
 
-        $option = new ilRadioOption(
-            $this->pl->txt('calculation_by_completed_learning_objective'),
-            ilLearnObjectSuggResult::CALC_TYPE_BY_COMPLETED_OBJECTIVE
-        );
-        $calculation_type_processing_state_suggested_objectives->addOption($option);
+        $periodStart = ilParticipationCertificateConfig::getConfig('period_start', $this->groupRefId);
+        $startDate = !empty($periodStart) ? DateTimeImmutable::createFromFormat('d.m.Y', $periodStart) : null;
 
-        $option = new ilRadioOption(
-            $this->pl->txt('calculation_by_highest_value'),
-            ilLearnObjectSuggResult::CALC_TYPE_HIGHEST_VALUE
-        );
-        $calculation_type_processing_state_suggested_objectives->addOption($option);
+        $periodEnd = ilParticipationCertificateConfig::getConfig('period_end', $this->groupRefId);
+        $endDate = !empty($periodEnd) ? DateTimeImmutable::createFromFormat('d.m.Y', $periodEnd) : null;
 
-        $value = ilParticipationCertificateConfig::getConfig
-        (
+        $durationInput = $ui->input()->field()->duration($this->pl->txt('period'));
+        if (!empty($startDate) && !empty($endDate)) {
+            $period = $durationInput
+                ->withTimezone('Europe/Berlin')
+                ->withUseTime(false)
+                ->withLabels($this->pl->txt('start'), $this->pl->txt('end'))
+                ->withFormat($dataFactory->dateFormat()->germanShort())
+                ->withMinValue($startDate)
+                ->withMaxValue($startDate);
+        }else {
+            $period = $durationInput
+                ->withTimezone('Europe/Berlin')
+                ->withUseTime(false)
+                ->withLabels($this->pl->txt('start'), $this->pl->txt('end'))
+                ->withFormat($dataFactory->dateFormat()->germanShort());
+        }
+
+        $inputFields['period'] = $period;
+
+        $calculationType = ilParticipationCertificateConfig::getConfig(
             'calculation_type_processing_state_suggested_objectives',
             $this->groupRefId
-        )
-            ?
-            ilParticipationCertificateConfig::getConfig(
+        ) ? ilParticipationCertificateConfig::getConfig(
                 'calculation_type_processing_state_suggested_objectives',
-                $this->groupRefId)
-            :
-            ilLearnObjectSuggResult::CALC_TYPE_BY_POINTS;
+                $this->groupRefId
+        ) : ilLearnObjectSuggResult::CALC_TYPE_BY_POINTS;
 
-        $calculation_type_processing_state_suggested_objectives->setValue($value);
+        $radio = $ui->input()->field()->radio( $this->pl->txt('calculation_type_processing_state_suggested_objectives'))
+                    ->withOption( ilLearnObjectSuggResult::CALC_TYPE_BY_POINTS, $this->pl->txt('calculation_by_points'))
+                    ->withOption(   ilLearnObjectSuggResult::CALC_TYPE_BY_COMPLETED_OBJECTIVE, $this->pl->txt('calculation_by_completed_learning_objective'))
+                    ->withOption( ilLearnObjectSuggResult::CALC_TYPE_HIGHEST_VALUE, $this->pl->txt('calculation_by_highest_value'))
+                    ->withValue($calculationType);
 
-        $form->addItem($calculation_type_processing_state_suggested_objectives);
+        $inputFields['calculation_type'] = $radio;
 
-        $ementoring = new ilCheckboxInputGUI($this->pl->txt('enable_ementoring'), 'enable_ementoring');
-        $ementoring_setting = ilParticipationCertificateConfig::getConfig('enable_ementoring', $this->groupRefId);
-        if ($ementoring_setting === NULL) {
-            $ementoring_setting = true;
+
+        $ementoringSetting = ilParticipationCertificateConfig::getConfig('enable_ementoring', $this->groupRefId);
+        if ($ementoringSetting === NULL) {
+            $ementoringSetting = true;
         } else {
-            $ementopting_setting = boolval($ementoring_setting);
+            $ementoringSetting = boolval($ementoringSetting);
         }
-        $ementoring->setChecked($ementoring_setting);
-        $form->addItem($ementoring);
 
-        $form->addCommandButton(self::CMD_RESULT_TABLE_CONFIG, $this->pl->txt('save'));
+        $checkbox = $ui->input()->field()->checkbox($this->pl->txt('enable_ementoring'))
+                             ->withValue($ementoringSetting);
 
+        $inputFields['ementoring'] = $checkbox;
 
+        $section = $ui->input()->field()->section(
+            $inputFields,
+            'Resultate für'
+        );
+        $formAction = $this->ctrl->getFormActionByClass(
+            self::class,
+            self::CMD_RESULT_TABLE_CONFIG,
+            $this->pl->txt('save')
+        );
+
+        //Step 2: Define the form and attach the section.
+        $form = $ui->input()->container()->form()->standard(
+            $formAction,
+            ['config' => $section]
+        );
         return $form;
     }
 
-
+    /**
+     * @throws ilCtrlException
+     */
     protected function saveResultTableConfig(): void
     {
-        $form = $this->initConfigResultTableForm();
+        global $DIC;
 
-        if (!$form->checkInput()) {
-            //TODO error message plus redirect
-            return;
-        }
+        $form  = $this->initConfigResultTableForm();
 
-        $period = $form->getInput('period');
-        $ementoring = $form->getInput('enable_ementoring');
-        ilParticipationCertificateConfig::setConfig('period_start', $period['start'], $this->groupRefId);
-        ilParticipationCertificateConfig::setConfig('period_end', $period['end'], $this->groupRefId);
+        $form  = $form->withRequest($DIC->http()->request());
+        $form_data = $form->getData()['config'];
+
+        $period = $form_data['period'];
+        $ementoring = $form_data['ementoring'];
+
+        $periodStart = !empty($period['start']) ? $period['start']->format('d.m.Y') : null;
+        $periodEnd = !empty($period['end']) ? $period['end']->format('d.m.Y') : null;
+
+        ilParticipationCertificateConfig::setConfig('period_start', $periodStart, $this->groupRefId);
+        ilParticipationCertificateConfig::setConfig('period_end', $periodEnd, $this->groupRefId);
         ilParticipationCertificateConfig::setConfig('enable_ementoring', $ementoring, $this->groupRefId);
 
-        $calculation_type_processing_state_suggested_objectives = $form->getInput('calculation_type_processing_state_suggested_objectives');
-
-        ilParticipationCertificateConfig::setConfig('calculation_type_processing_state_suggested_objectives', $calculation_type_processing_state_suggested_objectives, $this->groupRefId);
-
+        ilParticipationCertificateConfig::setConfig(
+            'calculation_type_processing_state_suggested_objectives',
+            $form_data['calculation_type'],
+            $this->groupRefId
+        );
 
         $this->tpl->setOnScreenMessage('success',$this->pl->txt('successFormSave'), true);
-
         $this->ctrl->redirect($this, self::CMD_CONFIG_RESULT_TABLE);
     }
-
 
     protected function selfPrint(): void
     {

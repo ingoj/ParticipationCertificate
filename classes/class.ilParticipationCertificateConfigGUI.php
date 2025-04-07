@@ -394,13 +394,8 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI
         global $DIC;
         $ui = $DIC->ui()->factory();
 
-        /*$id = filter_input(INPUT_GET, 'id');
-        $setType = filter_input(INPUT_GET, 'set_type');*/
-
         $DIC->ctrl()->setParameter($this, 'id', $global_config_id);
         $DIC->ctrl()->setParameter($this, 'set_type', $set_type);
-
-        //dd($set_type);
 
         $inputFields = [];
 
