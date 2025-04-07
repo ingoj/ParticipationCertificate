@@ -336,6 +336,7 @@ class ilParticipationCertificateGUI
         return $form;
     }
 
+    // TODO Remove this function
     public function initFormOld(): ilPropertyFormGUI
     {
         $form = new ilPropertyFormGUI();
@@ -455,10 +456,18 @@ class ilParticipationCertificateGUI
      */
     public function save(): bool
     {
+        global $DIC;
+
+        $renderer = $DIC->ui()->renderer();
 
         $form = $this->initForm();
 
-        if (!$form->checkInput()) {
+        $form  = $form->withRequest($DIC->http()->request());
+        $form_data = $form->getData()['config'];
+
+        //$renderer->render($form);
+
+        /*if (!$form->checkInput()) {
             $this->tpl->setContent($form->getHTML());
             if (method_exists($this->tpl, 'loadStandardTemplate')) {
                 $this->tpl->loadStandardTemplate();
@@ -473,35 +482,32 @@ class ilParticipationCertificateGUI
             }
 
             return false;
-        }
-
-        //save Text
-        foreach ($form->getItems() as $item) {
-            /**
-             * @var ilFormPropertyGUI $item
-             * @var ilParticipationCertificateConfig $config
-             */
+        }*/
+        foreach ($form_data as $key => $item) {
 
             $config = ilParticipationCertificateConfig::where(array(
-                'config_key' => $item->getPostVar(),
+                'config_key' => $key,
                 "group_ref_id" => $this->groupRefId,
                 'config_value_type' => ilParticipationCertificateConfig::CONFIG_VALUE_TYPE_CERT_TEXT
             ))->first();
+
+
             if (!is_object($config)) {
                 $config = new ilParticipationCertificateConfig();
                 $config->setGroupRefId($this->groupRefId);
                 $config->setConfigType(ilParticipationCertificateConfig::CONFIG_SET_TYPE_GROUP);
                 $config->setConfigValueType(ilParticipationCertificateConfig::CONFIG_VALUE_TYPE_CERT_TEXT);
-                $config->setConfigKey($item->getPostVar());
+                $config->setConfigKey($key);
                 $config->setConfigValue("");
             }
 
-            $input = $form->getInput($item->getPostVar());
+            $input = $item;
 
-            switch ($config->getConfigKey()) {
-                case "page1_issuer_signature":
+
+            switch ($key) {
+                case 'page1_issuer_signature':
                     //Picture
-                    $file_data = $form->getInput('page1_issuer_signature');
+                    $file_data = $input;
                     if (key_exists('tmp_name', $file_data) && $file_data['tmp_name']) {
                         $input = ilParticipationCertificateConfig::storePicture($file_data, $this->groupRefId, ilParticipationCertificateConfig::ISSUER_SIGNATURE_FILE_NAME);
                     } else {
@@ -511,7 +517,7 @@ class ilParticipationCertificateGUI
                     break;
                 case 'logo':
                     //Picture
-                    $file_data = $form->getInput('logo');
+                    $file_data = $input/*$form->getInput('logo')*/;
                     if (key_exists('tmp_name', $file_data) && $file_data['tmp_name']) {
                         $input = ilParticipationCertificateConfig::storePicture($file_data, $this->groupRefId, ilParticipationCertificateConfig::LOGO_FILE_NAME);
                     } else {
