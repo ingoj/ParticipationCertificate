@@ -4,10 +4,15 @@ class ilPartCertUsersData {
 	/**
 	 * @return ilPartCertUserData[]
 	 */
-	public static function getData(ilParticipationCertificatePlugin $pl, array $arr_usr_ids = array()): array
+	public static function getData(ilParticipationCertificatePlugin $pl, array $arr_usr_ids = []): array
     {
 		global $DIC;
 		$ilDB = $DIC->database();
+
+        if (empty($arr_usr_ids)) {
+            return [];
+        }
+
 		$result = $ilDB->query(self::getSQL($arr_usr_ids));
 		$usr_data = array();
 		while ($row = $ilDB->fetchAssoc($result)) {

@@ -227,7 +227,6 @@ class ilParticipationCertificateResultModificationGUI
 
         $form = $this->initForm();
 
-        dd($form->getInputs());
         $form  = $form ->withRequest($DIC->http()->request());
         $data = $form->getData()['config'];
 
@@ -252,7 +251,7 @@ class ilParticipationCertificateResultModificationGUI
         }
 
         $twigParser = new ilParticipationCertificateTwigParser($this->groupRefId, array(), $usr_id, $ementor, $edited, $array);
-        $twigParser->parseData($arr_usr_data);
+        $twigParser->parseData();
     }
 
     /**

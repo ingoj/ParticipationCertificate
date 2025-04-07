@@ -183,26 +183,26 @@ class ilParticipationCertificateResultGUI
     {
         $cert_access = new ilParticipationCertificateAccess($_GET['ref_id']);
         if ($cert_access->hasCurrentUserPrintAccess()) {
+            $ementor = false;
             if ($_GET['ementor'] == 'true') {
                 $ementor = true;
-                } else {
-                $ementor = false;
-                }
+            }
             $usr_id[] = $_GET['usr_id'];
 
-            $arr_usr_data = ilPartCertUsersData::getData($this->pl, $usr_id);
-            $user_data = new ilPartCertUserData();
-            if(!$user_data->checkIfUserDataFilled(
-                $arr_usr_data[$usr_id[0]]->getPartCertSalutation(),
-                $arr_usr_data[$usr_id[0]]->getPartCertFirstname(),
-                $arr_usr_data[$usr_id[0]]->getPartCertLastname()
-            )) {
-                $this->redirectWithError(self::CMD_CONTENT, $this->pl->txt('user_data_missing'));
+            // If single print
+            if (!empty($usr_id[0])) {
+                $arr_usr_data = ilPartCertUsersData::getData($this->pl, $usr_id);
+                $usr_id = $this->excludeUserIfDataMissing($usr_id, $arr_usr_data);
+
+                // Redirect if user data are missing
+                if (empty($usr_id)) {
+                    $this->redirectWithError(self::CMD_CONTENT, $this->pl->txt('user_data_missing'));
+                }
             }
 
             $twigParser = new ilParticipationCertificateTwigParser($this->groupRefId, array(), $usr_id, $ementor,
                 false);
-            $twigParser->parseData($arr_usr_data);
+            $twigParser->parseData();
         } else {
             $this->tpl->setOnScreenMessage('failure',$this->lng->txt('no_permission'), true);
             ilUtil::redirect('login.php');
@@ -240,7 +240,7 @@ class ilParticipationCertificateResultGUI
             }
 
             $twigParser = new ilParticipationCertificateTwigParser($this->groupRefId, array(), (array) $usr_id, true, false);
-            $twigParser->parseData($arr_usr_data);
+            $twigParser->parseData();
         } else {
             $this->tpl->setOnScreenMessage('failure',$this->lng->txt('no_permission'), true);
             ilUtil::redirect('login.php');
@@ -278,7 +278,7 @@ class ilParticipationCertificateResultGUI
             }
 
             $twigParser = new ilParticipationCertificateTwigParser($this->groupRefId, array(), $usr_id, false, false);
-            $twigParser->parseData($arr_usr_data);
+            $twigParser->parseData();
         } else {
             $this->tpl->setOnScreenMessage('failure',$this->lng->txt('no_permission'), true);
             ilUtil::redirect('login.php');
@@ -318,7 +318,7 @@ class ilParticipationCertificateResultGUI
      * @param array $arr_usr_data
      * @return array
      */
-    private function excludeUserIfDataMissing(array $usr_id, array $arr_usr_data)
+    private function excludeUserIfDataMissing(array $usr_id, array $arr_usr_data): array
     {
         $user_data = new ilPartCertUserData();
         foreach ($usr_id as $key => $id) {

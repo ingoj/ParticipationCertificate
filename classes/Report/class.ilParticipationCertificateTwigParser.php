@@ -33,6 +33,8 @@ class ilParticipationCertificateTwigParser {
 		if ($usr_id[0] == NULL || $usr_id == NULL) {
 			$this->usr_id = $this->usr_ids;
 		}
+        $this->usr_ids = $this->excludeUsersFromPrintIfMissingUserData($this->usr_ids);
+
 		$this->ementor = $ementor;
 		//wenn die Resultate bearbeitet wurden wird automatisch der footer auf true gesetzt
 		if ($edited == true) {
@@ -51,14 +53,34 @@ class ilParticipationCertificateTwigParser {
 	}
 
     /**
-     * @param array $arr_usr_data
+     * @param array $userIds
+     * @return array
+     */
+    private function excludeUsersFromPrintIfMissingUserData(array $userIds)
+    {
+        $arr_usr_data = ilPartCertUsersData::getData($this->pl, $userIds);
+
+        foreach($userIds as $key => $usrId) {
+            $user_data = new ilPartCertUserData();
+            if(!$user_data->checkIfUserDataFilled(
+                $arr_usr_data[$usrId]->getPartCertSalutation(),
+                $arr_usr_data[$usrId]->getPartCertFirstname(),
+                $arr_usr_data[$usrId]->getPartCertLastname()
+            )) {
+                unset($userIds[$key]);
+            }
+        }
+        return array_values($userIds);
+    }
+
+    /**
      * @return void
      * @throws \Twig\Error\LoaderError
      * @throws \Twig\Error\SyntaxError
      * @throws arException
      * @throws ilDateTimeException
      */
-	public function parseData(array $arr_usr_data): void
+	public function parseData(): void
     {
         $cert_configs = new ilParticipationCertificateConfigs();
         $arr_config = $cert_configs->getObjConfigSetIfNoneCreateDefaultAndCreateNewObjConfigValues($this->group_ref_id);
@@ -95,6 +117,7 @@ class ilParticipationCertificateTwigParser {
         $arr_new_iass_states = ilIassStatesMulti::getData($this->usr_ids,$_GET['ref_id']);
         $arr_xali_states = xaliStates::getData($this->usr_ids,$_GET['ref_id']);
 
+        $arr_usr_data = ilPartCertUsersData::getData($this->pl, $this->usr_ids);
         $arr_lo_master_crs = ilLearningObjectivesMasterCrs::getData($this->usr_ids);
 		$arr_initial_test_states = ilCrsInitialTestStates::getData($this->usr_ids);
 		$arr_excercise_states = ilExcerciseStates::getData($this->usr_ids,$this->group_ref_id);
@@ -127,7 +150,9 @@ class ilParticipationCertificateTwigParser {
 			$this->usr_id = array( $usr );
 		}
 
-		foreach ($this->usr_id as $usr_id) {
+        $this->usr_id = $this->excludeUsersFromPrintIfMissingUserData($this->usr_id);
+
+        foreach ($this->usr_id as $usr_id) {
             $percentage = 0;
 
 
