@@ -222,17 +222,14 @@ class ilParticipationCertificateGUI
         }
 
         foreach ($arr_config as $config) {
-            $disbaled = false;
+            $disabled = false;
             if ($config->getConfigType() == ilParticipationCertificateConfig::CONFIG_SET_TYPE_TEMPLATE) {
-                $disbaled = true;
+                $disabled = true;
             }
 
-            /**
-             * @var ilParticipationCertificateConfig $config
-             */
             switch ($config->getConfigKey()) {
                 case 'logo':
-                    if ($disbaled) {
+                    if ($disabled) {
                         /*$input = new ilFileInputGUI($this->pl->txt("logo"), 'logo');
                         if (is_file(ilParticipationCertificateConfig::returnPicturePath('absolute', $global_config_id, ilParticipationCertificateConfig::LOGO_FILE_NAME))) {
                             $input->setInfo('<img src="'
@@ -265,7 +262,7 @@ class ilParticipationCertificateGUI
                     }
                     break;
                 case 'page1_issuer_signature':
-                    if ($disbaled) {
+                    if ($disabled) {
                         /*$input = new ilFileInputGUI("page1_issuer_signature", 'page1_issuer_signature');
                         if (is_file(ilParticipationCertificateConfig::returnPicturePath('absolute', $global_config_id, ilParticipationCertificateConfig::ISSUER_SIGNATURE_FILE_NAME))) {
                             $input->setInfo('<img src="'
@@ -299,7 +296,7 @@ class ilParticipationCertificateGUI
                     $input->setRows(3);
                     $input->setValue($config->getConfigValue());*/
 
-                    if($disbaled){
+                    if($disabled){
                         $inputFields[$config->getConfigKey()] = $ui->input()->field()->textarea(
                             $config->getConfigKey()
                         )->withValue($config->getConfigValue() ?? '')
