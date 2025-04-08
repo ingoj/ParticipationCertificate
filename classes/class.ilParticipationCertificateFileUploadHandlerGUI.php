@@ -1,31 +1,32 @@
 <?php
 
+use ILIAS\FileUpload\DTO\UploadResult;
+use ILIAS\FileUpload\Exception\IllegalStateException;
 use ILIAS\FileUpload\Handler\AbstractCtrlAwareUploadHandler;
+use ILIAS\FileUpload\Handler\BasicFileInfoResult;
+use ILIAS\FileUpload\Handler\BasicHandlerResult;
 use ILIAS\FileUpload\Handler\FileInfoResult;
 use ILIAS\FileUpload\Handler\HandlerResult;
 use ILIAS\ResourceStorage\Services;
-use ILIAS\FileUpload\DTO\UploadResult;
-use ILIAS\FileUpload\Handler\BasicHandlerResult;
-use ILIAS\FileUpload\Handler\BasicFileInfoResult;
-
+use ILIAS\ResourceStorage\Stakeholder\ResourceStakeholder;
 
 /**
- * @ilCtrl_isCalledBy ilParticipationCertificateFileUploadHandlerGUI: ilUIPluginRouterGUI
+ * @ilCtrl_isCalledBy ilParticipationCertificateFileUploadHandlerGUI: ilUIPluginRouterGUI, ilRepositoryGUI
  */
+
 class ilParticipationCertificateFileUploadHandlerGUI extends AbstractCtrlAwareUploadHandler
 {
-    /**
-     * @var Services
-     */
     private Services $storage;
+    /** @var ResourceStakeholder  */
+    private $stakeholder;
 
     public function __construct()
     {
         parent::__construct();
         global $DIC;
         $this->storage = $DIC->resourceStorage();
+        $this->stakeholder = new Stakeholder();
     }
-
 
     /**
      * @inheritDoc
@@ -35,75 +36,77 @@ class ilParticipationCertificateFileUploadHandlerGUI extends AbstractCtrlAwareUp
         return $this->ctrl->getLinkTargetByClass([ilUIPluginRouterGUI::class, self::class], self::CMD_UPLOAD);
     }
 
-
     /**
-     * @inheritDoc
-     */
-    public function getExistingFileInfoURL(): string
-    {
-        return $this->ctrl->getLinkTargetByClass(
-            [ilUIPluginRouterGUI::class, self::class],
-            self::CMD_INFO
-        );
-    }
-
-
-    /**
-     * @inheritDoc
+     * @return string
+     * @throws ilCtrlException
      */
     public function getFileRemovalURL(): string
     {
-        return $this->ctrl->getLinkTargetByClass(
-            [ilUIPluginRouterGUI::class, self::class],
-            self::CMD_REMOVE,
-            null,
-            false
-        );
+        return $this->ctrl->getLinkTargetByClass([ilUIPluginRouterGUI::class, self::class], self::CMD_REMOVE);
     }
 
-
     /**
-     * @inheritDoc
-     */
-    public function getFileIdentifierParameterName(): string
-    {
-        return 'my_file_id';
-    }
-
-
-    /**
-     * @inheritDoc
+     * @return HandlerResult
+     * @throws IllegalStateException
      */
     protected function getUploadResult(): HandlerResult
     {
-        $status = HandlerResult::STATUS_OK;
-        $identifier = md5(random_bytes(65));
-        $message = 'Everything ok';
+        $this->upload->process();
 
-        return new BasicHandlerResult($this->getFileIdentifierParameterName(), $status, $identifier, $message);
+        /** @var $result UploadResult */
+        $array = $this->upload->getResults();
+
+        $result = end($array);
+
+        if ($result instanceof UploadResult && $result->isOK()) {
+            $identifier = $this->storage->manage()
+                                        ->upload($result, $this->stakeholder)
+                                        ->serialize();
+            $status = HandlerResult::STATUS_OK;
+        } else {
+            $identifier = '';
+            $status = HandlerResult::STATUS_FAILED;
+        }
+
+        return new BasicHandlerResult(
+            $this->getFileIdentifierParameterName(),
+            $status,
+            $identifier,
+            $result->getStatus()->getMessage()
+        );
     }
 
-
+    /**
+     * @param string $identifier
+     * @return HandlerResult
+     */
     protected function getRemoveResult(string $identifier): HandlerResult
     {
-        $status = HandlerResult::STATUS_OK;
-        $message = 'File Deleted';
+        $id = $this->storage->manage()->find($identifier);
 
-        return new BasicHandlerResult($this->getFileIdentifierParameterName(), $status, $identifier, $message);
+        if ($id !== null) {
+            $this->storage->manage()->remove($id, $this->stakeholder);
+            $status = HandlerResult::STATUS_OK;
+            $message = 'File deleted';
+        } else {
+            $status = HandlerResult::STATUS_FAILED;
+            $message = 'File not found';
+        }
+
+        return new BasicHandlerResult(
+            $this->getFileIdentifierParameterName(),
+            $status,
+            $identifier,
+            $message
+        );
     }
 
-
-    public function getInfoResult(string $identifier): ?FileInfoResult
+    /**
+     * @param string $identifier
+     * @return FileInfoResult
+     */
+    public function getInfoResult(string $identifier) : FileInfoResult
     {
-        /*return new BasicFileInfoResult(
-            $this->getFileIdentifierParameterName(),
-            $identifier,
-            "My funny Testfile $identifier.txt",
-            64,
-            ""
-        );*/
-
-
         $id = $this->storage->manage()->find($identifier);
 
         if ($id === null) {
@@ -119,25 +122,14 @@ class ilParticipationCertificateFileUploadHandlerGUI extends AbstractCtrlAwareUp
             $result->getSize(),
             $result->getMimeType()
         );
-
     }
 
-
-    public function getInfoForExistingFiles(array $file_ids): array
+    /**
+     * @param array $file_ids
+     * @return array
+     */
+    public function getInfoForExistingFiles(array $file_ids) : array
     {
-        /*$infos = [];
-        foreach ($file_ids as $file_id) {
-            $infos[] = new BasicFileInfoResult(
-                $this->getFileIdentifierParameterName(),
-                $file_id,
-                "Name $file_id.txt",
-                rand(1000, 2000),
-                "text/plain"
-            );
-        }
-
-        return $infos;*/
-
         $infos = [];
         foreach ($file_ids as $file_id) {
 
@@ -159,6 +151,5 @@ class ilParticipationCertificateFileUploadHandlerGUI extends AbstractCtrlAwareUp
         }
 
         return $infos;
-
     }
 }

@@ -237,11 +237,20 @@ class ilParticipationCertificateGUI
                         }*/
 
                         // TODO ilUIDemoFileUploadHandlerGUI ????
-                        $inputFields[$config->getConfigKey()] = $ui->input()->field()->file(
+                        /*$inputFields[$config->getConfigKey()] = $ui->input()->field()->file(
                             new \ilUIDemoFileUploadHandlerGUI(),
                             $this->pl->txt('logo'),
                             ''
-                        )->withDisabled(true);
+                        )->withDisabled(true);*/
+
+                        $inputFields[$config->getConfigKey()] = $ui->input()->field()->file(
+                            new ilParticipationCertificateFileUploadHandlerGUI(),
+                            $this->pl->txt('logo'),
+                            'rgreg'
+                        )->withAcceptedMimeTypes([
+                            'image/jpeg',
+                            'image/png'
+                        ])->withMaxFileSize((2 * 1024 * 1024));
 
                         break;
 
@@ -254,10 +263,17 @@ class ilParticipationCertificateGUI
                         }*/
 
                         // TODO ilUIDemoFileUploadHandlerGUI ????
-                        $inputFields[$config->getConfigKey()] = $ui->input()->field()->file(
+                        /*$inputFields[$config->getConfigKey()] = $ui->input()->field()->file(
                             new \ilUIDemoFileUploadHandlerGUI(),
                             $this->pl->txt('logo')
-                        );
+                        );*/
+                        $inputFields[$config->getConfigKey()] = $ui->input()->field()->file(
+                            new ilParticipationCertificateFileUploadHandlerGUI(),
+                            $this->pl->txt('logo')
+                        )->withAcceptedMimeTypes([
+                            'image/jpeg',
+                            'image/png'
+                        ])->withMaxFileSize((2 * 1024 * 1024));
 
                     }
                     break;
@@ -339,121 +355,6 @@ class ilParticipationCertificateGUI
         return $form;
     }
 
-    // TODO Remove this function
-    public function initFormOld(): ilPropertyFormGUI
-    {
-        $form = new ilPropertyFormGUI();
-
-        $this->toolbar->setFormAction($this->ctrl->getFormAction($this, self::CMD_CONFIG));
-
-        $dropdown = new ilSelectInputGUI($this->pl->txt("choose_template"), "global_template_id");
-        $cert_global_configs = new ilParticipationCertificateGlobalConfigSets();
-        $dropdown->setOptions($cert_global_configs->getSelectOptions());
-        $this->toolbar->addInputItem($dropdown);
-
-        $button = ilSubmitButton::getInstance();
-        $button->setCommand(self::CMD_SET_CERT_TEMPLATE);
-        $button->setCaption($this->pl->txt('btn_reset'), false);
-        $this->toolbar->addButtonInstance($button);
-
-        $button = ilSubmitButton::getInstance();
-        $button->setCommand(self::CMD_SET_OWN_CERT_TEXT_FROM_TEMPLATE);
-        $button->setCaption($this->pl->txt('btn_modify'), false);
-        $this->toolbar->addButtonInstance($button);
-
-        $form->setFormAction($this->ctrl->getFormAction($this));
-        $form->setTitle($this->pl->txt('config_plugin'));
-        $form->setDescription($this->pl->txt("placeholders") . ' <br>
-		&lbrace;&lbrace;username&rbrace;&rbrace;: Anrede Vorname Nachname <br>
-		&lbrace;&lbrace;date&rbrace;&rbrace;: Datum
-		');
-
-        $cert_configs = new ilParticipationCertificateConfigs();
-        $arr_config = $cert_configs->getObjConfigSetIfNoneCreateDefaultAndCreateNewObjConfigValues($this->groupRefId);
-
-        $global_config_sets = new ilParticipationCertificateGlobalConfigSets();
-        if (count($arr_config) > 0) {
-            $global_config_id = reset($arr_config)->getGlobalConfigId();
-        }
-
-        if ($global_config_id > 0) {
-            $global_config_set = $global_config_sets->getConfigSetById($global_config_id);
-            $this->tpl->setOnScreenMessage('info',$this->pl->txt('configset_type_1'). ' ' . $global_config_set->getTitle(), true);
-        } else {
-            //$this->tpl->setOnScreenMessage('info',$this->pl->txt('configset_type_2'). ' ' . $global_config_set->getTitle(), true);
-            $this->tpl->setOnScreenMessage('info',$this->pl->txt('configset_type_2'), true);
-        }
-
-
-        foreach ($arr_config as $config) {
-
-            $disbaled = false;
-            if ($config->getConfigType() == ilParticipationCertificateConfig::CONFIG_SET_TYPE_TEMPLATE) {
-                $disbaled = true;
-            }
-
-            /**
-             * @var ilParticipationCertificateConfig $config
-             */
-            switch ($config->getConfigKey()) {
-                case "logo":
-                    if ($disbaled) {
-                        $input = new ilFileInputGUI($this->pl->txt("logo"), 'logo');
-                        if (is_file(ilParticipationCertificateConfig::returnPicturePath('absolute', $global_config_id, ilParticipationCertificateConfig::LOGO_FILE_NAME))) {
-                            $input->setInfo('<img src="'
-                                . ilParticipationCertificateConfig::returnPicturePath('relative', $global_config_id, ilParticipationCertificateConfig::LOGO_FILE_NAME) . '" />');
-                        }
-                    } else {
-                        $input = new ilFileInputGUI($this->pl->txt("logo"), 'logo');
-                        $input->setSuffixes(array('png'));
-                        if (is_file(ilParticipationCertificateConfig::returnPicturePath('absolute', $this->groupRefId, ilParticipationCertificateConfig::LOGO_FILE_NAME))) {
-                            $input->setInfo('<img src="'
-                                . ilParticipationCertificateConfig::returnPicturePath('relative', $this->groupRefId, ilParticipationCertificateConfig::LOGO_FILE_NAME) . '" />');
-                        }
-
-                    }
-                    break;
-                case "page1_issuer_signature":
-                    if ($disbaled) {
-                        $input = new ilFileInputGUI("page1_issuer_signature", 'page1_issuer_signature');
-                        if (is_file(ilParticipationCertificateConfig::returnPicturePath('absolute', $global_config_id, ilParticipationCertificateConfig::ISSUER_SIGNATURE_FILE_NAME))) {
-                            $input->setInfo('<img src="'
-                                . ilParticipationCertificateConfig::returnPicturePath('relative', $global_config_id, ilParticipationCertificateConfig::ISSUER_SIGNATURE_FILE_NAME) . '" />');
-                        }
-                    } else {
-                        $input = new ilFileInputGUI("page1_issuer_signature", 'page1_issuer_signature');
-                        $input->setSuffixes(array('png'));
-                        if (is_file(ilParticipationCertificateConfig::returnPicturePath('absolute', $this->groupRefId, ilParticipationCertificateConfig::ISSUER_SIGNATURE_FILE_NAME))) {
-                            $input->setInfo('<img src="'
-                                . ilParticipationCertificateConfig::returnPicturePath('relative', $this->groupRefId, ilParticipationCertificateConfig::ISSUER_SIGNATURE_FILE_NAME) . '" />');
-                        }
-                    }
-                    break;
-
-                default:
-                    $input = new ilTextAreaInputGUI($config->getConfigKey(), $config->getConfigKey());
-                    $input->setRows(3);
-                    $input->setValue($config->getConfigValue());
-                    break;
-            }
-
-            if ($disbaled === true) {
-                $input->setDisabled($disbaled);
-            }
-
-            $form->addItem($input);
-        }
-        if ($this->objecttype === 'grp') {
-            $this->ctrl->saveParameterByClass(ilObjGroup::class, 'ref_id');
-        } else {
-            $this->ctrl->saveParameterByClass(ilObjCourse::class, 'ref_id');
-        }
-        $form->addCommandButton(self::CMD_SAVE, $this->pl->txt('save'));
-
-        return $form;
-    }
-
-
     /**
      * @return bool
      */
@@ -521,6 +422,9 @@ class ilParticipationCertificateGUI
                 case 'logo':
                     //Picture
                     $file_data = $input/*$form->getInput('logo')*/;
+
+                    dd($file_data);
+
                     if (key_exists('tmp_name', $file_data) && $file_data['tmp_name']) {
                         $input = ilParticipationCertificateConfig::storePicture($file_data, $this->groupRefId, ilParticipationCertificateConfig::LOGO_FILE_NAME);
                     } else {

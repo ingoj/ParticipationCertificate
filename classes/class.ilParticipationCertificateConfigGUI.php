@@ -432,26 +432,12 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI
                     // TODO ilUIDemoFileUploadHandlerGUI ????
                     $inputFields[$config->getConfigKey()] = $ui->input()->field()->file(
                         new ilParticipationCertificateFileUploadHandlerGUI(),
-                        $this->pl->txt('logo')
+                        $this->pl->txt('logo'),
+                        'rgreg'
                     )->withAcceptedMimeTypes([
                         'image/jpeg',
                         'image/png'
-                    ]);
-
-                    /*$file = $factory->input()->field()->file(new ilFileUploadHandlerGUI(), $this->dic->language()->txt('file'))
-                                    ->withAcceptedMimeTypes([
-                                        'application/vnd.openxmlformats-officedocument. wordprocessingml.document',
-                                        'application/msword',
-                                        'application/pdf',
-                                        'audio/mpeg',
-                                        'audio/mp4',
-                                        'audio/wav',
-                                        'text/plain	',
-                                        'image/jpeg',
-                                        'image/png'
-                                    ])
-                                    ->withMaxFileSize((2 * 1024 * 1024));*/
-
+                    ])->withMaxFileSize((2 * 1024 * 1024));
 
                     break;
 
