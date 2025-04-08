@@ -451,9 +451,27 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI
 
                     // TODO ilUIDemoFileUploadHandlerGUI ????
                     $inputFields[$config->getConfigKey()] = $ui->input()->field()->file(
-                        new \ilUIDemoFileUploadHandlerGUI(),
+                        new ilParticipationCertificateFileUploadHandlerGUI(),
                         $this->pl->txt('logo')
-                    );
+                    )->withAcceptedMimeTypes([
+                        'image/jpeg',
+                        'image/png'
+                    ]);
+
+                    /*$file = $factory->input()->field()->file(new ilFileUploadHandlerGUI(), $this->dic->language()->txt('file'))
+                                    ->withAcceptedMimeTypes([
+                                        'application/vnd.openxmlformats-officedocument. wordprocessingml.document',
+                                        'application/msword',
+                                        'application/pdf',
+                                        'audio/mpeg',
+                                        'audio/mp4',
+                                        'audio/wav',
+                                        'text/plain	',
+                                        'image/jpeg',
+                                        'image/png'
+                                    ])
+                                    ->withMaxFileSize((2 * 1024 * 1024));*/
+
 
                     break;
 
@@ -602,9 +620,9 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI
                             $global_config = $part_cert_configs->getParticipationGlobalConfigValueByKey($key);
 
                             $hexValue = $this->rgbToHex(
-                                $form_data['color']->r(),
-                                $form_data['color']->g(),
-                                $form_data['color']->b()
+                                $value->r(),
+                                $value->g(),
+                                $value->b()
                             );
 
                             $hexValue = str_replace('#', '', $hexValue);
@@ -620,45 +638,6 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI
                             break;
                     }
                 }
-
-
-
-/*
-                foreach ($form->getItems() as $item) {
-                    /**
-                     * @var ilFormPropertyGUI $item
-
-                    switch ($item->getPostVar()) {
-                        case 'logo':
-                            //Picture
-                            $file_data = $form->getInput('logo');
-                            if ($file_data['tmp_name']) {
-                                ilParticipationCertificateConfig::storePicture($file_data, $global_config_id,
-                                    ilParticipationCertificateConfig::LOGO_FILE_NAME);
-                            }
-                            break;
-                        case 'true_name_helper';
-                            $global_config = $part_cert_configs->getParticipationGlobalConfigValueByKey($item->getPostVar());
-                            $userinput=trim($form->getInput($item->getPostVar()));
-                            if (!ctype_digit($userinput) and $userinput != "") {
-                                $userinput="";
-                                $this->err_helper = true;
-                            }
-                            $global_config->setConfigValue($userinput);
-                            $global_config->store();
-                            break;
-
-                        default:
-                            /**
-                             * @var ilFormPropertyGUI $item
-
-                            $global_config = $part_cert_configs->getParticipationGlobalConfigValueByKey($item->getPostVar());
-                            $global_config->setConfigValue($form->getInput($item->getPostVar()));
-                            $global_config->store();
-                            break;
-                    }
-                }
-                break;*/
         }
 
         if ($this->err_helper) {
@@ -932,17 +911,43 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI
 	    return true;
     }
 
+    /**
+     * @throws ilCtrlException
+     */
     public function configure(): void
     {
+        global $DIC;
+
+        $r = $DIC['ui.renderer'];
+
+        $ui = $DIC->ui()->factory();
+
         $this->tpl->loadStandardTemplate();
 
-        $this->initTable();
+        $toolbarButton = $ui->button()->standard(
+            $this->pl->txt('add_config'),
+            $this->ctrl->getLinkTargetByClass(ilParticipationCertificateConfigGUI::class, ilParticipationCertificateConfigGUI::CMD_ADD_CONFIG)
+        );
+        $this->ilToolbar->addComponent($toolbarButton);
 
-        $this->tpl->setContent($this->table->getHTML());
+        $toolbarButton = $ui->button()->standard(
+            $this->pl->txt('reset_config'),
+            $this->ctrl->getLinkTargetByClass(ilParticipationCertificateConfigGUI::class, ilParticipationCertificateConfigGUI::CMD_CONFIRM_RESET_CONFIG)
+        );
+        $this->ilToolbar->addComponent($toolbarButton);
+
+        $table = $this->initTable();
+
+        $this->tpl->setContent(
+            $r->render($table->withRequest($DIC->http()->request()))
+        );
     }
 
     protected function initTable()
     {
-        $this->table = new ilParticipationCertificateConfigSetTableGUI($this, self::CMD_CONFIGURE);
+        $repo = new ilParticipationCertificateConfigSetTableNewGUI();
+        return $repo->getTableForRepresentation();
+
+        //$this->table = new ilParticipationCertificateConfigSetTableGUI($this, self::CMD_CONFIGURE);
     }
 }
