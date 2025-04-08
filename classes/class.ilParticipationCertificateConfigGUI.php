@@ -348,26 +348,6 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI
 	    self::showForm(true);
     }
 
-
-    /**
-     * @throws arException
-     * @throws ilCtrlException
-     */
-    public function showFormOld(bool $err=false): void
-    {
-        $id = filter_input(INPUT_GET, 'id');
-        $set_type = filter_input(INPUT_GET, 'set_type');
-
-        $this->ctrl->setParameter($this, "id", $id);
-        $this->tpl->loadStandardTemplate();
-
-        $form = $this->initForm($id, $set_type);
-	    $this->tpl->setContent($form->getHTML());
-        if ($id == 0 and $set_type == 3 and $err) {
-            $this->tpl->setOnScreenMessage('failure', $this->pl->txt("nonnumeric_ref"), true);
-        }
-    }
-
     /**
      * @throws ilCtrlException
      */
@@ -918,6 +898,29 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI
     {
         global $DIC;
 
+        $action = $_GET['config_action'];
+
+        if (!empty($action)) {
+            switch ($action) {
+                case 'edit':
+
+                    //$this->ctrl->setParameter($this, "id", $new_config_set->getId());
+                    break;
+
+                case 'copy':
+
+                    break;
+
+                case 'delete':
+
+                    break;
+
+                case 'activate':
+                    break;
+            }
+        }
+
+
         $r = $DIC['ui.renderer'];
 
         $ui = $DIC->ui()->factory();
@@ -937,6 +940,7 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI
         $this->ilToolbar->addComponent($toolbarButton);
 
         $table = $this->initTable();
+
 
         $this->tpl->setContent(
             $r->render($table->withRequest($DIC->http()->request()))
