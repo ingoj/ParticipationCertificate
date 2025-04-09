@@ -172,6 +172,10 @@ class ilParticipationCertificateFiles extends ActiveRecord
         global $DIC;
 
         $file = ilParticipationCertificateFiles::getFile($globalConfigId, $fileType);
+
+        if (empty($file)) {
+            return '';
+        }
         $fileArray = $file->asArray();
 
         $src = '';

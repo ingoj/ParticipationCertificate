@@ -186,14 +186,19 @@ class ilParticipationCertificateGUI
         $ui = $DIC->ui()->factory();
 
 
-        $this->toolbar->setFormAction($this->ctrl->getFormAction($this, self::CMD_CONFIG));
+        $this->toolbar->setFormAction(
+            $this->ctrl->getFormAction($this, self::CMD_CONFIG)
+        );
 
         $inputFields = [];
 
         $cert_global_configs = new ilParticipationCertificateGlobalConfigSets();
         $options_template = $cert_global_configs->getSelectOptions();
         $select = $ui->input()->field()->select('', $options_template);
+
         $this->toolbar->addComponent($select);
+
+        //$this->ctrl->setParameterByClass(ilRepositoryGUI::class, 'global_template_id', $this->groupRefId);
 
         $button_fixed_form = $ui->button()->standard(
             $this->pl->txt('btn_reset'),
@@ -203,6 +208,7 @@ class ilParticipationCertificateGUI
             $this->pl->txt('btn_modify'),
             $DIC->ctrl()->getLinkTarget($this, self::CMD_SET_OWN_CERT_TEXT_FROM_TEMPLATE)
         );
+
 
         $this->toolbar->addComponent($button_fixed_form);
         $this->toolbar->addComponent($button_editable_form);
@@ -348,31 +354,11 @@ class ilParticipationCertificateGUI
     {
         global $DIC;
 
-        $renderer = $DIC->ui()->renderer();
-
         $form = $this->initForm();
 
         $form  = $form->withRequest($DIC->http()->request());
         $form_data = $form->getData()['config'];
 
-        //$renderer->render($form);
-
-        /*if (!$form->checkInput()) {
-            $this->tpl->setContent($form->getHTML());
-            if (method_exists($this->tpl, 'loadStandardTemplate')) {
-                $this->tpl->loadStandardTemplate();
-            } else {
-                $this->tpl->getStandardTemplate();
-            }
-
-            if (method_exists($this->tpl, 'printToStdout')) {
-                $this->tpl->printToStdout();
-            } else {
-                $this->tpl->show();
-            }
-
-            return false;
-        }*/
         foreach ($form_data as $key => $item) {
 
             $config = ilParticipationCertificateConfig::where(array(
@@ -393,9 +379,6 @@ class ilParticipationCertificateGUI
 
             $input = $item;
 
-
-            $isFile = false;
-            $templateId = null;
             switch ($key) {
                 case 'page1_issuer_signature':
                     //Picture
@@ -410,47 +393,10 @@ class ilParticipationCertificateGUI
                 case 'logo':
 
                     $input = end($input);
-
-                    $isFile = true;
-                    $templateId = $this->groupRefId;
-
-                    //dd($file_data);
-
-                    /*if (is_array($form_data['test_file'])) {
-                        $this->settings->set($field_name, end($form_data['test_file']));
-                    }*/
-
-                    //$input = ilParticipationCertificateConfig::storePicture($file_data, $this->groupRefId, ilParticipationCertificateConfig::LOGO_FILE_NAME);
-
-                    /*if (key_exists('tmp_name', $file_data) && $file_data['tmp_name']) {
-                        $input = ilParticipationCertificateConfig::storePicture($file_data, $this->groupRefId, ilParticipationCertificateConfig::LOGO_FILE_NAME);
-                    } else {
-                        // Previous upload
-                        $input = $config->getConfigValue();
-                    }*/
                     break;
                 default:
                     break;
             }
-
-            /*if ($isFile) {
-
-                $src = '';
-                $resource = new ResourceIdentification($input);
-                if ($DIC->resourceStorage()->manage()->find($resource)) {
-                    $src = $DIC->resourceStorage()->consume()
-                               ->src($resource)
-                               ->getSrc();
-                }
-                if (copy($src, ilParticipationCertificateConfig::getFileStoragePath('img', 'absolute', $templateId, true))) {
-                    echo "File copied successfully!";
-                } else {
-                    echo "Failed to copy file.";
-                }
-                dd($src);
-            } else {
-                $config->setConfigValue($input);
-            }*/
 
             $config->setConfigValue($input);
 
@@ -493,6 +439,12 @@ class ilParticipationCertificateGUI
 
     public function setOwnCertTextFromTemplate(): void
     {
+        // TODO here should be passed the global_template_id.
+        // TODO the filter_input(INPUT_POST, 'global_template_id') doesnt wor in KS
+
+        $globalTemplateId = $_GET['global_template_id'];
+        dd($globalTemplateId);
+
         $cert_configs = new ilParticipationCertificateConfigs();
         if ($global_template_id = filter_input(INPUT_POST, 'global_template_id')) {
             $cert_configs->setOwnCertConfigFromTemplate($this->groupRefId, $global_template_id);
