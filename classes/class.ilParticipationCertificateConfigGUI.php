@@ -394,6 +394,10 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI
              * @var ilParticipationCertificateConfig $config
              */
             switch ($config->getConfigKey()) {
+                case 'page1_issuer_signature':
+                    // Skip
+                    $input = NULL;
+                    break;
                 case 'udf_firstname':
                 case 'udf_lastname':
                 case 'udf_gender':
@@ -428,24 +432,42 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI
                     break;
 
                 case 'logo':
+                    $file = new ilParticipationCertificateFiles();
+                    $src = $file->getFileSrcByStorageType(
+                        $config->getConfigValue(),
+                        $global_config_id,
+                        'logo'
+                    );
 
-                    // TODO ilUIDemoFileUploadHandlerGUI ????
                     $inputFields[$config->getConfigKey()] = $ui->input()->field()->file(
                         new ilParticipationCertificateFileUploadHandlerGUI(),
                         $this->pl->txt('logo'),
-                        'rgreg'
+                        'Maximum upload size: 1024.0 MB. Allowed file types: .png' . "<br>\n" .
+                        '<img src="' . $src . '">'
                     )->withAcceptedMimeTypes([
-                        'image/jpeg',
                         'image/png'
                     ])->withMaxFileSize((2 * 1024 * 1024));
 
                     break;
 
                 case 'page1_issuer_signature':
-                    $inputFields[$config->getConfigKey()] = $ui->input()->field()->file(
-                        new \ilUIDemoFileUploadHandlerGUI(),
-                        $config->getConfigKey()
+
+
+                    $file = new ilParticipationCertificateFiles();
+                    $src = $file->getFileSrcByStorageType(
+                        $config->getConfigValue(),
+                        $global_config_id,
+                        'page1_issuer_signature'
                     );
+
+                    $inputFields[$config->getConfigKey()] = $ui->input()->field()->file(
+                        new ilParticipationCertificateFileUploadHandlerGUI(),
+                        $this->pl->txt('page1_issuer_signature'),
+                        'Maximum upload size: 1024.0 MB. Allowed file types: .png' . "<br>\n" .
+                        '<img src="' . $src . '">'
+                    )->withAcceptedMimeTypes([
+                        'image/png'
+                    ])->withMaxFileSize((2 * 1024 * 1024));
 
                     break;
 
@@ -638,6 +660,8 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI
     }
 
     /**
+     * TODO Remove this function
+     *
      * @throws arException
      * @throws ilCtrlException
      */
@@ -764,6 +788,8 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI
     }
 
     /**
+     * TODO Remove this function
+     *
      * @throws arException
      * @throws ilCtrlException
      */
