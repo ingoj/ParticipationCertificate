@@ -33,7 +33,10 @@ class ilParticipationCertificateFileUploadHandlerGUI extends AbstractCtrlAwareUp
      */
     public function getUploadURL(): string
     {
-        return $this->ctrl->getLinkTargetByClass([ilUIPluginRouterGUI::class, self::class], self::CMD_UPLOAD);
+        return $this->ctrl->getLinkTargetByClass(
+            [ilUIPluginRouterGUI::class, self::class],
+            self::CMD_UPLOAD
+        );
     }
 
     /**
@@ -42,7 +45,10 @@ class ilParticipationCertificateFileUploadHandlerGUI extends AbstractCtrlAwareUp
      */
     public function getFileRemovalURL(): string
     {
-        return $this->ctrl->getLinkTargetByClass([ilUIPluginRouterGUI::class, self::class], self::CMD_REMOVE);
+        return $this->ctrl->getLinkTargetByClass(
+            [ilUIPluginRouterGUI::class, self::class],
+            self::CMD_REMOVE
+        );
     }
 
     /**

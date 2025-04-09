@@ -1,6 +1,7 @@
 <?php
 
 use ILIAS\UI\Component\Input\Container\Form\Standard;
+use ILIAS\ResourceStorage\Identification\ResourceIdentification;
 
 /**
  * Class ilParticipationCertificateGUI
@@ -230,48 +231,40 @@ class ilParticipationCertificateGUI
             switch ($config->getConfigKey()) {
                 case 'logo':
                     if ($disabled) {
-                        /*$input = new ilFileInputGUI($this->pl->txt("logo"), 'logo');
-                        if (is_file(ilParticipationCertificateConfig::returnPicturePath('absolute', $global_config_id, ilParticipationCertificateConfig::LOGO_FILE_NAME))) {
-                            $input->setInfo('<img src="'
-                                . ilParticipationCertificateConfig::returnPicturePath('relative', $global_config_id, ilParticipationCertificateConfig::LOGO_FILE_NAME) . '" />');
-                        }*/
-
-                        // TODO ilUIDemoFileUploadHandlerGUI ????
-                        /*$inputFields[$config->getConfigKey()] = $ui->input()->field()->file(
-                            new \ilUIDemoFileUploadHandlerGUI(),
-                            $this->pl->txt('logo'),
-                            ''
-                        )->withDisabled(true);*/
+                        $file = new ilParticipationCertificateFiles();
+                        $src = $file->getFileSrcByStorageType(
+                            $config->getConfigValue(),
+                            $global_config_id,
+                            'logo'
+                        );
 
                         $inputFields[$config->getConfigKey()] = $ui->input()->field()->file(
                             new ilParticipationCertificateFileUploadHandlerGUI(),
                             $this->pl->txt('logo'),
-                            'rgreg'
+                            'Maximum upload size: 1024.0 MB. Allowed file types: .png' . "<br>\n" .
+                            '<img src="' . $src . '">'
                         )->withAcceptedMimeTypes([
                             'image/jpeg',
                             'image/png'
                         ])->withMaxFileSize((2 * 1024 * 1024));
 
+
                         break;
 
                     } else {
-                        /*$input = new ilFileInputGUI($this->pl->txt("logo"), 'logo');
-                        $input->setSuffixes(array('png'));
-                        if (is_file(ilParticipationCertificateConfig::returnPicturePath('absolute', $this->groupRefId, ilParticipationCertificateConfig::LOGO_FILE_NAME))) {
-                            $input->setInfo('<img src="'
-                                . ilParticipationCertificateConfig::returnPicturePath('relative', $this->groupRefId, ilParticipationCertificateConfig::LOGO_FILE_NAME) . '" />');
-                        }*/
+                        $file = new ilParticipationCertificateFiles();
+                        $src = $file->getFileSrcByStorageType(
+                            $config->getConfigValue(),
+                            $global_config_id,
+                            'logo'
+                        );
 
-                        // TODO ilUIDemoFileUploadHandlerGUI ????
-                        /*$inputFields[$config->getConfigKey()] = $ui->input()->field()->file(
-                            new \ilUIDemoFileUploadHandlerGUI(),
-                            $this->pl->txt('logo')
-                        );*/
                         $inputFields[$config->getConfigKey()] = $ui->input()->field()->file(
                             new ilParticipationCertificateFileUploadHandlerGUI(),
-                            $this->pl->txt('logo')
+                            $this->pl->txt('logo'),
+                            'Maximum upload size: 1024.0 MB. Allowed file types: .png' . "<br>\n" .
+                            '<img src="' . $src . '">'
                         )->withAcceptedMimeTypes([
-                            'image/jpeg',
                             'image/png'
                         ])->withMaxFileSize((2 * 1024 * 1024));
 
@@ -279,39 +272,33 @@ class ilParticipationCertificateGUI
                     break;
                 case 'page1_issuer_signature':
                     if ($disabled) {
-                        /*$input = new ilFileInputGUI("page1_issuer_signature", 'page1_issuer_signature');
-                        if (is_file(ilParticipationCertificateConfig::returnPicturePath('absolute', $global_config_id, ilParticipationCertificateConfig::ISSUER_SIGNATURE_FILE_NAME))) {
-                            $input->setInfo('<img src="'
-                                . ilParticipationCertificateConfig::returnPicturePath('relative', $global_config_id, ilParticipationCertificateConfig::ISSUER_SIGNATURE_FILE_NAME) . '" />');
-                        }*/
-
-                        // TODO ilUIDemoFileUploadHandlerGUI ????
-                        $inputFields[$config->getConfigKey()] = $ui->input()->field()->file(
-                            new \ilUIDemoFileUploadHandlerGUI(),
-                            $this->pl->txt('page1_issuer_signature')
-                        )->withDisabled(true);
+                        $file = new ilParticipationCertificateFiles();
+                        $src = $file->getFileSrcByStorageType(
+                            $config->getConfigValue(),
+                            $global_config_id,
+                            'page1_issuer_signature'
+                        );
 
                     } else {
-                        /*$input = new ilFileInputGUI("page1_issuer_signature", 'page1_issuer_signature');
-                        $input->setSuffixes(array('png'));
-                        if (is_file(ilParticipationCertificateConfig::returnPicturePath('absolute', $this->groupRefId, ilParticipationCertificateConfig::ISSUER_SIGNATURE_FILE_NAME))) {
-                            $input->setInfo('<img src="'
-                                . ilParticipationCertificateConfig::returnPicturePath('relative', $this->groupRefId, ilParticipationCertificateConfig::ISSUER_SIGNATURE_FILE_NAME) . '" />');
-                        }*/
-
-                        // TODO ilUIDemoFileUploadHandlerGUI ????
-                        $inputFields[$config->getConfigKey()] = $ui->input()->field()->file(
-                            new \ilUIDemoFileUploadHandlerGUI(),
-                            $this->pl->txt('page1_issuer_signature')
+                        $file = new ilParticipationCertificateFiles();
+                        $src = $file->getFileSrcByStorageType(
+                            $config->getConfigValue(),
+                            $global_config_id,
+                            'page1_issuer_signature'
                         );
                     }
+
+                    $inputFields[$config->getConfigKey()] = $ui->input()->field()->file(
+                        new ilParticipationCertificateFileUploadHandlerGUI(),
+                        $this->pl->txt('logo'),
+                        'Maximum upload size: 1024.0 MB. Allowed file types: .png' . "<br>\n" .
+                        '<img src="' . $src . '">'
+                    )->withAcceptedMimeTypes([
+                        'image/png'
+                    ])->withMaxFileSize((2 * 1024 * 1024));
                     break;
 
                 default:
-                    /*$input = new ilTextAreaInputGUI($config->getConfigKey(), $config->getConfigKey());
-                    $input->setRows(3);
-                    $input->setValue($config->getConfigValue());*/
-
                     if($disabled){
                         $inputFields[$config->getConfigKey()] = $ui->input()->field()->textarea(
                             $config->getConfigKey()
@@ -322,7 +309,6 @@ class ilParticipationCertificateGUI
                             $config->getConfigKey()
                         )->withValue($config->getConfigValue() ?? '');
                     }
-
                     break;
             }
         }
@@ -408,6 +394,8 @@ class ilParticipationCertificateGUI
             $input = $item;
 
 
+            $isFile = false;
+            $templateId = null;
             switch ($key) {
                 case 'page1_issuer_signature':
                     //Picture
@@ -420,23 +408,52 @@ class ilParticipationCertificateGUI
                     }
                     break;
                 case 'logo':
-                    //Picture
-                    $file_data = $input/*$form->getInput('logo')*/;
 
-                    dd($file_data);
+                    $input = end($input);
 
-                    if (key_exists('tmp_name', $file_data) && $file_data['tmp_name']) {
+                    $isFile = true;
+                    $templateId = $this->groupRefId;
+
+                    //dd($file_data);
+
+                    /*if (is_array($form_data['test_file'])) {
+                        $this->settings->set($field_name, end($form_data['test_file']));
+                    }*/
+
+                    //$input = ilParticipationCertificateConfig::storePicture($file_data, $this->groupRefId, ilParticipationCertificateConfig::LOGO_FILE_NAME);
+
+                    /*if (key_exists('tmp_name', $file_data) && $file_data['tmp_name']) {
                         $input = ilParticipationCertificateConfig::storePicture($file_data, $this->groupRefId, ilParticipationCertificateConfig::LOGO_FILE_NAME);
                     } else {
                         // Previous upload
                         $input = $config->getConfigValue();
-                    }
+                    }*/
                     break;
                 default:
                     break;
             }
 
+            /*if ($isFile) {
+
+                $src = '';
+                $resource = new ResourceIdentification($input);
+                if ($DIC->resourceStorage()->manage()->find($resource)) {
+                    $src = $DIC->resourceStorage()->consume()
+                               ->src($resource)
+                               ->getSrc();
+                }
+                if (copy($src, ilParticipationCertificateConfig::getFileStoragePath('img', 'absolute', $templateId, true))) {
+                    echo "File copied successfully!";
+                } else {
+                    echo "Failed to copy file.";
+                }
+                dd($src);
+            } else {
+                $config->setConfigValue($input);
+            }*/
+
             $config->setConfigValue($input);
+
             $config->store();
         }
 

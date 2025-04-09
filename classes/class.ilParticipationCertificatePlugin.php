@@ -83,4 +83,31 @@ class ilParticipationCertificatePlugin extends ilUserInterfaceHookPlugin {
         return $this->getDirectory()."/templates/images/".$imageName;
     }
 
+    protected function afterUpdate(): void
+    {
+
+        // Get all files and directories in the specified path
+        $path = CLIENT_WEB_DIR . '/dhbw_part_cert';
+        $items = scandir($path);
+
+
+        // Filter out the current (.) and parent (..) directories, and keep only directories
+        $directories = array_filter($items, function($item) use ($path) {
+            return is_dir($path . '/' . $item) && $item !== '.' && $item !== '..';
+        });
+
+        $directories = array_values($directories);
+
+        foreach ($directories as $directory) {
+            $file = new ilParticipationCertificateFiles();
+            if (is_file(ilParticipationCertificateConfig::returnPicturePath('absolute', (int) $directory, ilParticipationCertificateConfig::LOGO_FILE_NAME))) {
+                $file->setFile($directory, 'logo', false);
+            }
+
+            if (is_file(ilParticipationCertificateConfig::returnPicturePath('absolute', (int) $directory, ilParticipationCertificateConfig::ISSUER_SIGNATURE_FILE_NAME))) {
+                $file->setFile($directory, 'page1_issuer_signature', false);
+            }
+        }
+    }
+
 }

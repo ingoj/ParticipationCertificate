@@ -677,3 +677,30 @@ if (!is_object($config)) {
 }
 $config->delete();
 ?>
+
+<#40>
+<?php
+$fields = array(
+    'id' => array(
+        'type' => 'integer',
+        'notnull' => true
+    ),
+    'group_ref_id' => array(
+        'type' => 'integer',
+        'notnull' => true
+    ),
+    'type' => array(
+        'type' => 'text',
+        'notnull' => true
+    ),
+    'resource_storage' => array(
+        'type' => 'integer',
+        'length' => 1,
+        'notnull' => true
+    )
+);
+
+$ilDB->createTable('dhbw_part_cert_files', $fields);
+$ilDB->addPrimaryKey('dhbw_part_cert_files', ['id']);
+$ilDB->createSequence('dhbw_part_cert_files');
+?>
