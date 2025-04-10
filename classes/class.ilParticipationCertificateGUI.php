@@ -484,10 +484,6 @@ class ilParticipationCertificateGUI
 
         $form = $this->initConfigResultTableForm();
 
-
-
-
-        /*$this->tpl->setContent($form->getHTML());*/
         $renderer = $DIC->ui()->renderer();
         $this->tpl->setContent($renderer->render($form));
 
@@ -508,7 +504,7 @@ class ilParticipationCertificateGUI
 
         $ui = $DIC->ui()->factory();
 
-        $dataFactory = new \ILIAS\Data\Factory();
+        $dataFactory = new Factory();
 
         $periodStart = ilParticipationCertificateConfig::getConfig('period_start', $this->groupRefId);
         $startDate = !empty($periodStart) ? DateTimeImmutable::createFromFormat('d.m.Y', $periodStart) : null;
@@ -517,17 +513,19 @@ class ilParticipationCertificateGUI
         $endDate = !empty($periodEnd) ? DateTimeImmutable::createFromFormat('d.m.Y', $periodEnd) : null;
 
         $durationInput = $ui->input()->field()->duration($this->pl->txt('period'));
+        $user = $DIC->user();
         if (!empty($startDate) && !empty($endDate)) {
             $period = $durationInput
-                ->withTimezone('Europe/Berlin')
+                ->withTimezone($user->getTimeZone())
                 ->withUseTime(false)
                 ->withLabels($this->pl->txt('start'), $this->pl->txt('end'))
                 ->withFormat($dataFactory->dateFormat()->germanShort())
                 ->withMinValue($startDate)
-                ->withMaxValue($endDate);
+                ->withMaxValue($endDate)
+                ->withValue([$startDate, $endDate]);
         }else {
             $period = $durationInput
-                ->withTimezone('Europe/Berlin')
+                ->withTimezone($user->getTimeZone())
                 ->withUseTime(false)
                 ->withLabels($this->pl->txt('start'), $this->pl->txt('end'))
                 ->withFormat($dataFactory->dateFormat()->germanShort());
