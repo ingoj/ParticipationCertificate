@@ -1,9 +1,7 @@
 <?php
 
-use ILIAS\UI\Component\Table\DataRetrieval;
 use ILIAS\Data\Factory;
 use ILIAS\Data\DateFormat\DateFormat;
-use ILIAS\UI\Implementation\Component\Table as T;
 use ILIAS\UI\Implementation\Component\Table\Data;
 use ILIAS\UI\Component\Table as I;
 use ILIAS\Data\Range;
