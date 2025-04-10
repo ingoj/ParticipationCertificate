@@ -1,4 +1,7 @@
 <?php
+
+// TODO DELETE CLASS FILE
+
 class ilParticipationCertificateConfigSetTableGUI extends ilTable2GUI {
 	protected ilTabsGUI $tabs;
     protected ilCtrl $ctrl;

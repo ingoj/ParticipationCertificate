@@ -85,6 +85,8 @@ class ilParticipationCertificateResultGUI
 
     public function content(): void
     {
+        global $DIC;
+
         $this->tpl->addCss($this->pl->getDirectory() . '/templates/css/participation-certificate.css');
 
         if (method_exists($this->tpl, 'loadStandardTemplate')) {
@@ -95,26 +97,37 @@ class ilParticipationCertificateResultGUI
         $this->initHeader();
 
         $cert_access = new ilParticipationCertificateAccess($_GET['ref_id']);
+        $toolbar = $DIC->toolbar();
+        $ui = $DIC->ui()->factory();
 
         if ($cert_access->hasCurrentUserPrintAccess()) {
             if ($this->ementoring) {
-                $b_print = ilLinkButton::getInstance();
-                $b_print->setCaption($this->pl->txt('header_btn_print_is_ementoring'), false);
                 $this->ctrl->setParameter($this, 'ementor', true);
-                $b_print->setUrl($this->ctrl->getLinkTarget($this, $this::CMD_PRINT_PDF));
-                $this->toolbar->addButtonInstance($b_print);
+                $toolbarButton = $ui->button()->standard(
+                    $this->pl->txt('header_btn_print_is_ementoring'),
+                    $this->ctrl->getLinkTarget($this, $this::CMD_PRINT_PDF)
+                );
+                $toolbar->addComponent($toolbarButton);
 
-                $b_print = ilLinkButton::getInstance();
                 $this->ctrl->setParameter($this, 'ementor', false);
-                $b_print->setCaption($this->pl->txt('header_btn_print_no_ementoring'), false);
-                $b_print->setUrl($this->ctrl->getLinkTarget($this, $this::CMD_PRINT_PDF));
-                $this->toolbar->addButtonInstance($b_print);
+                $toolbarButton = $ui->button()->standard(
+                    $this->pl->txt('header_btn_print_no_ementoring'),
+                    $this->ctrl->getLinkTarget($this, $this::CMD_PRINT_PDF)
+                );
+                $toolbar->addComponent($toolbarButton);
             } else {
                 $b_print = ilLinkButton::getInstance();
                 $this->ctrl->setParameter($this, 'ementor', false);
                 $b_print->setCaption($this->pl->txt('header_btn_print'), false);
                 $b_print->setUrl($this->ctrl->getLinkTarget($this, $this::CMD_PRINT_PDF));
                 $this->toolbar->addButtonInstance($b_print);
+
+                $this->ctrl->setParameter($this, 'ementor', false);
+                $toolbarButton = $ui->button()->standard(
+                    $this->pl->txt('header_btn_print'),
+                    $this->ctrl->getLinkTarget($this, $this::CMD_PRINT_PDF)
+                );
+                $toolbar->addComponent($toolbarButton);
             }
         }
         $target_ref = 0;
@@ -173,6 +186,9 @@ class ilParticipationCertificateResultGUI
 
     protected function initTable(bool $override = false): void
     {
+//        $repo = new ilParticipationCertificateConfigSetTableNewGUI();
+//        return $repo->getTableForRepresentation();
+
         $this->table = new ilParticipationCertificateResultTableGUI($this, self::CMD_CONTENT);
     }
 
@@ -193,11 +209,11 @@ class ilParticipationCertificateResultGUI
             if (!empty($usr_id[0])) {
                 $arr_usr_data = ilPartCertUsersData::getData($this->pl, $usr_id);
                 $usr_id = $this->excludeUserIfDataMissing($usr_id, $arr_usr_data);
+            }
 
-                // Redirect if user data are missing
-                if (empty($usr_id)) {
-                    $this->redirectWithError(self::CMD_CONTENT, $this->pl->txt('user_data_missing'));
-                }
+            // Redirect if selected user's data or all users' data are missing
+            if (empty($usr_id) || empty($usr_id[0])) {
+                $this->redirectWithError(self::CMD_CONTENT, $this->pl->txt('user_data_missing'));
             }
 
             $twigParser = new ilParticipationCertificateTwigParser($this->groupRefId, array(), $usr_id, $ementor,

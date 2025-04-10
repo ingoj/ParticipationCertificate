@@ -152,6 +152,7 @@ class ilParticipationCertificateTwigParser {
 
         $this->usr_id = $this->excludeUsersFromPrintIfMissingUserData($this->usr_id);
 
+
         foreach ($this->usr_id as $usr_id) {
             $percentage = 0;
 
@@ -163,14 +164,19 @@ class ilParticipationCertificateTwigParser {
 
 
 			$processed_arr_text_values = $arr_config_text;
+
+
 			//Preprocess text values
             foreach ($arr_config_text as $key => $value) {
                 $twig = new Twig\Environment(new Twig\Loader\ArrayLoader());
 
+                // Twig use the placeholders {{ }}, but plugins the  [[ ]]
+                $value = $this->preparePlaceholdersForTwig($value);
+
                 $template = $twig->createTemplate((string)$value);
 
                 $peparsed_value = $template->render([
-                    "username" => ($arr_usr_data[$usr_id]->getPartCertSalutation() ?
+                    'username' => ($arr_usr_data[$usr_id]->getPartCertSalutation() ?
                             $arr_usr_data[$usr_id]->getPartCertSalutation() . ' ' : '') .
                         $arr_usr_data[$usr_id]->getPartCertFirstname() . ' ' .
                         $arr_usr_data[$usr_id]->getPartCertLastname(),
@@ -180,7 +186,7 @@ class ilParticipationCertificateTwigParser {
                 $processed_arr_text_values[$key] = $peparsed_value;
             }
 
-			//Learning Objective Master Course
+            //Learning Objective Master Course
 			$arr_usr_lo_master_crs = array();
 			if (is_array($arr_lo_master_crs[$usr_id])) {
 				$arr_usr_lo_master_crs = $arr_lo_master_crs[$usr_id];
@@ -260,5 +266,21 @@ class ilParticipationCertificateTwigParser {
 
 			$part_pdf->generatePDF($this->twig_template->render($arr_render), count($this->usr_id));
 		}
+        $this->tpl->setOnScreenMessage('info',$this->pl->txt('configset_type_2'), true);
+
 	}
+
+    /**
+     * Replace the placeholders [[ ]] with the {{ }}
+     *
+     * @param string $value
+     * @return array|string|string[]
+     */
+    private function preparePlaceholdersForTwig(string $value)
+    {
+        $value = str_replace('[[', '{{', $value);
+        $value = str_replace(']]', '}}', $value);
+
+        return $value;
+    }
 }

@@ -159,18 +159,18 @@ class ilParticipationCertificateFiles extends ActiveRecord
      * Files are stored under ./data/default/dhbw_part_cert in ILIAS8, while the resource storage is used in ILIAS9.
      *
      * @param        $value
-     * @param string $globalConfigId
+     * @param string $configId
      * @param string $fileType
      * @return string
      */
     public function getFileSrcByStorageType (
         $value,
-        string $globalConfigId,
+        string $configId,
         string $fileType
     ): string {
         global $DIC;
 
-        $file = ilParticipationCertificateFiles::getFile($globalConfigId, $fileType);
+        $file = ilParticipationCertificateFiles::getFile($configId, $fileType);
 
         if (empty($file)) {
             return '';
@@ -194,7 +194,7 @@ class ilParticipationCertificateFiles extends ActiveRecord
 
             $filePath = ilParticipationCertificateConfig::returnPicturePath(
                 'relative',
-                $globalConfigId,
+                $configId,
                 $fileName
             );
 

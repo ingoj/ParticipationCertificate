@@ -1,5 +1,7 @@
 <?php
 
+// TODO DELETE CLASS FILE
+
 /**
  * Class ilParticipationCertificateResultGUI
  */

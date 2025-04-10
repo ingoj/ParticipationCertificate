@@ -234,64 +234,46 @@ class ilParticipationCertificateGUI
                 $disabled = true;
             }
 
-            switch ($config->getConfigKey()) {
+            $key = $config->getConfigKey();
+            switch ($key) {
                 case 'logo':
                     if ($disabled) {
-                        $file = new ilParticipationCertificateFiles();
-                        $src = $file->getFileSrcByStorageType(
-                            $config->getConfigValue(),
-                            $global_config_id,
-                            'logo'
-                        );
-
-                        $inputFields[$config->getConfigKey()] = $ui->input()->field()->file(
-                            new ilParticipationCertificateFileUploadHandlerGUI(),
-                            $this->pl->txt('logo'),
-                            'Maximum upload size: 1024.0 MB. Allowed file types: .png' . "<br>\n" .
-                            '<img src="' . $src . '">'
-                        )->withAcceptedMimeTypes([
-                            'image/jpeg',
-                            'image/png'
-                        ])->withMaxFileSize((2 * 1024 * 1024));
-
-                        break;
-
+                        $configId = $global_config_id;
                     } else {
-                        $file = new ilParticipationCertificateFiles();
-                        $src = $file->getFileSrcByStorageType(
-                            $config->getConfigValue(),
-                            $this->groupRefId,
-                            'logo'
-                        );
-
-                        $inputFields[$config->getConfigKey()] = $ui->input()->field()->file(
-                            new ilParticipationCertificateFileUploadHandlerGUI(),
-                            $this->pl->txt('logo'),
-                            'Maximum upload size: 1024.0 MB. Allowed file types: .png' . "<br>\n" .
-                            '<img src="' . $src . '">'
-                        )->withAcceptedMimeTypes([
-                            'image/png'
-                        ])->withMaxFileSize((2 * 1024 * 1024));
-
+                        $configId = $this->groupRefId;
                     }
+
+                    $file = new ilParticipationCertificateFiles();
+                    $src = $file->getFileSrcByStorageType(
+                        $config->getConfigValue(),
+                        $configId,
+                        'page1_issuer_signature'
+                    );
+
+                    $inputFields[$config->getConfigKey()] = $ui->input()->field()->file(
+                        new ilParticipationCertificateFileUploadHandlerGUI(),
+                        $this->pl->txt('logo'),
+                        'Maximum upload size: 1024.0 MB. Allowed file types: .png' . "<br>\n" .
+                        '<img src="' . $src . '">'
+                    )->withAcceptedMimeTypes([
+                        'image/jpeg',
+                        'image/png'
+                    ])->withMaxFileSize((2 * 1024 * 1024));
                     break;
                 case 'page1_issuer_signature':
-                    if ($disabled) {
-                        $file = new ilParticipationCertificateFiles();
-                        $src = $file->getFileSrcByStorageType(
-                            $config->getConfigValue(),
-                            $global_config_id,
-                            'page1_issuer_signature'
-                        );
 
+                    if ($disabled) {
+                        $configId = $global_config_id;
                     } else {
-                        $file = new ilParticipationCertificateFiles();
-                        $src = $file->getFileSrcByStorageType(
-                            $config->getConfigValue(),
-                            $this->groupRefId,
-                            'page1_issuer_signature'
-                        );
+                        $configId = $this->groupRefId;
                     }
+
+                    $file = new ilParticipationCertificateFiles();
+                    $src = $file->getFileSrcByStorageType(
+                        $config->getConfigValue(),
+                        $configId,
+                        'page1_issuer_signature'
+                    );
 
 
                     $inputFields[$config->getConfigKey()] = $ui->input()->field()->file(
@@ -305,16 +287,23 @@ class ilParticipationCertificateGUI
                     break;
 
                 default:
+                    $configValue = $config->getConfigValue();
+                    /*$configValue = str_replace('{{', '[[', $configValue);
+                    $configValue = str_replace('}}', ']]', $configValue);*/
+
+                    $configValue = $this->replacePlaceholdersFromOldVersion($configValue);
                     if($disabled){
                         $inputFields[$config->getConfigKey()] = $ui->input()->field()->textarea(
                             $config->getConfigKey()
-                        )->withValue($config->getConfigValue() ?? '')
+                        )->withValue($configValue ?? '')
                          ->withDisabled(true);
                     } else {
                         $inputFields[$config->getConfigKey()] = $ui->input()->field()->textarea(
                             $config->getConfigKey()
-                        )->withValue($config->getConfigValue() ?? '');
+                        )->withValue($configValue ?? '');
                     }
+
+
                     break;
             }
         }
@@ -323,8 +312,8 @@ class ilParticipationCertificateGUI
             $inputFields,
             $this->pl->txt('config_plugin'),
             $this->pl->txt("placeholders") . ' <br>
-		&lbrace;&lbrace;username&rbrace;&rbrace;: Anrede Vorname Nachname <br>
-		&lbrace;&lbrace;date&rbrace;&rbrace;: Datum
+		[[username]]: Anrede Vorname Nachname <br>
+		[[date]]: Datum
 		'
         );
 
@@ -344,6 +333,18 @@ class ilParticipationCertificateGUI
             $this->ctrl->saveParameterByClass(ilObjCourse::class, 'ref_id');
         }
         return $form;
+    }
+
+    /**
+     * @param string $configValue
+     * @return array|string|string[]
+     */
+    private function replacePlaceholdersFromOldVersion(string $configValue)
+    {
+        $configValue = str_replace('{{', '[[', $configValue);
+        $configValue = str_replace('}}', ']]', $configValue);
+
+        return $configValue;
     }
 
     /**
