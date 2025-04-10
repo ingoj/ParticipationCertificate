@@ -1,7 +1,7 @@
 <?php
 
 use ILIAS\UI\Component\Input\Container\Form\Standard;
-use ILIAS\ResourceStorage\Identification\ResourceIdentification;
+use ILIAS\Data\Factory;
 
 /**
  * Class ilParticipationCertificateGUI
@@ -632,8 +632,6 @@ class ilParticipationCertificateGUI
 
         $form = $this->initSelfPrintForm();
 
-      /*  $this->tpl->setContent($form->getHTML());*/
-
         $this->tpl->setContent($renderer->render($form));
         if (method_exists($this->tpl, 'printToStdout')) {
             $this->tpl->printToStdout();
@@ -642,14 +640,17 @@ class ilParticipationCertificateGUI
         }
     }
 
-    protected function initSelfPrintForm()
+    /**
+     * @return Standard
+     * @throws ilCtrlException
+     */
+    protected function initSelfPrintForm(): Standard
     {
         global $DIC;
 
         $ui = $DIC->ui()->factory();
 
-
-        $dataFactory = new \ILIAS\Data\Factory();
+        $dataFactory = new Factory();
 
         $periodStart = ilParticipationCertificateConfig::getConfig('self_print_start', $this->groupRefId);
         $startDate = !empty($periodStart) ? DateTimeImmutable::createFromFormat('d.m.Y', $periodStart) : null;
@@ -657,21 +658,32 @@ class ilParticipationCertificateGUI
         $periodEnd = ilParticipationCertificateConfig::getConfig('self_print_end', $this->groupRefId);
         $endDate = !empty($periodEnd) ? DateTimeImmutable::createFromFormat('d.m.Y', $periodEnd) : null;
 
-
         $durationInput = $ui->input()->field()->duration($this->pl->txt('period'));
-        $period = $durationInput
-            ->withTimezone('Europe/Berlin')
-            ->withUseTime(false)
-            ->withLabels($this->pl->txt('start'), $this->pl->txt('end'))
-            ->withFormat($dataFactory->dateFormat()->germanShort())
-            ->withMinValue($startDate)
-            ->withMaxValue($endDate);
 
+        $user = $DIC->user();
+        if (!empty($startDate) && !empty($endDate)) {
+            $period = $durationInput
+                ->withTimezone($user->getTimeZone())
+                ->withUseTime(false)
+                ->withLabels($this->pl->txt('start'), $this->pl->txt('end'))
+                ->withFormat($dataFactory->dateFormat()->germanShort())
+                ->withMinValue($startDate)
+                ->withMaxValue($endDate)
+                ->withValue([$startDate, $endDate]);
+        } else {
+            $period = $durationInput
+                ->withTimezone($user->getTimeZone())
+                ->withUseTime(false)
+                ->withLabels($this->pl->txt('start'), $this->pl->txt('end'))
+                ->withFormat($dataFactory->dateFormat()->germanShort());
+        }
+
+        // TODO uncheck checkbox when 'enable_self_print' is 0
         $inputFields['enable-self-printing'] = $ui->input()->field()->optionalGroup(
             [
                 'period' => $period
             ],
-            $this->pl->txt('period')
+            $this->pl->txt('enable_self_print')
         );
 
         $section = $ui->input()->field()->section(
@@ -684,61 +696,24 @@ class ilParticipationCertificateGUI
             $this->pl->txt('save')
         );
 
-        //Step 2: Define the form and attach the section.
         $form = $ui->input()->container()->form()->standard(
             $formAction,
             ['config' => $section]
         );
         return $form;
-
-        $form = new ilPropertyFormGUI();
-
-        $form->setFormAction($this->ctrl->getFormAction($this));
-
-        $form->setTitle($this->pl->txt('period_self_print'));
-
-        $enable = new ilCheckboxInputGUI($this->pl->txt('enable_self_print'), 'enable_self_print');
-        $enable->setChecked(boolval(ilParticipationCertificateConfig::getConfig('enable_self_print', $this->groupRefId)));
-        $form->addItem($enable);
-
-        $period = new ilDateDurationInputGUI($this->pl->txt('period'), 'period_self_print');
-        $period->setStart(new ilDateTime(ilParticipationCertificateConfig::getConfig('self_print_start', $this->groupRefId), IL_CAL_DATE));
-        $period->setEnd(new ilDateTime(ilParticipationCertificateConfig::getConfig('self_print_end', $this->groupRefId), IL_CAL_DATE));
-        $enable->addSubItem($period);
-
-        $form->addCommandButton(self::CMD_SELF_PRINT_SAVE, $this->pl->txt('save'));
-
-        return $form;
     }
 
-    /*protected function initSelfPrintForm(): ilPropertyFormGUI
-    {
-        $form = new ilPropertyFormGUI();
-
-        $form->setFormAction($this->ctrl->getFormAction($this));
-
-        $form->setTitle($this->pl->txt('period_self_print'));
-
-        $enable = new ilCheckboxInputGUI($this->pl->txt('enable_self_print'), 'enable_self_print');
-        $enable->setChecked(boolval(ilParticipationCertificateConfig::getConfig('enable_self_print', $this->groupRefId)));
-        $form->addItem($enable);
-
-        $period = new ilDateDurationInputGUI($this->pl->txt('period'), 'period_self_print');
-        $period->setStart(new ilDateTime(ilParticipationCertificateConfig::getConfig('self_print_start', $this->groupRefId), IL_CAL_DATE));
-        $period->setEnd(new ilDateTime(ilParticipationCertificateConfig::getConfig('self_print_end', $this->groupRefId), IL_CAL_DATE));
-        $enable->addSubItem($period);
-
-        $form->addCommandButton(self::CMD_SELF_PRINT_SAVE, $this->pl->txt('save'));
-
-        return $form;
-    }*/
-
+    /**
+     * @return void
+     * @throws DateInvalidTimeZoneException
+     * @throws DateMalformedStringException
+     * @throws ilCtrlException
+     */
     protected function saveSelfPrint(): void
     {
         global $DIC;
 
         $form = $this->initSelfPrintForm();
-
 
         $form  = $form->withRequest($DIC->http()->request());
         $formData = $form->getData();
@@ -746,23 +721,40 @@ class ilParticipationCertificateGUI
         // TODO implement this, in other files as well
         if ($form->getError()) {
             $this->tpl->setOnScreenMessage(ilGlobalTemplateInterface::MESSAGE_TYPE_FAILURE, $form->getError());
-            /*$this->configure();*/
+            $this->selfPrint();
             return;
         }
 
-        dd($formData);
-
-        if (!$form->checkInput()) {
-            //TODO error message plus redirect
-            return;
+        $enable = 0;
+        if (!empty($formData['config']['enable-self-printing'])) {
+            $enable = 1;
         }
-
-        $enable = boolval($form->getInput("enable_self_print"));
         ilParticipationCertificateConfig::setConfig('enable_self_print', $enable, $this->groupRefId);
 
-        $period = $form->getInput('period_self_print');
-        ilParticipationCertificateConfig::setConfig('self_print_start', $period['start'], $this->groupRefId);
-        ilParticipationCertificateConfig::setConfig('self_print_end', $period['end'], $this->groupRefId);
+        if (!empty($formData['config']['enable-self-printing']['period']['start'])) {
+            $startTimestamp = $formData['config']['enable-self-printing']['period']['start']->getTimestamp();
+        }
+
+        if (!empty($formData['config']['enable-self-printing']['period']['end'])) {
+            $endTimestamp = $formData['config']['enable-self-printing']['period']['end']->getTimestamp();
+        }
+
+        $startDate = null;
+        if (!empty($startTimestamp)) {
+            $startDate = new DateTimeImmutable('@' . $startTimestamp);
+            $startDate = $startDate->setTimezone(new DateTimeZone($DIC->user()->getTimeZone()));
+            $startDate = $startDate->format('d.m.Y');
+        }
+
+        $endDate = null;
+        if (!empty($endTimestamp)) {
+            $endDate = new DateTimeImmutable('@' . $endTimestamp);
+            $endDate = $endDate->setTimezone(new DateTimeZone($DIC->user()->getTimeZone()));
+            $endDate = $endDate->format('d.m.Y');
+        }
+
+        ilParticipationCertificateConfig::setConfig('self_print_start', $startDate, $this->groupRefId);
+        ilParticipationCertificateConfig::setConfig('self_print_end', $endDate, $this->groupRefId);
 
         $this->tpl->setOnScreenMessage('success',$this->pl->txt('successFormSave'), true);
         $this->ctrl->redirect($this, self::CMD_SELF_PRINT);
