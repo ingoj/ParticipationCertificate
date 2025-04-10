@@ -254,14 +254,13 @@ class ilParticipationCertificateGUI
                             'image/png'
                         ])->withMaxFileSize((2 * 1024 * 1024));
 
-
                         break;
 
                     } else {
                         $file = new ilParticipationCertificateFiles();
                         $src = $file->getFileSrcByStorageType(
                             $config->getConfigValue(),
-                            $global_config_id,
+                            $this->groupRefId,
                             'logo'
                         );
 
@@ -289,14 +288,15 @@ class ilParticipationCertificateGUI
                         $file = new ilParticipationCertificateFiles();
                         $src = $file->getFileSrcByStorageType(
                             $config->getConfigValue(),
-                            $global_config_id,
+                            $this->groupRefId,
                             'page1_issuer_signature'
                         );
                     }
 
+
                     $inputFields[$config->getConfigKey()] = $ui->input()->field()->file(
                         new ilParticipationCertificateFileUploadHandlerGUI(),
-                        $this->pl->txt('logo'),
+                        $this->pl->txt('page1_issuer_signature'),
                         'Maximum upload size: 1024.0 MB. Allowed file types: .png' . "<br>\n" .
                         '<img src="' . $src . '">'
                     )->withAcceptedMimeTypes([
@@ -343,30 +343,29 @@ class ilParticipationCertificateGUI
         } else {
             $this->ctrl->saveParameterByClass(ilObjCourse::class, 'ref_id');
         }
-
         return $form;
     }
 
     /**
      * @return bool
+     * @throws ilCtrlException|arException
      */
     public function save(): bool
     {
         global $DIC;
 
         $form = $this->initForm();
-
         $form  = $form->withRequest($DIC->http()->request());
         $form_data = $form->getData()['config'];
 
         foreach ($form_data as $key => $item) {
+            $file = null;
 
             $config = ilParticipationCertificateConfig::where(array(
                 'config_key' => $key,
-                "group_ref_id" => $this->groupRefId,
+                'group_ref_id' => $this->groupRefId,
                 'config_value_type' => ilParticipationCertificateConfig::CONFIG_VALUE_TYPE_CERT_TEXT
             ))->first();
-
 
             if (!is_object($config)) {
                 $config = new ilParticipationCertificateConfig();
@@ -381,26 +380,37 @@ class ilParticipationCertificateGUI
 
             switch ($key) {
                 case 'page1_issuer_signature':
-                    //Picture
-                    $file_data = $input;
-                    if (key_exists('tmp_name', $file_data) && $file_data['tmp_name']) {
-                        $input = ilParticipationCertificateConfig::storePicture($file_data, $this->groupRefId, ilParticipationCertificateConfig::ISSUER_SIGNATURE_FILE_NAME);
+                    $input = end($input);
+                    if (!empty($input)) {
+                        $file = 'page1_issuer_signature';
                     } else {
-                        // Previous upload
                         $input = $config->getConfigValue();
                     }
                     break;
                 case 'logo':
-
                     $input = end($input);
+
+                    if (!empty($input)) {
+                        $file = 'logo';
+                    } else {
+                        $input = $config->getConfigValue();
+                    }
                     break;
                 default:
+
                     break;
             }
 
             $config->setConfigValue($input);
-
             $config->store();
+
+            if ($file === 'logo' || $file === 'page1_issuer_signature') {
+                ilParticipationCertificateFiles::setFile(
+                    $this->groupRefId,
+                    $file,
+                    true
+                );
+            }
         }
 
         $this->tpl->setOnScreenMessage('success',$this->pl->txt('successFormSave'), true);

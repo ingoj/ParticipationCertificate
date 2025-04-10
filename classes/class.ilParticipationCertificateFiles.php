@@ -91,7 +91,6 @@ class ilParticipationCertificateFiles extends ActiveRecord
 			'type' => $fileType,
 		])->first();
 
-
 		if (!empty($file)) {
             $file->setGroupRefId($groupRefId);
             $file->setType($fileType);
@@ -188,10 +187,15 @@ class ilParticipationCertificateFiles extends ActiveRecord
                            ->getSrc();
             }
         } else {
+            $fileName = ilParticipationCertificateConfig::LOGO_FILE_NAME;
+            if($fileType === 'page1_issuer_signature') {
+                $fileName = ilParticipationCertificateConfig::ISSUER_SIGNATURE_FILE_NAME;
+            }
+
             $filePath = ilParticipationCertificateConfig::returnPicturePath(
                 'relative',
                 $globalConfigId,
-                ilParticipationCertificateConfig::LOGO_FILE_NAME
+                $fileName
             );
 
             $stream = \ILIAS\Filesystem\Stream\Streams::ofResource(
@@ -200,14 +204,12 @@ class ilParticipationCertificateFiles extends ActiveRecord
 
             $src = $DIC->fileDelivery()->buildTokenURL(
                 $stream,
-                'pic.png',
+                $fileName,
                 \ILIAS\FileDelivery\Delivery\Disposition::INLINE,
                 6,
                 6
             );
         }
-
         return $src;
-
     }
 }

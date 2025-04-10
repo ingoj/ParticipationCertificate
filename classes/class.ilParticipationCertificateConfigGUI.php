@@ -394,10 +394,6 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI
              * @var ilParticipationCertificateConfig $config
              */
             switch ($config->getConfigKey()) {
-                case 'page1_issuer_signature':
-                    // Skip
-                    $input = NULL;
-                    break;
                 case 'udf_firstname':
                 case 'udf_lastname':
                 case 'udf_gender':
@@ -451,7 +447,6 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI
                     break;
 
                 case 'page1_issuer_signature':
-
 
                     $file = new ilParticipationCertificateFiles();
                     $src = $file->getFileSrcByStorageType(
@@ -544,6 +539,7 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI
                      */
                     switch ($key) {
                         case 'config_title':
+                            // TODO
                             /**
                              * @var ilParticipationCertificateGlobalConfigSet $global_config
                              */
@@ -552,6 +548,7 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI
                             $global_config->store();
                             break;
                         case 'logo':
+                            // TODO
                             //Picture
                             $file_data = $value;
                             if ($file_data['tmp_name']) {
@@ -560,6 +557,7 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI
                             }
                             break;
                         case 'page1_issuer_signature':
+                            // TODO
                             $file_data = $value;
                             if ($file_data['tmp_name']) {
                                 /**
@@ -570,6 +568,7 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI
                             }
                             break;
                         default:
+                            // TODO
                             if (is_array($value)) {
                                 echo $key;
                                 exit;
