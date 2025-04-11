@@ -206,7 +206,7 @@ class ilParticipationCertificateFiles extends ActiveRecord
                 $stream,
                 $fileName,
                 \ILIAS\FileDelivery\Delivery\Disposition::INLINE,
-                6,
+                $DIC->user()->getId(),
                 6
             );
         }
