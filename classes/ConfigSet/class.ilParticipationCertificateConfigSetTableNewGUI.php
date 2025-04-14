@@ -249,28 +249,30 @@ class ilParticipationCertificateConfigSetTableNewGUI implements I\DataRetrieval
             'edit' => $f->table()->action()->single(
                 'Edit',
                 $url_builder->withParameter($this->action_parameter_token, 'edit'),
-                $this->row_id_token/*,
-                $this->config_type*/
+                $this->row_id_token
             ),
             'copy' => $f->table()->action()->single(
                 'Copy',
                 $url_builder->withParameter($this->action_parameter_token, 'copy'),
-                $this->row_id_token/*,
-                $this->config_type*/
+                $this->row_id_token
             ),
             'delete' =>
                 $f->table()->action()->standard(
                     'Delete',
                     $url_builder->withParameter($this->action_parameter_token, 'delete'),
-                    $this->row_id_token/*,
-                    $this->config_type*/
+                    $this->row_id_token
                 ),
             'activate' =>
                 $f->table()->action()->standard(
                     'Activate',
                     $url_builder->withParameter($this->action_parameter_token, 'activate'),
-                    $this->row_id_token/*,
-                    $this->config_type*/
+                    $this->row_id_token
+                ),
+            'deactivate' =>
+                $f->table()->action()->standard(
+                    'Deactivate',
+                    $url_builder->withParameter($this->action_parameter_token, 'deactivate'),
+                    $this->row_id_token
                 )
         ];
 

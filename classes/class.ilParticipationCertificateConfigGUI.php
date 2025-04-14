@@ -304,6 +304,11 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI
                     break;
 
                 case 'activate':
+                    $this->setActive();
+                    break;
+
+                case 'deactivate':
+                    $this->setInactive();
                     break;
             }
         }
@@ -336,11 +341,7 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI
      */
     public function setActive(): void
     {
-        //$id = filter_input(INPUT_GET, 'id');
-
         $id = $_GET['config_id'][0];
-
-        dd($id);
 
         $gl_config = new ilParticipationCertificateGlobalConfigSet($id);
         $gl_config->setActive(1);
@@ -356,8 +357,6 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI
     {
         //$id = filter_input(INPUT_GET, 'id');
         $id = $_GET['config_id'][0];
-
-        dd($id);
 
         $gl_config = new ilParticipationCertificateGlobalConfigSet($id);
 
