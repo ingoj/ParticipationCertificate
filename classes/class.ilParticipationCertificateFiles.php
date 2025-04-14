@@ -32,7 +32,7 @@ class ilParticipationCertificateFiles extends ActiveRecord
      * @db_fieldtype    integer
      * @con_is_notnull  true
      */
-    protected int $group_ref_id;
+    protected int $config_id;
 
     /**
      * @var bool
@@ -59,18 +59,20 @@ class ilParticipationCertificateFiles extends ActiveRecord
 	}
 
     /**
-     * @param string $groupRefId
+     * @param string $configId
      * @param string $fileType
      * @return ActiveRecord|null
      */
-	static function getFile(string $groupRefId, string $fileType): ActiveRecord|null
+	static function getFile(
+        string $configId,
+        string $fileType
+    ): ActiveRecord|null
     {
 		/**
 		 * @var ilParticipationCertificateFiles|null $config
 		 */
-
 		$file = self::where([
-            'group_ref_id' => $groupRefId,
+            'config_id' => $configId,
             'type' => $fileType,
 		])->first();
 
@@ -78,37 +80,35 @@ class ilParticipationCertificateFiles extends ActiveRecord
 	}
 
 	static function setFile(
-        string $groupRefId,
+        string $configId,
         string $fileType,
         bool $resourceStorage
     ): void {
 		/**
 		 * @var ilParticipationCertificateFiles|null $file
 		 */
-
 		$file = self::where([
-			'group_ref_id' => $groupRefId,
-			'type' => $fileType,
+            'config_id' => $configId,
+            'type' => $fileType,
 		])->first();
 
 		if (!empty($file)) {
-            $file->setGroupRefId($groupRefId);
+            $file->setConfigId($configId);
             $file->setType($fileType);
             $file->setResourceStorage($resourceStorage);
             $file->update();
 		} else {
             $file = new self();
-            $file->setGroupRefId($groupRefId);
+            $file->setConfigId($configId);
             $file->setResourceStorage($resourceStorage);
             $file->setType($fileType);
-
             $file->create();
 		}
 	}
 
-    public function setGroupRefId(string $groupRefId): void
+    public function setConfigId(string $groupRefId): void
     {
-        $this->group_ref_id = $groupRefId;
+        $this->config_id = $groupRefId;
     }
 
     public function setType(string $type): void
@@ -134,9 +134,9 @@ class ilParticipationCertificateFiles extends ActiveRecord
     /**
      * @return string
      */
-    public function getGroupRefId(): string
+    public function getConfigId(): string
     {
-        return $this->group_ref_id;
+        return $this->config_id;
     }
 
     /**

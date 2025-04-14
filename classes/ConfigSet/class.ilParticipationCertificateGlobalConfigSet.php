@@ -107,30 +107,53 @@ class ilParticipationCertificateGlobalConfigSet extends ActiveRecord {
 
 
 		foreach($part_cert_configs as $config) {
+            $file = null;
+            $resourceStorage = false;
+
             $file_path_id = 0;
             if($config->getGlobalConfigId() > 0) {
+                $configId = $config->getGlobalConfigId();
                 $file_path_id = $config->getGlobalConfigId() ;
             } else {
+                $configId = $config->getGroupRefId();
                 $file_path_id = $config->getGroupRefId();
             }
             $config->setGroupRefId(0);
 
 			switch ($config->getConfigKey()) {
 				case 'logo':
-					if (is_file(ilParticipationCertificateConfig::returnPicturePath('absolute', $file_path_id, ilParticipationCertificateConfig::LOGO_FILE_NAME))) {
-						copy(ilParticipationCertificateConfig::returnPicturePath('absolute', $file_path_id, ilParticipationCertificateConfig::LOGO_FILE_NAME), ilParticipationCertificateConfig::returnPicturePath('absolute', $gl_config->getId(), ilParticipationCertificateConfig::LOGO_FILE_NAME));
-					}
-					break;
-                case 'page1_issuer_signature':
-                    if (is_file(ilParticipationCertificateConfig::returnPicturePath('absolute', $file_path_id, ilParticipationCertificateConfig::ISSUER_SIGNATURE_FILE_NAME))) {
-                        copy(ilParticipationCertificateConfig::returnPicturePath('absolute', $file_path_id, ilParticipationCertificateConfig::ISSUER_SIGNATURE_FILE_NAME), ilParticipationCertificateConfig::returnPicturePath('absolute', $gl_config->getId(), ilParticipationCertificateConfig::ISSUER_SIGNATURE_FILE_NAME));
+                    $file = 'logo';
+                    if (empty($config->getConfigValue()) && is_file(ilParticipationCertificateConfig::returnPicturePath('absolute', $file_path_id, ilParticipationCertificateConfig::LOGO_FILE_NAME))) {
+                        copy(ilParticipationCertificateConfig::returnPicturePath('absolute', $file_path_id, ilParticipationCertificateConfig::LOGO_FILE_NAME), ilParticipationCertificateConfig::returnPicturePath('absolute', $gl_config->getId(), ilParticipationCertificateConfig::LOGO_FILE_NAME));
+                    } elseif (!empty($config->getConfigValue())) {
+                        $resourceStorage = true;
+                        $config->setConfigValue($config->getConfigValue());
                     }
 
+					break;
+                case 'page1_issuer_signature':
+                    $file = 'page1_issuer_signature';
+
+                    if (empty($config->getConfigValue()) && is_file(ilParticipationCertificateConfig::returnPicturePath('absolute', $file_path_id, ilParticipationCertificateConfig::ISSUER_SIGNATURE_FILE_NAME))) {
+                        copy(ilParticipationCertificateConfig::returnPicturePath('absolute', $file_path_id, ilParticipationCertificateConfig::ISSUER_SIGNATURE_FILE_NAME), ilParticipationCertificateConfig::returnPicturePath('absolute', $gl_config->getId(), ilParticipationCertificateConfig::ISSUER_SIGNATURE_FILE_NAME));
+                    } elseif (!empty($config->getConfigValue())) {
+                        $resourceStorage = true;
+                        $config->setConfigValue($config->getConfigValue());
+                    }
 			}
 
 			$config->setGlobalConfigId($gl_config->getId());
             $config->setConfigType(ilParticipationCertificateConfig::CONFIG_SET_TYPE_TEMPLATE);
             $config->create();
+
+            if($file === 'logo' || $file === 'page1_issuer_signature') {
+
+                ilParticipationCertificateFiles::setFile(
+                    $config->getGlobalConfigId(),
+                    $file,
+                    $resourceStorage
+                );
+            }
 		}
 
 		return $gl_config;

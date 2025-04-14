@@ -84,6 +84,7 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI
             case self::CMD_SAVE:
             case self::CMD_CANCEL:
             case self::CMD_SAVE_ORDER:
+            case self::CMD_ACTION:
                 $this->$cmd();
                 break;
         }
@@ -124,7 +125,9 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI
      */
     public function copyConfig(): void
     {
-        $id = (int) filter_input(INPUT_GET, 'id');
+        $entry = $_GET['config_entry'][0];
+        $explodedEntry = explode('_', $entry);
+        $id = $explodedEntry[0];
 
         if ($id == 0) {
             $this->ctrl->redirect($this, '');
@@ -281,22 +284,16 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI
 
     public function action()
     {
-       global $DIC;
-
-
         $action = $_GET['config_action'];
-
 
         if (!empty($action)) {
             switch ($action) {
                 case 'edit':
-
                     $this->showForm();
-                    //$this->ctrl->setParameter($this, "id", $new_config_set->getId());
                     break;
 
                 case 'copy':
-
+                    $this->copyConfig();
                     break;
 
                 case 'delete':
@@ -398,17 +395,20 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI
     {
         global $DIC;
 
-        //$id = filter_input(INPUT_GET, 'id');
-        //$set_type = filter_input(INPUT_GET, 'set_type');
+        $id = filter_input(INPUT_GET, 'id');
+        $set_type = filter_input(INPUT_GET, 'set_type');
 
-        $entry = $_GET['config_entry'][0];
-        $explodedEntry = explode('_', $entry);
-        $id = $explodedEntry[0];
-        $set_type = $explodedEntry[1];
+        if (empty($id) && empty($set_type)) {
+            $entry = $_GET['config_entry'][0];
+            $explodedEntry = explode('_', $entry);
+            $id = $explodedEntry[0];
+            $set_type = $explodedEntry[1];
+        }
 
         $this->ctrl->setParameter($this, 'id', $id);
 
         $renderer = $DIC->ui()->renderer();
+
         $form = $this->buildForm($id, $set_type);
 
         $this->tpl->setContent($renderer->render($form));
@@ -444,6 +444,7 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI
             'config_type' => $set_type,
             'global_config_id' => $global_config_id
         ))->orderBy('order_by')->get() as $config) {
+
             /**
              * @var ilParticipationCertificateConfig $config
              */

@@ -67,15 +67,16 @@ class ilParticipationCertificateConfigSetTableNewGUI implements I\DataRetrieval
                 yield $row_builder->buildDataRow($record['config_id'] . '_' . $record['config_type'], $record)
                                   ->withDisabledAction('copy')
                                   ->withDisabledAction('delete')
-                                  ->withDisabledAction('activate');
+                                  ->withDisabledAction('activate')
+                                  ->withDisabledAction('deactivate');
 
             } else if($record['order_by'] != 1) {
                 if ($record['active_status']) {
                     yield $row_builder->buildDataRow($record['config_id'] . '_' . $record['config_type'], $record)
-                                      ->withDisabledAction('deactivate');
+                                      ->withDisabledAction('activate');
                 } else {
                     yield $row_builder->buildDataRow($record['config_id'] . '_' . $record['config_type'], $record)
-                                      ->withDisabledAction('activate');
+                                      ->withDisabledAction('deactivate');
                 }
             } else {
                 // TODO must limit the actions for the second entry
@@ -129,9 +130,11 @@ class ilParticipationCertificateConfigSetTableNewGUI implements I\DataRetrieval
             'configset_type' => $f->table()->column()->text($columns['configset_type']['txt'])
                           ->withIsSortable(false),
             'title' => $f->table()->column()->text($columns['title']['txt'])
-                         ->withHighlight(true),
-            'parent_title' => $f->table()->column()->text($columns['parent_title']['txt']),
-            'active' => $f->table()->column()->text($columns['active']['txt'], $this->current_user_date_format),
+                         ->withIsSortable(false),
+            'parent_title' => $f->table()->column()->text($columns['parent_title']['txt'])
+                         ->withIsSortable(false),
+            'active' => $f->table()->column()->text($columns['active']['txt'])
+                         ->withIsSortable(false),
         ];
     }
 

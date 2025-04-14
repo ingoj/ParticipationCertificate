@@ -685,10 +685,10 @@ $fields = array(
         'type' => 'integer',
         'notnull' => true
     ),
-    'group_ref_id' => array(
+    'config_id' => array(
         'type' => 'integer',
         'notnull' => true
-    ),
+    ), // It is whether the global config id or the group ref id
     'type' => array(
         'type' => 'text',
         'notnull' => true
