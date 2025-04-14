@@ -291,7 +291,7 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI
             switch ($action) {
                 case 'edit':
 
-                    dd("edit");
+                    $this->showForm();
                     //$this->ctrl->setParameter($this, "id", $new_config_set->getId());
                     break;
 
@@ -319,7 +319,10 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI
      */
     public function deleteConfig(): void
     {
-        $id = $_GET['config_id'][0];
+        $entry = $_GET['config_entry'][0];
+        $explodedEntry = explode('_', $entry);
+        $id = $explodedEntry[0];
+
         $gl_config = new ilParticipationCertificateGlobalConfigSet($id);
 
         if ($gl_config->getOrderBy() === 1) {
@@ -341,7 +344,9 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI
      */
     public function setActive(): void
     {
-        $id = $_GET['config_id'][0];
+        $entry = $_GET['config_entry'][0];
+        $explodedEntry = explode('_', $entry);
+        $id = $explodedEntry[0];
 
         $gl_config = new ilParticipationCertificateGlobalConfigSet($id);
         $gl_config->setActive(1);
@@ -355,8 +360,9 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI
      */
     public function setInactive(): void
     {
-        //$id = filter_input(INPUT_GET, 'id');
-        $id = $_GET['config_id'][0];
+        $entry = $_GET['config_entry'][0];
+        $explodedEntry = explode('_', $entry);
+        $id = $explodedEntry[0];
 
         $gl_config = new ilParticipationCertificateGlobalConfigSet($id);
 
@@ -392,11 +398,15 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI
     {
         global $DIC;
 
-        $id = filter_input(INPUT_GET, 'id');
-        $set_type = filter_input(INPUT_GET, 'set_type');
+        //$id = filter_input(INPUT_GET, 'id');
+        //$set_type = filter_input(INPUT_GET, 'set_type');
+
+        $entry = $_GET['config_entry'][0];
+        $explodedEntry = explode('_', $entry);
+        $id = $explodedEntry[0];
+        $set_type = $explodedEntry[1];
 
         $this->ctrl->setParameter($this, 'id', $id);
-
 
         $renderer = $DIC->ui()->renderer();
         $form = $this->buildForm($id, $set_type);
@@ -420,7 +430,14 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI
 
         switch ($set_type) {
             case ilParticipationCertificateConfig::CONFIG_SET_TYPE_TEMPLATE:
-                // TODO
+                /**
+                 * @var ilParticipationCertificateGlobalConfigSet $global_config
+                 */
+                $global_config = ilParticipationCertificateGlobalConfigSet::findOrGetInstance($global_config_id);
+
+                $inputFields['config_title'] = $ui->input()->field()->text(
+                    $this->pl->txt('config_title')
+                )->withValue($global_config->getTitle() ?? '');
         }
 
         foreach (ilParticipationCertificateConfig::where(array(
@@ -511,9 +528,11 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI
                     break;
 
                 default:
+                    $configValue = $this->replacePlaceholdersFromOldVersion($config->getConfigValue());
+
                     $inputFields[$config->getConfigKey()] = $ui->input()->field()->textarea(
                         $config->getConfigKey()
-                    )->withValue($config->getConfigValue() ?? '');
+                    )->withValue($configValue ?? '');
 
                     break;
 
@@ -524,12 +543,10 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI
             $inputFields,
             $this->pl->txt('config_plugin'),
             $this->pl->txt("placeholders") . ' <br>
-		&lbrace;&lbrace;username&rbrace;&rbrace;: Anrede Vorname Nachname <br>
-		&lbrace;&lbrace;date&rbrace;&rbrace;: Datum
+		[[username]]: Anrede Vorname Nachname <br>
+		[[date]]: Datum
 		'
         );
-
-
 
         $formAction = $DIC->ctrl()->getFormActionByClass(
             self::class,
@@ -978,5 +995,15 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI
         return $repo->getTableForRepresentation();
 
         //$this->table = new ilParticipationCertificateConfigSetTableGUI($this, self::CMD_CONFIGURE);
+    }
+
+    /**
+     * @param string $configValue
+     * @return array|string|string[]
+     */
+    private function replacePlaceholdersFromOldVersion(string $configValue)
+    {
+        $configValue = str_replace('{{', '[[', $configValue);
+        return str_replace('}}', ']]', $configValue);
     }
 }

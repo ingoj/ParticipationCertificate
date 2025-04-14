@@ -58,26 +58,28 @@ class ilParticipationCertificateConfigSetTableNewGUI implements I\DataRetrieval
         ?array $filter_data,
         ?array $additional_parameters
     ): \Generator {
+        global $DIC;
+
         $data = $this->doSelect($order, $range);
 
         foreach ($data as $idx => $record) {
             if($record['config_id'] === 0) {
-                yield $row_builder->buildDataRow($record['config_id'], $record)
+                yield $row_builder->buildDataRow($record['config_id'] . '_' . $record['config_type'], $record)
                                   ->withDisabledAction('copy')
                                   ->withDisabledAction('delete')
                                   ->withDisabledAction('activate');
 
             } else if($record['order_by'] != 1) {
                 if ($record['active_status']) {
-                    yield $row_builder->buildDataRow($record['config_id'], $record)
+                    yield $row_builder->buildDataRow($record['config_id'] . '_' . $record['config_type'], $record)
                                       ->withDisabledAction('deactivate');
                 } else {
-                    yield $row_builder->buildDataRow($record['config_id'], $record)
+                    yield $row_builder->buildDataRow($record['config_id'] . '_' . $record['config_type'], $record)
                                       ->withDisabledAction('activate');
                 }
             } else {
                 // TODO must limit the actions for the second entry
-                yield $row_builder->buildDataRow($record['config_id'], $record);
+                yield $row_builder->buildDataRow($record['config_id'] . '_' . $record['config_type'], $record);
             }
         }
     }
@@ -237,12 +239,12 @@ class ilParticipationCertificateConfigSetTableNewGUI implements I\DataRetrieval
 
         $uri = $this->buildURI(ilParticipationCertificateConfigGUI::CMD_ACTION);
         $url_builder = new URLBuilder($uri);
-        [$url_builder, $this->action_parameter_token, $this->row_id_token, $this->config_type] =
+        [$url_builder, $this->action_parameter_token, $this->row_id_token/*, $this->config_type*/] =
             $url_builder->acquireParameters(
                 ['config'],
                 'action',
-                'id',
-                'type'
+                'entry'/*,
+                'type'*/
             );
 
         $actions = [
