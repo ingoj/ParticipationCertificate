@@ -247,7 +247,7 @@ class ilParticipationCertificateGUI
                     $src = $file->getFileSrcByStorageType(
                         $config->getConfigValue(),
                         $configId,
-                        'page1_issuer_signature'
+                        'logo'
                     );
 
                     $inputFields[$config->getConfigKey()] = $ui->input()->field()->file(

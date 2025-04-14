@@ -580,66 +580,107 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI
         $form  = $form->withRequest($DIC->http()->request());
         $form_data = $form->getData()['config'];
 
-
         $this->err_helper = false;
 
         $part_cert_configs = new ilParticipationCertificateConfigs();
         switch ($set_type) {
             case ilParticipationCertificateConfig::CONFIG_SET_TYPE_TEMPLATE:
-                //save Text
-                foreach ($form_data as $key => $value) {
-                    /**
-                     * @var ilFormPropertyGUI $item
-                     */
+                foreach ($form_data as $key => $item) {
+
+                    if($key !== 'config_title') {
+                        $config = ilParticipationCertificateConfig::where(array(
+                            'config_key' => $key,
+                            'global_config_id' => $global_config_id,
+                            // TODO ??? /*'config_value_type' => ilParticipationCertificateConfig::CONFIG_VALUE_TYPE_CERT_TEXT*/
+                        ))->first();
+                    }
+
+                    $input = $item;
+
                     switch ($key) {
                         case 'config_title':
-                            // TODO
-                            /**
-                             * @var ilParticipationCertificateGlobalConfigSet $global_config
-                             */
                             $global_config = ilParticipationCertificateGlobalConfigSet::findOrGetInstance($global_config_id);
-                            $global_config->setTitle($value);
+                            $global_config->setTitle($input);
                             $global_config->store();
+
                             break;
                         case 'logo':
-                            // TODO
-                            //Picture
-                            $file_data = $value;
-                            if ($file_data['tmp_name']) {
-                                ilParticipationCertificateConfig::storePicture($file_data, $global_config_id,
-                                    ilParticipationCertificateConfig::LOGO_FILE_NAME);
+                            $file = 'logo';
+                            if (!empty($input)) {
+                                $input = end($input);
+                            } else {
+                                $input = $config->getConfigValue();
                             }
+
+                            if (!empty($input)) {
+                                $global_config = $part_cert_configs->getParticipationTemplateConfigValueByKey(
+                                    $global_config_id,
+                                    $key
+                                );
+
+                                $global_config->setConfigValue($input);
+                                $global_config->store();
+
+                                ilParticipationCertificateFiles::setFile(
+                                    $global_config_id,
+                                    $file,
+                                    true
+                                );
+                            }
+
                             break;
                         case 'page1_issuer_signature':
-                            // TODO
-                            $file_data = $value;
-                            if ($file_data['tmp_name']) {
-                                /**
-                                 * @var array $input
-                                 */
-                                ilParticipationCertificateConfig::storePicture($file_data, $global_config_id,
-                                    ilParticipationCertificateConfig::ISSUER_SIGNATURE_FILE_NAME);
+                            $file = 'page1_issuer_signature';
+                            if (!empty($input)) {
+                                $file = 'page1_issuer_signature';
+                                $input = end($input);
+                            } else {
+                                $input = $config->getConfigValue();
                             }
+
+                            if (!empty($input)) {
+                                $global_config = $part_cert_configs->getParticipationTemplateConfigValueByKey(
+                                    $global_config_id,
+                                    $key
+                                );
+
+                                $global_config->setConfigValue($input);
+                                $global_config->store();
+
+                                ilParticipationCertificateFiles::setFile(
+                                    $global_config_id,
+                                    $file,
+                                    true
+                                );
+                            }
+
                             break;
                         default:
-                            // TODO
-                            if (is_array($value)) {
-                                echo $key;
-                                exit;
-                            }
-                            $global_config = $part_cert_configs->getParticipationTemplateConfigValueByKey($global_config_id, $key);
-                            $global_config->setConfigValue($value);
+                            $global_config = $part_cert_configs->getParticipationTemplateConfigValueByKey(
+                                $global_config_id,
+                                $key
+                            );
+
+                            $global_config->setConfigValue($input);
                             $global_config->store();
                             break;
                     }
                 }
                 break;
             case ilParticipationCertificateConfig::CONFIG_SET_TYPE_GLOBAL:
+                foreach ($form_data as $key => $item) {
+                    $file = null;
+                    $input = $item;
 
-                foreach ($form_data as $key => $value) {
                     switch ($key) {
                         case 'logo':
+                            $input = end($input);
 
+                            if (!empty($input)) {
+                                $file = 'logo';
+                            } else {
+                                $input = $item;
+                            }
                             break;
 
                         case 'true_name_helper':
@@ -647,13 +688,13 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI
                                 $key
                             );
 
-                            $userinput = trim($value);
+                            $userinput = trim($item);
                             if (!ctype_digit($userinput) and $userinput != "") {
                                 $userinput = "";
                                 $this->err_helper = true;
                             }
-                            $global_config->setConfigValue($userinput);
-                            $global_config->store();
+                            $input = $userinput;
+
                             break;
 
                         case 'color':
@@ -661,23 +702,21 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI
                             $global_config = $part_cert_configs->getParticipationGlobalConfigValueByKey($key);
 
                             $hexValue = $this->rgbToHex(
-                                $value->r(),
-                                $value->g(),
-                                $value->b()
+                                $item->r(),
+                                $item->g(),
+                                $item->b()
                             );
 
                             $hexValue = str_replace('#', '', $hexValue);
-
-                            $global_config->setConfigValue($hexValue);
-                            $global_config->store();
+                            $input = $hexValue;
 
                             break;
                         default:
-                            $global_config = $part_cert_configs->getParticipationGlobalConfigValueByKey($key);
-                            $global_config->setConfigValue($value);
-                            $global_config->store();
                             break;
                     }
+                    $global_config = $part_cert_configs->getParticipationGlobalConfigValueByKey($key);
+                    $global_config->setConfigValue($input);
+                    $global_config->store();
                 }
         }
 
