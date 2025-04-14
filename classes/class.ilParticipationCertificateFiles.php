@@ -198,17 +198,19 @@ class ilParticipationCertificateFiles extends ActiveRecord
                 $fileName
             );
 
-            $stream = \ILIAS\Filesystem\Stream\Streams::ofResource(
-                fopen($filePath, 'r')
-            );
+            if (is_file($filePath)) {
+                $stream = \ILIAS\Filesystem\Stream\Streams::ofResource(
+                    fopen($filePath, 'r')
+                );
 
-            $src = $DIC->fileDelivery()->buildTokenURL(
-                $stream,
-                $fileName,
-                \ILIAS\FileDelivery\Delivery\Disposition::INLINE,
-                $DIC->user()->getId(),
-                6
-            );
+                $src = $DIC->fileDelivery()->buildTokenURL(
+                    $stream,
+                    $fileName,
+                    \ILIAS\FileDelivery\Delivery\Disposition::INLINE,
+                    $DIC->user()->getId(),
+                    6
+                );
+            }
         }
         return $src;
     }

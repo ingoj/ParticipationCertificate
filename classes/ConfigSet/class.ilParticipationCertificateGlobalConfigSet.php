@@ -146,8 +146,7 @@ class ilParticipationCertificateGlobalConfigSet extends ActiveRecord {
             $config->setConfigType(ilParticipationCertificateConfig::CONFIG_SET_TYPE_TEMPLATE);
             $config->create();
 
-            if($file === 'logo' || $file === 'page1_issuer_signature') {
-
+            if(($file === 'logo' || $file === 'page1_issuer_signature')) {
                 ilParticipationCertificateFiles::setFile(
                     $config->getGlobalConfigId(),
                     $file,
