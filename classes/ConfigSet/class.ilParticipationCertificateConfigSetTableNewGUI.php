@@ -7,6 +7,9 @@ use ILIAS\UI\Component\Table as I;
 use ILIAS\Data\Range;
 use ILIAS\Data\Order;
 use ILIAS\UI\URLBuilder;
+use ILIAS\Data\URI;
+use ILIAS\UI\URLBuilderToken;
+
 
 class ilParticipationCertificateConfigSetTableNewGUI implements I\DataRetrieval
 {
@@ -14,6 +17,12 @@ class ilParticipationCertificateConfigSetTableNewGUI implements I\DataRetrieval
     protected DateFormat $current_user_date_format;
 
     protected ilParticipationCertificatePlugin $pl;
+
+    protected URLBuilderToken $action_parameter_token;
+
+    protected URLBuilderToken $row_id_token;
+
+    protected URLBuilderToken $config_type;
 
     public function __construct()
     {
@@ -29,16 +38,18 @@ class ilParticipationCertificateConfigSetTableNewGUI implements I\DataRetrieval
     //the repo is capable of building its table-view (similar to forms from a repo)
     public function getTableForRepresentation(): Data
     {
+        global $DIC;
+
         $actions = $this->getActions();
 
         return $this->ui_factory->table()->data(
             '',
             $this->getColumsForRepresentation(),
             $this
-        )->withActions($actions);
+        )->withActions($actions)/*
+        ->withRequest($DIC->http()->request())*/;
     }
 
-    //implementation of DataRetrieval - accept params and yield rows
     public function getRows(
         I\DataRowBuilder $row_builder,
         array $visible_column_ids,
@@ -47,12 +58,27 @@ class ilParticipationCertificateConfigSetTableNewGUI implements I\DataRetrieval
         ?array $filter_data,
         ?array $additional_parameters
     ): \Generator {
-        $icons = [
-            $this->ui_factory->symbol()->icon()->custom('templates/default/images/standard/icon_checked.svg', '', 'small'),
-            $this->ui_factory->symbol()->icon()->custom('templates/default/images/standard/icon_unchecked.svg', '', 'small')
-        ];
-        foreach ($this->doSelect($order, $range) as $idx => $record) {
-            yield $row_builder->buildDataRow($idx, $record);
+        $data = $this->doSelect($order, $range);
+
+        foreach ($data as $idx => $record) {
+            if($record['config_id'] === 0) {
+                yield $row_builder->buildDataRow($record['config_id'], $record)
+                                  ->withDisabledAction('copy')
+                                  ->withDisabledAction('delete')
+                                  ->withDisabledAction('activate');
+
+            } else if($record['order_by'] != 1) {
+                if ($record['active_status']) {
+                    yield $row_builder->buildDataRow($record['config_id'], $record)
+                                      ->withDisabledAction('deactivate');
+                } else {
+                    yield $row_builder->buildDataRow($record['config_id'], $record)
+                                      ->withDisabledAction('activate');
+                }
+            } else {
+                // TODO must limit the actions for the second entry
+                yield $row_builder->buildDataRow($record['config_id'], $record);
+            }
         }
     }
 
@@ -60,10 +86,10 @@ class ilParticipationCertificateConfigSetTableNewGUI implements I\DataRetrieval
     {
         $cols = array();
         $cols['order_by'] = array( 'txt' => $this->pl->txt('order_by'), 'default' => false, 'width' => 'auto' );
-        $cols['configset_type'] = array( 'txt' => $this->pl->txt('config_type'), 'default' => true, 'width' => 'auto' );
-        $cols['title'] = array( 'txt' => $this->pl->txt('title'), 'default' => true, 'width' => 'auto' );
-        $cols['parent_title'] = array( 'txt' => $this->pl->txt('parent_title'), 'default' => true, 'width' => 'auto' );
-        $cols['active'] = array( 'txt' => $this->pl->txt('active'), 'default' => true, 'width' => 'auto' );
+        $cols['configset_type'] = array( 'txt' => $this->pl->txt('config_type'), 'default' => '', 'width' => 'auto' );
+        $cols['title'] = array( 'txt' => $this->pl->txt('title'), 'default' => '', 'width' => 'auto' );
+        $cols['parent_title'] = array( 'txt' => $this->pl->txt('parent_title'), 'default' => '', 'width' => 'auto' );
+        $cols['active'] = array( 'txt' => $this->pl->txt('active'), 'default' => false, 'width' => 'auto' );
 
         return $cols;
     }
@@ -96,6 +122,8 @@ class ilParticipationCertificateConfigSetTableNewGUI implements I\DataRetrieval
         $f = $this->ui_factory;
 
         return  [
+            'order_by' => $f->table()->column()->text($columns['order_by']['txt'])
+                          ->withIsSortable(false),
             'configset_type' => $f->table()->column()->text($columns['configset_type']['txt'])
                           ->withIsSortable(false),
             'title' => $f->table()->column()->text($columns['title']['txt'])
@@ -107,6 +135,8 @@ class ilParticipationCertificateConfigSetTableNewGUI implements I\DataRetrieval
 
     protected function records()
     {
+        global $DIC;
+        $ui = $DIC->ui()->factory();
 
         $global_configs = new ilParticipationCertificateConfigSets();
         $data = $global_configs->getAllConfigSets();
@@ -115,18 +145,29 @@ class ilParticipationCertificateConfigSetTableNewGUI implements I\DataRetrieval
 
         $selectableColumns = $this->getSelectableColumns();
 
-
-
-
         foreach ($data as $configSet) {
             $active = 'inactive';
+            $activeStatus = false;
             $configSetType = '';
+            $configId = $configSet['conf_id'];
+            $configType = $configSet['configset_type'];
             /*foreach ($selectableColumns as $columnKey => $value) {*/
             foreach ($configSet as $key => $value) {
                 //if ($this->isColumnSelected($k)) { // TODO
 
                 switch ($key) {
                     case 'order_by':
+                        $value = intval($configSet[$key]) * 10;
+
+                        if($configSet[$key] > 0) {
+                           /* $configSet['order_by'] = $ui->input()->field()->text(
+                                ''
+                            )->withValue($value);*/
+                            $configSet['order_by'] = true;
+
+                        } else {
+                            $configSet['order_by'] = '';
+                        }
 
                         break;
                     case 'configset_type':
@@ -161,6 +202,7 @@ class ilParticipationCertificateConfigSetTableNewGUI implements I\DataRetrieval
                     case 'active':
                         if ((int)$configSet[$key] === 1) {
                             $active = 'active';
+                            $activeStatus = true;
                         }
                         break;
                     default:
@@ -170,10 +212,14 @@ class ilParticipationCertificateConfigSetTableNewGUI implements I\DataRetrieval
             }
 
             $tmp = [
+                'config_id' => $configId,
+                'config_type' => $configType,
+                'order_by' => $configSet['order_by'],
                 'configset_type' => $configSetType,
                 'title' => $configSet['title'],
                 'parent_title' => $configSet['parent_title'],
-                'active' => $active
+                'active' => $active,
+                'active_status' => $activeStatus
             ];
 
             $tableData[] = $tmp;
@@ -188,56 +234,59 @@ class ilParticipationCertificateConfigSetTableNewGUI implements I\DataRetrieval
 
         $f = $DIC['ui.factory'];
 
-        $df = new \ILIAS\Data\Factory();
 
-        /** this is the endpoint for actions, in this case the same page. */
-        $here_uri = $df->uri($DIC->http()->request()->getUri()->__toString());
-
-        /**
-         * Actions' commands and the row-ids affected are relayed to the server via GET.
-         * The URLBuilder orchestrates query-paramters (a.o. by assigning namespace)
-         */
-        $url_builder = new URLBuilder($here_uri);
-        $query_params_namespace = ['config'];
-
-        /**
-         * We have to claim those parameters. In return, there is a token to modify
-         * the value of the param; the tokens will work only with the given copy
-         * of URLBuilder, so acquireParameters will return the builder as first entry,
-         * followed by the tokens.
-         */
-        list($url_builder, $action_parameter_token, $row_id_token) =
+        $uri = $this->buildURI(ilParticipationCertificateConfigGUI::CMD_ACTION);
+        $url_builder = new URLBuilder($uri);
+        [$url_builder, $this->action_parameter_token, $this->row_id_token, $this->config_type] =
             $url_builder->acquireParameters(
-                $query_params_namespace,
-                'action', //this is the actions's parameter name
-                'id'   //this is the parameter name to be used for row-ids
+                ['config'],
+                'action',
+                'id',
+                'type'
             );
 
         $actions = [
             'edit' => $f->table()->action()->single(
                 'Edit',
-                $url_builder->withParameter($action_parameter_token, 'edit'),
-                $row_id_token
+                $url_builder->withParameter($this->action_parameter_token, 'edit'),
+                $this->row_id_token/*,
+                $this->config_type*/
             ),
             'copy' => $f->table()->action()->single(
                 'Copy',
-                $url_builder->withParameter($action_parameter_token, 'copy'),
-                $row_id_token
+                $url_builder->withParameter($this->action_parameter_token, 'copy'),
+                $this->row_id_token/*,
+                $this->config_type*/
             ),
             'delete' =>
                 $f->table()->action()->standard(
                     'Delete',
-                    $url_builder->withParameter($action_parameter_token, 'delete'),
-                    $row_id_token
+                    $url_builder->withParameter($this->action_parameter_token, 'delete'),
+                    $this->row_id_token/*,
+                    $this->config_type*/
                 ),
             'activate' =>
                 $f->table()->action()->standard(
                     'Activate',
-                    $url_builder->withParameter($action_parameter_token, 'activate'),
-                    $row_id_token
+                    $url_builder->withParameter($this->action_parameter_token, 'activate'),
+                    $this->row_id_token/*,
+                    $this->config_type*/
                 )
         ];
 
         return $actions;
+    }
+
+    private function buildURI(
+        string $command
+    ): URI {
+        global $DIC;
+
+        return new URI(
+            ILIAS_HTTP_PATH . '/' . $DIC->ctrl()->getLinkTargetByClass(
+                \ilParticipationCertificateConfigGUI::class,
+                $command
+            )
+        );
     }
 }

@@ -288,8 +288,6 @@ class ilParticipationCertificateGUI
 
                 default:
                     $configValue = $config->getConfigValue();
-                    /*$configValue = str_replace('{{', '[[', $configValue);
-                    $configValue = str_replace('}}', ']]', $configValue);*/
 
                     $configValue = $this->replacePlaceholdersFromOldVersion($configValue);
                     if($disabled){
@@ -439,6 +437,7 @@ class ilParticipationCertificateGUI
 
     public function setCertTemplate(): void
     {
+        // TODO filter_input(INPUT_POST, 'global_template_id') doesnt work in KS
         $cert_configs = new ilParticipationCertificateConfigs();
         if ($global_template_id = filter_input(INPUT_POST, 'global_template_id')) {
             $cert_configs->setObjToUseCertTemplate($this->groupRefId, $global_template_id);

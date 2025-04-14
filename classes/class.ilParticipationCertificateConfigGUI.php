@@ -25,6 +25,8 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI
 
     const CMD_SAVE = 'save';
 
+    const CMD_ACTION = 'action';
+
     const CMD_SAVE_ORDER = 'saveOrder';
     const CMD_CANCEL = 'cancel';
     protected ilParticipationCertificateConfig $object;
@@ -277,13 +279,42 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI
         $DIC->ui()->mainTemplate()->setContent($confirmation->getHTML());
     }
 
+    public function action()
+    {
+       global $DIC;
+
+
+        $action = $_GET['config_action'];
+
+
+        if (!empty($action)) {
+            switch ($action) {
+                case 'edit':
+
+                    dd("edit");
+                    //$this->ctrl->setParameter($this, "id", $new_config_set->getId());
+                    break;
+
+                case 'copy':
+
+                    break;
+
+                case 'delete':
+                    $this->deleteConfig();
+                    break;
+
+                case 'activate':
+                    break;
+            }
+        }
+    }
+
     /**
      * @throws ilCtrlException
      */
     public function deleteConfig(): void
     {
-        $id = filter_input(INPUT_GET, 'id');
-
+        $id = $_GET['config_id'][0];
         $gl_config = new ilParticipationCertificateGlobalConfigSet($id);
 
         if ($gl_config->getOrderBy() === 1) {
@@ -305,7 +336,11 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI
      */
     public function setActive(): void
     {
-        $id = filter_input(INPUT_GET, 'id');
+        //$id = filter_input(INPUT_GET, 'id');
+
+        $id = $_GET['config_id'][0];
+
+        dd($id);
 
         $gl_config = new ilParticipationCertificateGlobalConfigSet($id);
         $gl_config->setActive(1);
@@ -319,7 +354,10 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI
      */
     public function setInactive(): void
     {
-        $id = filter_input(INPUT_GET, 'id');
+        //$id = filter_input(INPUT_GET, 'id');
+        $id = $_GET['config_id'][0];
+
+        dd($id);
 
         $gl_config = new ilParticipationCertificateGlobalConfigSet($id);
 
@@ -908,29 +946,6 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI
     public function configure(): void
     {
         global $DIC;
-
-        $action = $_GET['config_action'];
-
-        if (!empty($action)) {
-            switch ($action) {
-                case 'edit':
-
-                    //$this->ctrl->setParameter($this, "id", $new_config_set->getId());
-                    break;
-
-                case 'copy':
-
-                    break;
-
-                case 'delete':
-
-                    break;
-
-                case 'activate':
-                    break;
-            }
-        }
-
 
         $r = $DIC['ui.renderer'];
 

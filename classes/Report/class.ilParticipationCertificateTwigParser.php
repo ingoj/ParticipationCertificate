@@ -152,70 +152,68 @@ class ilParticipationCertificateTwigParser {
 
         $this->usr_id = $this->excludeUsersFromPrintIfMissingUserData($this->usr_id);
 
+         foreach ($this->usr_id as $usr_id) {
+             $percentage = 0;
 
-        foreach ($this->usr_id as $usr_id) {
-            $percentage = 0;
-
-
-			//quickfix, wenn man user auswählt kann es sein, das $usr_id ein array bleibt. Das führt weiter unten zum crash. So wird das array aufgelöst.
-			if (is_array($usr_id)) {
-				$usr_id = $usr_id[0];
-			}
+             //quickfix, wenn man user auswählt kann es sein, das $usr_id ein array bleibt. Das führt weiter unten zum crash. So wird das array aufgelöst.
+             if (is_array($usr_id)) {
+                 $usr_id = $usr_id[0];
+             }
 
 
-			$processed_arr_text_values = $arr_config_text;
+             $processed_arr_text_values = $arr_config_text;
 
 
-			//Preprocess text values
-            foreach ($arr_config_text as $key => $value) {
-                $twig = new Twig\Environment(new Twig\Loader\ArrayLoader());
+             //Preprocess text values
+             foreach ($arr_config_text as $key => $value) {
+                 $twig = new Twig\Environment(new Twig\Loader\ArrayLoader());
 
-                // Twig use the placeholders {{ }}, but plugins the  [[ ]]
-                $value = $this->preparePlaceholdersForTwig($value);
+                 // Twig use the placeholders {{ }}, but plugins the  [[ ]]
+                 $value = $this->preparePlaceholdersForTwig($value);
 
-                $template = $twig->createTemplate((string)$value);
+                 $template = $twig->createTemplate((string)$value);
 
-                $peparsed_value = $template->render([
-                    'username' => ($arr_usr_data[$usr_id]->getPartCertSalutation() ?
-                            $arr_usr_data[$usr_id]->getPartCertSalutation() . ' ' : '') .
-                        $arr_usr_data[$usr_id]->getPartCertFirstname() . ' ' .
-                        $arr_usr_data[$usr_id]->getPartCertLastname(),
-                    'date' => $date->get(IL_CAL_FKT_DATE, 'd.m.Y')
-                ]);
+                 $peparsed_value = $template->render([
+                     'username' => ($arr_usr_data[$usr_id]->getPartCertSalutation() ?
+                             $arr_usr_data[$usr_id]->getPartCertSalutation() . ' ' : '') .
+                         $arr_usr_data[$usr_id]->getPartCertFirstname() . ' ' .
+                         $arr_usr_data[$usr_id]->getPartCertLastname(),
+                     'date' => $date->get(IL_CAL_FKT_DATE, 'd.m.Y')
+                 ]);
 
-                $processed_arr_text_values[$key] = $peparsed_value;
-            }
+                 $processed_arr_text_values[$key] = $peparsed_value;
+             }
 
-            //Learning Objective Master Course
-			$arr_usr_lo_master_crs = array();
-			if (is_array($arr_lo_master_crs[$usr_id])) {
-				$arr_usr_lo_master_crs = $arr_lo_master_crs[$usr_id];
-			}
-			if ($this->edited == true) {
-				$initial_test_state = $this->array[0];
-				$learn_sugg_result = $this->array[1];
-				$iass_state = $this->array[2];
-				$excercise_percentage = $this->array[3];
-			} else {
+             //Learning Objective Master Course
+             $arr_usr_lo_master_crs = array();
+             if (is_array($arr_lo_master_crs[$usr_id])) {
+                 $arr_usr_lo_master_crs = $arr_lo_master_crs[$usr_id];
+             }
+             if ($this->edited == true) {
+                 $initial_test_state = $this->array[0];
+                 $learn_sugg_result = $this->array[1];
+                 $iass_state = $this->array[2];
+                 $excercise_percentage = $this->array[3];
+             } else {
 
-				//Initial Test
-				$initial_test_state = 0;
-				if (key_exists($usr_id, $arr_initial_test_states) && is_object($arr_initial_test_states[$usr_id])) {
-					$initial_test_state = $arr_initial_test_states[$usr_id]->getCrsitestItestSubmitted();
-				}
-				//Percentage final tests of suggested modules
-				$learn_sugg_result = 0;
-				if (key_exists($usr_id, $arr_learn_sugg_results) && is_object($arr_learn_sugg_results[$usr_id])) {
-					$learn_sugg_result = $arr_learn_sugg_results[$usr_id]->getAveragePercentage(ilParticipationCertificateConfig::getConfig('calculation_type_processing_state_suggested_objectives',$_GET['ref_id']),true);
-				}
-				//Home Work
-				$excercise_percentage = 0;
-				if (key_exists($usr_id, $arr_excercise_states) && is_object($arr_excercise_states[$usr_id])) {
-					$excercise_percentage = $arr_excercise_states[$usr_id]->getPassedPercentage();
-				}
-			}
+                 //Initial Test
+                 $initial_test_state = 0;
+                 if (key_exists($usr_id, $arr_initial_test_states) && is_object($arr_initial_test_states[$usr_id])) {
+                     $initial_test_state = $arr_initial_test_states[$usr_id]->getCrsitestItestSubmitted();
+                 }
+                 //Percentage final tests of suggested modules
+                 $learn_sugg_result = 0;
+                 if (key_exists($usr_id, $arr_learn_sugg_results) && is_object($arr_learn_sugg_results[$usr_id])) {
+                     $learn_sugg_result = $arr_learn_sugg_results[$usr_id]->getAveragePercentage(ilParticipationCertificateConfig::getConfig('calculation_type_processing_state_suggested_objectives',$_GET['ref_id']),true);
+                 }
+                 //Home Work
+                 $excercise_percentage = 0;
+                 if (key_exists($usr_id, $arr_excercise_states) && is_object($arr_excercise_states[$usr_id])) {
+                     $excercise_percentage = $arr_excercise_states[$usr_id]->getPassedPercentage();
+                 }
+             }
 
-            /*Video Conferences */
+             /*Video Conferences */
             $countPassed = 0;
             $countTests = 0;
             if (key_exists($usr_id, $arr_new_iass_states) && is_array($arr_new_iass_states[$usr_id])) {

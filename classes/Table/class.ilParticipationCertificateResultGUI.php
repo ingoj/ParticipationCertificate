@@ -66,6 +66,7 @@ class ilParticipationCertificateResultGUI
             default:
                 $cmd = $this->ctrl->getCmd(self::CMD_CONTENT);
                 $this->tabs->activateTab(self::CMD_OVERVIEW);
+
                 switch ($cmd) {
                     case ilParticipationCertificateMultipleResultGUI::CMD_SHOW_ALL_RESULTS:
                         $this->ctrl->forwardCommand(new ilParticipationCertificateMultipleResultGUI());
@@ -210,6 +211,8 @@ class ilParticipationCertificateResultGUI
                 $arr_usr_data = ilPartCertUsersData::getData($this->pl, $usr_id);
                 $usr_id = $this->excludeUserIfDataMissing($usr_id, $arr_usr_data);
             }
+
+            // TODO Fix it. It returns empty pages if missing all users' data
 
             // Redirect if selected user's data or all users' data are missing
             if (empty($usr_id) || empty($usr_id[0])) {
