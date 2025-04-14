@@ -153,6 +153,7 @@ class ilParticipationCertificateConfigSetTableNewGUI implements I\DataRetrieval
             $configSetType = '';
             $configId = $configSet['conf_id'];
             $configType = $configSet['configset_type'];
+            $arr_type = [];
             /*foreach ($selectableColumns as $columnKey => $value) {*/
             foreach ($configSet as $key => $value) {
                 //if ($this->isColumnSelected($k)) { // TODO
@@ -161,15 +162,19 @@ class ilParticipationCertificateConfigSetTableNewGUI implements I\DataRetrieval
                     case 'order_by':
                         $value = intval($configSet[$key]) * 10;
 
-                        if($configSet[$key] > 0) {
-                           /* $configSet['order_by'] = $ui->input()->field()->text(
-                                ''
-                            )->withValue($value);*/
-                            $configSet['order_by'] = true;
+                        // TODO not possible to add input in table cell
+
+                        /*if($configSet[$key] > 0) {
+
+                            //$configSet['order_by'] = true;
 
                         } else {
                             $configSet['order_by'] = '';
-                        }
+                        }*/
+
+                        /*$configSet['order_by'] = $ui->input()->field()->text(
+                            ''
+                        )->withValue((string) $value);*/
 
                         break;
                     case 'configset_type':
@@ -189,6 +194,7 @@ class ilParticipationCertificateConfigSetTableNewGUI implements I\DataRetrieval
                                         $configSet['object_gl_conf_template_id']
                                     );
                                     $arr_type[] = $this->pl->txt('origin_template') . ": " . $template->getTitle();
+
                                     $configSetType = implode("<br/>", $arr_type);
                                     break;
                                 default:
