@@ -1049,10 +1049,9 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI
 
     protected function initTable()
     {
-        $repo = new ilParticipationCertificateConfigSetTableNewGUI();
+        $repo = new ilParticipationCertificateConfigSetTableGUI();
         return $repo->getTableForRepresentation();
 
-        //$this->table = new ilParticipationCertificateConfigSetTableGUI($this, self::CMD_CONFIGURE);
     }
 
     /**
