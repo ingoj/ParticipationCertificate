@@ -42,6 +42,7 @@ class ilParticipationCertificateConfigSetTableNewGUI implements I\DataRetrieval
 
         $actions = $this->getActions();
 
+
         return $this->ui_factory->table()->data(
             '',
             $this->getColumsForRepresentation(),
@@ -167,13 +168,13 @@ class ilParticipationCertificateConfigSetTableNewGUI implements I\DataRetrieval
 
                         // TODO not possible to add input in table cell
 
-                        /*if($configSet[$key] > 0) {
+                        if($value > 0) {
 
-                            //$configSet['order_by'] = true;
+                            $configSet['order_by'] = $value;
 
                         } else {
                             $configSet['order_by'] = '';
-                        }*/
+                        }
 
                         /*$configSet['order_by'] = $ui->input()->field()->text(
                             ''
