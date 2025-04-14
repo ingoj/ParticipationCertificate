@@ -331,6 +331,24 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI
         $configs = new ilParticipationCertificateConfigs();
         foreach ($configs->getGlobalConfigSet($id) as $config) {
             $config->delete();
+
+            switch($config->getConfigKey()) {
+                case 'logo':
+                case 'page1_issuer_signature':
+                    $file = ilParticipationCertificateFiles::getFile(
+                        $config->getGlobalConfigId(),
+                        $config->getConfigKey()
+
+                    );
+
+                    if (!empty($file)) {
+                        $file->delete();
+                    }
+                    break;
+
+                default:
+                    break;
+            }
         }
 
         $this->ctrl->redirect($this, self::CMD_CONFIGURE);
