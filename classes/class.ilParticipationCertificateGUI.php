@@ -346,16 +346,21 @@ class ilParticipationCertificateGUI
     }
 
     /**
-     * @return bool
      * @throws ilCtrlException|arException
      */
-    public function save(): bool
+    public function save()
     {
         global $DIC;
 
         $form = $this->initForm();
         $form  = $form->withRequest($DIC->http()->request());
         $form_data = $form->getData()['config'];
+
+        if ($form->getError()) {
+            $this->tpl->setOnScreenMessage(ilGlobalTemplateInterface::MESSAGE_TYPE_FAILURE, $form->getError());
+            $this->selfPrint();
+            return;
+        }
 
         foreach ($form_data as $key => $item) {
             $file = null;
@@ -575,6 +580,12 @@ class ilParticipationCertificateGUI
         $form  = $form->withRequest($DIC->http()->request());
         $form_data = $form->getData()['config'];
 
+        if ($form->getError()) {
+            $this->tpl->setOnScreenMessage(ilGlobalTemplateInterface::MESSAGE_TYPE_FAILURE, $form->getError());
+            $this->selfPrint();
+            return;
+        }
+
         $period = $form_data['period'];
         $ementoring = $form_data['ementoring'];
 
@@ -595,6 +606,10 @@ class ilParticipationCertificateGUI
         $this->ctrl->redirect($this, self::CMD_CONFIG_RESULT_TABLE);
     }
 
+    /**
+     * @throws ilCtrlException
+     * @throws ilTemplateException
+     */
     protected function selfPrint(): void
     {
         global $DIC;
@@ -642,12 +657,13 @@ class ilParticipationCertificateGUI
         $durationInput = $ui->input()->field()->duration($this->pl->txt('period'));
 
         $user = $DIC->user();
+
         if (!empty($startDate) && !empty($endDate)) {
             $period = $durationInput
                 ->withTimezone($user->getTimeZone())
                 ->withUseTime(false)
                 ->withLabels($this->pl->txt('start'), $this->pl->txt('end'))
-                ->withFormat($dataFactory->dateFormat()->germanShort())
+                ->withFormat($user->getDateFormat())
                 ->withMinValue($startDate)
                 ->withMaxValue($endDate)
                 ->withValue([$startDate, $endDate]);
@@ -656,16 +672,31 @@ class ilParticipationCertificateGUI
                 ->withTimezone($user->getTimeZone())
                 ->withUseTime(false)
                 ->withLabels($this->pl->txt('start'), $this->pl->txt('end'))
-                ->withFormat($dataFactory->dateFormat()->germanShort());
+                ->withFormat($user->getDateFormat());
         }
 
-        // TODO uncheck checkbox when 'enable_self_print' is 0
-        $inputFields['enable-self-printing'] = $ui->input()->field()->optionalGroup(
-            [
-                'period' => $period
-            ],
-            $this->pl->txt('enable_self_print')
-        );
+        //dd(boolval(ilParticipationCertificateConfig::getConfig('enable_self_print', $this->groupRefId)));
+
+
+        $selfPrintIsEnabled = boolval(ilParticipationCertificateConfig::getConfig('enable_self_print', $this->groupRefId));
+
+
+        if (!$selfPrintIsEnabled) {
+            $inputFields['enable-self-printing'] = $ui->input()->field()->optionalGroup(
+                [
+                    'period' => $period
+                ],
+                $this->pl->txt('enable_self_print')
+            )->withValue(null);
+
+        } else {
+            $inputFields['enable-self-printing'] = $ui->input()->field()->optionalGroup(
+                [
+                    'period' => $period
+                ],
+                $this->pl->txt('enable_self_print')
+            );
+        }
 
         $section = $ui->input()->field()->section(
             $inputFields,
@@ -699,7 +730,6 @@ class ilParticipationCertificateGUI
         $form  = $form->withRequest($DIC->http()->request());
         $formData = $form->getData();
 
-        // TODO implement this, in other files as well
         if ($form->getError()) {
             $this->tpl->setOnScreenMessage(ilGlobalTemplateInterface::MESSAGE_TYPE_FAILURE, $form->getError());
             $this->selfPrint();

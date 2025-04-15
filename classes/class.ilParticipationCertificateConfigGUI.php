@@ -407,9 +407,9 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI
     }
 
     /**
-     * @throws ilCtrlException
+     * @throws ilCtrlException|arException
      */
-    public function showForm(bool $err=false): void
+    public function showForm(): void
     {
         global $DIC;
 
