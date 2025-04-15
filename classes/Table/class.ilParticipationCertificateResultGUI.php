@@ -192,8 +192,6 @@ class ilParticipationCertificateResultGUI
     {
         $repo = new ilParticipationCertificateResultTableNewGUI();
         return $repo->getTableForRepresentation();
-
-        //$this->table = new ilParticipationCertificateResultTableGUI($this, self::CMD_CONTENT);
     }
 
     /**
@@ -214,6 +212,9 @@ class ilParticipationCertificateResultGUI
                 case 'show_all_results':
                     $singleResultGui = new ilParticipationCertificateSingleResultGUI();
                     $singleResultGui->display();
+
+                    //$t = new ilParticipationCertificateMultipleResultGUI();
+
                     break;
 
                 case 'adjust_results':
@@ -232,11 +233,6 @@ class ilParticipationCertificateResultGUI
         $cert_access = new ilParticipationCertificateAccess($_GET['ref_id']);
         if ($cert_access->hasCurrentUserPrintAccess()) {
             $ementor = false;
-           /* if ($_GET['ementor'] == 'true') {
-                $ementor = true;
-            }*/
-            //$usr_id[] = $_GET['usr_id'];
-
             $usr_id = [];
             if (!empty($_GET['config_entry'])) {
                 $urlParameters = $this->excludeURLParameters($_GET['config_entry'][0]);

@@ -418,23 +418,6 @@ class ilParticipationCertificateGUI
         return true;
     }
 
-
-    /*
-     *
-     * /
-    public function printPdf() {
-        $twigParser = new ilParticipationCertificateTwigParser($this->groupRefId);
-        $twigParser->parseData();
-    }
-    /*	/ **
-     *
-     * /
-    public function printPdfWithoutMentoring() {
-        $twigParser = new ilParticipationCertificateTwigParser($this->groupRefId,array(),false);
-        $twigParser->parseData();
-    }
-    */
-
     public function setCertTemplate(): void
     {
         // TODO filter_input(INPUT_POST, 'global_template_id') doesnt work in KS
