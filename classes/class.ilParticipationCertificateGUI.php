@@ -168,12 +168,93 @@ class ilParticipationCertificateGUI
 
         $form = $this->initForm();
 
+        $DIC->ui()->mainTemplate()->addOnLoadCode(<<<JS
+    const formToolbar = document.getElementById('ilToolbar');
+    const select = formToolbar.querySelector('select');
+
+    select.addEventListener('change', function(e) {
+       const selected = select ? select.value : null;
+               
+        formToolbar.querySelectorAll('.navbar-form button.btn[data-action]').forEach(btn => {
+          const baseUrl = btn.getAttribute('data-action');
+          const url = baseUrl.replace('__TEMPLATE__', encodeURIComponent(selected));
+          btn.setAttribute('data-action', url);
+        });
+    });
+    
+    formToolbar.querySelectorAll('.navbar-form button.btn[data-action]').forEach(btn => {
+      
+      /*// Ensure button is explicitly type="button" to avoid form submission
+        if (btn.type !== 'button') {
+            btn.setAttribute('type', 'button');
+        }
+        
+      const baseUrl = btn.getAttribute('data-action');
+      console.log("Base URL from getAttribute:", baseUrl);
+      */
+      
+        btn.addEventListener('click', function(e) {
+           
+          const toolbar = document.getElementById('ilToolbar');
+          toolbar.preventDefault();
+          alert("OK");
+          
+          window.location.href = 'test';
+            /*const selected = select ? select.value : null;
+            const baseUrl = btn.dataset.action;
+            
+            if (selected && baseUrl) {
+                const url = baseUrl.replace('__TEMPLATE__', encodeURIComponent(selected));
+                btn.setAttribute('data-action', url);
+                
+                 e.preventDefault();
+                 return;
+                //window.location.href = url;
+            } else {
+                console.warn("Missing selected value or data-action.");
+            }*/
+        });
+    });
+JS);
+
         $this->tpl->setContent($renderer->render($form));
         if (method_exists($this->tpl, 'printToStdout')) {
             $this->tpl->printToStdout();
         } else {
             $this->tpl->show();
         }
+    }
+
+    /**
+     * @throws ilCtrlException
+     */
+    private function initToolbar(): void
+    {
+        global $DIC;
+        $ui = $DIC->ui()->factory();
+
+
+        $this->toolbar->setFormAction(
+            $this->ctrl->getFormAction($this, self::CMD_CONFIG)
+        );
+
+        $cert_global_configs = new ilParticipationCertificateGlobalConfigSets();
+        $options_template = $cert_global_configs->getSelectOptions();
+        $select = $ui->input()->field()->select('', $options_template);
+
+        $this->toolbar->addComponent($select);
+
+        $button_fixed_form = $ui->button()->standard(
+            $this->pl->txt('btn_reset'),
+            $DIC->ctrl()->getLinkTarget($this, self::CMD_SET_CERT_TEMPLATE) . '&template_id=__TEMPLATE__'
+        );
+        $button_editable_form = $ui->button()->standard(
+            $this->pl->txt('btn_modify'),
+            $DIC->ctrl()->getLinkTarget($this, self::CMD_SET_OWN_CERT_TEXT_FROM_TEMPLATE) . '&template_id=__TEMPLATE__'
+        );
+
+        $this->toolbar->addComponent($button_fixed_form);
+        $this->toolbar->addComponent($button_editable_form);
     }
 
     /**
@@ -185,33 +266,9 @@ class ilParticipationCertificateGUI
         global $DIC;
         $ui = $DIC->ui()->factory();
 
-
-        $this->toolbar->setFormAction(
-            $this->ctrl->getFormAction($this, self::CMD_CONFIG)
-        );
-
         $inputFields = [];
 
-        $cert_global_configs = new ilParticipationCertificateGlobalConfigSets();
-        $options_template = $cert_global_configs->getSelectOptions();
-        $select = $ui->input()->field()->select('', $options_template);
-
-        $this->toolbar->addComponent($select);
-
-        //$this->ctrl->setParameterByClass(ilRepositoryGUI::class, 'global_template_id', $this->groupRefId);
-
-        $button_fixed_form = $ui->button()->standard(
-            $this->pl->txt('btn_reset'),
-            $DIC->ctrl()->getLinkTarget($this, self::CMD_SET_CERT_TEMPLATE)
-        );
-        $button_editable_form = $ui->button()->standard(
-            $this->pl->txt('btn_modify'),
-            $DIC->ctrl()->getLinkTarget($this, self::CMD_SET_OWN_CERT_TEXT_FROM_TEMPLATE)
-        );
-
-
-        $this->toolbar->addComponent($button_fixed_form);
-        $this->toolbar->addComponent($button_editable_form);
+        $this->initToolbar();
 
         $cert_configs = new ilParticipationCertificateConfigs();
         $arr_config = $cert_configs->getObjConfigSetIfNoneCreateDefaultAndCreateNewObjConfigValues($this->groupRefId);
@@ -437,8 +494,11 @@ class ilParticipationCertificateGUI
 
     public function setOwnCertTextFromTemplate(): void
     {
+        global $DIC;
+
         // TODO here should be passed the global_template_id.
         // TODO the filter_input(INPUT_POST, 'global_template_id') doesnt wor in KS
+
 
         $globalTemplateId = $_GET['global_template_id'];
         dd($globalTemplateId);
@@ -452,9 +512,9 @@ class ilParticipationCertificateGUI
         $this->ctrl->redirect($this, self::CMD_DISPLAY);
     }
 
-
     /**
      *
+     * @throws ilCtrlException
      */
     public function configResultTable(): void
     {
@@ -492,8 +552,6 @@ class ilParticipationCertificateGUI
 
         $ui = $DIC->ui()->factory();
 
-        $dataFactory = new Factory();
-
         $periodStart = ilParticipationCertificateConfig::getConfig('period_start', $this->groupRefId);
         $startDate = !empty($periodStart) ? DateTimeImmutable::createFromFormat('d.m.Y', $periodStart) : null;
 
@@ -507,7 +565,7 @@ class ilParticipationCertificateGUI
                 ->withTimezone($user->getTimeZone())
                 ->withUseTime(false)
                 ->withLabels($this->pl->txt('start'), $this->pl->txt('end'))
-                ->withFormat($dataFactory->dateFormat()->germanShort())
+                ->withFormat($user->getDateFormat())
                 ->withMinValue($startDate)
                 ->withMaxValue($endDate)
                 ->withValue([$startDate, $endDate]);
@@ -516,7 +574,7 @@ class ilParticipationCertificateGUI
                 ->withTimezone($user->getTimeZone())
                 ->withUseTime(false)
                 ->withLabels($this->pl->txt('start'), $this->pl->txt('end'))
-                ->withFormat($dataFactory->dateFormat()->germanShort());
+                ->withFormat($user->getDateFormat());
         }
 
         $inputFields['period'] = $period;
@@ -646,8 +704,6 @@ class ilParticipationCertificateGUI
 
         $ui = $DIC->ui()->factory();
 
-        $dataFactory = new Factory();
-
         $periodStart = ilParticipationCertificateConfig::getConfig('self_print_start', $this->groupRefId);
         $startDate = !empty($periodStart) ? DateTimeImmutable::createFromFormat('d.m.Y', $periodStart) : null;
 
@@ -675,11 +731,7 @@ class ilParticipationCertificateGUI
                 ->withFormat($user->getDateFormat());
         }
 
-        //dd(boolval(ilParticipationCertificateConfig::getConfig('enable_self_print', $this->groupRefId)));
-
-
         $selfPrintIsEnabled = boolval(ilParticipationCertificateConfig::getConfig('enable_self_print', $this->groupRefId));
-
 
         if (!$selfPrintIsEnabled) {
             $inputFields['enable-self-printing'] = $ui->input()->field()->optionalGroup(
