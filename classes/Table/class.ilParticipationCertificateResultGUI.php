@@ -87,6 +87,7 @@ class ilParticipationCertificateResultGUI
     public function content(): void
     {
         global $DIC;
+        $renderer = $DIC->ui()->renderer();
 
         $this->tpl->addCss($this->pl->getDirectory() . '/templates/css/participation-certificate.css');
 
@@ -108,27 +109,21 @@ class ilParticipationCertificateResultGUI
                     $this->pl->txt('header_btn_print_is_ementoring'),
                     $this->ctrl->getLinkTarget($this, $this::CMD_PRINT_PDF)
                 );
-                $toolbar->addComponent($toolbarButton);
+                $this->toolbar->addComponent($toolbarButton);
 
                 $this->ctrl->setParameter($this, 'ementor', false);
                 $toolbarButton = $ui->button()->standard(
                     $this->pl->txt('header_btn_print_no_ementoring'),
                     $this->ctrl->getLinkTarget($this, $this::CMD_PRINT_PDF)
                 );
-                $toolbar->addComponent($toolbarButton);
+                $this->toolbar->addComponent($toolbarButton);
             } else {
-                $b_print = ilLinkButton::getInstance();
-                $this->ctrl->setParameter($this, 'ementor', false);
-                $b_print->setCaption($this->pl->txt('header_btn_print'), false);
-                $b_print->setUrl($this->ctrl->getLinkTarget($this, $this::CMD_PRINT_PDF));
-                $this->toolbar->addButtonInstance($b_print);
-
                 $this->ctrl->setParameter($this, 'ementor', false);
                 $toolbarButton = $ui->button()->standard(
                     $this->pl->txt('header_btn_print'),
                     $this->ctrl->getLinkTarget($this, $this::CMD_PRINT_PDF)
                 );
-                $toolbar->addComponent($toolbarButton);
+                $this->toolbar->addComponent($toolbarButton);
             }
         }
         $target_ref = 0;
@@ -145,12 +140,20 @@ class ilParticipationCertificateResultGUI
                 $msgadd= $this->pl->txt('helper_action_pre') . $msgurl . $this->pl->txt('helper_action_post');
                 $this->tpl->setOnScreenMessage('info',$msgadd, true);
 				//Variants sendQuestion, send Info or unified Failure (with some codechange). two same not possible
-				}
-			}
-        
-        $this->initTable();
+            }
+        }
 
-        $this->tpl->setContent($this->table->getHTML());
+        $filterHtml = '';
+        if ($cert_access->hasCurrentUserWriteAccess()) {
+            $filterHtml .= $renderer->render($this->buildFilter());
+        }
+
+        $table = $this->initTable();
+        $tableHtml = $renderer->render($table->withRequest($DIC->http()->request()));
+
+
+        $this->tpl->setContent($filterHtml . $tableHtml);
+        /*$this->tpl->setContent($this->table->getHTML());*/
         if (method_exists($this->tpl, 'printToStdout')) {
             $this->tpl->printToStdout();
 
@@ -185,12 +188,41 @@ class ilParticipationCertificateResultGUI
     }
 
 
-    protected function initTable(bool $override = false): void
+    protected function initTable(bool $override = false)
     {
-//        $repo = new ilParticipationCertificateConfigSetTableNewGUI();
-//        return $repo->getTableForRepresentation();
+        $repo = new ilParticipationCertificateResultTableNewGUI();
+        return $repo->getTableForRepresentation();
 
-        $this->table = new ilParticipationCertificateResultTableGUI($this, self::CMD_CONTENT);
+        //$this->table = new ilParticipationCertificateResultTableGUI($this, self::CMD_CONTENT);
+    }
+
+    public function action()
+    {
+        $action = $_GET['config_action'];
+
+        if (!empty($action)) {
+            switch ($action) {
+                case 'edit':
+                    $this->showForm();
+                    break;
+
+                case 'copy':
+                    $this->copyConfig();
+                    break;
+
+                case 'delete':
+                    $this->deleteConfig();
+                    break;
+
+                case 'activate':
+                    $this->setActive();
+                    break;
+
+                case 'deactivate':
+                    $this->setInactive();
+                    break;
+            }
+        }
     }
 
     /**
@@ -351,4 +383,40 @@ class ilParticipationCertificateResultGUI
         }
         return array_values($usr_id);
     }
+
+    private function buildFilter()
+    {
+        global $DIC;
+        $ui = $DIC->ui()->factory();
+        $renderer = $DIC->ui()->renderer();
+
+        $inputFirstname = $ui->input()->field()->text('Firstname');
+        $inputLastname = $ui->input()->field()->text('Lastname');
+
+        $action = $DIC->ctrl()->getLinkTargetByClass(
+            self::class,
+            'content',
+            "",
+            true
+        );
+        $filter = $DIC->uiService()->filter()->standard(
+            'filter_ID',
+            $action,
+            [
+                'firstname' => $inputFirstname,
+                'lastname' => $inputLastname,
+            ],
+            [true, true],
+            true,
+            true,
+        );
+
+        return $filter;
+
+       /* //Step 3: Get filter data
+        $filter_data = $DIC->uiService()->filter()->getData($filter);
+
+        //Step 4: Render the filter
+        return $renderer->render($filter) . "Filter Data: " . print_r($filter_data, true);
+    */}
 }

@@ -35,20 +35,15 @@ class ilParticipationCertificateConfigSetTableGUI implements I\DataRetrieval
         $this->pl = ilParticipationCertificatePlugin::getInstance();
     }
 
-    //the repo is capable of building its table-view (similar to forms from a repo)
     public function getTableForRepresentation(): Data
     {
-        global $DIC;
-
         $actions = $this->getActions();
-
 
         return $this->ui_factory->table()->data(
             '',
             $this->getColumsForRepresentation(),
             $this
-        )->withActions($actions)/*
-        ->withRequest($DIC->http()->request())*/;
+        )->withActions($actions);
     }
 
     public function getRows(
@@ -59,8 +54,6 @@ class ilParticipationCertificateConfigSetTableGUI implements I\DataRetrieval
         ?array $filter_data,
         ?array $additional_parameters
     ): \Generator {
-        global $DIC;
-
         $data = $this->doSelect($order, $range);
 
         foreach ($data as $idx => $record) {
@@ -249,12 +242,11 @@ class ilParticipationCertificateConfigSetTableGUI implements I\DataRetrieval
 
         $uri = $this->buildURI(ilParticipationCertificateConfigGUI::CMD_ACTION);
         $url_builder = new URLBuilder($uri);
-        [$url_builder, $this->action_parameter_token, $this->row_id_token/*, $this->config_type*/] =
+        [$url_builder, $this->action_parameter_token, $this->row_id_token] =
             $url_builder->acquireParameters(
                 ['config'],
                 'action',
-                'entry'/*,
-                'type'*/
+                'entry'
             );
 
         $actions = [
@@ -291,6 +283,11 @@ class ilParticipationCertificateConfigSetTableGUI implements I\DataRetrieval
         return $actions;
     }
 
+    /**
+     * @param string $command
+     * @return URI
+     * @throws ilCtrlException
+     */
     private function buildURI(
         string $command
     ): URI {
