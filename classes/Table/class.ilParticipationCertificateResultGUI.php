@@ -196,30 +196,26 @@ class ilParticipationCertificateResultGUI
         //$this->table = new ilParticipationCertificateResultTableGUI($this, self::CMD_CONTENT);
     }
 
+    /**
+     * @throws ilCtrlException
+     */
     public function action()
     {
         $action = $_GET['config_action'];
 
         if (!empty($action)) {
             switch ($action) {
-                case 'edit':
-                    $this->showForm();
+                case 'print_with_ementorining':
+                case 'print_without_ementorining':
+                    $this->printPdf();
                     break;
 
-                case 'copy':
-                    $this->copyConfig();
+                case 'show_all_results':
+
                     break;
 
-                case 'delete':
-                    $this->deleteConfig();
-                    break;
+                case 'adjust_results':
 
-                case 'activate':
-                    $this->setActive();
-                    break;
-
-                case 'deactivate':
-                    $this->setInactive();
                     break;
             }
         }
@@ -233,21 +229,32 @@ class ilParticipationCertificateResultGUI
         $cert_access = new ilParticipationCertificateAccess($_GET['ref_id']);
         if ($cert_access->hasCurrentUserPrintAccess()) {
             $ementor = false;
-            if ($_GET['ementor'] == 'true') {
+           /* if ($_GET['ementor'] == 'true') {
                 $ementor = true;
-            }
-            $usr_id[] = $_GET['usr_id'];
+            }*/
+            //$usr_id[] = $_GET['usr_id'];
 
-            // If single print
-            if (!empty($usr_id[0])) {
+            $usr_id = [];
+            if (!empty($_GET['config_entry'])) {
+                $urlParameters = $this->excludeURLParameters($_GET['config_entry'][0]);
+                $userId = $urlParameters[0];
+                $ementor = (bool) $urlParameters[1];
+                $usr_id[] = $userId;
+            } else {
+                $cert_access = new ilParticipationCertificateAccess($this->groupRefId);
+                $userIds = $cert_access->getUserIdsOfGroup();
+                if (empty($usr_id)) {
+                    $usr_id = $userIds;
+                }
+            }
+
+            if (!empty($usr_id)) {
                 $arr_usr_data = ilPartCertUsersData::getData($this->pl, $usr_id);
                 $usr_id = $this->excludeUserIfDataMissing($usr_id, $arr_usr_data);
             }
 
-            // TODO Fix it. It returns empty pages if missing all users' data
-
             // Redirect if selected user's data or all users' data are missing
-            if (empty($usr_id) || empty($usr_id[0])) {
+            if (empty($usr_id)) {
                 $this->redirectWithError(self::CMD_CONTENT, $this->pl->txt('user_data_missing'));
             }
 
@@ -419,4 +426,13 @@ class ilParticipationCertificateResultGUI
         //Step 4: Render the filter
         return $renderer->render($filter) . "Filter Data: " . print_r($filter_data, true);
     */}
+
+    /**
+     * @param string $parameter
+     * @return string[]
+     */
+    private function excludeURLParameters(string $parameter): array
+    {
+        return explode('_', $parameter);
+    }
 }

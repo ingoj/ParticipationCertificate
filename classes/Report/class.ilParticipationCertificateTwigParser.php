@@ -27,13 +27,11 @@ class ilParticipationCertificateTwigParser {
 		$cert_access = new ilParticipationCertificateAccess($group_ref_id);
 
 		$this->usr_ids = $cert_access->getUserIdsOfGroup();
-
 		$this->usr_id = $usr_id;
-		//wenn keine $usr_id übegeben wird, werden alle in der Gruppe gedruckt
-		if ($usr_id[0] == NULL || $usr_id == NULL) {
-			$this->usr_id = $this->usr_ids;
-		}
-        $this->usr_ids = $this->excludeUsersFromPrintIfMissingUserData($this->usr_ids);
+
+        if (empty($this->usr_id)) {
+            $this->usr_id = $this->usr_ids;
+        }
 
 		$this->ementor = $ementor;
 		//wenn die Resultate bearbeitet wurden wird automatisch der footer auf true gesetzt
@@ -145,12 +143,13 @@ class ilParticipationCertificateTwigParser {
         }
 
 		//quickfix, wenn nur ein User $this->usr_id ist kein array -> foreach kann also nicht gebraucht werden. Jetzt wird ein array erstellt auch wenn nur ein user
-		if (!is_array($this->usr_id)) {
+	/*	if (!is_array($this->usr_id)) {
 			$usr = $this->usr_id;
 			$this->usr_id = array( $usr );
-		}
+		}*/
 
-        $this->usr_id = $this->excludeUsersFromPrintIfMissingUserData($this->usr_id);
+
+         $this->usr_id = $this->excludeUsersFromPrintIfMissingUserData($this->usr_id);
 
          foreach ($this->usr_id as $usr_id) {
              $percentage = 0;

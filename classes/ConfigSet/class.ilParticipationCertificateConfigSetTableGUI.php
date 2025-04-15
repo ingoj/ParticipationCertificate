@@ -233,13 +233,14 @@ class ilParticipationCertificateConfigSetTableGUI implements I\DataRetrieval
         return $tableData;
     }
 
-    private function getActions()
+    /**
+     * @throws ilCtrlException
+     */
+    private function getActions(): array
     {
         global $DIC;
 
         $f = $DIC['ui.factory'];
-
-
         $uri = $this->buildURI(ilParticipationCertificateConfigGUI::CMD_ACTION);
         $url_builder = new URLBuilder($uri);
         [$url_builder, $this->action_parameter_token, $this->row_id_token] =
