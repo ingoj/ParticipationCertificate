@@ -212,6 +212,8 @@ class ilParticipationCertificateResultGUI
 
                 case 'show_all_results':
 
+                    $singleResultGui = new ilParticipationCertificateSingleResultGUI();
+                    $singleResultGui->display();
                     break;
 
                 case 'adjust_results':

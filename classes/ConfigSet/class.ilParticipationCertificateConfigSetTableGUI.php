@@ -262,19 +262,19 @@ class ilParticipationCertificateConfigSetTableGUI implements I\DataRetrieval
                 $this->row_id_token
             ),
             'delete' =>
-                $f->table()->action()->standard(
+                $f->table()->action()->single(
                     'Delete',
                     $url_builder->withParameter($this->action_parameter_token, 'delete'),
                     $this->row_id_token
                 ),
             'activate' =>
-                $f->table()->action()->standard(
+                $f->table()->action()->single(
                     'Activate',
                     $url_builder->withParameter($this->action_parameter_token, 'activate'),
                     $this->row_id_token
                 ),
             'deactivate' =>
-                $f->table()->action()->standard(
+                $f->table()->action()->single(
                     'Deactivate',
                     $url_builder->withParameter($this->action_parameter_token, 'deactivate'),
                     $this->row_id_token

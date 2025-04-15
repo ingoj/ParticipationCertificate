@@ -61,17 +61,10 @@ class ilParticipationCertificateResultTableNewGUI implements I\DataRetrieval
         $this->ctrl = $DIC->ctrl();
         $this->tabs = $DIC->tabs();
         $this->pl = ilParticipationCertificatePlugin::getInstance();
-
         $this->refId = $_GET['ref_id'];
-
-      /*  $this->setPrefix('dhbw_part_cert');
-        $this->setFormName('dhbw_part_cert');
-        $this->setId('dhbw_part_cert');*/
 
         $cert_access = new ilParticipationCertificateAccess($_GET['ref_id']);
         $this->usr_ids = $cert_access->getUserIdsOfGroup();
-
-       /* parent::__construct($a_parent_obj, $a_parent_cmd);*/
 
         $ementoring=ilParticipationCertificateConfig::getConfig('enable_ementoring', $_GET['ref_id']);
         if ($ementoring === NULL) {
@@ -80,31 +73,6 @@ class ilParticipationCertificateResultTableNewGUI implements I\DataRetrieval
             $ementoring = boolval($ementoring);
         }
         $this->ementoring = $ementoring;
-        /*$this->getEnableHeader();
-        $this->setTitle($this->pl->txt('tbl_overview_results'));
-        $this->addColumns();
-        $this->setPreventDoubleSubmission(false);
-        $this->setExportFormats(array( self::EXPORT_EXCEL, self::EXPORT_CSV ));*/
-       /* if ($cert_access->hasCurrentUserWriteAccess()) {
-            $this->initFilter();
-            $this->setSelectAllCheckbox('record_ids');
-            if ($this->ementoring) {
-                $this->addMultiCommand(ilParticipationCertificateResultGUI::CMD_PRINT_SELECTED, $this->pl->txt('list_print_with'));
-                $this->addMultiCommand(ilParticipationCertificateResultGUI::CMD_PRINT_SELECTED_WITHOUTE_MENTORING, $this->pl->txt('list_print_without'));
-            } else {
-                $this->addMultiCommand(ilParticipationCertificateResultGUI::CMD_PRINT_SELECTED_WITHOUTE_MENTORING, $this->pl->txt('list_print'));
-            }
-            $this->addMultiCommand(ilParticipationCertificateMultipleResultGUI::CMD_SHOW_ALL_RESULTS, $this->pl->txt('list_overview'));
-        }
-
-
-        $this->setRowTemplate('tpl.default_row.html', $this->pl->getDirectory());
-        $this->setFormAction($this->ctrl->getFormAction($a_parent_obj));
-
-        $this->parseData();*/
-
-
-
     }
 
     public function getTableForRepresentation(): Data
@@ -219,7 +187,6 @@ class ilParticipationCertificateResultTableNewGUI implements I\DataRetrieval
         return count($this->records());
     }
 
-    //do the actual reading - note, that e.g. order and range are easily converted to SQL
     protected function doSelect(Order $order, Range $range): array
     {
         $sql_order_part = $order->join('ORDER BY', fn(...$o) => implode(' ', $o));
@@ -259,17 +226,10 @@ class ilParticipationCertificateResultTableNewGUI implements I\DataRetrieval
         $arr_usr_data = ilPartCertUsersData::getData($this->pl, $this->usr_ids);
         $arr_initial_test_states = ilCrsInitialTestStates::getData($this->usr_ids);
         $arr_learn_reached_percentages = ilLearnObjectSuggResults::getData($this->usr_ids);
-
-
         $arr_final_tests = ilLearnObjectFinalTestStates::getData($this->usr_ids);
-
         $arr_new_iass_states = ilIassStatesMulti::getData($this->usr_ids, $this->refId);
-
         $arr_xali_states = xaliStates::getData($this->usr_ids, $this->refId);
-
-
         $arr_excercise_states = ilExcerciseStates::getData($this->usr_ids, $this->refId);
-        //$arr_FinalTestsStates = ilLearnObjectFinalTestOfSuggStates::getData($this->usr_ids);
 
         $rows = array();
         foreach ($this->usr_ids as $usr_id) {
@@ -298,14 +258,10 @@ class ilParticipationCertificateResultTableNewGUI implements I\DataRetrieval
                 $row['initial_test_finished'] = $this->pl->txt("no");
             }
             if ((key_exists($usr_id, $arr_learn_reached_percentages)) && (is_object($arr_learn_reached_percentages[$usr_id]))) {
-
-
                 $row['result_qualifing_tests'] = $this->buildProgressBar($arr_learn_reached_percentages[$usr_id]->getAveragePercentage(ilParticipationCertificateConfig::getConfig('calculation_type_processing_state_suggested_objectives',$_GET['ref_id'])
                 ), $arr_learn_reached_percentages[$usr_id]->getLimitPercentage());
 
-
             } else {
-                //$row['result_qualifing_tests'] = 0 . '%';
                 $row['result_qualifing_tests'] = $this->buildProgressBar(0,0);
             }
 
@@ -336,12 +292,9 @@ class ilParticipationCertificateResultTableNewGUI implements I\DataRetrieval
                             }
                         }
                     }
-
                 }
 
                 $array_results = $rec_array;
-               /* $row['results_qualifing_tests'] = $array_results;*/
-
                 $row['results_qualifing_tests'] = implode('<br/><br/>', $array_results);
 
             } else {
@@ -364,9 +317,6 @@ class ilParticipationCertificateResultTableNewGUI implements I\DataRetrieval
 
             if($countTests > 0) {
                 $percentage = $countPassed / $countTests * 100;
-
-
-
                 switch ($countTests) {
                     case 1:
                         if ($countPassed == 1) {
@@ -385,11 +335,9 @@ class ilParticipationCertificateResultTableNewGUI implements I\DataRetrieval
 
             if (key_exists($usr_id, $arr_excercise_states) && is_object($arr_excercise_states[$usr_id])) {
                 $row['eMentoring_homework'] = $arr_excercise_states[$usr_id]->getPassed();
-                //$row['eMentoring_percentage'] = $arr_excercise_states[$usr_id]->getPassedPercentage() . '%';
                 $row['eMentoring_percentage'] = $this->buildProgressBar($arr_excercise_states[$usr_id]->getPassedPercentage(),0);
             } else {
                 $row['eMentoring_homework'] = 0;
-                //$row['eMentoring_percentage'] = 0 . '%';
                 $row['eMentoring_percentage'] = $this->buildProgressBar(0,0);
             }
 
@@ -405,9 +353,6 @@ class ilParticipationCertificateResultTableNewGUI implements I\DataRetrieval
                 $rows[] = $row;
             }
         }
-
-        //$this->setData($rows);
-
         return $rows;
 
     }
@@ -430,12 +375,12 @@ class ilParticipationCertificateResultTableNewGUI implements I\DataRetrieval
             );
 
         $actions = [
-            'print_with_ementorining' => $f->table()->action()->single(
+            'print_with_ementorining' => $f->table()->action()->standard(
                 $this->pl->txt('list_print_with'),
                 $url_builder->withParameter($this->action_parameter_token, 'print_with_ementorining'),
                 $this->row_id_token
             ),
-            'print_without_ementorining' => $f->table()->action()->single(
+            'print_without_ementorining' => $f->table()->action()->standard(
                 $this->pl->txt('list_print_without'),
                 $url_builder->withParameter($this->action_parameter_token, 'print_without_ementorining'),
                 $this->row_id_token
@@ -443,7 +388,7 @@ class ilParticipationCertificateResultTableNewGUI implements I\DataRetrieval
             'show_all_results' => $f->table()->action()->standard(
                     $this->pl->txt('list_overview'),
                     $url_builder->withParameter($this->action_parameter_token, 'show_all_results'),
-                $this->row_id_token
+                    $this->row_id_token
                 ),
         ];
         $cert_access = new ilParticipationCertificateAccess($this->refId);
@@ -471,11 +416,6 @@ class ilParticipationCertificateResultTableNewGUI implements I\DataRetrieval
             $end = new DateTime($end);
             $current = new DateTime();
 
-            // Test
-            /*$start = new DateTime("2018-01-01");
-            $end = new DateTime("2018-06-30");
-            $current = new DateTime("2018-03-26");*/
-
             if ($current >= $start) {
                 if ($current <= $end) {
                     // Running
@@ -486,8 +426,6 @@ class ilParticipationCertificateResultTableNewGUI implements I\DataRetrieval
                     // Ended
                     $perc_limit = 100;
                 }
-
-
 
                 if ($a_perc_result >= 90) {
                     // 90% reached
@@ -534,7 +472,6 @@ class ilParticipationCertificateResultTableNewGUI implements I\DataRetrieval
                 $css_class = self::RED_PROGRESS;
             }
         }
-
         return ilContainerObjectiveGUI::renderProgressBar($a_perc_result, $perc_limit, $css_class);
     }
 

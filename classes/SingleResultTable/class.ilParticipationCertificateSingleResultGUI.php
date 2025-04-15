@@ -62,9 +62,12 @@ class ilParticipationCertificateSingleResultGUI
         $this->usr_ids = $cert_access->getUserIdsOfGroup();
 
         $usr_id = $_GET[self::IDENTIFIER];
+
+        if(empty($usr_id) && !empty($_GET['config_entry'])) {
+            $urlParameters = $this->excludeURLParameters($_GET['config_entry'][0]);
+            $usr_id = (int) $urlParameters[0];
+        }
         $this->usr_id = $usr_id;
-
-
     }
 
     public function executeCommand(): void
@@ -102,6 +105,15 @@ class ilParticipationCertificateSingleResultGUI
     }
     public function initTable($override = false): void
     {
-        $this->table = new ilParticipationCertificateSingleResultTableGUI($this, ilParticipationCertificateSingleResultGUI::CMD_DISPLAY, $_GET[ilParticipationCertificateSingleResultGUI::IDENTIFIER]);
+        $this->table = new ilParticipationCertificateSingleResultTableGUI($this, ilParticipationCertificateSingleResultGUI::CMD_DISPLAY, $this->usr_id);
+    }
+
+    /**
+     * @param string $parameter
+     * @return string[]
+     */
+    private function excludeURLParameters(string $parameter): array
+    {
+        return explode('_', $parameter);
     }
 }
