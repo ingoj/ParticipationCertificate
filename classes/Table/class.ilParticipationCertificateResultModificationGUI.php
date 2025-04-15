@@ -70,7 +70,13 @@ class ilParticipationCertificateResultModificationGUI
         $this->ctrl->saveParameterByClass(ilParticipationCertificateResultGUI::class, 'usr_id');
         $cert_access = new ilParticipationCertificateAccess($_GET['ref_id']);
         $this->usr_ids = $cert_access->getUserIdsOfGroup();
+
         $usr_id = $_GET[self::IDENTIFIER];
+
+        if(empty($usr_id)) {
+            $urlParameters = $this->excludeURLParameters($_GET['config_entry'][0]);
+            $usr_id = (int) $urlParameters[0];
+        }
         $this->usr_id = $usr_id;
 
         $this->arr_usr_data = ilPartCertUsersData::getData($this->pl, $this->usr_ids);
@@ -83,6 +89,7 @@ class ilParticipationCertificateResultModificationGUI
 
         $this->ctrl->setParameterByClass(ilParticipationCertificateResultModificationGUI::class, 'edited', true);
         $this->ctrl->setParameterByClass(ilParticipationCertificateResultModificationGUI::class, 'ementor', true);
+        $this->ctrl->setParameterByClass(ilParticipationCertificateResultModificationGUI::class, 'usr_id', $this->usr_id);
     }
 
 
@@ -148,6 +155,12 @@ class ilParticipationCertificateResultModificationGUI
         $ui = $this->dic->ui()->factory();
 
         $usr_id = $_GET[self::IDENTIFIER];
+
+        if(empty($usr_id)) {
+            $urlParameters = $this->excludeURLParameters($_GET['config_entry'][0]);
+            $usr_id = (int) $urlParameters[0];
+        }
+
         $arr_usr_data = ilPartCertUsersData::getData($this->pl, $this->usr_ids);
         $name_user = $arr_usr_data[$usr_id]->getPartCertFirstname() . ' ' . $arr_usr_data[$usr_id]->getPartCertLastname();
 
@@ -192,26 +205,24 @@ class ilParticipationCertificateResultModificationGUI
      */
     public function getFormData(): array
     {
-        $usr_id = $_GET[self::IDENTIFIER];
-
         $array = [];
-        if (key_exists($usr_id, $this->arr_initial_test_states) && is_object($this->arr_initial_test_states[$usr_id])) {
-            $array['initial'] = $this->arr_initial_test_states[$usr_id]->getCrsitestItestSubmitted();
+        if (key_exists($this->usr_id, $this->arr_initial_test_states) && is_object($this->arr_initial_test_states[$this->usr_id])) {
+            $array['initial'] = $this->arr_initial_test_states[$this->usr_id]->getCrsitestItestSubmitted();
         } else {
             $array['initial'] = 0;
         }
-        if (key_exists($usr_id, $this->arr_learn_reached_percentages) && is_object($this->arr_learn_reached_percentages[$usr_id])) {
-            $array['resultstest'] = $this->arr_learn_reached_percentages[$usr_id]->getAveragePercentage(ilParticipationCertificateConfig::getConfig('calculation_type_processing_state_suggested_objectives', $_GET['ref_id']));
+        if (key_exists($this->usr_id, $this->arr_learn_reached_percentages) && is_object($this->arr_learn_reached_percentages[$this->usr_id])) {
+            $array['resultstest'] = $this->arr_learn_reached_percentages[$this->usr_id]->getAveragePercentage(ilParticipationCertificateConfig::getConfig('calculation_type_processing_state_suggested_objectives', $_GET['ref_id']));
         } else {
             $array['resultstest'] = 0;
         }
-        if (key_exists($usr_id, $this->arr_iass_states) && is_object($this->arr_iass_states[$usr_id])) {
-            $array['conf'] = $this->arr_iass_states[$usr_id]->getPassed();
+        if (key_exists($this->usr_id, $this->arr_iass_states) && is_object($this->arr_iass_states[$this->usr_id])) {
+            $array['conf'] = $this->arr_iass_states[$this->usr_id]->getPassed();
         } else {
             $array['conf'] = 0;
         }
-        if (key_exists($usr_id, $this->arr_excercise_states) && is_object($this->arr_excercise_states[$usr_id])) {
-            $array['homework'] = $this->arr_excercise_states[$usr_id]->getPassedPercentage();
+        if (key_exists($this->usr_id, $this->arr_excercise_states) && is_object($this->arr_excercise_states[$this->usr_id])) {
+            $array['homework'] = $this->arr_excercise_states[$this->usr_id]->getPassedPercentage();
         } else {
             $array['homework'] = 0;
         }
@@ -264,5 +275,14 @@ class ilParticipationCertificateResultModificationGUI
     {
         $this->tpl->setOnScreenMessage('failure', $msg, true);
         $this->ctrl->redirect($this, $cmd);
+    }
+
+    /**
+     * @param string $parameter
+     * @return string[]
+     */
+    private function excludeURLParameters(string $parameter): array
+    {
+        return explode('_', $parameter);
     }
 }

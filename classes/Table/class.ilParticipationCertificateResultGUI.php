@@ -198,6 +198,7 @@ class ilParticipationCertificateResultGUI
 
     /**
      * @throws ilCtrlException
+     * @throws ilTemplateException
      */
     public function action()
     {
@@ -211,13 +212,13 @@ class ilParticipationCertificateResultGUI
                     break;
 
                 case 'show_all_results':
-
                     $singleResultGui = new ilParticipationCertificateSingleResultGUI();
                     $singleResultGui->display();
                     break;
 
                 case 'adjust_results':
-
+                    $resultModificationGui = new ilParticipationCertificateResultModificationGUI();
+                    $resultModificationGui->display();
                     break;
             }
         }
