@@ -52,6 +52,7 @@ enable_self_print#:#Selbstausdruck aktivieren
 color#:#Farbe empfohlene LZ
 keyword#:#Keyword
 logo#:#Logo
+page1_issuer_signature#:#page1_issuer_signature
 udf_percent_value#:#Schwellenwert Videokonferenzen (Prozent)
 placeholders#:#Folgende Platzhalter sind verfügbar:
 yes#:#Ja

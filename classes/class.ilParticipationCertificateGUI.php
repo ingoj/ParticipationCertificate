@@ -168,55 +168,6 @@ class ilParticipationCertificateGUI
 
         $form = $this->initForm();
 
-        $DIC->ui()->mainTemplate()->addOnLoadCode(<<<JS
-    const formToolbar = document.getElementById('ilToolbar');
-    const select = formToolbar.querySelector('select');
-
-    select.addEventListener('change', function(e) {
-       const selected = select ? select.value : null;
-               
-        formToolbar.querySelectorAll('.navbar-form button.btn[data-action]').forEach(btn => {
-          const baseUrl = btn.getAttribute('data-action');
-          const url = baseUrl.replace('__TEMPLATE__', encodeURIComponent(selected));
-          btn.setAttribute('data-action', url);
-        });
-    });
-    
-    formToolbar.querySelectorAll('.navbar-form button.btn[data-action]').forEach(btn => {
-      
-      /*// Ensure button is explicitly type="button" to avoid form submission
-        if (btn.type !== 'button') {
-            btn.setAttribute('type', 'button');
-        }
-        
-      const baseUrl = btn.getAttribute('data-action');
-      console.log("Base URL from getAttribute:", baseUrl);
-      */
-      
-        btn.addEventListener('click', function(e) {
-           
-          const toolbar = document.getElementById('ilToolbar');
-          toolbar.preventDefault();
-          alert("OK");
-          
-          window.location.href = 'test';
-            /*const selected = select ? select.value : null;
-            const baseUrl = btn.dataset.action;
-            
-            if (selected && baseUrl) {
-                const url = baseUrl.replace('__TEMPLATE__', encodeURIComponent(selected));
-                btn.setAttribute('data-action', url);
-                
-                 e.preventDefault();
-                 return;
-                //window.location.href = url;
-            } else {
-                console.warn("Missing selected value or data-action.");
-            }*/
-        });
-    });
-JS);
-
         $this->tpl->setContent($renderer->render($form));
         if (method_exists($this->tpl, 'printToStdout')) {
             $this->tpl->printToStdout();
@@ -247,11 +198,46 @@ JS);
         $button_fixed_form = $ui->button()->standard(
             $this->pl->txt('btn_reset'),
             $DIC->ctrl()->getLinkTarget($this, self::CMD_SET_CERT_TEMPLATE) . '&template_id=__TEMPLATE__'
-        );
+        )->withOnLoadCode(function ($id) {
+            return <<<JS
+                const select = $('#ilToolbar select'); 
+                const btn = $('#$id');
+                
+                $('#$id').click(function(e) {
+                    e.preventDefault();
+                  
+                    const selected = select ? select.val() : null;
+                    const baseUrl = $('#$id').data('action');
+                    const url = baseUrl.replace('__TEMPLATE__', encodeURIComponent(selected));
+                   
+                    btn.closest('form').attr('action', url);
+                    btn.closest('form').submit();
+                });
+        JS;
+        });;
+
+
         $button_editable_form = $ui->button()->standard(
             $this->pl->txt('btn_modify'),
             $DIC->ctrl()->getLinkTarget($this, self::CMD_SET_OWN_CERT_TEXT_FROM_TEMPLATE) . '&template_id=__TEMPLATE__'
-        );
+        )->withOnLoadCode(function ($id) {
+            return <<<JS
+                const select = $('#ilToolbar select'); 
+                const btn = $('#$id');
+                
+                $('#$id').click(function(e) {
+                    e.preventDefault();
+                  
+                    const selected = select ? select.val() : null;
+                    const baseUrl = $('#$id').data('action');
+                    const url = baseUrl.replace('__TEMPLATE__', encodeURIComponent(selected));
+                   
+                    btn.closest('form').attr('action', url);
+                    btn.closest('form').submit();
+            });
+        JS;
+        });
+
 
         $this->toolbar->addComponent($button_fixed_form);
         $this->toolbar->addComponent($button_editable_form);
@@ -499,8 +485,9 @@ JS);
         // TODO here should be passed the global_template_id.
         // TODO the filter_input(INPUT_POST, 'global_template_id') doesnt wor in KS
 
+dd(filter_input(INPUT_GET, 'template_id'));
 
-        $globalTemplateId = $_GET['global_template_id'];
+        $globalTemplateId = $_GET['template_id'];
         dd($globalTemplateId);
 
         $cert_configs = new ilParticipationCertificateConfigs();
