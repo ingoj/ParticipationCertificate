@@ -246,6 +246,28 @@ class ilParticipationCertificateTwigParser {
                 $iass_states =  "<img alt='' src=" . ILIAS_ABSOLUTE_PATH . "/" . $this->pl->getImagePath("not_attempted_s.png") . ">";
             }
 
+            if (empty($logo_path) && !empty($processed_arr_text_values['logo'])) {
+                $file = new ilParticipationCertificateFiles();
+                $src = $file->getFileSrcByStorageType(
+                    $processed_arr_text_values['logo'],
+                    $this->group_ref_id,
+                    'logo'
+                );
+
+                $logo_path = $src;
+            }
+
+             if (empty($page1_issuer_signature) && !empty($processed_arr_text_values['page1_issuer_signature'])) {
+                 $file = new ilParticipationCertificateFiles();
+                 $src = $file->getFileSrcByStorageType(
+                     $processed_arr_text_values['page1_issuer_signature'],
+                     $this->group_ref_id,
+                     'page1_issuer_signature'
+                 );
+
+                 $page1_issuer_signature = $src;
+             }
+
 			$arr_render = array(
 				'text_values' => $processed_arr_text_values,
 				'show_ementoring' => $this->ementor,

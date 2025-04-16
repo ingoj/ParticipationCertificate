@@ -385,7 +385,7 @@ class ilParticipationCertificateResultTableNewGUI implements I\DataRetrieval
                 $url_builder->withParameter($this->action_parameter_token, 'print_without_ementorining'),
                 $this->row_id_token
             ),
-            'show_all_results' => $f->table()->action()->standard(
+            'show_all_results' => $f->table()->action()->single(
                     $this->pl->txt('list_overview'),
                     $url_builder->withParameter($this->action_parameter_token, 'show_all_results'),
                     $this->row_id_token
