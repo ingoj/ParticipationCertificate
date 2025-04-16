@@ -468,34 +468,26 @@ class ilParticipationCertificateGUI
 
     public function setCertTemplate(): void
     {
-        // TODO filter_input(INPUT_POST, 'global_template_id') doesnt work in KS
-        $cert_configs = new ilParticipationCertificateConfigs();
-        if ($global_template_id = filter_input(INPUT_POST, 'global_template_id')) {
-            $cert_configs->setObjToUseCertTemplate($this->groupRefId, $global_template_id);
-            $this->tpl->setOnScreenMessage('success',$this->pl->txt('successForm'), true);
-        }
+        $globalTemplateId = $_GET['template_id'];
 
+        $cert_configs = new ilParticipationCertificateConfigs();
+        if ($globalTemplateId != 0) {
+            $cert_configs->setObjToUseCertTemplate($this->groupRefId, $globalTemplateId);
+            $this->tpl->setOnScreenMessage('success',$this->pl->txt('successForm'), true);
+
+        }
         $this->ctrl->redirect($this, self::CMD_DISPLAY);
     }
 
     public function setOwnCertTextFromTemplate(): void
     {
-        global $DIC;
-
-        // TODO here should be passed the global_template_id.
-        // TODO the filter_input(INPUT_POST, 'global_template_id') doesnt wor in KS
-
-dd(filter_input(INPUT_GET, 'template_id'));
-
         $globalTemplateId = $_GET['template_id'];
-        dd($globalTemplateId);
 
-        $cert_configs = new ilParticipationCertificateConfigs();
-        if ($global_template_id = filter_input(INPUT_POST, 'global_template_id')) {
-            $cert_configs->setOwnCertConfigFromTemplate($this->groupRefId, $global_template_id);
+        if ($globalTemplateId != 0) {
+            $cert_configs = new ilParticipationCertificateConfigs();
+            $cert_configs->setOwnCertConfigFromTemplate($this->groupRefId, $globalTemplateId);
             $this->tpl->setOnScreenMessage('success',$this->pl->txt('successForm'), true);
         }
-
         $this->ctrl->redirect($this, self::CMD_DISPLAY);
     }
 
