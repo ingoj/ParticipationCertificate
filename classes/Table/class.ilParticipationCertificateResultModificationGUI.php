@@ -114,6 +114,8 @@ class ilParticipationCertificateResultModificationGUI
      */
     public function display(): void
     {
+        global $DIC;
+
         $cert_access = new ilParticipationCertificateAccess($_GET['ref_id']);
         if ($cert_access->hasCurrentUserWriteAccess()) {
             $renderer = $this->dic->ui()->renderer();
@@ -122,12 +124,19 @@ class ilParticipationCertificateResultModificationGUI
 
             $form = $this->initForm();
 
+            $printButtonText = $this->pl->txt('print');
+            $printButtonTextJs = json_encode($printButtonText);
+            $DIC->ui()->mainTemplate()->addOnLoadCode(<<<JS
+              $('#ilContentContainer #il_center_col form .il-standard-form-cmd button.btn').text($printButtonTextJs)
+            JS);
+
             $this->tpl->setContent($renderer->render($form));
             if (method_exists($this->tpl, 'printToStdout')) {
                 $this->tpl->printToStdout();
             } else {
                 $this->tpl->show();
             }
+
         } else {
             // TODO Test this
             $this->ctrl->redirect(new ilParticipationCertificateResultGUI(), 'content');

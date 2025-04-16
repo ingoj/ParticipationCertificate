@@ -14,6 +14,7 @@ cols_actions#:#Aktion
 list_actions#:#Aktionen
 list_results#:#Resultate für den Druck anpassen
 list_print#:#Drucken
+print#:#Drucken
 filter_name#:#Name
 header_config#:#Konfigurieren
 header_overview#:#Übersicht

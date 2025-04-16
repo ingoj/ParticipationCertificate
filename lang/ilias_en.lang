@@ -14,6 +14,7 @@ cols_actions#:#Action
 list_actions#:#Actions
 list_results#:#Adjust Results for Printing
 list_print#:#Print
+print#:#Print
 filter_name#:#Name
 header_config#:#Configure
 header_overview#:#Overview
