@@ -1,5 +1,7 @@
 <?php
 
+use ILIAS\UI\Component\Input\Container\Filter\Standard;
+
 /**
  * Class ilParticipationCertificateResultGUI
  * @ilCtrl_isCalledBy ilParticipationCertificateResultGUI: ilUIPluginRouterGUI
@@ -84,10 +86,14 @@ class ilParticipationCertificateResultGUI
         }
     }
 
+    /**
+     * @throws ilTemplateException
+     * @throws arException
+     * @throws ilCtrlException
+     */
     public function content(): void
     {
         global $DIC;
-        $renderer = $DIC->ui()->renderer();
 
         $this->tpl->addCss($this->pl->getDirectory() . '/templates/css/participation-certificate.css');
 
@@ -143,17 +149,9 @@ class ilParticipationCertificateResultGUI
             }
         }
 
-        $filterHtml = '';
-        if ($cert_access->hasCurrentUserWriteAccess()) {
-            $filterHtml .= $renderer->render($this->buildFilter());
-        }
+        $tableHtml = $this->initTable($_GET['ref_id']);
+        $this->tpl->setContent($tableHtml);
 
-        $table = $this->initTable();
-        $tableHtml = $renderer->render($table->withRequest($DIC->http()->request()));
-
-
-        $this->tpl->setContent($filterHtml . $tableHtml);
-        /*$this->tpl->setContent($this->table->getHTML());*/
         if (method_exists($this->tpl, 'printToStdout')) {
             $this->tpl->printToStdout();
 
@@ -187,11 +185,33 @@ class ilParticipationCertificateResultGUI
         $this->tabs->activateTab(self::CMD_OVERVIEW);
     }
 
-
-    protected function initTable(bool $override = false)
+    /**
+     * @throws ilCtrlException
+     */
+    protected function initTable(int $refId)
     {
-        $repo = new ilParticipationCertificateResultTableNewGUI();
-        return $repo->getTableForRepresentation();
+        global $DIC;
+
+        $renderer = $DIC->ui()->renderer();
+
+        $resultTable = new ilParticipationCertificateResultTableNewGUI();
+        $cert_access = new ilParticipationCertificateAccess($refId);
+
+        $filterHtml = '';
+        $filterFirstname = '';
+        $filterLastname = '';
+        $filterData = [];
+        if ($cert_access->hasCurrentUserWriteAccess()) {
+            $filter = $resultTable->buildFilter();
+            $filterData = $DIC->uiService()->filter()->getData($filter);
+            $filterFirstname = $filterData['firstname'];
+            $filterLastname = $filterData['lastname'];
+            $filterHtml .= $renderer->render($filter);
+        }
+        $table = $resultTable->getTableForRepresentation($filterFirstname, $filterLastname);
+        $tableHtml = $renderer->render($table->withRequest($DIC->http()->request()));
+
+        return $filterHtml . $tableHtml;
     }
 
     /**
@@ -339,19 +359,21 @@ class ilParticipationCertificateResultGUI
         }
     }
 
+    /**
+     * @throws ilCtrlException
+     */
     public function applyFilter(): void
     {
-        $table = new ilParticipationCertificateResultTableGUI($this, self::CMD_CONTENT);
-        $table->writeFilterToSession();
-        $table->resetOffset();
+        $resultTable = new ilParticipationCertificateResultTableNewGUI();
+        $resultTable->buildFilter();
         $this->ctrl->redirect($this, self::CMD_CONTENT);
     }
 
+    /**
+     * @throws ilCtrlException
+     */
     public function resetFilter(): void
     {
-        $table = new ilParticipationCertificateResultTableGUI($this, self::CMD_CONTENT);
-        $table->resetOffset();
-        $table->resetFilter();
         $this->ctrl->redirect($this, self::CMD_CONTENT);
     }
 
@@ -387,22 +409,21 @@ class ilParticipationCertificateResultGUI
         return array_values($usr_id);
     }
 
-    private function buildFilter()
+    /*private function buildFilter()
     {
         global $DIC;
         $ui = $DIC->ui()->factory();
-        $renderer = $DIC->ui()->renderer();
 
         $inputFirstname = $ui->input()->field()->text('Firstname');
         $inputLastname = $ui->input()->field()->text('Lastname');
 
         $action = $DIC->ctrl()->getLinkTargetByClass(
             self::class,
-            'content',
+            'applyFilter',
             "",
             true
         );
-        $filter = $DIC->uiService()->filter()->standard(
+        $this->filter = $DIC->uiService()->filter()->standard(
             'filter_ID',
             $action,
             [
@@ -414,14 +435,8 @@ class ilParticipationCertificateResultGUI
             true,
         );
 
-        return $filter;
-
-       /* //Step 3: Get filter data
-        $filter_data = $DIC->uiService()->filter()->getData($filter);
-
-        //Step 4: Render the filter
-        return $renderer->render($filter) . "Filter Data: " . print_r($filter_data, true);
-    */}
+        return $this->filter;
+    }*/
 
     /**
      * @param string $parameter

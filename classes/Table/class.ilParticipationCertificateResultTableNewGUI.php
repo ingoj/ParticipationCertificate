@@ -10,6 +10,7 @@ use ILIAS\UI\URLBuilder;
 use ILIAS\Data\URI;
 use ILIAS\UI\URLBuilderToken;
 
+
 /**
  * Class ilParticipationCertificateResultTableNewGUI
  */
@@ -35,6 +36,10 @@ class ilParticipationCertificateResultTableNewGUI implements I\DataRetrieval
     protected ilCtrl $ctrl;
 
     private int $refId;
+
+    private ?string $firstname = null;
+
+    private ?string $lastname = null;
 
     /**
      * @var ilParticipationCertificateResultGUI
@@ -66,7 +71,7 @@ class ilParticipationCertificateResultTableNewGUI implements I\DataRetrieval
         $cert_access = new ilParticipationCertificateAccess($_GET['ref_id']);
         $this->usr_ids = $cert_access->getUserIdsOfGroup();
 
-        $ementoring=ilParticipationCertificateConfig::getConfig('enable_ementoring', $_GET['ref_id']);
+        $ementoring = ilParticipationCertificateConfig::getConfig('enable_ementoring', $_GET['ref_id']);
         if ($ementoring === NULL) {
             $ementoring = true;
         } else {
@@ -75,8 +80,14 @@ class ilParticipationCertificateResultTableNewGUI implements I\DataRetrieval
         $this->ementoring = $ementoring;
     }
 
-    public function getTableForRepresentation(): Data
-    {
+    /**
+     * @throws ilCtrlException
+     */
+    public function getTableForRepresentation(
+        ?string $firstname = null,
+        ?string $lastname = null
+    ): Data {
+        $this->setFilter($firstname, $lastname);
         $actions = $this->getActions();
 
         return $this->ui_factory->table()->data(
@@ -85,6 +96,19 @@ class ilParticipationCertificateResultTableNewGUI implements I\DataRetrieval
             $this
         )->withActions($actions);
 
+    }
+
+    /**
+     * @param string|null $firstname
+     * @param string|null $lastname
+     * @return void
+     */
+    public function setFilter(
+        ?string $firstname = null,
+        ?string $lastname = null
+    ) {
+        $this->firstname = $firstname;
+        $this->lastname = $lastname;
     }
 
     /**
@@ -224,6 +248,8 @@ class ilParticipationCertificateResultTableNewGUI implements I\DataRetrieval
     protected function records()
     {
         $arr_usr_data = ilPartCertUsersData::getData($this->pl, $this->usr_ids);
+
+        $arr_usr_data = $this->excludeUserIdIfFiltered($arr_usr_data);
         $arr_initial_test_states = ilCrsInitialTestStates::getData($this->usr_ids);
         $arr_learn_reached_percentages = ilLearnObjectSuggResults::getData($this->usr_ids);
         $arr_final_tests = ilLearnObjectFinalTestStates::getData($this->usr_ids);
@@ -341,20 +367,30 @@ class ilParticipationCertificateResultTableNewGUI implements I\DataRetrieval
                 $row['eMentoring_percentage'] = $this->buildProgressBar(0,0);
             }
 
-            if ((key_exists('firstname',$this->filter)) && ($this->filter['firstname'] != false)) {
-                if (strtolower($row['firstname']) == strtolower($this->filter['firstname'])) {
-                    $rows[] = $row;
-                }
-            } elseif ((key_exists('lastname',$this->filter)) &&($this->filter['lastname'] != false)) {
-                if (strtolower($row['lastname']) == strtolower($this->filter['lastname'])) {
-                    $rows[] = $row;
-                }
-            } else {
-                $rows[] = $row;
-            }
+            $rows[] = $row;
         }
         return $rows;
 
+    }
+
+    /**
+     * @param array $userData
+     * @return array
+     */
+    private function excludeUserIdIfFiltered(array $userData): array
+    {
+        foreach($userData as $userId => $user) {
+            if ((!empty($this->firstname) && $user->getPartCertFirstname() !== $this->firstname) ||
+                (!empty($this->lastname) && $user->getPartCertLastname() !== $this->lastname)
+            ) {
+                unset($userData[$userId]);
+
+                $this->usr_ids = array_values(array_filter($this->usr_ids, function($value) use ($userId) {
+                    return $value !== $userId;
+                }));
+            }
+        }
+        return $userData;
     }
 
     /**
@@ -488,5 +524,40 @@ class ilParticipationCertificateResultTableNewGUI implements I\DataRetrieval
                 ilParticipationCertificateConfigGUI::CMD_ACTION
             )
         );
+    }
+
+    /**
+     * @return \ILIAS\UI\Component\Input\Container\Filter\Standard
+     * @throws ilCtrlException
+     */
+    public function buildFilter()
+    {
+        global $DIC;
+
+        $ui = $DIC->ui()->factory();
+
+        $inputFirstname = $ui->input()->field()->text('Firstname');
+        $inputLastname = $ui->input()->field()->text('Lastname');
+
+        $action = $DIC->ctrl()->getLinkTargetByClass(
+            ilParticipationCertificateResultGUI::class,
+            'applyFilter',
+            "",
+            false
+        );
+
+        $filter = $DIC->uiService()->filter()->standard(
+            'filter-results',
+            $action,
+            [
+                'firstname' => $inputFirstname,
+                'lastname' => $inputLastname,
+            ],
+            [true, true],
+            true,
+            true,
+        );
+
+        return $filter;
     }
 }
