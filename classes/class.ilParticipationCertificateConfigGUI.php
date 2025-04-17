@@ -27,6 +27,8 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI
 
     const CMD_ACTION = 'action';
 
+    const CMD_SORTING = 'sorting';
+
     const CMD_SAVE_ORDER = 'saveOrder';
     const CMD_CANCEL = 'cancel';
     protected ilParticipationCertificateConfig $object;
@@ -66,7 +68,17 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI
     function performCommand(string $cmd): void
     {
         if ($cmd !== 'configure') {
-            $this->addTabs();
+            $this->addTabs(
+                'return-back',
+                $this->plugin_object->txt('back'),
+                $this->ctrl->getLinkTarget($this, 'returnBack')
+            );
+        } else {
+            $this->addTabs(
+                'sorting',
+                $this->plugin_object->txt('sorting'),
+                $this->ctrl->getLinkTarget($this, self::CMD_SORTING)
+            );
         }
 
         switch ($cmd) {
@@ -85,9 +97,76 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI
             case self::CMD_CANCEL:
             case self::CMD_SAVE_ORDER:
             case self::CMD_ACTION:
+            case self::CMD_SORTING:
                 $this->$cmd();
                 break;
         }
+    }
+
+    /**
+     * @throws ilCtrlException
+     */
+    private function sorting()
+    {
+        global $DIC;
+
+        /*$id = filter_input(INPUT_GET, 'id');
+        $set_type = filter_input(INPUT_GET, 'set_type');
+
+        if (empty($id) && empty($set_type)) {
+            $entry = $_GET['config_entry'][0];
+            $explodedEntry = explode('_', $entry);
+            $id = $explodedEntry[0];
+            $set_type = $explodedEntry[1];
+        }
+
+        $this->ctrl->setParameter($this, 'id', $id);*/
+
+        $renderer = $DIC->ui()->renderer();
+
+        $form = $this->sortingForm();
+
+        $this->tpl->setContent($renderer->render($form));
+    }
+
+    /**
+     * @return \ILIAS\UI\Component\Input\Container\Form\Standard
+     * @throws ilCtrlException
+     */
+    private function sortingForm()
+    {
+        global $DIC;
+        $ui = $DIC->ui()->factory();
+
+        $global_configs = new ilParticipationCertificateConfigSets();
+        $data = $global_configs->getAllConfigSets();
+
+        foreach ($data as $configSet) {
+            $value = intval($configSet['order_by']) * 10;
+            if ($configSet['order_by'] > 0) {
+                $inputFields[$configSet['conf_id']] = $ui->input()->field()->text(
+                    $configSet['title'],
+                    ''
+                )->withValue((string) $value)->withRequired(true);
+            }
+        }
+
+        $section = $ui->input()->field()->section(
+            $inputFields,
+            $this->pl->txt('sorting'),
+        );
+
+        $formAction = $DIC->ctrl()->getFormActionByClass(
+            self::class,
+            'saveOrder'
+        );
+
+        $form = $ui->input()->container()->form()->standard(
+            $formAction,
+            ['config' => $section]
+        );
+
+        return $form;
     }
 
     public function addConfig(): void
@@ -338,7 +417,6 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI
                     $file = ilParticipationCertificateFiles::getFile(
                         $config->getGlobalConfigId(),
                         $config->getConfigKey()
-
                     );
 
                     if (!empty($file)) {
@@ -396,9 +474,16 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI
      */
     public function saveOrder(): void
     {
+        global $DIC;
+
+        $form  = $this->sortingForm();
+
+        $form  = $form->withRequest($DIC->http()->request());
+        $form_data = $form->getData();
+
         $configs = new ilParticipationCertificateGlobalConfigSets();
-        $configs->saveAndRearangeOrderBy((array)$_POST['order_by']);
-        $this->ctrl->redirect($this, self::CMD_CONFIGURE);
+        $configs->saveAndRearangeOrderBy($form_data['config']);
+        $this->ctrl->redirect($this, self::CMD_SORTING);
     }
 
     public function showErrForm(): void
@@ -610,7 +695,7 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI
                         $config = ilParticipationCertificateConfig::where(array(
                             'config_key' => $key,
                             'global_config_id' => $global_config_id,
-                            // TODO ??? /*'config_value_type' => ilParticipationCertificateConfig::CONFIG_VALUE_TYPE_CERT_TEXT*/
+                            // TODO ??? /*'config_value_type' => ilParticipationCertificateConfig::CONFIG_VALUE_TYPE_CERT_TEXT
                         ))->first();
                     }
 
@@ -703,10 +788,6 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI
                             break;
 
                         case 'true_name_helper':
-                            $global_config = $part_cert_configs->getParticipationGlobalConfigValueByKey(
-                                $key
-                            );
-
                             $userinput = trim($item);
                             if (!ctype_digit($userinput) and $userinput != "") {
                                 $userinput = "";
@@ -718,8 +799,6 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI
 
                         case 'color':
                         case 'unsugg_color':
-                            $global_config = $part_cert_configs->getParticipationGlobalConfigValueByKey($key);
-
                             $hexValue = $this->rgbToHex(
                                 $item->r(),
                                 $item->g(),
@@ -753,12 +832,17 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI
     }
 
     /**
-     * @throws ilCtrlException
      */
-    protected function addTabs() : void
-    {
-        $this->tabs->addTab('return-back', $this->plugin_object->txt('back'),
-            $this->ctrl->getLinkTarget($this, 'returnBack'));
+    protected function addTabs(
+        string $id,
+        string $text,
+        string $link
+    ) : void {
+        $this->tabs->addTab(
+            $id,
+            $text,
+            $link
+        );
     }
 
     /**

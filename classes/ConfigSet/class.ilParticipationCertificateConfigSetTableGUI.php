@@ -82,7 +82,6 @@ class ilParticipationCertificateConfigSetTableGUI implements I\DataRetrieval
     private function getSelectableColumns(): array
     {
         $cols = array();
-        $cols['order_by'] = array( 'txt' => $this->pl->txt('order_by'), 'default' => false, 'width' => 'auto' );
         $cols['configset_type'] = array( 'txt' => $this->pl->txt('config_type'), 'default' => '', 'width' => 'auto' );
         $cols['title'] = array( 'txt' => $this->pl->txt('title'), 'default' => '', 'width' => 'auto' );
         $cols['parent_title'] = array( 'txt' => $this->pl->txt('parent_title'), 'default' => '', 'width' => 'auto' );
@@ -119,8 +118,6 @@ class ilParticipationCertificateConfigSetTableGUI implements I\DataRetrieval
         $f = $this->ui_factory;
 
         return  [
-            'order_by' => $f->table()->column()->text($columns['order_by']['txt'])
-                          ->withIsSortable(false),
             'configset_type' => $f->table()->column()->text($columns['configset_type']['txt'])
                           ->withIsSortable(false),
             'title' => $f->table()->column()->text($columns['title']['txt'])
@@ -151,29 +148,9 @@ class ilParticipationCertificateConfigSetTableGUI implements I\DataRetrieval
             $configId = $configSet['conf_id'];
             $configType = $configSet['configset_type'];
             $arr_type = [];
-            /*foreach ($selectableColumns as $columnKey => $value) {*/
+
             foreach ($configSet as $key => $value) {
-                //if ($this->isColumnSelected($k)) { // TODO
-
                 switch ($key) {
-                    case 'order_by':
-                        $value = intval($configSet[$key]) * 10;
-
-                        // TODO not possible to add input in table cell
-
-                        if($value > 0) {
-
-                            $configSet['order_by'] = $value;
-
-                        } else {
-                            $configSet['order_by'] = '';
-                        }
-
-                        /*$configSet['order_by'] = $ui->input()->field()->text(
-                            ''
-                        )->withValue((string) $value);*/
-
-                        break;
                     case 'configset_type':
                         if ($configSet[$key] > 0) {
                             switch ($configSet['configset_type']) {

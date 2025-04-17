@@ -126,18 +126,55 @@ class ilParticipationCertificateTwigParser {
 
 		$part_pdf = new ilParticipationCertificatePDFGenerator();
 
+        $logoIsSavedInResourceStorage = false;
 		if (is_numeric($global_config_id) && is_file(ilParticipationCertificateConfig::returnPicturePath('absolute', $global_config_id, ilParticipationCertificateConfig::LOGO_FILE_NAME))) {
 			$logo_path = ilParticipationCertificateConfig::returnPicturePath('absolute', $global_config_id, ilParticipationCertificateConfig::LOGO_FILE_NAME);
-		} elseif (is_file(ilParticipationCertificateConfig::returnPicturePath('absolute', $this->group_ref_id, ilParticipationCertificateConfig::LOGO_FILE_NAME))) {
+
+            $file = ilParticipationCertificateFiles::getFile(
+                $global_config_id,
+                'logo'
+            );
+
+            if ($file->getResourceStorage()) {
+                $logoIsSavedInResourceStorage = true;
+            }
+
+        } elseif (is_file(ilParticipationCertificateConfig::returnPicturePath('absolute', $this->group_ref_id, ilParticipationCertificateConfig::LOGO_FILE_NAME))) {
             $logo_path = ilParticipationCertificateConfig::returnPicturePath('absolute', $this->group_ref_id, ilParticipationCertificateConfig::LOGO_FILE_NAME);
+
+            $file = ilParticipationCertificateFiles::getFile(
+                $this->group_ref_id,
+                'logo'
+            );
+
+            if ($file->getResourceStorage()) {
+                $logoIsSavedInResourceStorage = true;
+            }
         } else {
 			$logo_path = '';
 		}
 
+        $signatureIsSavedInResourceStorage = false;
         if (is_numeric($global_config_id) && is_file(ilParticipationCertificateConfig::returnPicturePath('absolute', $global_config_id, ilParticipationCertificateConfig::ISSUER_SIGNATURE_FILE_NAME))) {
             $page1_issuer_signature = ilParticipationCertificateConfig::returnPicturePath('absolute', $global_config_id, ilParticipationCertificateConfig::ISSUER_SIGNATURE_FILE_NAME);
+
+            $file = ilParticipationCertificateFiles::getFile(
+                $global_config_id,
+                'page1_issuer_signature'
+            );
+            $signatureIsSavedInResourceStorage = $file->getResourceStorage();
+
+
         }  elseif (is_file(ilParticipationCertificateConfig::returnPicturePath('absolute', $this->group_ref_id, ilParticipationCertificateConfig::ISSUER_SIGNATURE_FILE_NAME))) {
             $page1_issuer_signature = ilParticipationCertificateConfig::returnPicturePath('absolute', $this->group_ref_id, ilParticipationCertificateConfig::ISSUER_SIGNATURE_FILE_NAME);
+
+
+            $file = ilParticipationCertificateFiles::getFile(
+                $this->group_ref_id,
+                'page1_issuer_signature'
+            );
+            $signatureIsSavedInResourceStorage = $file->getResourceStorage();
+
         } else {
             $page1_issuer_signature = '';
         }
@@ -246,7 +283,8 @@ class ilParticipationCertificateTwigParser {
                 $iass_states =  "<img alt='' src=" . ILIAS_ABSOLUTE_PATH . "/" . $this->pl->getImagePath("not_attempted_s.png") . ">";
             }
 
-            if (empty($logo_path) && !empty($processed_arr_text_values['logo'])) {
+
+            if ($logoIsSavedInResourceStorage && !empty($processed_arr_text_values['logo'])) {
                 $file = new ilParticipationCertificateFiles();
                 $src = $file->getFileSrcByStorageType(
                     $processed_arr_text_values['logo'],
@@ -257,7 +295,7 @@ class ilParticipationCertificateTwigParser {
                 $logo_path = $src;
             }
 
-             if (empty($page1_issuer_signature) && !empty($processed_arr_text_values['page1_issuer_signature'])) {
+             if ($signatureIsSavedInResourceStorage && !empty($processed_arr_text_values['page1_issuer_signature'])) {
                  $file = new ilParticipationCertificateFiles();
                  $src = $file->getFileSrcByStorageType(
                      $processed_arr_text_values['page1_issuer_signature'],

@@ -57,6 +57,11 @@ class ilParticipationCertificatePDFGenerator
         //Checkt ob es nur einen User in der Gruppe hat. Wenn True wird das PDf direkt nur für diesen gedruckt
         if ($total_users == 1) {
             $mpdf->WriteHTML($css, 1);
+
+
+            // TODO Remove it
+            $rendered = str_replace('http://localhost:8413', 'http://host.docker.internal:8413', $rendered);
+
             $mpdf->WriteHTML($rendered, 2);
             $mpdf->Output($this->pl->txt("plugin") . '.pdf', 'D');
             if (method_exists($this->tpl, 'loadStandardTemplate')) {

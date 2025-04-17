@@ -407,7 +407,9 @@ class ilParticipationCertificateGUI
 
         foreach ($form_data as $key => $item) {
             $file = null;
-
+            /**
+             * @var ilParticipationCertificateConfig $config
+             */
             $config = ilParticipationCertificateConfig::where(array(
                 'config_key' => $key,
                 'group_ref_id' => $this->groupRefId,
