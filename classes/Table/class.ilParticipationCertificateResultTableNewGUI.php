@@ -487,6 +487,7 @@ class ilParticipationCertificateResultTableNewGUI implements I\DataRetrieval
                         $css_class = self::RED_PROGRESS;
                     }
                 }
+
                 if ($perc_limit < 30) {
                     //
                     $perc_limit = 30;

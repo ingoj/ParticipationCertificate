@@ -75,7 +75,7 @@ class ilParticipationCertificateConfigSetTableGUI implements I\DataRetrieval
 
                     if ($record['order_by'] == 1) {
 
-                        yield $buildRow->withDisabledAction('delete')
+                        $buildRow = $buildRow->withDisabledAction('delete')
                                        ->withDisabledAction('activate')
                                        ->withDisabledAction('deactivate');
                     }
