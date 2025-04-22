@@ -59,7 +59,7 @@ class ilParticipationCertificateConfigSetTableGUI implements I\DataRetrieval
         foreach ($data as $idx => $record) {
             switch ($record['configset_type']) {
                 case  ilParticipationCertificateConfig::CONFIG_SET_TYPE_GLOBAL:
-                    yield $row_builder->buildDataRow($record['config_id'] . '_' . $record['config_type'], $record)
+                    yield $row_builder->buildDataRow($record['config_id'] . '_' . $record['config_type']. '_' . $record['obj_ref_id'], $record)
                                       ->withDisabledAction('copy')
                                       ->withDisabledAction('delete')
                                       ->withDisabledAction('activate')
@@ -69,7 +69,7 @@ class ilParticipationCertificateConfigSetTableGUI implements I\DataRetrieval
                     break;
                 case  ilParticipationCertificateConfig::CONFIG_SET_TYPE_TEMPLATE:
 
-                    $buildRow = $row_builder->buildDataRow($record['config_id'] . '_' . $record['config_type'], $record)
+                    $buildRow = $row_builder->buildDataRow($record['config_id'] . '_' . $record['config_type']. '_' . $record['obj_ref_id'], $record)
                         ->withDisabledAction('go_to')
                         ->withDisabledAction('create_template');
 
@@ -88,7 +88,7 @@ class ilParticipationCertificateConfigSetTableGUI implements I\DataRetrieval
 
                     break;
                 case  ilParticipationCertificateConfig::CONFIG_SET_TYPE_GROUP:
-                    yield $row_builder->buildDataRow($record['config_id'] . '_' . $record['config_type'], $record)
+                    yield $row_builder->buildDataRow($record['config_id'] . '_' . $record['config_type'] . '_' . $record['obj_ref_id'], $record)
                                       ->withDisabledAction('edit')
                                       ->withDisabledAction('copy')
                                       ->withDisabledAction('delete')
@@ -169,6 +169,7 @@ class ilParticipationCertificateConfigSetTableGUI implements I\DataRetrieval
             $configId = $configSet['conf_id'];
             $configType = $configSet['configset_type'];
             $arr_type = [];
+            $objRefId = $configSet['obj_ref_id'];
 
             foreach ($configSet as $key => $value) {
                 switch ($key) {
@@ -222,6 +223,7 @@ class ilParticipationCertificateConfigSetTableGUI implements I\DataRetrieval
                 'configset_type_title' => $configSetType,
                 'title' => $configSet['title'],
                 'parent_title' => $configSet['parent_title'],
+                'obj_ref_id' => $objRefId,
                 'active' => $active,
                 'active_status' => $activeStatus
             ];
@@ -281,13 +283,13 @@ class ilParticipationCertificateConfigSetTableGUI implements I\DataRetrieval
             'create_template' =>
                 $f->table()->action()->single(
                     $this->pl->txt('create_template'),
-                    $url_builder->withParameter($this->action_parameter_token, 'create_template'),
+                    $url_builder->withParameter($this->action_parameter_token, 'create-template'),
                     $this->row_id_token
                 ),
             'go_to' =>
                 $f->table()->action()->single(
                     $this->pl->txt('go_to_object'),
-                    $url_builder->withParameter($this->action_parameter_token, 'create_template'),
+                    $url_builder->withParameter($this->action_parameter_token, 'go-to'),
                     $this->row_id_token
                 )
         ];

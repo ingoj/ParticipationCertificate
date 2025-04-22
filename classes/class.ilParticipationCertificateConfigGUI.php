@@ -184,7 +184,9 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI
 
     public function createTemplateFromLocalConfig(): void
     {
-        $grp_ref_id = (int) filter_input(INPUT_GET, 'grp_ref_id');
+        $entry = $_GET['config_entry'][0];
+        $explodedEntry = explode('_', $entry);
+        $grp_ref_id = $explodedEntry[2];
 
         if ($grp_ref_id == 0) {
             $this->ctrl->redirect($this, '');
@@ -363,6 +365,8 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI
 
     public function action()
     {
+        global $DIC;
+
         $action = $_GET['config_action'];
 
         if (!empty($action)) {
@@ -392,7 +396,11 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI
                     break;
 
                 case 'go-to':
-                    // TODO
+                    $entry = $_GET['config_entry'][0];
+                    $explodedEntry = explode('_', $entry);
+                    $objRefId = $explodedEntry[2];
+                    $DIC->ctrl()->redirectToURL(ilLink::_getStaticLink($objRefId));
+
                     break;
             }
         }
@@ -552,7 +560,7 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI
         }
 
         foreach (ilParticipationCertificateConfig::where(array(
-            'config_type' => $set_type,
+            'config_type' => (int) $set_type,
             'global_config_id' => $global_config_id
         ))->orderBy('order_by')->get() as $config) {
 
