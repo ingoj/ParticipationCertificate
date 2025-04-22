@@ -409,35 +409,6 @@ class ilParticipationCertificateResultGUI
         return array_values($usr_id);
     }
 
-    /*private function buildFilter()
-    {
-        global $DIC;
-        $ui = $DIC->ui()->factory();
-
-        $inputFirstname = $ui->input()->field()->text('Firstname');
-        $inputLastname = $ui->input()->field()->text('Lastname');
-
-        $action = $DIC->ctrl()->getLinkTargetByClass(
-            self::class,
-            'applyFilter',
-            "",
-            true
-        );
-        $this->filter = $DIC->uiService()->filter()->standard(
-            'filter_ID',
-            $action,
-            [
-                'firstname' => $inputFirstname,
-                'lastname' => $inputLastname,
-            ],
-            [true, true],
-            true,
-            true,
-        );
-
-        return $this->filter;
-    }*/
-
     /**
      * @param string $parameter
      * @return string[]
