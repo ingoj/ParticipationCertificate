@@ -363,6 +363,10 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI
         $DIC->ui()->mainTemplate()->setContent($confirmation->getHTML());
     }
 
+    /**
+     * @throws arException
+     * @throws ilCtrlException
+     */
     public function action()
     {
         global $DIC;
