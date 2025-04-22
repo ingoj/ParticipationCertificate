@@ -57,24 +57,45 @@ class ilParticipationCertificateConfigSetTableGUI implements I\DataRetrieval
         $data = $this->doSelect($order, $range);
 
         foreach ($data as $idx => $record) {
-            if($record['config_id'] === 0) {
-                yield $row_builder->buildDataRow($record['config_id'] . '_' . $record['config_type'], $record)
-                                  ->withDisabledAction('copy')
-                                  ->withDisabledAction('delete')
-                                  ->withDisabledAction('activate')
-                                  ->withDisabledAction('deactivate');
+            switch ($record['configset_type']) {
+                case  ilParticipationCertificateConfig::CONFIG_SET_TYPE_GLOBAL:
+                    yield $row_builder->buildDataRow($record['config_id'] . '_' . $record['config_type'], $record)
+                                      ->withDisabledAction('copy')
+                                      ->withDisabledAction('delete')
+                                      ->withDisabledAction('activate')
+                                      ->withDisabledAction('deactivate')
+                                      ->withDisabledAction('go_to')
+                                      ->withDisabledAction('create_template');;
+                    break;
+                case  ilParticipationCertificateConfig::CONFIG_SET_TYPE_TEMPLATE:
 
-            } else if($record['order_by'] != 1) {
-                if ($record['active_status']) {
+                    $buildRow = $row_builder->buildDataRow($record['config_id'] . '_' . $record['config_type'], $record)
+                        ->withDisabledAction('go_to')
+                        ->withDisabledAction('create_template');
+
+                    if ($record['order_by'] == 1) {
+
+                        yield $buildRow->withDisabledAction('delete')
+                                       ->withDisabledAction('activate')
+                                       ->withDisabledAction('deactivate');
+                    }
+
+                    if ($record['active_status']) {
+                        yield $buildRow->withDisabledAction('activate');
+                    } else {
+                        yield $buildRow->withDisabledAction('deactivate');
+                    }
+
+                    break;
+                case  ilParticipationCertificateConfig::CONFIG_SET_TYPE_GROUP:
                     yield $row_builder->buildDataRow($record['config_id'] . '_' . $record['config_type'], $record)
-                                      ->withDisabledAction('activate');
-                } else {
-                    yield $row_builder->buildDataRow($record['config_id'] . '_' . $record['config_type'], $record)
+                                      ->withDisabledAction('edit')
+                                      ->withDisabledAction('copy')
+                                      ->withDisabledAction('delete')
+                                      ->withDisabledAction('activate')
                                       ->withDisabledAction('deactivate');
-                }
-            } else {
-                // TODO must limit the actions for the second entry
-                yield $row_builder->buildDataRow($record['config_id'] . '_' . $record['config_type'], $record);
+
+                    break;
             }
         }
     }
@@ -118,7 +139,7 @@ class ilParticipationCertificateConfigSetTableGUI implements I\DataRetrieval
         $f = $this->ui_factory;
 
         return  [
-            'configset_type' => $f->table()->column()->text($columns['configset_type']['txt'])
+            'configset_type_title' => $f->table()->column()->text($columns['configset_type']['txt'])
                           ->withIsSortable(false),
             'title' => $f->table()->column()->text($columns['title']['txt'])
                          ->withIsSortable(false),
@@ -197,7 +218,8 @@ class ilParticipationCertificateConfigSetTableGUI implements I\DataRetrieval
                 'config_id' => $configId,
                 'config_type' => $configType,
                 'order_by' => $configSet['order_by'],
-                'configset_type' => $configSetType,
+                'configset_type' => $configSet['configset_type'],
+                'configset_type_title' => $configSetType,
                 'title' => $configSet['title'],
                 'parent_title' => $configSet['parent_title'],
                 'active' => $active,
@@ -229,31 +251,43 @@ class ilParticipationCertificateConfigSetTableGUI implements I\DataRetrieval
 
         $actions = [
             'edit' => $f->table()->action()->single(
-                'Edit',
+                $this->pl->txt('edit'),
                 $url_builder->withParameter($this->action_parameter_token, 'edit'),
                 $this->row_id_token
             ),
             'copy' => $f->table()->action()->single(
-                'Copy',
+                $this->pl->txt('copy'),
                 $url_builder->withParameter($this->action_parameter_token, 'copy'),
                 $this->row_id_token
             ),
             'delete' =>
                 $f->table()->action()->single(
-                    'Delete',
+                    $this->pl->txt('delete'),
                     $url_builder->withParameter($this->action_parameter_token, 'delete'),
                     $this->row_id_token
                 ),
             'activate' =>
                 $f->table()->action()->single(
-                    'Activate',
+                    $this->pl->txt('set_active'),
                     $url_builder->withParameter($this->action_parameter_token, 'activate'),
                     $this->row_id_token
                 ),
             'deactivate' =>
                 $f->table()->action()->single(
-                    'Deactivate',
+                    $this->pl->txt('set_inactive'),
                     $url_builder->withParameter($this->action_parameter_token, 'deactivate'),
+                    $this->row_id_token
+                ),
+            'create_template' =>
+                $f->table()->action()->single(
+                    $this->pl->txt('create_template'),
+                    $url_builder->withParameter($this->action_parameter_token, 'create_template'),
+                    $this->row_id_token
+                ),
+            'go_to' =>
+                $f->table()->action()->single(
+                    $this->pl->txt('go_to_object'),
+                    $url_builder->withParameter($this->action_parameter_token, 'create_template'),
                     $this->row_id_token
                 )
         ];

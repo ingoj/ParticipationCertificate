@@ -386,6 +386,14 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI
                 case 'deactivate':
                     $this->setInactive();
                     break;
+
+                case 'create-template':
+                    $this->createTemplateFromLocalConfig();
+                    break;
+
+                case 'go-to':
+                    // TODO
+                    break;
             }
         }
     }
