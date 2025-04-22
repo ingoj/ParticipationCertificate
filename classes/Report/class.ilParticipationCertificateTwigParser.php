@@ -179,13 +179,6 @@ class ilParticipationCertificateTwigParser {
             $page1_issuer_signature = '';
         }
 
-		//quickfix, wenn nur ein User $this->usr_id ist kein array -> foreach kann also nicht gebraucht werden. Jetzt wird ein array erstellt auch wenn nur ein user
-	/*	if (!is_array($this->usr_id)) {
-			$usr = $this->usr_id;
-			$this->usr_id = array( $usr );
-		}*/
-
-
          $this->usr_id = $this->excludeUsersFromPrintIfMissingUserData($this->usr_id);
 
          foreach ($this->usr_id as $usr_id) {
@@ -195,10 +188,7 @@ class ilParticipationCertificateTwigParser {
              if (is_array($usr_id)) {
                  $usr_id = $usr_id[0];
              }
-
-
              $processed_arr_text_values = $arr_config_text;
-
 
              //Preprocess text values
              foreach ($arr_config_text as $key => $value) {

@@ -58,7 +58,6 @@ class ilParticipationCertificatePDFGenerator
         if ($total_users == 1) {
             $mpdf->WriteHTML($css, 1);
 
-
             // TODO Remove it
             $rendered = str_replace('http://localhost:8413', 'http://host.docker.internal:8413', $rendered);
 
@@ -79,6 +78,10 @@ class ilParticipationCertificatePDFGenerator
         } /*Checkt ob es der letzte Durchlauf ist. Wenn ja wird das letzte PDF erzeugt und das vorhandene PDF auf dem Server
 			 *wird hinten an das erzeugte PDF angehängt. Anschliessend wird das fertige PDF dem User im Browser als Download angeboten.
 			*/ elseif ($printCount == $total_users) {
+
+            // TODO Remove it
+            $rendered = str_replace('http://localhost:8413', 'http://host.docker.internal:8413', $rendered);
+
             $mpdf->WriteHTML($css, 1);
             $mpdf->WriteHTML($rendered, 2);
             //$mpdf->SetImportUse();
