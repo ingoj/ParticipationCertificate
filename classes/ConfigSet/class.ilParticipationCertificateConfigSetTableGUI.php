@@ -38,7 +38,10 @@ class ilParticipationCertificateConfigSetTableGUI implements I\DataRetrieval
         $this->pl = ilParticipationCertificatePlugin::getInstance();
     }
 
-    public function getTableForRepresentation(): Data
+    /**
+     * @throws ilCtrlException
+     */
+    public function getTableForRepresentation(): I\Data
     {
         $actions = $this->getActions();
 

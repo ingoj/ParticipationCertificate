@@ -9,7 +9,7 @@ use ILIAS\Data\Order;
 use ILIAS\UI\URLBuilder;
 use ILIAS\Data\URI;
 use ILIAS\UI\URLBuilderToken;
-
+use ILIAS\UI\Component\Input\Container\Filter\Standard;
 
 /**
  * Class ilParticipationCertificateResultTableNewGUI
@@ -53,9 +53,12 @@ class ilParticipationCertificateResultTableGUI implements I\DataRetrieval
     protected array $usr_ids;
     protected ?string $ementoring = null;
 
+    private \ILIAS\UI\Factory $ui_factory;
+
     public function __construct()
     {
         global $DIC;
+
         $this->ui_factory = $DIC->ui()->factory();
         $this->df = new Factory();
         $this->current_user_date_format = $this->df->dateFormat()->withTime24(
@@ -86,7 +89,7 @@ class ilParticipationCertificateResultTableGUI implements I\DataRetrieval
     public function getTableForRepresentation(
         ?string $firstname = null,
         ?string $lastname = null
-    ): Data {
+    ): I\Data {
         $this->setFilter($firstname, $lastname);
         $actions = $this->getActions();
 
@@ -106,7 +109,7 @@ class ilParticipationCertificateResultTableGUI implements I\DataRetrieval
     public function setFilter(
         ?string $firstname = null,
         ?string $lastname = null
-    ) {
+    ): void {
         $this->firstname = $firstname;
         $this->lastname = $lastname;
     }
@@ -245,7 +248,7 @@ class ilParticipationCertificateResultTableGUI implements I\DataRetrieval
         ];
     }
 
-    protected function records()
+    protected function records(): array
     {
         $arr_usr_data = ilPartCertUsersData::getData($this->pl, $this->usr_ids);
 
@@ -396,7 +399,7 @@ class ilParticipationCertificateResultTableGUI implements I\DataRetrieval
     /**
      * @throws ilCtrlException
      */
-    private function getActions()
+    private function getActions(): array
     {
         global $DIC;
 
@@ -528,10 +531,10 @@ class ilParticipationCertificateResultTableGUI implements I\DataRetrieval
     }
 
     /**
-     * @return \ILIAS\UI\Component\Input\Container\Filter\Standard
+     * @return Standard
      * @throws ilCtrlException
      */
-    public function buildFilter()
+    public function buildFilter(): Standard
     {
         global $DIC;
 
