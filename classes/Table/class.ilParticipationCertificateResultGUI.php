@@ -49,6 +49,13 @@ class ilParticipationCertificateResultGUI
 
     public function executeCommand(): void
     {
+        global $DIC;
+
+        if (!$DIC->rbac()->system()->checkAccess('write', $this->groupRefId)) {
+            $this->tpl->setOnScreenMessage('failure',$this->lng->txt('no_permission'), true);
+            $DIC->ctrl()->redirectToURL('login.php');
+        }
+
         $nextClass = $this->ctrl->getNextClass();
 
         switch ($nextClass) {
@@ -247,6 +254,8 @@ class ilParticipationCertificateResultGUI
      */
     public function printPdf(): void
     {
+        global $DIC;
+
         $cert_access = new ilParticipationCertificateAccess($_GET['ref_id']);
         if ($cert_access->hasCurrentUserPrintAccess()) {
             $ementor = false;
@@ -279,7 +288,7 @@ class ilParticipationCertificateResultGUI
             $twigParser->parseData();
         } else {
             $this->tpl->setOnScreenMessage('failure',$this->lng->txt('no_permission'), true);
-            ilUtil::redirect('login.php');
+            $DIC->ctrl()->redirectToURL('login.php');
         }
     }
 
@@ -292,6 +301,8 @@ class ilParticipationCertificateResultGUI
      */
     public function printSelected(): void
     {
+        global $DIC;
+
         $cert_access = new ilParticipationCertificateAccess($_GET['ref_id']);
         if ($cert_access->hasCurrentUserPrintAccess()) {
             if (!isset($_POST['record_ids']) || (isset($_POST['record_ids']) && !count($_POST['record_ids']))) {
@@ -316,8 +327,7 @@ class ilParticipationCertificateResultGUI
             $twigParser = new ilParticipationCertificateTwigParser($this->groupRefId, array(), (array) $usr_id, true, false);
             $twigParser->parseData();
         } else {
-            $this->tpl->setOnScreenMessage('failure',$this->lng->txt('no_permission'), true);
-            ilUtil::redirect('login.php');
+            $DIC->ctrl()->redirectToURL('login.php');
         }
     }
 
@@ -330,6 +340,8 @@ class ilParticipationCertificateResultGUI
      */
     public function printSelectedWithouteMentoring(): void
     {
+        global $DIC;
+
         $cert_access = new ilParticipationCertificateAccess($_GET['ref_id']);
         if ($cert_access->hasCurrentUserPrintAccess()) {
             if (!isset($_POST['record_ids']) || (isset($_POST['record_ids']) && !count($_POST['record_ids']))) {
@@ -354,8 +366,7 @@ class ilParticipationCertificateResultGUI
             $twigParser = new ilParticipationCertificateTwigParser($this->groupRefId, array(), $usr_id, false, false);
             $twigParser->parseData();
         } else {
-            $this->tpl->setOnScreenMessage('failure',$this->lng->txt('no_permission'), true);
-            ilUtil::redirect('login.php');
+            $DIC->ctrl()->redirectToURL('login.php');
         }
     }
 

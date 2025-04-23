@@ -25,9 +25,6 @@ class ilParticipationCertificateGUI
     const CMD_SET_CERT_TEMPLATE = 'setCertTemplate';
     const CMD_SET_OWN_CERT_TEXT_FROM_TEMPLATE = 'setOwnCertTextFromTemplate';
 
-
-    /*const CMD_PRINT_PDF = 'printPdf';
-    const CMD_PRINT_PDF_WITHOUT_MENTORING = 'printPdfWithoutMentoring';*/
     const TAB_CONFIG = 'config';
     const TAB_CONFIG_DISPLAY = 'config_display';
     const TAB_CONFIG_RESULT_TABLE = 'config_result_table';
@@ -63,7 +60,7 @@ class ilParticipationCertificateGUI
         $cert_access = new ilParticipationCertificateAccess($this->groupRefId);
         if (!$cert_access->hasCurrentUserAdminAccess()) {
             $this->tpl->setOnScreenMessage('failure',$this->lng->txt('no_permission'), true);
-            ilUtil::redirect('login.php');
+            $DIC->ctrl()->redirectToURL('login.php');
         }
         $this->objecttype = ilObject::_lookupType($this->groupRefId, true);
         $this->pl = ilParticipationCertificatePlugin::getInstance();

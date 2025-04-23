@@ -15,6 +15,8 @@ class ilParticipationCertificateUIHookGUI extends ilUIHookPluginGUI {
 	protected string $learnGroupTitle;
 	protected array $keywords;
 
+    private string $objecttype;
+
 
 	public function __construct() {
 		global $DIC;
