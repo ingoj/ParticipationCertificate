@@ -248,6 +248,8 @@ class ilParticipationCertificateResultGUI
     {
         $action = $_GET['config_action'];
 
+
+
         if (!empty($action)) {
             switch ($action) {
                 case 'print_with_ementorining':
@@ -256,6 +258,13 @@ class ilParticipationCertificateResultGUI
                     break;
 
                 case 'show_all_results':
+
+                    $usrId = null;
+                    if (!empty($_GET['config_entry'])) {
+                        $usrId = explode('_', $_GET['config_entry'][0])[0];
+                        $this->ctrl->setParameterByClass(ilParticipationCertificateResultGUI::class, 'usr_id', $usrId);
+                    }
+
                     $singleResultGui = new ilParticipationCertificateSingleResultGUI();
                     $singleResultGui->display();
                     break;
