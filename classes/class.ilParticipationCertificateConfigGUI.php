@@ -1,6 +1,8 @@
 <?php
 
 //TODO Refactoring - find a better way to save and display the form
+use ILIAS\UI\Component\Input\Container\Form\Standard;
+use ILIAS\UI\Component\Table\Data;
 
 /**
  * Class ilParticipationCertificateConfigGUI
@@ -106,21 +108,9 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI
     /**
      * @throws ilCtrlException
      */
-    private function sorting()
+    private function sorting(): void
     {
         global $DIC;
-
-        /*$id = filter_input(INPUT_GET, 'id');
-        $set_type = filter_input(INPUT_GET, 'set_type');
-
-        if (empty($id) && empty($set_type)) {
-            $entry = $_GET['config_entry'][0];
-            $explodedEntry = explode('_', $entry);
-            $id = $explodedEntry[0];
-            $set_type = $explodedEntry[1];
-        }
-
-        $this->ctrl->setParameter($this, 'id', $id);*/
 
         $renderer = $DIC->ui()->renderer();
 
@@ -130,10 +120,10 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI
     }
 
     /**
-     * @return \ILIAS\UI\Component\Input\Container\Form\Standard
+     * @return Standard
      * @throws ilCtrlException
      */
-    private function sortingForm()
+    private function sortingForm(): Standard
     {
         global $DIC;
         $ui = $DIC->ui()->factory();
@@ -182,6 +172,10 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI
         $this->ctrl->redirect($this, self::CMD_SHOW_FORM);
     }
 
+    /**
+     * @throws arException
+     * @throws ilCtrlException
+     */
     public function createTemplateFromLocalConfig(): void
     {
         $entry = $_GET['config_entry'][0];
@@ -202,7 +196,7 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI
     }
 
     /**
-     * @throws ilCtrlException
+     * @throws ilCtrlException|arException
      */
     public function copyConfig(): void
     {
@@ -367,7 +361,7 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI
      * @throws arException
      * @throws ilCtrlException
      */
-    public function action()
+    public function action(): void
     {
         global $DIC;
 
@@ -411,7 +405,8 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI
     }
 
     /**
-     * @throws ilCtrlException
+     * @throws ilCtrlException|arException
+     * @throws arException
      */
     public function deleteConfig(): void
     {
@@ -506,6 +501,10 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI
         $this->ctrl->redirect($this, self::CMD_SORTING);
     }
 
+    /**
+     * @throws arException
+     * @throws ilCtrlException
+     */
     public function showErrForm(): void
     {
 	    self::showForm(true);
@@ -541,7 +540,7 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI
      * @throws arException
      * @throws ilCtrlException
      */
-    private function buildForm($global_config_id, $set_type)
+    private function buildForm($global_config_id, $set_type): Standard
     {
         global $DIC;
         $ui = $DIC->ui()->factory();
@@ -922,7 +921,11 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI
         );
     }
 
-    protected function initTable()
+    /**
+     * @return Data
+     * @throws ilCtrlException
+     */
+    protected function initTable(): Data
     {
         $repo = new ilParticipationCertificateConfigSetTableGUI();
         return $repo->getTableForRepresentation();

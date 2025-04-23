@@ -1,6 +1,7 @@
 <?php
 
-use ILIAS\UI\Component\Input\Container\Filter\Standard;
+use Twig\Error\SyntaxError;
+use Twig\Error\LoaderError;
 
 /**
  * Class ilParticipationCertificateResultGUI
@@ -25,6 +26,13 @@ class ilParticipationCertificateResultGUI
     protected ilParticipationCertificateAccess $cert_access;
     protected ilLanguage $lng;
 
+    private bool $ementoring;
+
+    /**
+     * @throws ilObjectNotFoundException
+     * @throws ilCtrlException
+     * @throws ilDatabaseException
+     */
     public function __construct()
     {
         global $DIC;
@@ -47,6 +55,9 @@ class ilParticipationCertificateResultGUI
         $this->ctrl->saveParameterByClass(ilParticipationCertificateResultGUI::class, ['ref_id', 'group_id']);
     }
 
+    /**
+     * @throws ilCtrlException
+     */
     public function executeCommand(): void
     {
         global $DIC;
@@ -113,7 +124,6 @@ class ilParticipationCertificateResultGUI
         $this->initHeader();
 
         $cert_access = new ilParticipationCertificateAccess($_GET['ref_id']);
-        $toolbar = $DIC->toolbar();
         $ui = $DIC->ui()->factory();
 
         if ($cert_access->hasCurrentUserPrintAccess()) {
@@ -168,6 +178,9 @@ class ilParticipationCertificateResultGUI
         }
     }
 
+    /**
+     * @throws ilCtrlException
+     */
     public function initHeader(): void
     {
         $this->tpl->setTitle($this->learnGroup->getTitle());
@@ -196,7 +209,7 @@ class ilParticipationCertificateResultGUI
     /**
      * @throws ilCtrlException
      */
-    protected function initTable(int $refId)
+    protected function initTable(int $refId): string
     {
         global $DIC;
 
@@ -208,7 +221,6 @@ class ilParticipationCertificateResultGUI
         $filterHtml = '';
         $filterFirstname = '';
         $filterLastname = '';
-        $filterData = [];
         if ($cert_access->hasCurrentUserWriteAccess()) {
             $filter = $resultTable->buildFilter();
             $filterData = $DIC->uiService()->filter()->getData($filter);
@@ -226,7 +238,7 @@ class ilParticipationCertificateResultGUI
      * @throws ilCtrlException
      * @throws ilTemplateException
      */
-    public function action()
+    public function action(): void
     {
         $action = $_GET['config_action'];
 
@@ -252,6 +264,7 @@ class ilParticipationCertificateResultGUI
 
     /**
      * @throws ilCtrlException
+     * @throws Exception
      */
     public function printPdf(): void
     {
@@ -296,9 +309,9 @@ class ilParticipationCertificateResultGUI
 
     /**
      * @throws arException
-     * @throws \Twig\Error\SyntaxError
+     * @throws SyntaxError
      * @throws ilCtrlException
-     * @throws \Twig\Error\LoaderError
+     * @throws LoaderError
      * @throws ilDateTimeException
      */
     public function printSelected(): void
@@ -318,7 +331,6 @@ class ilParticipationCertificateResultGUI
                 $usr_id = $usr_ids;
             }
 
-
             $arr_usr_data = ilPartCertUsersData::getData($this->pl, $usr_id);
             $usr_id = $this->excludeUserIfDataMissing($usr_id, $arr_usr_data);
 
@@ -336,9 +348,10 @@ class ilParticipationCertificateResultGUI
     /**
      * @throws arException
      * @throws ilCtrlException
-     * @throws \Twig\Error\SyntaxError
+     * @throws SyntaxError
      * @throws ilDateTimeException
-     * @throws \Twig\Error\LoaderError
+     * @throws LoaderError
+     * @throws Exception
      */
     public function printSelectedWithouteMentoring(): void
     {

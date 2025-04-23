@@ -29,6 +29,8 @@ class ilParticipationCertificateGUI
     const TAB_CONFIG_DISPLAY = 'config_display';
     const TAB_CONFIG_RESULT_TABLE = 'config_result_table';
     const TAB_CONFIG_SELF_PRINT = 'config_self_print';
+    private string $objecttype;
+    private ?ilObject $learnGroup;
     public ilTemplate|ilGlobalTemplateInterface $tpl;
     public ilCtrl|ilCtrlInterface $ctrl;
     public ilTabsGUI $tabs;
@@ -40,9 +42,9 @@ class ilParticipationCertificateGUI
     protected ilParticipationCertificatePlugin $pl;
     protected ilLanguage $lng;
 
-
     /**
      *
+     * @throws ilCtrlException
      */
     function __construct()
     {
@@ -100,6 +102,9 @@ class ilParticipationCertificateGUI
         }
     }
 
+    /**
+     * @throws ilCtrlException
+     */
     protected function config(): void
     {
         $this->configResultTable();
@@ -257,11 +262,12 @@ class ilParticipationCertificateGUI
         $arr_config = $cert_configs->getObjConfigSetIfNoneCreateDefaultAndCreateNewObjConfigValues($this->groupRefId);
 
         $global_config_sets = new ilParticipationCertificateGlobalConfigSets();
+        $global_config_id = null;
         if (count($arr_config) > 0) {
             $global_config_id = reset($arr_config)->getGlobalConfigId();
         }
 
-        if ($global_config_id > 0) {
+        if (!empty($global_config_id) && $global_config_id > 0) {
             $global_config_set = $global_config_sets->getConfigSetById($global_config_id);
             $this->tpl->setOnScreenMessage('info',$this->pl->txt('configset_type_1'). ' ' . $global_config_set->getTitle(), true);
         } else {
@@ -315,7 +321,6 @@ class ilParticipationCertificateGUI
                         'page1_issuer_signature'
                     );
 
-
                     $inputFields[$config->getConfigKey()] = $ui->input()->field()->file(
                         new ilParticipationCertificateFileUploadHandlerGUI(),
                         $this->pl->txt('page1_issuer_signature'),
@@ -340,8 +345,6 @@ class ilParticipationCertificateGUI
                             $config->getConfigKey()
                         )->withValue($configValue ?? '');
                     }
-
-
                     break;
             }
         }
@@ -380,13 +383,11 @@ class ilParticipationCertificateGUI
     private function replacePlaceholdersFromOldVersion(string $configValue)
     {
         $configValue = str_replace('{{', '[[', $configValue);
-        $configValue = str_replace('}}', ']]', $configValue);
-
-        return $configValue;
+        return str_replace('}}', ']]', $configValue);
     }
 
     /**
-     * @throws ilCtrlException|arException
+     * @throws ilCtrlException|arException|ilTemplateException
      */
     public function save()
     {
@@ -465,6 +466,9 @@ class ilParticipationCertificateGUI
         return true;
     }
 
+    /**
+     * @throws ilCtrlException
+     */
     public function setCertTemplate(): void
     {
         $globalTemplateId = $_GET['template_id'];
@@ -478,6 +482,9 @@ class ilParticipationCertificateGUI
         $this->ctrl->redirect($this, self::CMD_DISPLAY);
     }
 
+    /**
+     * @throws ilCtrlException
+     */
     public function setOwnCertTextFromTemplate(): void
     {
         $globalTemplateId = $_GET['template_id'];
@@ -492,7 +499,7 @@ class ilParticipationCertificateGUI
 
     /**
      *
-     * @throws ilCtrlException
+     * @throws ilCtrlException|ilTemplateException
      */
     public function configResultTable(): void
     {
@@ -524,7 +531,7 @@ class ilParticipationCertificateGUI
      * @return Standard
      * @throws ilCtrlException
      */
-    protected function initConfigResultTableForm()
+    protected function initConfigResultTableForm(): Standard
     {
         global $DIC;
 
@@ -605,7 +612,7 @@ class ilParticipationCertificateGUI
     }
 
     /**
-     * @throws ilCtrlException
+     * @throws ilCtrlException|ilTemplateException
      */
     protected function saveResultTableConfig(): void
     {
@@ -749,7 +756,8 @@ class ilParticipationCertificateGUI
      * @return void
      * @throws DateInvalidTimeZoneException
      * @throws DateMalformedStringException
-     * @throws ilCtrlException
+     * @throws ilCtrlException|ilTemplateException
+     * @throws Exception
      */
     protected function saveSelfPrint(): void
     {

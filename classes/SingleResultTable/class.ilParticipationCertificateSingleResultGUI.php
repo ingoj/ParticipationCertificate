@@ -16,33 +16,14 @@ class ilParticipationCertificateSingleResultGUI
     protected ?ilObject $learnGroup;
     protected array $usr_ids;
     protected int $usr_id;
-    /**
-     * @var ilPartCertUserData[]
-     */
-    protected array $arr_usr_data;
-    /**
-     * @var ilCrsInitialTestState[]
-     */
-    protected array $arr_initial_test_states;
-    /**
-     * @var ilIassState[]
-     */
-    protected array $arr_iass_states;
-    /**
-     * @var ilExcerciseState[]
-     */
-    protected array $arr_excercise_states;
-    /**
-     * @var ilLearnObjectFinalTestState[][]
-     */
-    protected array $arr_FinalTestsStates;
-    /**
-     * @var ilLearnObjectFinalTestState[][]
-     */
-    protected array $array_obj_ids;
+
     protected ilParticipationCertificateSingleResultTableGUI $table;
 
-
+    /**
+     * @throws ilCtrlException
+     * @throws ilObjectNotFoundException
+     * @throws ilDatabaseException
+     */
     public function __construct()
     {
         global $DIC;
@@ -70,9 +51,13 @@ class ilParticipationCertificateSingleResultGUI
         $this->usr_id = $usr_id;
     }
 
+    /**
+     * @throws ilCtrlException
+     */
     public function executeCommand(): void
     {
         $nextClass = $this->ctrl->getNextClass();
+
         switch ($nextClass) {
             default:
                 $cmd = $this->ctrl->getCmd(self::CMD_DISPLAY);
@@ -81,6 +66,9 @@ class ilParticipationCertificateSingleResultGUI
         }
     }
 
+    /**
+     * @throws ilTemplateException
+     */
     public function display(): void
     {
         $this->tpl->addCss($this->pl->getDirectory() . '/templates/css/participation-certificate.css');
@@ -95,6 +83,10 @@ class ilParticipationCertificateSingleResultGUI
             $this->tpl->show();
         }
     }
+
+    /**
+     * @throws ilCtrlException
+     */
     public function initHeader(): void
     {
         $this->tpl->setTitle($this->learnGroup->getTitle());
@@ -103,7 +95,7 @@ class ilParticipationCertificateSingleResultGUI
         $this->ctrl->saveParameterByClass(ilParticipationCertificateResultGUI::class, 'ref_id');
         $this->tabs->setBackTarget($this->pl->txt('header_btn_back'), $this->ctrl->getLinkTargetByClass(ilParticipationCertificateResultGUI::class, ilParticipationCertificateResultGUI::CMD_CONTENT));
     }
-    public function initTable($override = false): void
+    public function initTable(): void
     {
         $this->table = new ilParticipationCertificateSingleResultTableGUI($this, ilParticipationCertificateSingleResultGUI::CMD_DISPLAY, $this->usr_id);
     }

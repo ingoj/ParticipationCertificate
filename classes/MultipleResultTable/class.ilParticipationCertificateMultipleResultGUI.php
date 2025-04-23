@@ -25,7 +25,11 @@ class ilParticipationCertificateMultipleResultGUI
     protected mixed $ref_id;
     protected ilObject|null|ilObjGroup $learnGroup;
 
-
+    /**
+     * @throws ilObjectNotFoundException
+     * @throws ilCtrlException
+     * @throws ilDatabaseException
+     */
     public function __construct()
     {
         global $DIC;
@@ -49,16 +53,13 @@ class ilParticipationCertificateMultipleResultGUI
 
         $this->ctrl->saveParameterByClass(ilParticipationCertificateUIHookGUI::class, ['ref_id', 'group_id']);
         $this->ctrl->saveParameterByClass(ilParticipationCertificateResultModificationGUI::class, ['ref_id', 'group_id']);
-        //$this->ctrl->saveParameterByClass(ilParticipationCertificateUIHookGUI::class, 'record_ids');
         $this->ctrl->saveParameterByClass(ilParticipationCertificateResultGUI::class, 'ref_id');
     }
 
     public function executeCommand(): void
     {
-        //$nextClass = $this->ctrl->getNextClass($this);
-        //switch ($nextClass) {
-        //default:
         $cmd = $this->ctrl->getCmd(self::CMD_SHOW_ALL_RESULTS);
+
         switch ($cmd) {
             case self::CMD_SHOW_ALL_RESULTS:
                 $this->{$cmd}();
@@ -67,7 +68,9 @@ class ilParticipationCertificateMultipleResultGUI
         //}
     }
 
-
+    /**
+     * @throws ilTemplateException
+     */
     protected function show_all_results(): void
     {
         if (method_exists($this->tpl, 'loadStandardTemplate')) {

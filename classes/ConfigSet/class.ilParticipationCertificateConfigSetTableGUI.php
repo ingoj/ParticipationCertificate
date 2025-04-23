@@ -2,7 +2,6 @@
 
 use ILIAS\Data\Factory;
 use ILIAS\Data\DateFormat\DateFormat;
-use ILIAS\UI\Implementation\Component\Table\Data;
 use ILIAS\UI\Component\Table as I;
 use ILIAS\Data\Range;
 use ILIAS\Data\Order;
@@ -124,7 +123,11 @@ class ilParticipationCertificateConfigSetTableGUI implements I\DataRetrieval
         return count($this->records());
     }
 
-    //do the actual reading - note, that e.g. order and range are easily converted to SQL
+    /**
+     * @param Order $order
+     * @param Range $range
+     * @return array
+     */
     protected function doSelect(Order $order, Range $range): array
     {
         $sql_order_part = $order->join('ORDER BY', fn(...$o) => implode(' ', $o));
@@ -156,10 +159,12 @@ class ilParticipationCertificateConfigSetTableGUI implements I\DataRetrieval
         ];
     }
 
-    protected function records()
+    /**
+     * @return array
+     */
+    protected function records(): array
     {
         global $DIC;
-        $ui = $DIC->ui()->factory();
 
         $global_configs = new ilParticipationCertificateConfigSets();
         $data = $global_configs->getAllConfigSets();

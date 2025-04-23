@@ -1,5 +1,8 @@
 <?php
 
+use Twig\Error\SyntaxError;
+use Twig\Error\LoaderError;
+
 /**
  * Class ilParticipationCertificateTwigParser
  *
@@ -16,7 +19,7 @@ class ilParticipationCertificateTwigParser {
 	protected ?array $array;
     public ilTemplate|ilGlobalTemplateInterface $tpl;
 
-    protected \Twig\TemplateWrapper|Twig_TemplateWrapper $twig_template;
+    protected \Twig\TemplateWrapper $twig_template;
 
 	public function __construct(int $group_ref_id, array $twig_options, array $usr_id = null, bool $ementor = true, bool $edited = false, array|null $array = NULL) {
 		global $DIC;
@@ -54,7 +57,7 @@ class ilParticipationCertificateTwigParser {
      * @param array $userIds
      * @return array
      */
-    private function excludeUsersFromPrintIfMissingUserData(array $userIds)
+    private function excludeUsersFromPrintIfMissingUserData(array $userIds): array
     {
         $arr_usr_data = ilPartCertUsersData::getData($this->pl, $userIds);
 
@@ -73,8 +76,8 @@ class ilParticipationCertificateTwigParser {
 
     /**
      * @return void
-     * @throws \Twig\Error\LoaderError
-     * @throws \Twig\Error\SyntaxError
+     * @throws LoaderError
+     * @throws SyntaxError
      * @throws arException
      * @throws ilDateTimeException
      */
@@ -110,7 +113,6 @@ class ilParticipationCertificateTwigParser {
         } else {
             $this->tpl->setOnScreenMessage('info',$this->pl->txt('configset_type_2'), true);
         }
-
 
         $arr_new_iass_states = ilIassStatesMulti::getData($this->usr_ids,$_GET['ref_id']);
         $arr_xali_states = xaliStates::getData($this->usr_ids,$_GET['ref_id']);
@@ -215,7 +217,7 @@ class ilParticipationCertificateTwigParser {
              if (is_array($arr_lo_master_crs[$usr_id])) {
                  $arr_usr_lo_master_crs = $arr_lo_master_crs[$usr_id];
              }
-             if ($this->edited == true) {
+             if ($this->edited) {
                  $initial_test_state = $this->array[0];
                  $learn_sugg_result = $this->array[1];
                  $iass_state = $this->array[2];
