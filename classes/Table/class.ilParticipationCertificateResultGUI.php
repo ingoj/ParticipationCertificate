@@ -194,7 +194,7 @@ class ilParticipationCertificateResultGUI
 
         $renderer = $DIC->ui()->renderer();
 
-        $resultTable = new ilParticipationCertificateResultTableNewGUI();
+        $resultTable = new ilParticipationCertificateResultTableGUI();
         $cert_access = new ilParticipationCertificateAccess($refId);
 
         $filterHtml = '';
@@ -364,7 +364,7 @@ class ilParticipationCertificateResultGUI
      */
     public function applyFilter(): void
     {
-        $resultTable = new ilParticipationCertificateResultTableNewGUI();
+        $resultTable = new ilParticipationCertificateResultTableGUI();
         $resultTable->buildFilter();
         $this->ctrl->redirect($this, self::CMD_CONTENT);
     }
