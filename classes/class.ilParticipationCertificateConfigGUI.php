@@ -896,7 +896,7 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI
     {
         global $DIC;
 
-        $r = $DIC['ui.renderer'];
+        $r = $DIC->ui()->renderer();
 
         $ui = $DIC->ui()->factory();
 

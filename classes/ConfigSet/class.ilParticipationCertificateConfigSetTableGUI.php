@@ -33,7 +33,7 @@ class ilParticipationCertificateConfigSetTableGUI implements I\DataRetrieval
         $this->ui_factory = $DIC->ui()->factory();
         $this->df = new Factory();
         $this->current_user_date_format = $this->df->dateFormat()->withTime24(
-            $DIC['ilUser']->getDateFormat()
+            $DIC->user()->getDateFormat()
         );
         $this->pl = ilParticipationCertificatePlugin::getInstance();
     }
