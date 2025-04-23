@@ -51,7 +51,7 @@ class ilParticipationCertificateResultGUI
     {
         global $DIC;
 
-        if (!$DIC->rbac()->system()->checkAccess('write', $this->groupRefId)) {
+        if (!$DIC->rbac()->system()->checkAccess('read', $this->groupRefId)) {
             $this->tpl->setOnScreenMessage('failure',$this->lng->txt('no_permission'), true);
             $DIC->ctrl()->redirectToURL('login.php');
         }
@@ -97,6 +97,7 @@ class ilParticipationCertificateResultGUI
      * @throws ilTemplateException
      * @throws arException
      * @throws ilCtrlException
+     * @throws Exception
      */
     public function content(): void
     {
@@ -142,7 +143,7 @@ class ilParticipationCertificateResultGUI
         $target_ref = 0;
         if ($cert_access->isSelfPrintEnabled() and !$cert_access->hasCurrentUserPrintAccess()) {
 			$global_config_sets = ilParticipationCertificateConfig::where(array("config_type"=>3, "global_config_id" => 0 ))->orderBy('order_by')->get();
-			foreach ($global_config_sets as $config) {
+            foreach ($global_config_sets as $config) {
 				if ($config->getConfigKey() == "true_name_helper") {
 					$target_ref=$config->getConfigValue();
 				}
