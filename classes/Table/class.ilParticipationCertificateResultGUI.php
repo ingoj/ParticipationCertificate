@@ -211,6 +211,7 @@ class ilParticipationCertificateResultGUI
      */
     protected function initTable(int $refId): string
     {
+
         global $DIC;
 
         $renderer = $DIC->ui()->renderer();
@@ -221,13 +222,18 @@ class ilParticipationCertificateResultGUI
         $filterHtml = '';
         $filterFirstname = '';
         $filterLastname = '';
+
         if ($cert_access->hasCurrentUserWriteAccess()) {
             $filter = $resultTable->buildFilter();
             $filterData = $DIC->uiService()->filter()->getData($filter);
-            $filterFirstname = $filterData['firstname'];
-            $filterLastname = $filterData['lastname'];
+
+            if (!empty($filterData)) {
+                $filterFirstname = $filterData['firstname'];
+                $filterLastname = $filterData['lastname'];
+            }
             $filterHtml .= $renderer->render($filter);
         }
+
         $table = $resultTable->getTableForRepresentation($filterFirstname, $filterLastname);
         $tableHtml = $renderer->render($table->withRequest($DIC->http()->request()));
 
