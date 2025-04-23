@@ -131,7 +131,6 @@ class ilParticipationCertificateResultTableGUI implements I\DataRetrieval
         ?array $filter_data,
         ?array $additional_parameters
     ): \Generator {
-
         $data = $this->doSelect($order, $range);
 
         $ementoringIsActive = false;
@@ -144,7 +143,7 @@ class ilParticipationCertificateResultTableGUI implements I\DataRetrieval
         }
     }
 
-    private function getSelectableColumns(): array
+    public function getSelectableColumns(): array
     {
         $cols = [];
         $cert_access = new ilParticipationCertificateAccess($_GET["ref_id"]);
@@ -237,9 +236,9 @@ class ilParticipationCertificateResultTableGUI implements I\DataRetrieval
             'loginname' => $f->table()->column()->text($columns['loginname']['txt'])
                                   ->withIsSortable(false),
             'firstname' => $f->table()->column()->text($columns['firstname']['txt'])
-                         ->withHighlight(true),
+                         ->withHighlight(false),
             'lastname' => $f->table()->column()->text($columns['lastname']['txt']),
-            'initial_test_finished' => $f->table()->column()->text($columns['initial_test_finished']['txt'], $this->current_user_date_format),
+            'initial_test_finished' => $f->table()->column()->text($columns['initial_test_finished']['txt']),
             'result_qualifing_tests' => $f->table()->column()->text($columns['result_qualifing_tests']['txt']),
             'results_qualifing_tests' => $f->table()->column()->text($columns['results_qualifing_tests']['txt']),
             'eMentoring_finished' => $f->table()->column()->text($columns['eMentoring_finished']['txt']),
@@ -248,7 +247,7 @@ class ilParticipationCertificateResultTableGUI implements I\DataRetrieval
         ];
     }
 
-    protected function records(): array
+    public function records(): array
     {
         $arr_usr_data = ilPartCertUsersData::getData($this->pl, $this->usr_ids);
 

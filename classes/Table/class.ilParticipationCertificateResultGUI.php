@@ -16,6 +16,17 @@ class ilParticipationCertificateResultGUI
     const CMD_PRINT_SELECTED_WITHOUTE_MENTORING = 'printSelectedWithouteMentoring';
     const CMD_PRINT_SELECTED = 'printSelected';
     const CMD_INIT_TABLE = 'initTable';
+
+    const CMD_EXPORT_EXCEL = 'exportExcel';
+
+    public const EXPORT_EXCEL = 1;
+
+    public const EXPORT_CSV = 2;
+    /**
+     * @var array|array[]
+     */
+    private array $columns;
+
     protected ilTemplate|ilGlobalTemplateInterface $tpl;
     protected ilCtrl|ilCtrlInterface $ctrl;
     protected ilTabsGUI $tabs;
@@ -149,6 +160,13 @@ class ilParticipationCertificateResultGUI
                 );
                 $this->toolbar->addComponent($toolbarButton);
             }
+
+            $toolbarButton = $ui->button()->standard(
+                $this->pl->txt('excel_export'),
+                $this->ctrl->getLinkTarget($this, $this::CMD_EXPORT_EXCEL)
+            );
+            $this->toolbar->addComponent($toolbarButton);
+
         }
         $target_ref = 0;
         if ($cert_access->isSelfPrintEnabled() and !$cert_access->hasCurrentUserPrintAccess()) {
@@ -175,6 +193,105 @@ class ilParticipationCertificateResultGUI
 
         } else {
             $this->tpl->show();
+        }
+    }
+
+    private function exportExcel()
+    {
+        $resultTable = new ilParticipationCertificateResultTableGUI();
+        $data = $resultTable->records();
+        $excel = new ilExcel();
+        $excel->addSheet('TEST'
+            ?: $this->lng->txt("export"));
+        $row = 1;
+
+        ob_start();
+        $this->fillMetaExcel($excel, $row); // row must be increment in fillMetaExcel()! (optional method)
+
+        // #14813
+        $pre = $row;
+        $this->fillHeaderExcel($excel, $row, $resultTable); // row should NOT be incremented in fillHeaderExcel()! (required method)
+        if ($pre == $row) {
+            $row++;
+        }
+
+        foreach ($data as $set) {
+            $this->fillRowExcel($excel, $row, $set);
+            $row++; // #14760
+        }
+        ob_end_clean();
+
+        $filename = "export";
+        $excel->sendToClient($filename);
+
+       /* if ($send) {
+            $excel->sendToClient($filename);
+        } else {
+            $excel->writeToFile($filename);
+        }*/
+    }
+
+    protected function fillMetaExcel(ilExcel $a_excel, int &$a_row): void
+    {
+    }
+
+    /**
+     * Excel Version of Fill Header. Likely to
+     * be overwritten by derived class.
+     * @param	ilExcel	$a_excel excel wrapper
+     * @param	int		$a_row   row counter
+     */
+    protected function fillHeaderExcel(ilExcel $a_excel, int &$a_row, $resultTable): void
+    {
+        $this->columns = [
+            [
+                'text' => 'invisible',
+                'sort_field' => '',
+                'width' => 'invisible',
+                'is_checkbox_action_column' => true
+            ]
+        ];
+        
+        $selectableColumns = $resultTable->getSelectableColumns();
+        foreach ($selectableColumns as $column) {
+            $this->columns[] = [
+                'text' => $column['txt'],
+                'sort_field' => $column['sort_field'],
+                'width' => $column['width'],
+                'is_checkbox_action_column' => true
+            ];
+        }
+
+        $col = 0;
+        foreach ($this->columns as $column) {
+            $title = strip_tags($column["text"]);
+            if ($title) {
+                $a_excel->setCell($a_row, $col++, $title);
+            }
+        }
+        $a_excel->setBold("A" . $a_row . ":" . $a_excel->getColumnCoord($col - 1) . $a_row);
+    }
+
+    /**
+     * Excel Version of Fill Row. Most likely to
+     * be overwritten by derived class.
+     * @param	ilExcel $a_excel excel wrapper
+     * @param	int     $a_row   row counter
+     * @param	array   $a_set   data array
+     */
+    protected function fillRowExcel(ilExcel $a_excel, int &$a_row, array $a_set): void
+    {
+        $col = 0;
+
+        foreach ($a_set as $key => $value) {
+
+            if ($key !== 'usr_id') {
+                if (is_array($value)) {
+                    $value = implode(', ', $value);
+                }
+                $a_excel->setCell($a_row, $col++, $value);
+            }
+
         }
     }
 

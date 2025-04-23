@@ -140,6 +140,9 @@ class ilParticipationCertificateGUI
         $this->tabs->activateTab(self::TAB_CONFIG);
     }
 
+    /**
+     * @throws ilCtrlException
+     */
     protected function initConfTabs(): void
     {
         $this->tabs->addSubTab(self::TAB_CONFIG_RESULT_TABLE, $this->pl->txt('config_result_table'), $this->ctrl->getLinkTarget($this, self::CMD_CONFIG_RESULT_TABLE));
