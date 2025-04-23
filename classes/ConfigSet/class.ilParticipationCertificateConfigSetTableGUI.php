@@ -24,10 +24,13 @@ class ilParticipationCertificateConfigSetTableGUI implements I\DataRetrieval
 
     protected URLBuilderToken $config_type;
 
+    private \ILIAS\UI\Factory $ui_factory;
+
     public function __construct()
     {
         global $DIC;
-        $this->ui_factory = $DIC['ui.factory'];
+
+        $this->ui_factory = $DIC->ui()->factory();
         $this->df = new Factory();
         $this->current_user_date_format = $this->df->dateFormat()->withTime24(
             $DIC['ilUser']->getDateFormat()
@@ -241,7 +244,7 @@ class ilParticipationCertificateConfigSetTableGUI implements I\DataRetrieval
     {
         global $DIC;
 
-        $f = $DIC['ui.factory'];
+        $f = $DIC->ui()->factory();
         $uri = $this->buildURI(ilParticipationCertificateConfigGUI::CMD_ACTION);
         $url_builder = new URLBuilder($uri);
         [$url_builder, $this->action_parameter_token, $this->row_id_token] =

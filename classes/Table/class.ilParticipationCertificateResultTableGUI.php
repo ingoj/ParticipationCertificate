@@ -56,7 +56,7 @@ class ilParticipationCertificateResultTableGUI implements I\DataRetrieval
     public function __construct()
     {
         global $DIC;
-        $this->ui_factory = $DIC['ui.factory'];
+        $this->ui_factory = $DIC->ui()->factory();
         $this->df = new Factory();
         $this->current_user_date_format = $this->df->dateFormat()->withTime24(
             $DIC['ilUser']->getDateFormat()
@@ -400,7 +400,7 @@ class ilParticipationCertificateResultTableGUI implements I\DataRetrieval
     {
         global $DIC;
 
-        $f = $DIC['ui.factory'];
+        $f = $DIC->ui()->factory();
         $uri = $this->buildURI();
         $url_builder = new URLBuilder($uri);
         [$url_builder, $this->action_parameter_token, $this->row_id_token] =

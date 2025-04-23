@@ -86,9 +86,6 @@ class ilParticipationCertificateSingleResultTableGUI extends ilTable2GUI {
 		$sorted = $this->sortColumns();
 		$i = 0;
 
-		/*print_r($sorted);
-		print_r($finalTestsStates);exit;*/
-
 		if (count($finalTestsStates)) {
             foreach ($sorted as $sort_key => $sort_arr) {
                 if (array_key_exists($sort_key, $finalTestsStates[$this->usr_id])) {
