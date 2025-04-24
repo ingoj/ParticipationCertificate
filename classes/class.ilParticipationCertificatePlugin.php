@@ -9,7 +9,11 @@ class ilParticipationCertificatePlugin extends ilUserInterfaceHookPlugin {
 
 	const PLUGIN_ID = "dhbwparticipationpdf";
 	const PLUGIN_NAME = "ParticipationCertificate";
+
 	const PLUGIN_CLASS_NAME = self::class;
+
+    const CERTIFICATIONS_PATH = 'dhbw_part_cert';
+
 	protected static ?ilParticipationCertificatePlugin $instance = null;
 
 
@@ -85,11 +89,9 @@ class ilParticipationCertificatePlugin extends ilUserInterfaceHookPlugin {
 
     protected function afterUpdate(): void
     {
-
-        // Get all files and directories in the specified path
-        $path = CLIENT_WEB_DIR . '/dhbw_part_cert';
+        // Get all files and directories in the certifications' path
+        $path = CLIENT_WEB_DIR . '/' . self::CERTIFICATIONS_PATH;
         $items = scandir($path);
-
 
         // Filter out the current (.) and parent (..) directories, and keep only directories
         $directories = array_filter($items, function($item) use ($path) {

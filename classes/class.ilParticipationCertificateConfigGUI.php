@@ -224,9 +224,17 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI
         foreach (ilParticipationCertificateConfig::get() as $config) {
             $config->delete();
         }
+
         foreach (ilParticipationCertificateGlobalConfigSet::get() as $configset) {
             $configset->delete();
         }
+
+        $files = ilParticipationCertificateFiles::get();
+
+        foreach ($files as $file) {
+            $file->delete();
+        }
+
 
         //Global Config
         //set global plugin configurations
