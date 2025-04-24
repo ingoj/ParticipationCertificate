@@ -233,17 +233,33 @@ class ilParticipationCertificateResultTableGUI implements I\DataRetrieval
         $f = $this->ui_factory;
 
         return  [
-            'loginname' => $f->table()->column()->text($columns['loginname']['txt'])
-                                  ->withIsSortable(false),
-            'firstname' => $f->table()->column()->text($columns['firstname']['txt'])
-                         ->withHighlight(false),
-            'lastname' => $f->table()->column()->text($columns['lastname']['txt']),
-            'initial_test_finished' => $f->table()->column()->text($columns['initial_test_finished']['txt']),
-            'result_qualifing_tests' => $f->table()->column()->text($columns['result_qualifing_tests']['txt']),
-            'results_qualifing_tests' => $f->table()->column()->text($columns['results_qualifing_tests']['txt']),
-            'eMentoring_finished' => $f->table()->column()->text($columns['eMentoring_finished']['txt']),
-            'eMentoring_homework' => $f->table()->column()->text($columns['eMentoring_homework']['txt']),
-            'eMentoring_percentage' => $f->table()->column()->text($columns['eMentoring_percentage']['txt']),
+            'loginname' => $f->table()->column()
+                                      ->text($columns['loginname']['txt'])
+                                      ->withIsSortable(false),
+            'firstname' => $f->table()->column()
+                                      ->text($columns['firstname']['txt'])
+                                      ->withIsSortable(false),
+            'lastname' => $f->table()->column()
+                                      ->text($columns['lastname']['txt'])
+                                      ->withIsSortable(false),
+            'initial_test_finished' => $f->table()->column()
+                                                  ->text($columns['initial_test_finished']['txt'])
+                                                  ->withIsSortable(false),
+            'result_qualifing_tests' => $f->table()->column()
+                                                   ->text($columns['result_qualifing_tests']['txt'])
+                                                   ->withIsSortable(false),
+            'results_qualifing_tests' => $f->table()->column()
+                                                    ->text($columns['results_qualifing_tests']['txt'])
+                                                    ->withIsSortable(false),
+            'eMentoring_finished' => $f->table()->column()
+                                                ->text($columns['eMentoring_finished']['txt'])
+                                                ->withIsSortable(false),
+            'eMentoring_homework' => $f->table()->column()
+                                                ->text($columns['eMentoring_homework']['txt'])
+                                                ->withIsSortable(false),
+            'eMentoring_percentage' => $f->table()->column()
+                                                  ->text($columns['eMentoring_percentage']['txt'])
+                                                  ->withIsSortable(false),
         ];
     }
 
@@ -413,17 +429,17 @@ class ilParticipationCertificateResultTableGUI implements I\DataRetrieval
             );
 
         $actions = [
-            'print_with_ementorining' => $f->table()->action()->standard(
+            'print_with_ementorining' => $f->table()->action()->multi(
                 $this->pl->txt('list_print_with'),
                 $url_builder->withParameter($this->action_parameter_token, 'print_with_ementorining'),
                 $this->row_id_token
             ),
-            'print_without_ementorining' => $f->table()->action()->standard(
+            'print_without_ementorining' => $f->table()->action()->multi(
                 $this->pl->txt('list_print_without'),
                 $url_builder->withParameter($this->action_parameter_token, 'print_without_ementorining'),
                 $this->row_id_token
             ),
-            'show_all_results' => $f->table()->action()->single(
+            'show_all_results' => $f->table()->action()->multi(
                     $this->pl->txt('list_overview'),
                     $url_builder->withParameter($this->action_parameter_token, 'show_all_results'),
                     $this->row_id_token

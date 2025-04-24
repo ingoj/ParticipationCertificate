@@ -5,22 +5,37 @@ class ilParticipationCertificateSingleResultTableGUI extends ilTable2GUI {
 	const SUCCESSFUL_PROGRESS_CSS_CLASS = "ilCourseObjectiveProgressBarCompleted";
 	const NON_SUCCESSFUL_PROGRESS_CSS_CLASS = "ilCourseObjectiveProgressBarNeutral";
 	const FAILED_PROGRESS_CSS_CLASS = "ilCourseObjectiveProgressBarFailed";
+
 	protected ilTabsGUI $tabs;
+
 	protected ilCtrl $ctrl;
+
 	protected ?object $parent_obj;
+
 	protected ilParticipationCertificatePlugin $pl;
+
 	protected array $filter = array();
+
 	protected int $usr_id;
+
 	protected array $marks = array();
+
 	protected string $color;
+
 	protected array $usr_ids;
+
+    private string $unsugg_color;
+
 	/**
 	 * @var ilLearningObjectivesMasterCrs[]
 	 */
 	protected array $sugg;
 
-
-	public function __construct(ilParticipationCertificateMultipleResultGUI|ilParticipationCertificateResultGUI|ilParticipationCertificateSingleResultGUI $a_parent_obj, string $a_parent_cmd, int $usr_id) {
+    /**
+     * @throws ilCtrlException
+     * @throws ilException
+     */
+    public function __construct(ilParticipationCertificateMultipleResultGUI|ilParticipationCertificateResultGUI|ilParticipationCertificateSingleResultGUI $a_parent_obj, string $a_parent_cmd, int $usr_id) {
 		global $DIC;
 
 		$this->ctrl = $DIC->ctrl();

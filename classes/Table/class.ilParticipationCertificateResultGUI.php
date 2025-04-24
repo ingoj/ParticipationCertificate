@@ -19,22 +19,25 @@ class ilParticipationCertificateResultGUI
 
     const CMD_EXPORT_EXCEL = 'exportExcel';
 
-    public const EXPORT_EXCEL = 1;
+    const CMD_EXPORT_CSV = 'exportCSV';
 
-    public const EXPORT_CSV = 2;
     /**
      * @var array|array[]
      */
     private array $columns;
 
     protected ilTemplate|ilGlobalTemplateInterface $tpl;
+
     protected ilCtrl|ilCtrlInterface $ctrl;
+
     protected ilTabsGUI $tabs;
+
     protected ilToolbarGUI $toolbar;
+
     protected ilParticipationCertificatePlugin $pl;
     protected int $groupRefId;
     protected ?ilObject $learnGroup;
-    protected ilParticipationCertificateAccess $cert_access;
+
     protected ilLanguage $lng;
 
     private bool $ementoring;
@@ -161,9 +164,23 @@ class ilParticipationCertificateResultGUI
                 $this->toolbar->addComponent($toolbarButton);
             }
 
+            if (!empty($_GET['filter_firstname'])) {
+                $this->ctrl->setParameter($this, 'filter_firstname', $_GET['filter_firstname']);
+            }
+
+            if (!empty($_GET['filter_lastname'])) {
+                $this->ctrl->setParameter($this, 'filter_lastname', $_GET['filter_lastname']);
+            }
+
             $toolbarButton = $ui->button()->standard(
                 $this->pl->txt('excel_export'),
-                $this->ctrl->getLinkTarget($this, $this::CMD_EXPORT_EXCEL)
+                $this->ctrl->getLinkTarget($this, self::CMD_EXPORT_EXCEL)
+            );
+            $this->toolbar->addComponent($toolbarButton);
+
+            $toolbarButton = $ui->button()->standard(
+                $this->pl->txt('csv_export'),
+                $this->ctrl->getLinkTarget($this, $this::CMD_EXPORT_CSV)
             );
             $this->toolbar->addComponent($toolbarButton);
 
@@ -196,21 +213,43 @@ class ilParticipationCertificateResultGUI
         }
     }
 
+    /**
+     * @return void
+     */
     private function exportExcel()
     {
         $resultTable = new ilParticipationCertificateResultTableGUI();
+
+        $filterFirstname = '';
+        $isFilterActive = false;
+        if (!empty($_GET['filter_firstname'])) {
+            $filterFirstname = $_GET['filter_firstname'];
+            $isFilterActive = true;
+        }
+
+        $filterLastname = '';
+        if (!empty($_GET['filter_lastname'])) {
+            $filterLastname = $_GET['filter_lastname'];
+            $isFilterActive = true;
+        }
+
+        if ($isFilterActive) {
+            $resultTable->setFilter($filterFirstname, $filterLastname);
+        }
+
         $data = $resultTable->records();
+
         $excel = new ilExcel();
         $excel->addSheet('TEST'
             ?: $this->lng->txt("export"));
         $row = 1;
 
         ob_start();
-        $this->fillMetaExcel($excel, $row); // row must be increment in fillMetaExcel()! (optional method)
+        $this->fillMetaExcel($excel, $row);
 
         // #14813
         $pre = $row;
-        $this->fillHeaderExcel($excel, $row, $resultTable); // row should NOT be incremented in fillHeaderExcel()! (required method)
+        $this->fillHeaderExcel($excel, $row, $resultTable);
         if ($pre == $row) {
             $row++;
         }
@@ -223,12 +262,52 @@ class ilParticipationCertificateResultGUI
 
         $filename = "export";
         $excel->sendToClient($filename);
+    }
 
-       /* if ($send) {
-            $excel->sendToClient($filename);
-        } else {
-            $excel->writeToFile($filename);
-        }*/
+    private function exportCSV()
+    {
+        $resultTable = new ilParticipationCertificateResultTableGUI();
+
+        $filterFirstname = '';
+        $isFilterActive = false;
+        if (!empty($_GET['filter_firstname'])) {
+            $filterFirstname = $_GET['filter_firstname'];
+            $isFilterActive = true;
+        }
+
+        $filterLastname = '';
+        if (!empty($_GET['filter_lastname'])) {
+            $filterLastname = $_GET['filter_lastname'];
+            $isFilterActive = true;
+        }
+
+        if ($isFilterActive) {
+            $resultTable->setFilter($filterFirstname, $filterLastname);
+        }
+
+
+        $data = $resultTable->records();
+
+
+        $csv = new ilCSVWriter();
+        $csv->setSeparator(";");
+
+        ob_start();
+        //$this->fillMetaCSV($csv);
+        $this->fillHeaderCSV($csv, $resultTable);
+        foreach ($data as $set) {
+            $this->fillRowCSV($csv, $set);
+        }
+        ob_end_clean();
+
+        $filename = "export.csv";
+        header("Content-type: text/comma-separated-values");
+        header("Content-Disposition: attachment; filename=\"" . $filename . "\"");
+        header("Expires: 0");
+        header("Cache-Control: must-revalidate, post-check=0,pre-check=0");
+        header("Pragma: public");
+        echo $csv->getCSVString();
+        exit();
     }
 
     protected function fillMetaExcel(ilExcel $a_excel, int &$a_row): void
@@ -236,8 +315,8 @@ class ilParticipationCertificateResultGUI
     }
 
     /**
-     * Excel Version of Fill Header. Likely to
-     * be overwritten by derived class.
+     * Excel Version of Fill Header.
+     *
      * @param	ilExcel	$a_excel excel wrapper
      * @param	int		$a_row   row counter
      */
@@ -273,8 +352,8 @@ class ilParticipationCertificateResultGUI
     }
 
     /**
-     * Excel Version of Fill Row. Most likely to
-     * be overwritten by derived class.
+     * Excel Version of Fill Row.
+     *
      * @param	ilExcel $a_excel excel wrapper
      * @param	int     $a_row   row counter
      * @param	array   $a_set   data array
@@ -293,6 +372,60 @@ class ilParticipationCertificateResultGUI
             }
 
         }
+    }
+
+    /**
+     * CSV Version of Fill Header.
+     *
+     * @param	ilCSVWriter $a_csv current file
+     */
+    protected function fillHeaderCSV(ilCSVWriter $a_csv, $resultTable): void
+    {
+        $this->columns = [
+            [
+                'text' => 'invisible',
+                'sort_field' => '',
+                'width' => 'invisible',
+                'is_checkbox_action_column' => true
+            ]
+        ];
+
+        $selectableColumns = $resultTable->getSelectableColumns();
+        foreach ($selectableColumns as $column) {
+            $this->columns[] = [
+                'text' => $column['txt'],
+                'sort_field' => $column['sort_field'],
+                'width' => $column['width'],
+                'is_checkbox_action_column' => true
+            ];
+        }
+
+        foreach ($this->columns as $column) {
+            $title = strip_tags($column["text"]);
+            if ($title) {
+                $a_csv->addColumn($title);
+            }
+        }
+        $a_csv->addRow();
+    }
+
+    /**
+     * CSV Version of Fill Row.
+     *
+     * @param	ilCSVWriter $a_csv current file
+     * @param	array       $a_set data array
+     */
+    protected function fillRowCSV(ilCSVWriter $a_csv, array $a_set): void
+    {
+        foreach ($a_set as $key => $value) {
+            if ($key !== 'usr_id') {
+                if (is_array($value)) {
+                    $value = implode(', ', $value);
+                }
+                $a_csv->addColumn(strip_tags($value));
+            }
+        }
+        $a_csv->addRow();
     }
 
     /**
@@ -351,7 +484,10 @@ class ilParticipationCertificateResultGUI
             $filterHtml .= $renderer->render($filter);
         }
 
-        $table = $resultTable->getTableForRepresentation($filterFirstname, $filterLastname);
+        $table = $resultTable->getTableForRepresentation(
+            $filterFirstname,
+            $filterLastname
+        );
         $tableHtml = $renderer->render($table->withRequest($DIC->http()->request()));
 
         return $filterHtml . $tableHtml;
@@ -365,8 +501,6 @@ class ilParticipationCertificateResultGUI
     {
         $action = $_GET['config_action'];
 
-
-
         if (!empty($action)) {
             switch ($action) {
                 case 'print_with_ementorining':
@@ -375,8 +509,6 @@ class ilParticipationCertificateResultGUI
                     break;
 
                 case 'show_all_results':
-
-                    $usrId = null;
                     if (!empty($_GET['config_entry'])) {
                         $usrId = explode('_', $_GET['config_entry'][0])[0];
                         $this->ctrl->setParameterByClass(ilParticipationCertificateResultGUI::class, 'usr_id', $usrId);
@@ -522,8 +654,19 @@ class ilParticipationCertificateResultGUI
      */
     public function applyFilter(): void
     {
+        global $DIC;
+
         $resultTable = new ilParticipationCertificateResultTableGUI();
-        $resultTable->buildFilter();
+        $filter = $resultTable->buildFilter();
+        $filterData = $DIC->uiService()->filter()->getData($filter);
+
+        if (!empty($filterData['firstname'])) {
+            $this->ctrl->setParameterByClass(self::class, 'filter_firstname', $filterData['firstname']);
+        }
+
+        if (!empty($filterData['lastname'])) {
+            $this->ctrl->setParameterByClass(self::class, 'filter_lastname', $filterData['lastname']);
+        }
         $this->ctrl->redirect($this, self::CMD_CONTENT);
     }
 
