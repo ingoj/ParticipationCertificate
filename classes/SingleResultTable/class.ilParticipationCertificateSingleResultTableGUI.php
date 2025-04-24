@@ -255,8 +255,7 @@ class ilParticipationCertificateSingleResultTableGUI extends ilTable2GUI {
 		}
 		//required to dodge bug in ilContainerObjectiveGUI::renderProgressBar
         if ($required_percent == 0) {
-            // TODO here there is problem with parameter $required_percent in renderProgressBar(). It can't be float|string
-            //$required_percent = 0.1; // TODO ask and test this
+            $required_percent = 0.1;
         }
 
 		if ($current_percent >= $required_percent) {
