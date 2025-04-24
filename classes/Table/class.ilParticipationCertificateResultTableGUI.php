@@ -90,14 +90,73 @@ class ilParticipationCertificateResultTableGUI implements I\DataRetrieval
         ?string $firstname = null,
         ?string $lastname = null
     ): I\Data {
+        global $DIC;
+
         $this->setFilter($firstname, $lastname);
         $actions = $this->getActions();
-
-        return $this->ui_factory->table()->data(
+        $request = $DIC->http()->request();
+        $table = $this->ui_factory->table()->data(
             '',
             $this->getColumsForRepresentation(),
             $this
-        )->withActions($actions);
+        )->withActions($actions)->withRequest($request);
+
+
+
+        /*$f = $DIC->ui()->factory();
+        $refinery = $DIC->refinery();
+        $query = $DIC->http()->wrapper()->query();
+
+
+        /*if ($query->has($this->action_parameter_token->getName())) {*/
+        /*if (!empty($_GET['config_action'])) {
+            $action = $query->retrieve('config_action', $refinery->to()->string());
+
+            dd($action);
+            $ids = $query->retrieve($this->row_id_token->getName(), $refinery->custom()->transformation(fn($v) => $v));
+            $listing = $f->listing()->characteristicValue()->text([
+                'table_action' => $action,
+                'id' => print_r($ids, true),
+            ]);
+
+            dd($listing);
+
+            /** take care of the async-call; 'delete'-action asks for it.
+            if ($action === 'delete') {
+                $items = [];
+                foreach ($ids as $id) {
+                    $items[] = $f->modal()->interruptiveItem()->keyValue($id, $row_id_token->getName(), $id);
+                }
+                echo($r->renderAsync([
+                    $f->modal()->interruptive(
+                        'Deletion',
+                        'You are about to delete items!',
+                        '#'
+                    )->withAffectedItems($items)
+                      ->withAdditionalOnLoadCode(static fn($id): string => "console.log('ASYNC JS');")
+                ]));
+                exit();
+            }
+            if ($action === 'info') {
+                echo(
+                    $r->render($f->messageBox()->info('an info message: <br><li>' . implode('<li>', $ids)))
+                    . '<script data-replace-marker="script">console.log("ASYNC JS, too");</script>'
+                );
+                exit();
+            }
+
+            /** otherwise, we want the table and the results below
+            $out[] = $f->divider()->horizontal();
+            $out[] = $listing;
+        }*/
+
+
+
+
+
+
+
+        return $table;
 
     }
 
@@ -429,21 +488,36 @@ class ilParticipationCertificateResultTableGUI implements I\DataRetrieval
             );
 
         $actions = [
-            'print_with_ementorining' => $f->table()->action()->multi(
+            'print_with_ementorining' => $f->table()->action()->single(
                 $this->pl->txt('list_print_with'),
                 $url_builder->withParameter($this->action_parameter_token, 'print_with_ementorining'),
                 $this->row_id_token
             ),
-            'print_without_ementorining' => $f->table()->action()->multi(
+            'print_without_ementorining' => $f->table()->action()->single(
                 $this->pl->txt('list_print_without'),
                 $url_builder->withParameter($this->action_parameter_token, 'print_without_ementorining'),
                 $this->row_id_token
             ),
-            'show_all_results' => $f->table()->action()->multi(
-                    $this->pl->txt('list_overview'),
-                    $url_builder->withParameter($this->action_parameter_token, 'show_all_results'),
-                    $this->row_id_token
-                ),
+            'show_all_results' => $f->table()->action()->single(
+                $this->pl->txt('list_overview'),
+                $url_builder->withParameter($this->action_parameter_token, 'show_all_results'),
+                $this->row_id_token
+            ),
+            'print_selected_with_ementorining' => $f->table()->action()->multi(
+                $this->pl->txt('list_print_with'),
+                $url_builder->withParameter($this->action_parameter_token, 'print_selected_with_ementorining'),
+                $this->row_id_token
+            ),
+            'print_selected_without_ementorining' => $f->table()->action()->multi(
+                $this->pl->txt('list_print_without'),
+                $url_builder->withParameter($this->action_parameter_token, 'print_selected_without_ementorining'),
+                $this->row_id_token
+            ),
+            'show_selected_all_results' => $f->table()->action()->multi(
+                $this->pl->txt('list_overview'),
+                $url_builder->withParameter($this->action_parameter_token, 'show_selected_all_results'),
+                $this->row_id_token
+            ),
         ];
         $cert_access = new ilParticipationCertificateAccess($this->refId);
         if ($cert_access->hasCurrentUserWriteAccess()) {

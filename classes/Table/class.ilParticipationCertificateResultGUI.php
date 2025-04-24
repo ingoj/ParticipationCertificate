@@ -488,6 +488,7 @@ class ilParticipationCertificateResultGUI
             $filterFirstname,
             $filterLastname
         );
+
         $tableHtml = $renderer->render($table->withRequest($DIC->http()->request()));
 
         return $filterHtml . $tableHtml;
@@ -521,6 +522,14 @@ class ilParticipationCertificateResultGUI
                 case 'adjust_results':
                     $resultModificationGui = new ilParticipationCertificateResultModificationGUI();
                     $resultModificationGui->display();
+                    break;
+
+                case 'print_selected_with_ementorining':
+                    $this->printSelected();
+                    break;
+
+                case 'print_selected_without_ementorining':
+                    $this->printSelectedWithoutEmentoring();
                     break;
             }
         }
@@ -584,25 +593,29 @@ class ilParticipationCertificateResultGUI
 
         $cert_access = new ilParticipationCertificateAccess($_GET['ref_id']);
         if ($cert_access->hasCurrentUserPrintAccess()) {
-            if (!isset($_POST['record_ids']) || (isset($_POST['record_ids']) && !count($_POST['record_ids']))) {
+            $configEntries = $_GET['config_entry'];
+
+            if (empty($configEntries)) {
                 $this->tpl->setOnScreenMessage('failure',$this->lng->txt('no_records_selected'), true);
                 $this->ctrl->redirect($this, self::CMD_CONTENT);
             }
-            $usr_ids = $_POST['record_ids'];
-            if (!is_array($usr_ids)) {
-                $usr_id[] = $usr_ids;
-            } else {
-                $usr_id = $usr_ids;
+
+            $usr_ids = [];
+
+            foreach ($configEntries as $entry) {
+                $urlParameters = $this->excludeURLParameters($entry);
+                $userId = $urlParameters[0];
+                $usr_ids[] = $userId;
             }
 
-            $arr_usr_data = ilPartCertUsersData::getData($this->pl, $usr_id);
-            $usr_id = $this->excludeUserIfDataMissing($usr_id, $arr_usr_data);
+            $arr_usr_data = ilPartCertUsersData::getData($this->pl, $usr_ids);
+            $usr_ids = $this->excludeUserIfDataMissing($usr_ids, $arr_usr_data);
 
-            if(empty($usr_id)) {
+            if(empty($usr_ids)) {
                 $this->redirectWithError(self::CMD_CONTENT, $this->pl->txt('all_user_data_missing'));
             }
 
-            $twigParser = new ilParticipationCertificateTwigParser($this->groupRefId, array(), (array) $usr_id, true, false);
+            $twigParser = new ilParticipationCertificateTwigParser($this->groupRefId, array(), (array) $usr_ids, true, false);
             $twigParser->parseData();
         } else {
             $DIC->ctrl()->redirectToURL('login.php');
@@ -623,26 +636,28 @@ class ilParticipationCertificateResultGUI
 
         $cert_access = new ilParticipationCertificateAccess($_GET['ref_id']);
         if ($cert_access->hasCurrentUserPrintAccess()) {
-            if (!isset($_POST['record_ids']) || (isset($_POST['record_ids']) && !count($_POST['record_ids']))) {
+            $configEntries = $_GET['config_entry'];
+
+            if (empty($configEntries)) {
                 $this->tpl->setOnScreenMessage('failure',$this->lng->txt('no_records_selected'), true);
                 $this->ctrl->redirect($this, self::CMD_CONTENT);
             }
+            $usr_ids = [];
 
-            $usr_ids = $_POST['record_ids'];
-            if (!is_array($usr_ids)) {
-                $usr_id[] = $usr_ids;
-            } else {
-                $usr_id = $usr_ids;
+            foreach ($configEntries as $entry) {
+                $urlParameters = $this->excludeURLParameters($entry);
+                $userId = $urlParameters[0];
+                $usr_ids[] = $userId;
             }
 
-            $arr_usr_data = ilPartCertUsersData::getData($this->pl, $usr_id);
-            $usr_id = $this->excludeUserIfDataMissing($usr_id, $arr_usr_data);
+            $arr_usr_data = ilPartCertUsersData::getData($this->pl, $usr_ids);
+            $usr_ids = $this->excludeUserIfDataMissing($usr_ids, $arr_usr_data);
 
-            if(empty($usr_id)) {
+            if(empty($usr_ids)) {
                 $this->redirectWithError(self::CMD_CONTENT, $this->pl->txt('all_user_data_missing'));
             }
 
-            $twigParser = new ilParticipationCertificateTwigParser($this->groupRefId, array(), $usr_id, false, false);
+            $twigParser = new ilParticipationCertificateTwigParser($this->groupRefId, array(), $usr_ids, false, false);
             $twigParser->parseData();
         } else {
             $DIC->ctrl()->redirectToURL('login.php');
