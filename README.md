@@ -38,3 +38,17 @@ $src = $DIC->resourceStorage()->consume()
 ```
 
 In this case, the file is assumed to have been imported using Kitchen Sink.
+
+## Testing Image Uploads in Docker (Development Environment)
+
+To enable testing of image uploads in a Docker-based development environment, you should modify the `generatePDF()` function in the `./classes/Report/ilParticipationCertificatePDFGenerator.php` file.
+
+Add the following line:
+
+```
+$rendered = str_replace('http://localhost:<port>', 'http://host.docker.internal:<port>', $rendered);
+```
+
+This ensures that image URLs referencing localhost are correctly resolved from within the Docker container by redirecting them to host.docker.internal.
+
+Replace <port> with the actual port number your application is running on.

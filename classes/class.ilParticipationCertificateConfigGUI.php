@@ -1,6 +1,5 @@
 <?php
 
-//TODO Refactoring - find a better way to save and display the form
 use ILIAS\UI\Component\Input\Container\Form\Standard;
 use ILIAS\UI\Component\Table\Data;
 
@@ -722,7 +721,6 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI
                         $config = ilParticipationCertificateConfig::where(array(
                             'config_key' => $key,
                             'global_config_id' => $global_config_id,
-                            // TODO ??? /*'config_value_type' => ilParticipationCertificateConfig::CONFIG_VALUE_TYPE_CERT_TEXT
                         ))->first();
                     }
 

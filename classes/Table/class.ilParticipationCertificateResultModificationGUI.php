@@ -138,7 +138,6 @@ class ilParticipationCertificateResultModificationGUI
             }
 
         } else {
-            // TODO Test this
             $this->ctrl->redirect(new ilParticipationCertificateResultGUI(), 'content');
         }
     }
