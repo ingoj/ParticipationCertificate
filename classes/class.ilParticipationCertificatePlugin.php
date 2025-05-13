@@ -1,7 +1,5 @@
 <?php
 
-require_once __DIR__ . "/../vendor/autoload.php";
-
 /**
  * Class ilParticipationCertificatePlugin
  *
@@ -11,7 +9,11 @@ class ilParticipationCertificatePlugin extends ilUserInterfaceHookPlugin {
 
 	const PLUGIN_ID = "dhbwparticipationpdf";
 	const PLUGIN_NAME = "ParticipationCertificate";
+
 	const PLUGIN_CLASS_NAME = self::class;
+
+    const CERTIFICATIONS_PATH = 'dhbw_part_cert';
+
 	protected static ?ilParticipationCertificatePlugin $instance = null;
 
 
@@ -83,6 +85,31 @@ class ilParticipationCertificatePlugin extends ilUserInterfaceHookPlugin {
 
     public function getImagePath(string $imageName): string {
         return $this->getDirectory()."/templates/images/".$imageName;
+    }
+
+    protected function afterUpdate(): void
+    {
+        // Get all files and directories in the certifications' path
+        $path = CLIENT_WEB_DIR . '/' . self::CERTIFICATIONS_PATH;
+        $items = scandir($path);
+
+        // Filter out the current (.) and parent (..) directories, and keep only directories
+        $directories = array_filter($items, function($item) use ($path) {
+            return is_dir($path . '/' . $item) && $item !== '.' && $item !== '..';
+        });
+
+        $directories = array_values($directories);
+
+        foreach ($directories as $directory) {
+            $file = new ilParticipationCertificateFiles();
+            if (is_file(ilParticipationCertificateConfig::returnPicturePath('absolute', (int) $directory, ilParticipationCertificateConfig::LOGO_FILE_NAME))) {
+                $file->setFile($directory, 'logo', false);
+            }
+
+            if (is_file(ilParticipationCertificateConfig::returnPicturePath('absolute', (int) $directory, ilParticipationCertificateConfig::ISSUER_SIGNATURE_FILE_NAME))) {
+                $file->setFile($directory, 'page1_issuer_signature', false);
+            }
+        }
     }
 
 }

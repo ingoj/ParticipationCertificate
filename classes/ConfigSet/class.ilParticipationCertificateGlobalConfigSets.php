@@ -54,7 +54,7 @@ class ilParticipationCertificateGlobalConfigSets {
 
 		asort($arr_order_by);
 
-		foreach($arr_order_by as $id => $order_by) {
+        foreach($arr_order_by as $id => $order_by) {
 			//$order_by = intval($order) / 10;
 
 			if(in_array($order_by,$arr_reserved)) {

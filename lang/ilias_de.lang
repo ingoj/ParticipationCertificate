@@ -14,6 +14,7 @@ cols_actions#:#Aktion
 list_actions#:#Aktionen
 list_results#:#Resultate für den Druck anpassen
 list_print#:#Drucken
+print#:#Drucken
 filter_name#:#Name
 header_config#:#Konfigurieren
 header_overview#:#Übersicht
@@ -31,7 +32,6 @@ result_for#:#Alle Resultate für
 no_records_selected#:#Keine User ausgewählt
 upload_header #:# Laden Sie Ihren PDF Header hoch
 save#:#Speichern
-udf_gender#:#Benutzerdefiniertes Feld Anrade
 udf_lastname#:#Benutzerdefiniertes Feld Nachname
 udf_firstname#:#Benutzerdefiniertes Feld Vorname
 config_plugin#:#Konfiguration Teilnahmebescheinigung
@@ -53,6 +53,7 @@ enable_self_print#:#Selbstausdruck aktivieren
 color#:#Farbe empfohlene LZ
 keyword#:#Keyword
 logo#:#Logo
+page1_issuer_signature#:#page1_issuer_signature
 udf_percent_value#:#Schwellenwert Videokonferenzen (Prozent)
 placeholders#:#Folgende Platzhalter sind verfügbar:
 yes#:#Ja
@@ -96,4 +97,13 @@ unsugg_color#:#Farbe nicht empfohlene LZ
 true_name_helper#:#UDF-Editor-Objekt für die Namenseingabe
 nonnumeric_ref#:#Die Eingabe für das UDF-Editor-Objekt muss die Ref-ID sein (numerisch oder leer, andere Zeichen sind nicht erlaubt).
 enable_ementoring#:#Ementoring einblenden
-
+back#:#Zurück
+Mr#:#Herr
+Ms#:#Frau
+user_data_missing#:#Benutzerdatenfelder sind nicht ausgefüllt. Bitte geben Sie einen Wert ein, bevor das Zertifikat generiert wird.
+all_user_data_missing#:#Benutzerdatenfelder sind nicht ausgefüllt. Bitte geben Sie einen Wert ein, bevor das Zertifikat generiert wird.
+start#:#Start
+end#:#Ende
+sorting#:#Sortierung
+excel_export#:#Excel-Export
+csv_export#:#.CSV-Export

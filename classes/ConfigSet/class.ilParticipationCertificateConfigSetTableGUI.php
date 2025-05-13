@@ -1,288 +1,328 @@
 <?php
-class ilParticipationCertificateConfigSetTableGUI extends ilTable2GUI {
-	protected ilTabsGUI $tabs;
-    protected ilCtrl $ctrl;
-	protected ?object $parent_obj;
-	protected ilParticipationCertificatePlugin $pl;
-	protected array $filter = array();
-	protected array $custom_export_formats = array();
-	protected array $custom_export_generators = array();
-	protected array $usr_ids;
 
-	public function __construct(ilParticipationCertificateConfigGUI $a_parent_obj, string $a_parent_cmd) {
-		global $DIC;
-
-		$this->ctrl = $DIC->ctrl();
-		$this->tabs = $DIC->tabs();
-		$this->pl = ilParticipationCertificatePlugin::getInstance();
-
-		$this->setPrefix('dhbw_cert_conf');
-		$this->setFormName('dhbw_cert_conf');
-		$this->setId('dhbw_cert_conf');
-
-		$toolbar = $DIC->toolbar();
-		$button = ilLinkButton::getInstance();
-		$button->setCaption($this->pl->txt('add_config'), false);
-		$button->setUrl($this->ctrl->getLinkTargetByClass(ilParticipationCertificateConfigGUI::class, ilParticipationCertificateConfigGUI::CMD_ADD_CONFIG));
-		$toolbar->addButtonInstance($button);
-
-		$button = ilLinkButton::getInstance();
-		$button->setCaption($this->pl->txt('reset_config'), false);
-		$button->setUrl($this->ctrl->getLinkTargetByClass(ilParticipationCertificateConfigGUI::class, ilParticipationCertificateConfigGUI::CMD_CONFIRM_RESET_CONFIG));
-		$toolbar->addButtonInstance($button);
-
-		parent::__construct($a_parent_obj, $a_parent_cmd);
-
-		$this->addColumns();
-		//$this->initFilter();
-
-		$this->addMultiCommand(ilParticipationCertificateConfigGUI::CMD_SAVE_ORDER, $this->pl->txt('save_order'));
-		$this->setRowTemplate('tpl.default_row.html', $this->pl->getDirectory());
-		$this->setFormAction($this->ctrl->getFormAction($a_parent_obj));
-
-		$this->parseData();
-	}
+use ILIAS\Data\Factory;
+use ILIAS\Data\DateFormat\DateFormat;
+use ILIAS\UI\Component\Table as I;
+use ILIAS\Data\Range;
+use ILIAS\Data\Order;
+use ILIAS\UI\URLBuilder;
+use ILIAS\Data\URI;
+use ILIAS\UI\URLBuilderToken;
 
 
-	/**
-	 * Get selectable columns
-	 */
-	function getSelectableColumns(): array
+class ilParticipationCertificateConfigSetTableGUI implements I\DataRetrieval
+{
+    protected Factory $df;
+    protected DateFormat $current_user_date_format;
+
+    protected ilParticipationCertificatePlugin $pl;
+
+    protected URLBuilderToken $action_parameter_token;
+
+    protected URLBuilderToken $row_id_token;
+
+    protected URLBuilderToken $config_type;
+
+    private \ILIAS\UI\Factory $ui_factory;
+
+    public function __construct()
     {
-		$cols = array();
-		$cols['order_by'] = array( 'txt' => $this->pl->txt('order_by'), 'default' => false, 'width' => 'auto' );
-		$cols['configset_type'] = array( 'txt' => $this->pl->txt('config_type'), 'default' => true, 'width' => 'auto' );
-		$cols['title'] = array( 'txt' => $this->pl->txt('title'), 'default' => true, 'width' => 'auto' );
-		$cols['parent_title'] = array( 'txt' => $this->pl->txt('parent_title'), 'default' => true, 'width' => 'auto' );
-		$cols['active'] = array( 'txt' => $this->pl->txt('active'), 'default' => true, 'width' => 'auto' );
+        global $DIC;
 
-		return $cols;
-	}
+        $this->ui_factory = $DIC->ui()->factory();
+        $this->df = new Factory();
+        $this->current_user_date_format = $this->df->dateFormat()->withTime24(
+            $DIC->user()->getDateFormat()
+        );
+        $this->pl = ilParticipationCertificatePlugin::getInstance();
+    }
 
-	private function addColumns(): void
+    /**
+     * @throws ilCtrlException
+     */
+    public function getTableForRepresentation(): I\Data
     {
-		//$this->addColumn('', '', '', true);
-		foreach ($this->getSelectableColumns() as $k => $v) {
-			if ($this->isColumnSelected($k)) {
-				if (isset($v['sort_field'])) {
-					$sort = $v['sort_field'];
-				} else {
-					$sort = "";
-				}
-				$this->addColumn($v['txt'], $sort, $v['width']);
-			}
-		}
-		if (!$this->getExportMode()) {
-			$this->addColumn($this->pl->txt('cols_actions'));
-		}
-	}
+        $actions = $this->getActions();
 
-	public function parseData(): void
-    {
-		$global_configs = new ilParticipationCertificateConfigSets();
-		$this->setData($global_configs->getAllConfigSets());
-	}
+        return $this->ui_factory->table()->data(
+            '',
+            $this->getColumsForRepresentation(),
+            $this
+        )->withActions($actions);
+    }
 
-	public function fillRow(array $a_set): void
-    {
-		global $DIC;
-		foreach ($this->getSelectableColumns() as $k => $v) {
+    public function getRows(
+        I\DataRowBuilder $row_builder,
+        array $visible_column_ids,
+        Range $range,
+        Order $order,
+        ?array $filter_data,
+        ?array $additional_parameters
+    ): \Generator {
+        $data = $this->doSelect($order, $range);
 
-			if ($this->isColumnSelected($k)) {
+        foreach ($data as $idx => $record) {
+            switch ($record['configset_type']) {
+                case  ilParticipationCertificateConfig::CONFIG_SET_TYPE_GLOBAL:
+                    yield $row_builder->buildDataRow($record['config_id'] . '_' . $record['config_type']. '_' . $record['obj_ref_id'], $record)
+                                      ->withDisabledAction('copy')
+                                      ->withDisabledAction('delete')
+                                      ->withDisabledAction('activate')
+                                      ->withDisabledAction('deactivate')
+                                      ->withDisabledAction('go_to')
+                                      ->withDisabledAction('create_template');;
+                    break;
+                case  ilParticipationCertificateConfig::CONFIG_SET_TYPE_TEMPLATE:
 
-				switch ($k) {
-					case 'order_by':
-						$value = intval($a_set[$k]) * 10;
-						$this->tpl->setCurrentBlock('td');
-						if ($a_set[$k] > 0) {
-							$number_input_gui = new ilNumberInputGUI('', 'order_by[' . $a_set['conf_id'] . ']');
-							$number_input_gui->setSize(3);
-							$number_input_gui->setValue($value);
+                    $buildRow = $row_builder->buildDataRow($record['config_id'] . '_' . $record['config_type']. '_' . $record['obj_ref_id'], $record)
+                        ->withDisabledAction('go_to')
+                        ->withDisabledAction('create_template');
 
-							$this->tpl->setVariable('VALUE', $number_input_gui->render());
-						} else {
-							$this->tpl->setVariable('VALUE', "&nbsp");
-						}
+                    if ($record['order_by'] == 1) {
 
-						$this->tpl->parseCurrentBlock();
-						break;
-					case 'configset_type':
-						$this->tpl->setCurrentBlock('td');
-						if ($a_set[$k] > 0) {
-							switch ($a_set['configset_type']) {
-								case ilParticipationCertificateConfig::CONFIG_SET_TYPE_GROUP:
-									if(!ilParticipationCertificateGlobalConfigSet::find($a_set['object_gl_conf_template_id'])) {
-										$this->tpl->setVariable('VALUE',"&nbsp");
-										break;
-									}
-									$arr_type[] =  $this->pl->txt('configset_type_' . $a_set[$k]);
-									$arr_type[] = $this->pl->txt('object_config_type_' . $a_set['object_config_type']);
-									$template = new ilParticipationCertificateGlobalConfigSet($a_set['object_gl_conf_template_id']);
-									$arr_type[] = $this->pl->txt('origin_template') . ": " . $template->getTitle();
-									$this->tpl->setVariable('VALUE', implode("<br/>", $arr_type));
-									break;
-								default:
-									$this->tpl->setVariable('VALUE', $this->pl->txt('configset_type_' . $a_set[$k]));
-									break;
-							}
-						} else {
-							$this->tpl->setVariable('VALUE', "&nbsp");
-						}
-						$this->tpl->parseCurrentBlock();
-						break;
-					case "active":
-						$factory = $DIC->ui()->factory();
-						if ((int)$a_set[$k] === 1) {
-							$this->tpl->setVariable('VALUE',"active");
-						} else {
-							$this->tpl->setVariable('VALUE',"inactive");
-						}
-						break;
-					default:
-						$this->tpl->setCurrentBlock('td');
-						$this->tpl->setVariable('VALUE', (is_array($a_set[$k]) ? implode("<br/>", $a_set[$k]) : ($a_set[$k] ? $a_set[$k] : "&nbsp;")));
-						$this->tpl->parseCurrentBlock();
-						break;
-				}
-			}
-		}
+                        $buildRow = $buildRow->withDisabledAction('delete')
+                                       ->withDisabledAction('activate')
+                                       ->withDisabledAction('deactivate');
+                    }
 
-		$action_list = new ilAdvancedSelectionListGUI();
-		$action_list->setListTitle($this->pl->txt('list_actions'));
-        if(array_key_exists('id', $a_set)) {
-            $action_list->setId('_actions' . $a_set['id']);
+                    if ($record['active_status']) {
+                        yield $buildRow->withDisabledAction('activate');
+                    } else {
+                        yield $buildRow->withDisabledAction('deactivate');
+                    }
+
+                    break;
+                case  ilParticipationCertificateConfig::CONFIG_SET_TYPE_GROUP:
+                    yield $row_builder->buildDataRow($record['config_id'] . '_' . $record['config_type'] . '_' . $record['obj_ref_id'], $record)
+                                      ->withDisabledAction('edit')
+                                      ->withDisabledAction('copy')
+                                      ->withDisabledAction('delete')
+                                      ->withDisabledAction('activate')
+                                      ->withDisabledAction('deactivate');
+
+                    break;
+            }
         }
-		$action_list->setUseImages(false);
+    }
 
-
-
-		switch ($a_set['configset_type']) {
-			case  ilParticipationCertificateConfig::CONFIG_SET_TYPE_GLOBAL:
-                $this->ctrl->setParameterByClass(ilParticipationCertificateConfigGUI::class, 'id', $a_set['conf_id']);
-				$this->ctrl->setParameterByClass(ilParticipationCertificateConfigGUI::class, 'set_type', ilParticipationCertificateConfig::CONFIG_SET_TYPE_GLOBAL);
-				$action_list->addItem($this->pl->txt('edit'), ilParticipationCertificateConfigGUI::CMD_SHOW_FORM, $this->ctrl->getLinkTargetByClass(ilParticipationCertificateConfigGUI::class, ilParticipationCertificateConfigGUI::CMD_SHOW_FORM));
-				break;
-			case  ilParticipationCertificateConfig::CONFIG_SET_TYPE_TEMPLATE:
-                $this->ctrl->setParameterByClass(ilParticipationCertificateConfigGUI::class, 'id', $a_set['conf_id']);
-				$this->ctrl->setParameterByClass(ilParticipationCertificateConfigGUI::class, 'set_type', ilParticipationCertificateConfig::CONFIG_SET_TYPE_TEMPLATE);
-				$action_list->addItem($this->pl->txt('edit'), ilParticipationCertificateConfigGUI::CMD_SHOW_FORM, $this->ctrl->getLinkTargetByClass(ilParticipationCertificateConfigGUI::class, ilParticipationCertificateConfigGUI::CMD_SHOW_FORM));
-				$action_list->addItem($this->pl->txt('copy'), ilParticipationCertificateConfigGUI::CMD_COPY_CONFIG, $this->ctrl->getLinkTargetByClass(ilParticipationCertificateConfigGUI::class, ilParticipationCertificateConfigGUI::CMD_COPY_CONFIG));
-				if ($a_set['order_by'] != 1) {
-					$action_list->addItem($this->pl->txt('delete'), ilParticipationCertificateConfigGUI::CMD_DELETE_CONFIG, $this->ctrl->getLinkTargetByClass(ilParticipationCertificateConfigGUI::class, ilParticipationCertificateConfigGUI::CMD_DELETE_CONFIG));
-
-					if ($a_set['active'] == 1) {
-						$action_list->addItem($this->pl->txt('set_inactive'), ilParticipationCertificateConfigGUI::CMD_SET_INACTIVE, $this->ctrl->getLinkTargetByClass(ilParticipationCertificateConfigGUI::class, ilParticipationCertificateConfigGUI::CMD_SET_INACTIVE));
-					}
-				}
-
-				if ($a_set['active'] == 0) {
-					$action_list->addItem($this->pl->txt('set_active'), ilParticipationCertificateConfigGUI::CMD_SET_ACTIVE, $this->ctrl->getLinkTargetByClass(ilParticipationCertificateConfigGUI::class, ilParticipationCertificateConfigGUI::CMD_SET_ACTIVE));
-				}
-				break;
-			case  ilParticipationCertificateConfig::CONFIG_SET_TYPE_GROUP:
-				$action_list->addItem($this->pl->txt('go_to_object'), $a_set['obj_ref_id'], ilLink::_getStaticLink($a_set['obj_ref_id']));
-
-                $this->ctrl->setParameterByClass(ilParticipationCertificateConfigGUI::class, 'grp_ref_id', $a_set['obj_ref_id']);
-
-                $action_list->addItem($this->pl->txt('create_template'), ilParticipationCertificateConfigGUI::CMD_CREATE_TEMPLATE_FRON_LOCAL_CONFIG, $this->ctrl->getLinkTargetByClass(ilParticipationCertificateConfigGUI::class, ilParticipationCertificateConfigGUI::CMD_CREATE_TEMPLATE_FRON_LOCAL_CONFIG));
-				break;
-		}
-
-		$this->tpl->setVariable('ACTIONS', $action_list->getHTML());
-		$this->tpl->parseCurrentBlock();
-	}
-
-
-	/**
-	 * @param ilExcel $a_excel
-	 * @param int     $a_row
-	 * @param array   $a_set
-	 */
-	/*protected function fillRowExcel(ilExcel $a_excel, &$a_row, $a_set) {
-		$col = 0;
-
-		foreach ($a_set as $key => $value) {
-			if (is_array($value)) {
-				$value = implode(', ', $value);
-			}
-			if ($this->isColumnSelected($key)) {
-				$a_excel->setCell($a_row, $col, strip_tags($value));
-				$col ++;
-			}
-		}
-	}*/
-
-	/**
-	 * @param object $a_csv
-	 * @param array  $a_set
-	 */
-	/*protected function fillRowCSV($a_csv, $a_set) {
-		foreach ($a_set as $key => $value) {
-			if (is_array($value)) {
-				$value = implode(', ', $value);
-			}
-			if ($this->isColumnSelected($key)) {
-				$a_csv->addColumn(strip_tags($value));
-			}
-		}
-		$a_csv->addRow();
-	}*/
-
-	public function initFilter(): void
+    private function getSelectableColumns(): array
     {
-		/*$firstname = new ilTextInputGUI($this->pl->txt('firstname'), 'firstname');
-		$lastname = new ilTextInputGUI($this->pl->txt('lastname'), 'lastname');
+        $cols = array();
+        $cols['configset_type'] = array( 'txt' => $this->pl->txt('config_type'), 'default' => '', 'width' => 'auto' );
+        $cols['title'] = array( 'txt' => $this->pl->txt('title'), 'default' => '', 'width' => 'auto' );
+        $cols['parent_title'] = array( 'txt' => $this->pl->txt('parent_title'), 'default' => '', 'width' => 'auto' );
+        $cols['active'] = array( 'txt' => $this->pl->txt('active'), 'default' => false, 'width' => 'auto' );
 
-		$this->addAndReadFilterItem($firstname);
-		$this->addAndReadFilterItem($lastname);
+        return $cols;
+    }
 
-		$firstname->readFromSession();
-		$lastname->readFromSession();
+    public function getTotalRowCount(
+        ?array $filter_data,
+        ?array $additional_parameters
+    ): ?int {
+        return count($this->records());
+    }
 
-		$this->filter['firstname'] = $firstname->getValue();
-		$this->filter['lastname'] = $lastname->getValue();*/
-	}
-
-
-	/**
-	 * @param ilFormPropertyGUI $item
-	 */
-	public function addAndReadFilterItem($item) {
-		/*$this->addFilterItem($item);
-		$item->readFromSession();
-
-		$this->filter[$item->getPostVar()] = $item->getValue();
-
-		$this->setDisableFilterHiding(true);*/
-	}
-
-
-	public function setExportFormats(array $formats): void
+    /**
+     * @param Order $order
+     * @param Range $range
+     * @return array
+     */
+    protected function doSelect(Order $order, Range $range): array
     {
-		/*parent::setExportFormats($formats);
+        $sql_order_part = $order->join('ORDER BY', fn(...$o) => implode(' ', $o));
+        $sql_range_part = sprintf('LIMIT %2$s OFFSET %1$s', ...$range->unpack());
+        return array_map(
+            fn($rec) => array_merge($rec, ['sql_order' => $sql_order_part, 'sql_range' => $sql_range_part]),
+            $this->records()
+        );
+    }
 
-		$custom_fields = array_diff($formats, $this->export_formats);
-
-		foreach ($custom_fields as $format_key) {
-			if (isset($this->custom_export_formats[$format_key])) {
-				$this->export_formats[$format_key] = $this->pl->getPrefix() . '_' - $this->custom_export_formats[$format_key];
-			}
-		}*/
-	}
-
-	public function exportData(int $format, bool $send = false): void
+    /**
+     * @return array
+     */
+    protected function getColumsForRepresentation(): array
     {
-		/*if (array_key_exists($format, $this->custom_export_formats)) {
-			if ($this->dataExists()) {
+        $columns = $this->getSelectableColumns();
 
-				foreach ($this->custom_export_generators as $export_format => $generator_config) {
-					if ($this->getExportMode() == $export_format) {
-						$generator_config['generator']->generate();
-					}
-				}
-			}
-		} else {
-			parent::exportData($format, $send);
-		}*/
-	}
+        $f = $this->ui_factory;
+
+        return  [
+            'configset_type_title' => $f->table()->column()->text($columns['configset_type']['txt'])
+                          ->withIsSortable(false),
+            'title' => $f->table()->column()->text($columns['title']['txt'])
+                         ->withIsSortable(false),
+            'parent_title' => $f->table()->column()->text($columns['parent_title']['txt'])
+                         ->withIsSortable(false),
+            'active' => $f->table()->column()->text($columns['active']['txt'])
+                         ->withIsSortable(false),
+        ];
+    }
+
+    /**
+     * @return array
+     */
+    protected function records(): array
+    {
+        global $DIC;
+
+        $global_configs = new ilParticipationCertificateConfigSets();
+        $data = $global_configs->getAllConfigSets();
+
+        $tableData = [];
+
+        $selectableColumns = $this->getSelectableColumns();
+
+        foreach ($data as $configSet) {
+            $active = 'inactive';
+            $activeStatus = false;
+            $configSetType = '';
+            $configId = $configSet['conf_id'];
+            $configType = $configSet['configset_type'];
+            $arr_type = [];
+            $objRefId = $configSet['obj_ref_id'];
+
+            foreach ($configSet as $key => $value) {
+                switch ($key) {
+                    case 'configset_type':
+                        if ($configSet[$key] > 0) {
+                            switch ($configSet['configset_type']) {
+                                case ilParticipationCertificateConfig::CONFIG_SET_TYPE_GROUP:
+                                    if (!ilParticipationCertificateGlobalConfigSet::find(
+                                        $configSet['object_gl_conf_template_id']
+                                    )) {
+                                        $configSetType = '';
+                                    }
+                                    $arr_type[] = $this->pl->txt('configset_type_' . $configSet['configset_type']);
+                                    $arr_type[] = $this->pl->txt(
+                                        'object_config_type_' . $configSet['object_config_type']
+                                    );
+                                    $template = new ilParticipationCertificateGlobalConfigSet(
+                                        $configSet['object_gl_conf_template_id']
+                                    );
+                                    $arr_type[] = $this->pl->txt('origin_template') . ": " . $template->getTitle();
+
+                                    $configSetType = implode("<br/>", $arr_type);
+                                    break;
+                                default:
+                                    $configSetType = $this->pl->txt('configset_type_' . $configSet['configset_type']);
+                                    break;
+                            }
+                        } else {
+                            $configSetType = '';
+                        }
+
+                        break;
+
+                    case 'active':
+                        if ((int)$configSet[$key] === 1) {
+                            $active = 'active';
+                            $activeStatus = true;
+                        }
+                        break;
+                    default:
+
+                        break;
+                }
+            }
+
+            $tmp = [
+                'config_id' => $configId,
+                'config_type' => $configType,
+                'order_by' => $configSet['order_by'],
+                'configset_type' => $configSet['configset_type'],
+                'configset_type_title' => $configSetType,
+                'title' => $configSet['title'],
+                'parent_title' => $configSet['parent_title'],
+                'obj_ref_id' => $objRefId,
+                'active' => $active,
+                'active_status' => $activeStatus
+            ];
+
+            $tableData[] = $tmp;
+        }
+
+        return $tableData;
+    }
+
+    /**
+     * @throws ilCtrlException
+     */
+    private function getActions(): array
+    {
+        global $DIC;
+
+        $f = $DIC->ui()->factory();
+        $uri = $this->buildURI(ilParticipationCertificateConfigGUI::CMD_ACTION);
+        $url_builder = new URLBuilder($uri);
+        [$url_builder, $this->action_parameter_token, $this->row_id_token] =
+            $url_builder->acquireParameters(
+                ['config'],
+                'action',
+                'entry'
+            );
+
+        $actions = [
+            'edit' => $f->table()->action()->single(
+                $this->pl->txt('edit'),
+                $url_builder->withParameter($this->action_parameter_token, 'edit'),
+                $this->row_id_token
+            ),
+            'copy' => $f->table()->action()->single(
+                $this->pl->txt('copy'),
+                $url_builder->withParameter($this->action_parameter_token, 'copy'),
+                $this->row_id_token
+            ),
+            'delete' =>
+                $f->table()->action()->single(
+                    $this->pl->txt('delete'),
+                    $url_builder->withParameter($this->action_parameter_token, 'delete'),
+                    $this->row_id_token
+                ),
+            'activate' =>
+                $f->table()->action()->single(
+                    $this->pl->txt('set_active'),
+                    $url_builder->withParameter($this->action_parameter_token, 'activate'),
+                    $this->row_id_token
+                ),
+            'deactivate' =>
+                $f->table()->action()->single(
+                    $this->pl->txt('set_inactive'),
+                    $url_builder->withParameter($this->action_parameter_token, 'deactivate'),
+                    $this->row_id_token
+                ),
+            'create_template' =>
+                $f->table()->action()->single(
+                    $this->pl->txt('create_template'),
+                    $url_builder->withParameter($this->action_parameter_token, 'create-template'),
+                    $this->row_id_token
+                ),
+            'go_to' =>
+                $f->table()->action()->single(
+                    $this->pl->txt('go_to_object'),
+                    $url_builder->withParameter($this->action_parameter_token, 'go-to'),
+                    $this->row_id_token
+                )
+        ];
+
+        return $actions;
+    }
+
+    /**
+     * @param string $command
+     * @return URI
+     * @throws ilCtrlException
+     */
+    private function buildURI(
+        string $command
+    ): URI {
+        global $DIC;
+
+        return new URI(
+            ILIAS_HTTP_PATH . '/' . $DIC->ctrl()->getLinkTargetByClass(
+                \ilParticipationCertificateConfigGUI::class,
+                $command
+            )
+        );
+    }
 }
