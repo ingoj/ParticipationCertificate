@@ -478,7 +478,7 @@ class ilParticipationCertificateGUI
 
         $cert_configs = new ilParticipationCertificateConfigs();
         if ($globalTemplateId != 0) {
-            $cert_configs->setObjToUseCertTemplate($this->groupRefId, $globalTemplateId);
+            $cert_configs->setObjToUseCertTemplate($this->groupRefId, (int) $globalTemplateId);
             $this->tpl->setOnScreenMessage('success',$this->pl->txt('successForm'), true);
 
         }
