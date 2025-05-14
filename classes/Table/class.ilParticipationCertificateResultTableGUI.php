@@ -516,7 +516,7 @@ class ilParticipationCertificateResultTableGUI implements I\DataRetrieval
         }
         
         $cert_access = new ilParticipationCertificateAccess($this->refId);
-        if ($cert_access->hasCurrentUserWriteAccess()) {
+        if ($cert_access->hasCurrentUserAdminAccess()) {
            $actions['adjust_results'] = $f->table()->action()->single(
                $this->pl->txt('list_results'),
                $url_builder->withParameter($this->action_parameter_token, 'adjust_results'),
