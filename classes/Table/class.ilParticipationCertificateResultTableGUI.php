@@ -522,7 +522,10 @@ class ilParticipationCertificateResultTableGUI implements I\DataRetrieval
                $url_builder->withParameter($this->action_parameter_token, 'adjust_results'),
                $this->row_id_token
            );
-        // } uncoment if results table should be visible to mentees    
+        }
+
+        // if mentees shoud see results, change the check to Read instead of Special
+        if ($cert_access->hasCurrentUserSpecialAccess()) {
            $actions['show_all_results'] = $f->table()->action()->single(
                 $this->pl->txt('list_overview'),
                 $url_builder->withParameter($this->action_parameter_token, 'show_all_results'),
@@ -533,7 +536,7 @@ class ilParticipationCertificateResultTableGUI implements I\DataRetrieval
                 $url_builder->withParameter($this->action_parameter_token, 'show_selected_all_results'),
                 $this->row_id_token
             );
-        } // comment if results table should be visible to mentees
+        }
 
         return $actions;
     }
