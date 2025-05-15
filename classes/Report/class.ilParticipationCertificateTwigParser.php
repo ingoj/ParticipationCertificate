@@ -214,7 +214,7 @@ class ilParticipationCertificateTwigParser {
 
              //Learning Objective Master Course
              $arr_usr_lo_master_crs = array();
-             if (is_array($arr_lo_master_crs[$usr_id])) {
+             if (is_array($arr_lo_master_crs) && array_key_exists($usr_id, $arr_lo_master_crs) && is_array($arr_lo_master_crs[$usr_id])) {
                  $arr_usr_lo_master_crs = $arr_lo_master_crs[$usr_id];
              }
              if ($this->edited) {
