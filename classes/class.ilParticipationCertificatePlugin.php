@@ -5,36 +5,36 @@
  *
  * @author Silas Stulz <sst@studer-raimann.ch>
  */
-class ilParticipationCertificatePlugin extends ilUserInterfaceHookPlugin {
+class ilParticipationCertificatePlugin extends ilUserInterfaceHookPlugin
+{
+    public const PLUGIN_ID = "dhbwparticipationpdf";
+    public const PLUGIN_NAME = "ParticipationCertificate";
 
-	const PLUGIN_ID = "dhbwparticipationpdf";
-	const PLUGIN_NAME = "ParticipationCertificate";
+    public const PLUGIN_CLASS_NAME = self::class;
 
-	const PLUGIN_CLASS_NAME = self::class;
+    public const CERTIFICATIONS_PATH = 'dhbw_part_cert';
 
-    const CERTIFICATIONS_PATH = 'dhbw_part_cert';
-
-	protected static ?ilParticipationCertificatePlugin $instance = null;
+    protected static ?ilParticipationCertificatePlugin $instance = null;
 
 
     public function getPluginName(): string
     {
-		return self::PLUGIN_NAME;
-	}
-	public static function getInstance(): ilParticipationCertificatePlugin
+        return self::PLUGIN_NAME;
+    }
+    public static function getInstance(): ilParticipationCertificatePlugin
     {
         global $DIC;
-		if (is_null(self::$instance)) {
+        if (is_null(self::$instance)) {
             /** @var $component_factory ilComponentFactory */
             $component_factory = $DIC['component.factory'];
             /** @var $plugin ilParticipationCertificatePlugin */
             $plugin = $component_factory->getPlugin(ilParticipationCertificatePlugin::PLUGIN_ID);
-            self::$instance  = $plugin;
-		}
+            self::$instance = $plugin;
+        }
 
-		return self::$instance;
-	}
-	protected ilDBInterface $db;
+        return self::$instance;
+    }
+    protected ilDBInterface $db;
 
     public function __construct(
         ilDBInterface $db,
@@ -46,20 +46,6 @@ class ilParticipationCertificatePlugin extends ilUserInterfaceHookPlugin {
 
         $this->db = $DIC->database();
     }
-
-	protected function init(): void
-    {
-		parent::init();
-        if(file_exists(__DIR__ . "/../../../../Cron/CronHook/LearningObjectiveSuggestions/vendor/autoload.php")) {
-            require_once __DIR__ . "/../../../../Cron/CronHook/LearningObjectiveSuggestions/vendor/autoload.php";
-        }
-        if(file_exists(__DIR__ . "/../../../../EventHandling/EventHook/UserDefaults/vendor/autoload.php")) {
-            require_once __DIR__ . "/../../../../EventHandling/EventHook/UserDefaults/vendor/autoload.php";
-        }
-        if(file_exists(__DIR__ . "/../../../../UIComponent/UserInterfaceHook/LearningObjectiveSuggestionsUI/vendor/autoload.php")) {
-            require_once __DIR__ . "/../../../../UIComponent/UserInterfaceHook/LearningObjectiveSuggestionsUI/vendor/autoload.php";
-        }
-	}
 
     protected function afterUninstall(): void
     {
@@ -77,14 +63,15 @@ class ilParticipationCertificatePlugin extends ilUserInterfaceHookPlugin {
         foreach ($sequences as $sequence) {
             try {
                 $this->db->dropSequence($sequence);
-            }catch (Exception $e){
+            } catch (Exception $e) {
                 //ignore
             }
         }
     }
 
-    public function getImagePath(string $imageName): string {
-        return $this->getDirectory()."/templates/images/".$imageName;
+    public function getImagePath(string $imageName): string
+    {
+        return $this->getDirectory() . "/templates/images/" . $imageName;
     }
 
     protected function afterUpdate(): void
@@ -94,7 +81,7 @@ class ilParticipationCertificatePlugin extends ilUserInterfaceHookPlugin {
         $items = scandir($path);
 
         // Filter out the current (.) and parent (..) directories, and keep only directories
-        $directories = array_filter($items, function($item) use ($path) {
+        $directories = array_filter($items, function ($item) use ($path) {
             return is_dir($path . '/' . $item) && $item !== '.' && $item !== '..';
         });
 
