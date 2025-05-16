@@ -202,7 +202,7 @@ class ilParticipationCertificateResultGUI
             }
         }
 
-        $tableHtml = $this->initTable($_GET['ref_id']);
+        $tableHtml = $this->initTable((int) $_GET['ref_id']);
         $this->tpl->setContent($tableHtml);
 
         if (method_exists($this->tpl, 'printToStdout')) {
