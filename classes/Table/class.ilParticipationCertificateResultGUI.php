@@ -543,7 +543,8 @@ class ilParticipationCertificateResultGUI
     {
         global $DIC;
 
-        $cert_access = new ilParticipationCertificateAccess($_GET['ref_id']);
+        $cert_access = new ilParticipationCertificateAccess((int) $_GET['ref_id']);
+
         if ($cert_access->hasCurrentUserPrintAccess()) {
             $ementor = false;
             $usr_id = [];
