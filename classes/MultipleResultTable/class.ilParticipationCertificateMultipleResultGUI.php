@@ -30,7 +30,7 @@ class ilParticipationCertificateMultipleResultGUI
      * @throws ilCtrlException
      * @throws ilDatabaseException
      */
-    public function __construct()
+    public function __construct(?array $userIds = null)
     {
         global $DIC;
 
@@ -44,7 +44,7 @@ class ilParticipationCertificateMultipleResultGUI
 
         $this->learnGroup = ilObjectFactory::getInstanceByRefId($this->ref_id);
 
-        $this->usr_ids = filter_input(INPUT_POST, 'record_ids', FILTER_DEFAULT, FILTER_FORCE_ARRAY);
+        $this->usr_ids = $userIds;//filter_input(INPUT_POST, 'record_ids', FILTER_DEFAULT, FILTER_FORCE_ARRAY);
 
         if (!is_array($this->usr_ids) || count($this->usr_ids) === 0) {
             $this->tpl->setOnScreenMessage('failure',$this->pl->txt('no_records_selected'), true);
@@ -71,7 +71,7 @@ class ilParticipationCertificateMultipleResultGUI
     /**
      * @throws ilTemplateException
      */
-    protected function show_all_results(): void
+    public function show_all_results(): void
     {
         if (method_exists($this->tpl, 'loadStandardTemplate')) {
             $this->tpl->loadStandardTemplate();

@@ -461,7 +461,6 @@ class ilParticipationCertificateResultGUI
      */
     protected function initTable(int $refId): string
     {
-
         global $DIC;
 
         $renderer = $DIC->ui()->renderer();
@@ -519,6 +518,15 @@ class ilParticipationCertificateResultGUI
                     $singleResultGui->display();
                     break;
 
+                case 'show_selected_all_results':
+                    $userIds = [];
+                    if (!empty($_GET['config_entry'])) {
+                        $userIds = $this->excludeUserIdsFromUrlParameters($_GET['config_entry']);
+                    }
+
+                    $resultGUI = new ilParticipationCertificateMultipleResultGUI($userIds);
+                    $resultGUI->show_all_results();
+                    break;
                 case 'adjust_results':
                     $resultModificationGui = new ilParticipationCertificateResultModificationGUI();
                     $resultModificationGui->display();
@@ -533,6 +541,22 @@ class ilParticipationCertificateResultGUI
                     break;
             }
         }
+    }
+
+    /**
+     * @param array $configEntries
+     * @return array
+     */
+    private function excludeUserIdsFromUrlParameters(array $configEntries): array
+    {
+        $userIds = [];
+        if (!empty($configEntries)) {
+            foreach ($configEntries as $configEntry) {
+                $usrId = explode('_', $configEntry)[0];
+                $userIds[] = $usrId;
+            }
+        }
+        return $userIds;
     }
 
     /**
