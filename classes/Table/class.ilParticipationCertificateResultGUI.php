@@ -524,8 +524,7 @@ class ilParticipationCertificateResultGUI
                         $userIds = $this->excludeUserIdsFromUrlParameters($_GET['config_entry']);
                     }
 
-                    $resultGUI = new ilParticipationCertificateMultipleResultGUI($userIds);
-                    $resultGUI->show_all_results();
+                    new ilParticipationCertificateMultipleResultGUI($userIds, $this->groupRefId);
                     break;
                 case 'adjust_results':
                     $resultModificationGui = new ilParticipationCertificateResultModificationGUI();
