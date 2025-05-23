@@ -116,11 +116,14 @@ class ilParticipationCertificateTwigParser
             $this->tpl->setOnScreenMessage('info', $this->pl->txt('configset_type_2'), true);
         }
 
-        $arr_new_iass_states = ilIassStatesMulti::getData($this->usr_ids, $_GET['ref_id']);
-        $arr_xali_states = xaliStates::getData($this->usr_ids, $_GET['ref_id']);
+        $refId = (int) $_GET['ref_id'];
+        $arr_new_iass_states = ilIassStatesMulti::getData($this->usr_ids, $refId);
+        $arr_xali_states = xaliStates::getData($this->usr_ids, $refId);
 
         $arr_usr_data = ilPartCertUsersData::getData($this->pl, $this->usr_ids);
-        $arr_lo_master_crs = ilLearningObjectivesMasterCrs::getData($this->usr_ids);
+        $arr_lo_master_crs = ilLearningObjectivesMasterCrs::getData(ilObject::_lookupObjectId($refId), $this->usr_ids);
+
+
         $arr_initial_test_states = ilCrsInitialTestStates::getData($this->usr_ids);
         $arr_excercise_states = ilExcerciseStates::getData($this->usr_ids, $this->group_ref_id);
         $arr_iass_states = ilIassStates::getData($this->usr_ids);

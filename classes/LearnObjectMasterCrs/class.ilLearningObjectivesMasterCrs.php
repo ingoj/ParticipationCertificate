@@ -5,11 +5,11 @@ class ilLearningObjectivesMasterCrs
     /**
      * @return ilLearningObjectiveMasterCrs[]
      */
-    public static function getData(array $arr_usr_ids = array()): array
+    public static function getData(int $crsId, array $arr_usr_ids = array()): array
     {
         global $DIC;
         $ilDB = $DIC->database();
-        $result = $ilDB->query(self::getSQL($arr_usr_ids));
+        $result = $ilDB->query(self::getSQL($crsId, $arr_usr_ids));
 
         $lo_master_data = array();
         while ($row = $ilDB->fetchAssoc($result)) {
@@ -24,7 +24,7 @@ class ilLearningObjectivesMasterCrs
     }
 
 
-    protected static function getSQL(array $arr_usr_ids = array()): string
+    protected static function getSQL(int $crsId, array $arr_usr_ids = array()): string
     {
         global $DIC;
         $ilDB = $DIC->database();
@@ -38,7 +38,8 @@ class ilLearningObjectivesMasterCrs
 					inner join loc_settings on loc_settings.obj_id = crs_obj.obj_id and loc_settings.itest > 0
 					inner join obj_members as crs_memb on crs_memb.obj_id = crs_obj.obj_id
 					inner join alo_crs_config as alp_crs on alp_crs.course_obj_id = crs_obj.obj_id
-					WHERE " . $ilDB->in('crs_memb.usr_id', $arr_usr_ids, false, 'integer');
+					WHERE crso.crs_id = " . $ilDB->quote($crsId, 'integer') . " AND "
+					. $ilDB->in('crs_memb.usr_id', $arr_usr_ids, false, 'integer');
 
         return $select;
     }
