@@ -6,27 +6,41 @@ class ilParticipationCertificateMultipleResultGUI
 {
 
     const CMD_SHOW_ALL_RESULTS = 'show_all_results';
+    const CMD_SHOW_SELECTED_ALL_RESULTS = 'show_selected_all_results';
+
     protected ilTabsGUI $tabs;
+
     protected ilTemplate|ilGlobalTemplateInterface $tpl;
+
     protected ilCtrl|ilCtrlInterface $ctrl;
+
     protected ilParticipationCertificatePlugin $pl;
+
     protected ilToolbarGUI $toolbar;
+
     /**
      * @var ilParticipationCertificateMultipleResultTableGUI[]
      */
     protected array $tables = array();
+
     /**
      * @var int[]
      */
     protected ?array $usr_ids;
+
     /**
      * @var int
      */
     protected mixed $ref_id;
+
     protected ilObject|null|ilObjGroup $learnGroup;
 
-
-    public function __construct()
+    /**
+     * @throws ilObjectNotFoundException
+     * @throws ilCtrlException
+     * @throws ilDatabaseException|ilTemplateException
+     */
+    public function __construct(?array $userIds = null, ?string $refId = null)
     {
         global $DIC;
 
@@ -36,11 +50,19 @@ class ilParticipationCertificateMultipleResultGUI
         $this->tpl = $DIC->ui()->mainTemplate();
         $this->pl = ilParticipationCertificatePlugin::getInstance();
 
-        $this->ref_id = filter_input(INPUT_GET, 'ref_id');
+        if ($refId !== null) {
+            $this->ref_id = (int) $refId;
+        } else {
+            $this->ref_id = (int) $_GET['ref_id'];
+        }
 
         $this->learnGroup = ilObjectFactory::getInstanceByRefId($this->ref_id);
 
-        $this->usr_ids = filter_input(INPUT_POST, 'record_ids', FILTER_DEFAULT, FILTER_FORCE_ARRAY);
+        if ($userIds !== null) {
+            $this->usr_ids = $userIds;
+        } else {
+            $this->usr_ids = filter_input(INPUT_POST, 'record_ids', FILTER_DEFAULT, FILTER_FORCE_ARRAY);
+        }
 
         if (!is_array($this->usr_ids) || count($this->usr_ids) === 0) {
             $this->tpl->setOnScreenMessage('failure',$this->pl->txt('no_records_selected'), true);
@@ -49,16 +71,16 @@ class ilParticipationCertificateMultipleResultGUI
 
         $this->ctrl->saveParameterByClass(ilParticipationCertificateUIHookGUI::class, ['ref_id', 'group_id']);
         $this->ctrl->saveParameterByClass(ilParticipationCertificateResultModificationGUI::class, ['ref_id', 'group_id']);
-        //$this->ctrl->saveParameterByClass(ilParticipationCertificateUIHookGUI::class, 'record_ids');
         $this->ctrl->saveParameterByClass(ilParticipationCertificateResultGUI::class, 'ref_id');
+
+
+        $this->show_all_results();
     }
 
     public function executeCommand(): void
     {
-        //$nextClass = $this->ctrl->getNextClass($this);
-        //switch ($nextClass) {
-        //default:
         $cmd = $this->ctrl->getCmd(self::CMD_SHOW_ALL_RESULTS);
+
         switch ($cmd) {
             case self::CMD_SHOW_ALL_RESULTS:
                 $this->{$cmd}();
@@ -67,15 +89,17 @@ class ilParticipationCertificateMultipleResultGUI
         //}
     }
 
-
-    protected function show_all_results(): void
+    /**
+     * @throws ilTemplateException
+     */
+    private function show_all_results(): void
     {
         if (method_exists($this->tpl, 'loadStandardTemplate')) {
             $this->tpl->loadStandardTemplate();
         } else {
             $this->tpl->getStandardTemplate();
         }
-        $this->tpl->addCss($this->pl->getDirectory() . '/Templates/css/table.css');
+        $this->tpl->addCss($this->pl->getDirectory() . '/templates/css/participation-certificate.css');
         $this->initHeader();
 
         $this->initTables();
@@ -84,6 +108,7 @@ class ilParticipationCertificateMultipleResultGUI
         foreach ($this->tables as $table) {
             $html .= $table->getHTML();
         }
+
         $this->tpl->setContent($html);
         if (method_exists($this->tpl, 'printToStdout')) {
             $this->tpl->printToStdout();
@@ -102,8 +127,9 @@ class ilParticipationCertificateMultipleResultGUI
 
     protected function initTables(): void
     {
+        $this->ctrl->saveParameterByClass(ilParticipationCertificateMultipleResultGUI::class, 'ref_id');
         foreach ($this->usr_ids as $usr_id) {
-            $this->tables[] = new ilParticipationCertificateMultipleResultTableGUI($this, self::CMD_SHOW_ALL_RESULTS, $usr_id, $this->usr_ids);
+            $this->tables[] = new ilParticipationCertificateMultipleResultTableGUI($this, self::CMD_SHOW_SELECTED_ALL_RESULTS, $usr_id, $this->usr_ids);
         }
     }
 }

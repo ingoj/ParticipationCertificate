@@ -1,0 +1,8 @@
+/* Include CSS, becuase ILIAS does overwrite */
+.ilCourseObjectiveProgressBarCompleted {
+    background-color: #60b060 !important;
+}
+
+.ilCourseObjectiveProgressBarFailed {
+    background-color: #b06060 !important;
+}

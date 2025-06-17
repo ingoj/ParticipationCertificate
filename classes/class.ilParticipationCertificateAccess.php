@@ -1,5 +1,4 @@
 <?php
-require_once __DIR__ . "/../vendor/autoload.php";
 
 use srag\Plugins\UserDefaults\UserSearch\usrdefObj;
 
@@ -55,14 +54,16 @@ class ilParticipationCertificateAccess {
 			return true;
 		}
 		// find users data for firstname and lastname, return false if length = 0 for at least one
-		$usrdata = new ilPartCertUsersData;
+		$partCertUserdata = new ilPartCertUsersData;
 		$curr_user[] = $this->usr->getId();
-		$first = $usrdata->getData($curr_user)[$curr_user[0]]->getPartCertFirstname();
-		$last = $usrdata->getData($curr_user)[$curr_user[0]]->getPartCertLastname();
+        $userData = $partCertUserdata->getData($this->pl, $curr_user);
 
-		if (strlen($first)*strlen($last) == 0) {
-			return false;
-		}	
+		$first = $userData[$curr_user[0]]->getPartCertFirstname();
+		$last = $userData[$curr_user[0]]->getPartCertLastname();
+
+        if (strlen($first ?? '') * strlen($last ?? '') == 0) {
+            return false;
+        }
 		// if user has data, check if selfprint is active (changed to a new function)
 		return ($this->isSelfPrintEnabled());
 	}

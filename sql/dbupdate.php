@@ -666,3 +666,41 @@ if (!is_object($config)) {
     $part_conf->store();
 }
 ?>
+
+<#39>
+<?php
+require_once "Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/ParticipationCertificate/vendor/autoload.php";
+
+$config = ilParticipationCertificateConfig::where(["config_key" => 'udf_gender'])->first();
+if (!is_object($config)) {
+    $config = new ilParticipationCertificateConfig();
+}
+$config->delete();
+?>
+
+<#40>
+<?php
+$fields = array(
+    'id' => array(
+        'type' => 'integer',
+        'notnull' => true
+    ),
+    'config_id' => array(
+        'type' => 'integer',
+        'notnull' => true
+    ), // It is whether the global config id or the group ref id
+    'type' => array(
+        'type' => 'text',
+        'notnull' => true
+    ),
+    'resource_storage' => array(
+        'type' => 'integer',
+        'length' => 1,
+        'notnull' => true
+    )
+);
+
+$ilDB->createTable('dhbw_part_cert_files', $fields);
+$ilDB->addPrimaryKey('dhbw_part_cert_files', ['id']);
+$ilDB->createSequence('dhbw_part_cert_files');
+?>

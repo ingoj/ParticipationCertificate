@@ -49,11 +49,14 @@ class ilParticipationCertificateResultModificationGUI
      */
     protected array $array_obj_ids;
 
+    private $dic;
+
 
     public function __construct()
     {
         global $DIC;
 
+        $this->dic = $DIC;
         $this->toolbar = $DIC->toolbar();
         $this->ctrl = $DIC->ctrl();
         $this->tabs = $DIC->tabs();
@@ -67,10 +70,16 @@ class ilParticipationCertificateResultModificationGUI
         $this->ctrl->saveParameterByClass(ilParticipationCertificateResultGUI::class, 'usr_id');
         $cert_access = new ilParticipationCertificateAccess($_GET['ref_id']);
         $this->usr_ids = $cert_access->getUserIdsOfGroup();
+
         $usr_id = $_GET[self::IDENTIFIER];
+
+        if(empty($usr_id)) {
+            $urlParameters = $this->excludeURLParameters($_GET['config_entry'][0]);
+            $usr_id = (int) $urlParameters[0];
+        }
         $this->usr_id = $usr_id;
 
-        $this->arr_usr_data = ilPartCertUsersData::getData($this->usr_ids);
+        $this->arr_usr_data = ilPartCertUsersData::getData($this->pl, $this->usr_ids);
         $this->arr_initial_test_states = ilCrsInitialTestStates::getData($this->usr_ids);
         $this->arr_learn_reached_percentages = ilLearnObjectSuggResults::getData($this->usr_ids);
         $this->arr_iass_states = ilIassStates::getData($this->usr_ids);
@@ -80,6 +89,7 @@ class ilParticipationCertificateResultModificationGUI
 
         $this->ctrl->setParameterByClass(ilParticipationCertificateResultModificationGUI::class, 'edited', true);
         $this->ctrl->setParameterByClass(ilParticipationCertificateResultModificationGUI::class, 'ementor', true);
+        $this->ctrl->setParameterByClass(ilParticipationCertificateResultModificationGUI::class, 'usr_id', $this->usr_id);
     }
 
 
@@ -98,22 +108,37 @@ class ilParticipationCertificateResultModificationGUI
         }
     }
 
+    /**
+     * @throws ilTemplateException
+     * @throws ilCtrlException
+     */
     public function display(): void
     {
-        if (method_exists($this->tpl, 'loadStandardTemplate')) {
-            $this->tpl->loadStandardTemplate();
-        } else {
-            $this->tpl->getStandardTemplate();
-        }
-        $this->initHeader();
-        $form = $this->initForm();
-        $this->fillForm($form);
+        global $DIC;
 
-        $this->tpl->setContent($form->getHTML());
-        if (method_exists($this->tpl, 'printToStdout')) {
-            $this->tpl->printToStdout();
+        $cert_access = new ilParticipationCertificateAccess($_GET['ref_id']);
+        if ($cert_access->hasCurrentUserWriteAccess()) {
+            $renderer = $this->dic->ui()->renderer();
+            $this->tpl->loadStandardTemplate();
+            $this->initHeader();
+
+            $form = $this->initForm();
+
+            $printButtonText = $this->pl->txt('print');
+            $printButtonTextJs = json_encode($printButtonText);
+            $DIC->ui()->mainTemplate()->addOnLoadCode(<<<JS
+              $('#ilContentContainer #il_center_col form .il-standard-form-cmd button.btn').text($printButtonTextJs)
+            JS);
+
+            $this->tpl->setContent($renderer->render($form));
+            if (method_exists($this->tpl, 'printToStdout')) {
+                $this->tpl->printToStdout();
+            } else {
+                $this->tpl->show();
+            }
+
         } else {
-            $this->tpl->show();
+            $this->ctrl->redirect(new ilParticipationCertificateResultGUI(), 'content');
         }
     }
 
@@ -130,86 +155,142 @@ class ilParticipationCertificateResultModificationGUI
         ), ilParticipationCertificateResultGUI::CMD_CONTENT));
     }
 
-    public function initForm(): ilPropertyFormGUI
+    /**
+     * @throws ilCtrlException
+     */
+    public function initForm()
     {
-        $usr_id = $_GET[self::IDENTIFIER];
-        $arr_usr_data = ilPartCertUsersData::getData($this->usr_ids);
-        $nameUser = $arr_usr_data[$usr_id]->getPartCertFirstname() . ' ' . $arr_usr_data[$usr_id]->getPartCertLastname();
+        $ui = $this->dic->ui()->factory();
 
-        $form = new ilPropertyFormGUI();
-        $form->setPreventDoubleSubmission(false);
-        $cert_access = new ilParticipationCertificateAccess($_GET['ref_id']);
-        if ($cert_access->hasCurrentUserWriteAccess()) {
-            $form->setFormAction($this->ctrl->getFormAction($this));
-            $form->setTitle('Resultate für ' . $nameUser . ' bearbeiten');
-
-            $initialtest = new ilTextInputGUI($this->pl->txt('mod_initial'), 'initial');
-            $form->addItem($initialtest);
-
-            $resultstests = new ilTextInputGUI($this->pl->txt('mod_resultstest'), 'resultstest');
-            $form->addItem($resultstests);
-
-            $conferences = new ilTextInputGUI($this->pl->txt('mod_conf'), 'conf');
-            $form->addItem($conferences);
-
-            $homeworks = new ilTextInputGUI($this->pl->txt('mod_homework'), 'homework');
-            $form->addItem($homeworks);
-
-            $form->addCommandButton(ilParticipationCertificateResultGUI::CMD_PRINT_PDF, $this->pl->txt('list_print'));
-        } else {
-            $this->tpl->setOnScreenMessage('failure','No Access Permissions', true);
-        }
-        return $form;
-    }
-
-    public function save(): void
-    {
-        $form = $this->initForm();
-
-        if (!$form->checkInput()) {
-            //TODO error message plus redirect
-            return;
-        }
-    }
-
-    public function fillForm(&$form): void
-    {
         $usr_id = $_GET[self::IDENTIFIER];
 
-        if (key_exists($usr_id, $this->arr_initial_test_states) && is_object($this->arr_initial_test_states[$usr_id])) {
-            $array['initial'] = $this->arr_initial_test_states[$usr_id]->getCrsitestItestSubmitted();
+        if(empty($usr_id)) {
+            $urlParameters = $this->excludeURLParameters($_GET['config_entry'][0]);
+            $usr_id = (int) $urlParameters[0];
+        }
+
+        $arr_usr_data = ilPartCertUsersData::getData($this->pl, $this->usr_ids);
+        $name_user = $arr_usr_data[$usr_id]->getPartCertFirstname() . ' ' . $arr_usr_data[$usr_id]->getPartCertLastname();
+
+        $form_data = $this->getFormData();
+
+        $inputFields['initial'] = $ui->input()->field()->text(
+            $this->pl->txt('mod_initial')
+        )->withValue((string) $form_data['initial'] ?? '');
+
+        $inputFields['mod_resultstest'] = $ui->input()->field()->text(
+            $this->pl->txt('mod_resultstest')
+        )->withValue((string) $form_data['resultstest'] ?? '');
+
+        $inputFields['conf'] = $ui->input()->field()->text(
+            $this->pl->txt('mod_conf')
+        )->withValue((string) $form_data['conf'] ?? '');
+
+        $inputFields['homework'] = $ui->input()->field()->text(
+            $this->pl->txt('mod_homework')
+        )->withValue((string) $form_data['homework'] ?? '');
+
+        $section = $ui->input()->field()->section(
+            $inputFields,
+            'Resultate für ' . $name_user . ' bearbeiten'
+        );
+        $formAction = $this->ctrl->getFormActionByClass(
+            self::class,
+            ilParticipationCertificateResultGUI::CMD_PRINT_PDF,
+            $this->pl->txt('list_print')
+        );
+
+        //Step 2: Define the form and attach the section.
+         $form = $ui->input()->container()->form()->standard(
+             $formAction,
+             ['config' => $section]
+         );
+         return $form;
+    }
+
+    /**
+     * @return array
+     */
+    public function getFormData(): array
+    {
+        $array = [];
+        if (key_exists($this->usr_id, $this->arr_initial_test_states) && is_object($this->arr_initial_test_states[$this->usr_id])) {
+            $array['initial'] = $this->arr_initial_test_states[$this->usr_id]->getCrsitestItestSubmitted();
         } else {
             $array['initial'] = 0;
         }
-        if (key_exists($usr_id, $this->arr_learn_reached_percentages) && is_object($this->arr_learn_reached_percentages[$usr_id])) {
-            $array['resultstest'] = $this->arr_learn_reached_percentages[$usr_id]->getAveragePercentage(ilParticipationCertificateConfig::getConfig('calculation_type_processing_state_suggested_objectives', $_GET['ref_id']));
+        if (key_exists($this->usr_id, $this->arr_learn_reached_percentages) && is_object($this->arr_learn_reached_percentages[$this->usr_id])) {
+            $array['resultstest'] = $this->arr_learn_reached_percentages[$this->usr_id]->getAveragePercentage(ilParticipationCertificateConfig::getConfig('calculation_type_processing_state_suggested_objectives', $_GET['ref_id']));
         } else {
             $array['resultstest'] = 0;
         }
-        if (key_exists($usr_id, $this->arr_iass_states) && is_object($this->arr_iass_states[$usr_id])) {
-            $array['conf'] = $this->arr_iass_states[$usr_id]->getPassed();
+        if (key_exists($this->usr_id, $this->arr_iass_states) && is_object($this->arr_iass_states[$this->usr_id])) {
+            $array['conf'] = $this->arr_iass_states[$this->usr_id]->getPassed();
         } else {
             $array['conf'] = 0;
         }
-        if (key_exists($usr_id, $this->arr_excercise_states) && is_object($this->arr_excercise_states[$usr_id])) {
-            $array['homework'] = $this->arr_excercise_states[$usr_id]->getPassedPercentage();
+        if (key_exists($this->usr_id, $this->arr_excercise_states) && is_object($this->arr_excercise_states[$this->usr_id])) {
+            $array['homework'] = $this->arr_excercise_states[$this->usr_id]->getPassedPercentage();
         } else {
             $array['homework'] = 0;
         }
-        $form->setValuesbyArray($array);
+        return $array;
     }
 
+    /**
+     * @throws ilCtrlException
+     */
     public function printPDF(): void
     {
-        $form = $this->initForm();
-        $form->setValuesByPost();
-        $form->checkInput();
+        global $DIC;
 
-        $array = array($form->getInput('initial'), $form->getInput('resultstest'), $form->getInput('conf'), $form->getInput('homework'));
+        $form = $this->initForm();
+
+        $form  = $form ->withRequest($DIC->http()->request());
+        $data = $form->getData()['config'];
+
+        $array = [
+            $data['initial'],
+            $data['mod_resultstest'],
+            $data['conf'],
+            $data['homework']
+        ];
         $ementor = $_GET['ementor'];
         $edited = $_GET['edited'];
         $usr_id[] = $this->usr_id;
+
+        $arr_usr_data = ilPartCertUsersData::getData($this->pl, $usr_id);
+        $user_data = new ilPartCertUserData();
+        if(!$user_data->checkIfUserDataFilled(
+            $arr_usr_data[$usr_id[0]]->getPartCertSalutation(),
+            $arr_usr_data[$usr_id[0]]->getPartCertFirstname(),
+            $arr_usr_data[$usr_id[0]]->getPartCertLastname()
+        )) {
+            $this->redirectWithError(self::CMD_DISPLAY, $this->pl->txt('user_data_missing'));
+        }
+
         $twigParser = new ilParticipationCertificateTwigParser($this->groupRefId, array(), $usr_id, $ementor, $edited, $array);
         $twigParser->parseData();
+    }
+
+    /**
+     * @param string $cmd
+     * @param string $msg
+     * @return void
+     * @throws ilCtrlException
+     */
+    private function redirectWithError(string $cmd, string $msg): void
+    {
+        $this->tpl->setOnScreenMessage('failure', $msg, true);
+        $this->ctrl->redirect($this, $cmd);
+    }
+
+    /**
+     * @param string $parameter
+     * @return string[]
+     */
+    private function excludeURLParameters(string $parameter): array
+    {
+        return explode('_', $parameter);
     }
 }

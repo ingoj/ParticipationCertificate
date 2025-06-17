@@ -1,70 +1,103 @@
 <?php
 
+use Twig\Error\SyntaxError;
+use Twig\Error\LoaderError;
+
 /**
  * Class ilParticipationCertificateTwigParser
  *
  * @ilCtrl_isCalledBy ilParticipationCertificateTwigParser: ilParticipationCertificateGUI, ilParticipationCertificateResultGUI
  */
-class ilParticipationCertificateTwigParser {
+class ilParticipationCertificateTwigParser
+{
     protected ilParticipationCertificatePlugin $pl;
     protected int $group_ref_id;
-	protected array $usr_ids;
-	protected null|int|array $usr_id;
-	protected bool $ementor = false;
-	protected bool $footer = false;
-	protected bool $edited = false;
-	protected ?array $array;
+    protected array $usr_ids;
+    protected null|int|array $usr_id;
+    protected bool $ementor = false;
+    protected bool $footer = false;
+    protected bool $edited = false;
+    protected ?array $array;
     public ilTemplate|ilGlobalTemplateInterface $tpl;
 
-    protected \Twig\TemplateWrapper|Twig_TemplateWrapper $twig_template;
+    protected \Twig\TemplateWrapper $twig_template;
 
-	public function __construct(int $group_ref_id, array $twig_options, array $usr_id = null, bool $ementor = true, bool $edited = false, array|null $array = NULL) {
-		global $DIC;
+    public function __construct(int $group_ref_id, array $twig_options, array $usr_id = null, bool $ementor = true, bool $edited = false, array|null $array = null)
+    {
+        global $DIC;
         $this->pl = ilParticipationCertificatePlugin::getInstance();
         $this->tpl = $DIC->ui()->mainTemplate();
-		$this->group_ref_id = $group_ref_id;
+        $this->group_ref_id = $group_ref_id;
 
-		$cert_access = new ilParticipationCertificateAccess($group_ref_id);
+        $cert_access = new ilParticipationCertificateAccess($group_ref_id);
 
-		$this->usr_ids = $cert_access->getUserIdsOfGroup();
+        $this->usr_ids = $cert_access->getUserIdsOfGroup();
+        $this->usr_id = $usr_id;
 
-		$this->usr_id = $usr_id;
-		//wenn keine $usr_id übegeben wird, werden alle in der Gruppe gedruckt
-		if ($usr_id[0] == NULL || $usr_id == NULL) {
-			$this->usr_id = $this->usr_ids;
-		}
-		$this->ementor = $ementor;
-		//wenn die Resultate bearbeitet wurden wird automatisch der footer auf true gesetzt
-		if ($edited == true) {
-			$this->footer = true;
-		}
-		$this->edited = $edited;
-		//$array sind die abgeänderten werte
-		$this->array = $array;
+        if (empty($this->usr_id)) {
+            $this->usr_id = $this->usr_ids;
+        }
 
-		$this->loadTwig();
-		$loader = new Twig\Loader\FilesystemLoader($this->pl->getDirectory() . '/templates/report/');
-		$twig = new Twig\Environment($loader, $twig_options);
+        $this->ementor = $ementor;
+        //wenn die Resultate bearbeitet wurden wird automatisch der footer auf true gesetzt
+        if ($edited == true) {
+            $this->footer = true;
+        }
+        $this->edited = $edited;
+        //$array sind die abgeänderten werte
+        $this->array = $array;
 
-		$this->twig_template = $twig->load('certificate.html');
-	}
+        $loader = new Twig\Loader\FilesystemLoader($this->pl->getDirectory() . '/templates/report/');
+        $twig = new Twig\Environment($loader, [
+            'cache' => false,
+        ]);
 
+        $this->twig_template = $twig->load('certificate.html');
+    }
 
-	public function parseData(): void
+    /**
+     * @param array $userIds
+     * @return array
+     */
+    private function excludeUsersFromPrintIfMissingUserData(array $userIds): array
+    {
+        $arr_usr_data = ilPartCertUsersData::getData($this->pl, $userIds);
+
+        foreach ($userIds as $key => $usrId) {
+            $user_data = new ilPartCertUserData();
+            if (!$user_data->checkIfUserDataFilled(
+                $arr_usr_data[$usrId]->getPartCertSalutation(),
+                $arr_usr_data[$usrId]->getPartCertFirstname(),
+                $arr_usr_data[$usrId]->getPartCertLastname()
+            )) {
+                unset($userIds[$key]);
+            }
+        }
+        return array_values($userIds);
+    }
+
+    /**
+     * @return void
+     * @throws LoaderError
+     * @throws SyntaxError
+     * @throws arException
+     * @throws ilDateTimeException
+     */
+    public function parseData(): void
     {
         $cert_configs = new ilParticipationCertificateConfigs();
         $arr_config = $cert_configs->getObjConfigSetIfNoneCreateDefaultAndCreateNewObjConfigValues($this->group_ref_id);
 
         $global_config_sets = new ilParticipationCertificateGlobalConfigSets();
-        if(count($arr_config) > 0) {
+        if (count($arr_config) > 0) {
             $global_config_id = reset($arr_config)->getGlobalConfigId();
         }
 
-        if($global_config_id > 0) {
+        if ($global_config_id > 0) {
             $global_config_set = $global_config_sets->getConfigSetById($global_config_id);
-            $this->tpl->setOnScreenMessage('info',$this->pl->txt('configset_type_1'). ' ' . $global_config_set->getTitle(), true);
+            $this->tpl->setOnScreenMessage('info', $this->pl->txt('configset_type_1') . ' ' . $global_config_set->getTitle(), true);
         } else {
-            $this->tpl->setOnScreenMessage('info',$this->pl->txt('configset_type_2'), true);
+            $this->tpl->setOnScreenMessage('info', $this->pl->txt('configset_type_2'), true);
         }
 
         $arr_config_text = [];
@@ -72,105 +105,146 @@ class ilParticipationCertificateTwigParser {
             $arr_config_text[$config->getConfigKey()] = $config->getConfigValue();
         }
 
-        if(count($arr_config) > 0) {
+        if (count($arr_config) > 0) {
             $global_config_id = reset($arr_config)->getGlobalConfigId();
         }
 
-        if($global_config_id > 0) {
+        if ($global_config_id > 0) {
             $global_config_set = $global_config_sets->getConfigSetById($global_config_id);
-            $this->tpl->setOnScreenMessage('info',$this->pl->txt('configset_type_1').' '.$global_config_set->getTitle(), true);
+            $this->tpl->setOnScreenMessage('info', $this->pl->txt('configset_type_1') . ' ' . $global_config_set->getTitle(), true);
         } else {
-            $this->tpl->setOnScreenMessage('info',$this->pl->txt('configset_type_2'), true);
+            $this->tpl->setOnScreenMessage('info', $this->pl->txt('configset_type_2'), true);
         }
 
+        $refId = (int) $_GET['ref_id'];
+        $arr_new_iass_states = ilIassStatesMulti::getData($this->usr_ids, $refId);
+        $arr_xali_states = xaliStates::getData($this->usr_ids, $refId);
 
-        $arr_new_iass_states = ilIassStatesMulti::getData($this->usr_ids,$_GET['ref_id']);
-        $arr_xali_states = xaliStates::getData($this->usr_ids,$_GET['ref_id']);
+        $arr_usr_data = ilPartCertUsersData::getData($this->pl, $this->usr_ids);
+        $arr_lo_master_crs = ilLearningObjectivesMasterCrs::getData(ilObject::_lookupObjectId($refId), $this->usr_ids);
 
-		$arr_usr_data = ilPartCertUsersData::getData($this->usr_ids);
-		$arr_lo_master_crs = ilLearningObjectivesMasterCrs::getData($this->usr_ids);
-		$arr_initial_test_states = ilCrsInitialTestStates::getData($this->usr_ids);
-		$arr_excercise_states = ilExcerciseStates::getData($this->usr_ids,$this->group_ref_id);
-		$arr_iass_states = ilIassStates::getData($this->usr_ids);
-		$arr_learn_sugg_results = ilLearnObjectSuggResults::getData($this->usr_ids);
 
-		$date = new ilDate(time(), IL_CAL_UNIX);
+        $arr_initial_test_states = ilCrsInitialTestStates::getData($this->usr_ids);
+        $arr_excercise_states = ilExcerciseStates::getData($this->usr_ids, $this->group_ref_id);
+        $arr_iass_states = ilIassStates::getData($this->usr_ids);
+        $arr_learn_sugg_results = ilLearnObjectSuggResults::getData($this->usr_ids);
 
-		$part_pdf = new ilParticipationCertificatePDFGenerator();
+        $date = new ilDate(time(), IL_CAL_UNIX);
 
-		if (is_numeric($global_config_id) && is_file(ilParticipationCertificateConfig::returnPicturePath('absolute', $global_config_id, ilParticipationCertificateConfig::LOGO_FILE_NAME))) {
-			$logo_path = ilParticipationCertificateConfig::returnPicturePath('absolute', $global_config_id, ilParticipationCertificateConfig::LOGO_FILE_NAME);
-		} elseif (is_file(ilParticipationCertificateConfig::returnPicturePath('absolute', $this->group_ref_id, ilParticipationCertificateConfig::LOGO_FILE_NAME))) {
+        $part_pdf = new ilParticipationCertificatePDFGenerator();
+
+        $logoIsSavedInResourceStorage = false;
+        if (is_numeric($global_config_id) && is_file(ilParticipationCertificateConfig::returnPicturePath('absolute', $global_config_id, ilParticipationCertificateConfig::LOGO_FILE_NAME))) {
+            $logo_path = ilParticipationCertificateConfig::returnPicturePath('absolute', $global_config_id, ilParticipationCertificateConfig::LOGO_FILE_NAME);
+
+            $file = ilParticipationCertificateFiles::getFile(
+                $global_config_id,
+                'logo'
+            );
+
+            if ($file->getResourceStorage()) {
+                $logoIsSavedInResourceStorage = true;
+            }
+
+        } elseif (is_file(ilParticipationCertificateConfig::returnPicturePath('absolute', $this->group_ref_id, ilParticipationCertificateConfig::LOGO_FILE_NAME))) {
             $logo_path = ilParticipationCertificateConfig::returnPicturePath('absolute', $this->group_ref_id, ilParticipationCertificateConfig::LOGO_FILE_NAME);
-        } else {
-			$logo_path = '';
-		}
 
+            $file = ilParticipationCertificateFiles::getFile(
+                $this->group_ref_id,
+                'logo'
+            );
+
+            if ($file->getResourceStorage()) {
+                $logoIsSavedInResourceStorage = true;
+            }
+        } else {
+            $logo_path = '';
+        }
+
+        $signatureIsSavedInResourceStorage = false;
         if (is_numeric($global_config_id) && is_file(ilParticipationCertificateConfig::returnPicturePath('absolute', $global_config_id, ilParticipationCertificateConfig::ISSUER_SIGNATURE_FILE_NAME))) {
             $page1_issuer_signature = ilParticipationCertificateConfig::returnPicturePath('absolute', $global_config_id, ilParticipationCertificateConfig::ISSUER_SIGNATURE_FILE_NAME);
-        }  elseif (is_file(ilParticipationCertificateConfig::returnPicturePath('absolute', $this->group_ref_id, ilParticipationCertificateConfig::ISSUER_SIGNATURE_FILE_NAME))) {
+
+            $file = ilParticipationCertificateFiles::getFile(
+                $global_config_id,
+                'page1_issuer_signature'
+            );
+            $signatureIsSavedInResourceStorage = $file->getResourceStorage();
+
+
+        } elseif (is_file(ilParticipationCertificateConfig::returnPicturePath('absolute', $this->group_ref_id, ilParticipationCertificateConfig::ISSUER_SIGNATURE_FILE_NAME))) {
             $page1_issuer_signature = ilParticipationCertificateConfig::returnPicturePath('absolute', $this->group_ref_id, ilParticipationCertificateConfig::ISSUER_SIGNATURE_FILE_NAME);
+
+
+            $file = ilParticipationCertificateFiles::getFile(
+                $this->group_ref_id,
+                'page1_issuer_signature'
+            );
+            $signatureIsSavedInResourceStorage = $file->getResourceStorage();
+
         } else {
             $page1_issuer_signature = '';
         }
 
-		//quickfix, wenn nur ein User $this->usr_id ist kein array -> foreach kann also nicht gebraucht werden. Jetzt wird ein array erstellt auch wenn nur ein user
-		if (!is_array($this->usr_id)) {
-			$usr = $this->usr_id;
-			$this->usr_id = array( $usr );
-		}
+        $this->usr_id = $this->excludeUsersFromPrintIfMissingUserData($this->usr_id);
 
-		foreach ($this->usr_id as $usr_id) {
+        foreach ($this->usr_id as $usr_id) {
             $percentage = 0;
 
+            //quickfix, wenn man user auswählt kann es sein, das $usr_id ein array bleibt. Das führt weiter unten zum crash. So wird das array aufgelöst.
+            if (is_array($usr_id)) {
+                $usr_id = $usr_id[0];
+            }
+            $processed_arr_text_values = $arr_config_text;
 
-			//quickfix, wenn man user auswählt kann es sein, das $usr_id ein array bleibt. Das führt weiter unten zum crash. So wird das array aufgelöst.
-			if (is_array($usr_id)) {
-				$usr_id = $usr_id[0];
-			}
+            //Preprocess text values
+            foreach ($arr_config_text as $key => $value) {
+                $twig = new Twig\Environment(new Twig\Loader\ArrayLoader());
 
+                // Twig use the placeholders {{ }}, but plugins the  [[ ]]
+                $value = $this->preparePlaceholdersForTwig($value);
 
-			$processed_arr_text_values = $arr_config_text;
-			//Preprocess text values
-			foreach ($arr_config_text as $key => $value) {
-				$twig = new \Twig_Environment(new \Twig_Loader_String());
-				$peparsed_value = $twig->render((string)$value, array(
-					"username" => ($arr_usr_data[$usr_id]->getPartCertSalutation() ? $arr_usr_data[$usr_id]->getPartCertSalutation() . ' ' : '')
-						. $arr_usr_data[$usr_id]->getPartCertFirstname() . ' ' . $arr_usr_data[$usr_id]->getPartCertLastname(),
-					'date' => $date->get(IL_CAL_FKT_DATE, 'd.m.Y')
-				));
+                $template = $twig->createTemplate((string) $value);
 
-				$processed_arr_text_values[$key] = $peparsed_value;
-			}
+                $peparsed_value = $template->render([
+                    'username' => ($arr_usr_data[$usr_id]->getPartCertSalutation() ?
+                            $arr_usr_data[$usr_id]->getPartCertSalutation() . ' ' : '') .
+                        $arr_usr_data[$usr_id]->getPartCertFirstname() . ' ' .
+                        $arr_usr_data[$usr_id]->getPartCertLastname(),
+                    'date' => $date->get(IL_CAL_FKT_DATE, 'd.m.Y')
+                ]);
 
-			//Learning Objective Master Course
-			$arr_usr_lo_master_crs = array();
-			if (is_array($arr_lo_master_crs[$usr_id])) {
-				$arr_usr_lo_master_crs = $arr_lo_master_crs[$usr_id];
-			}
-			if ($this->edited == true) {
-				$initial_test_state = $this->array[0];
-				$learn_sugg_result = $this->array[1];
-				$iass_state = $this->array[2];
-				$excercise_percentage = $this->array[3];
-			} else {
+                $processed_arr_text_values[$key] = $peparsed_value;
+            }
 
-				//Initial Test
-				$initial_test_state = 0;
-				if (key_exists($usr_id, $arr_initial_test_states) && is_object($arr_initial_test_states[$usr_id])) {
-					$initial_test_state = $arr_initial_test_states[$usr_id]->getCrsitestItestSubmitted();
-				}
-				//Percentage final tests of suggested modules
-				$learn_sugg_result = 0;
-				if (key_exists($usr_id, $arr_learn_sugg_results) && is_object($arr_learn_sugg_results[$usr_id])) {
-					$learn_sugg_result = $arr_learn_sugg_results[$usr_id]->getAveragePercentage(ilParticipationCertificateConfig::getConfig('calculation_type_processing_state_suggested_objectives',$_GET['ref_id']),true);
-				}
-				//Home Work
-				$excercise_percentage = 0;
-				if (key_exists($usr_id, $arr_excercise_states) && is_object($arr_excercise_states[$usr_id])) {
-					$excercise_percentage = $arr_excercise_states[$usr_id]->getPassedPercentage();
-				}
-			}
+            //Learning Objective Master Course
+            $arr_usr_lo_master_crs = array();
+            if (is_array($arr_lo_master_crs) && array_key_exists($usr_id, $arr_lo_master_crs) && is_array($arr_lo_master_crs[$usr_id])) {
+                $arr_usr_lo_master_crs = $arr_lo_master_crs[$usr_id];
+            }
+            if ($this->edited) {
+                $initial_test_state = $this->array[0];
+                $learn_sugg_result = $this->array[1];
+                $iass_state = $this->array[2];
+                $excercise_percentage = $this->array[3];
+            } else {
+
+                //Initial Test
+                $initial_test_state = 0;
+                if (key_exists($usr_id, $arr_initial_test_states) && is_object($arr_initial_test_states[$usr_id])) {
+                    $initial_test_state = $arr_initial_test_states[$usr_id]->getCrsitestItestSubmitted();
+                }
+                //Percentage final tests of suggested modules
+                $learn_sugg_result = 0;
+                if (key_exists($usr_id, $arr_learn_sugg_results) && is_object($arr_learn_sugg_results[$usr_id])) {
+                    $learn_sugg_result = $arr_learn_sugg_results[$usr_id]->getAveragePercentage(ilParticipationCertificateConfig::getConfig('calculation_type_processing_state_suggested_objectives', $_GET['ref_id']), true);
+                }
+                //Home Work
+                $excercise_percentage = 0;
+                if (key_exists($usr_id, $arr_excercise_states) && is_object($arr_excercise_states[$usr_id])) {
+                    $excercise_percentage = $arr_excercise_states[$usr_id]->getPassedPercentage();
+                }
+            }
 
             /*Video Conferences */
             $countPassed = 0;
@@ -182,12 +256,12 @@ class ilParticipationCertificateTwigParser {
                 }
             }
 
-            if (key_exists($usr_id, $arr_xali_states) &&  is_object($arr_xali_states[$usr_id])) {
+            if (key_exists($usr_id, $arr_xali_states) && is_object($arr_xali_states[$usr_id])) {
                 $countPassed = $countPassed + $arr_xali_states[$usr_id]->getPassed();
                 $countTests = $countTests + $arr_xali_states[$usr_id]->getTotal();
             }
 
-            if($countTests > 0) {
+            if ($countTests > 0) {
                 $percentage = $countPassed / $countTests * 100;
 
                 switch ($countTests) {
@@ -203,34 +277,64 @@ class ilParticipationCertificateTwigParser {
                         break;
                 }
             } else {
-                $iass_states =  "<img alt='' src=" . ILIAS_ABSOLUTE_PATH . "/" . $this->pl->getImagePath("not_attempted_s.png") . ">";
+                $iass_states = "<img alt='' src=" . ILIAS_ABSOLUTE_PATH . "/" . $this->pl->getImagePath("not_attempted_s.png") . ">";
             }
 
-			$arr_render = array(
-				'text_values' => $processed_arr_text_values,
-				'show_ementoring' => $this->ementor,
-				'show_footer' => $this->footer,
-				'arr_lo_master_crs' => $arr_usr_lo_master_crs,
-				'crsitest_itest_submitted' => $initial_test_state,
-				'learn_sugg_reached_percentage' => $learn_sugg_result,
-				'iass_state' => $percentage,
-				'iass_states' => $iass_states,
-				'excercise_percentage' => $excercise_percentage,
-				'logo_path' => $logo_path,
-				'page1_issuer_signature' => $page1_issuer_signature,
-				'standard_value' => $cert_configs->returnPercentValue($this->group_ref_id)
-			);
 
-			$part_pdf->generatePDF($this->twig_template->render($arr_render), count($this->usr_id));
-		}
-	}
+            if ($logoIsSavedInResourceStorage && !empty($processed_arr_text_values['logo'])) {
+                $file = new ilParticipationCertificateFiles();
+                $src = $file->getFileSrcByStorageType(
+                    $processed_arr_text_values['logo'],
+                    $this->group_ref_id,
+                    'logo'
+                );
 
-	protected function loadTwig(): void
+                $logo_path = $src;
+            }
+
+            if ($signatureIsSavedInResourceStorage && !empty($processed_arr_text_values['page1_issuer_signature'])) {
+                $file = new ilParticipationCertificateFiles();
+                $src = $file->getFileSrcByStorageType(
+                    $processed_arr_text_values['page1_issuer_signature'],
+                    $this->group_ref_id,
+                    'page1_issuer_signature'
+                );
+
+                $page1_issuer_signature = $src;
+            }
+
+            $arr_render = array(
+                'text_values' => $processed_arr_text_values,
+                'show_ementoring' => $this->ementor,
+                'show_footer' => $this->footer,
+                'arr_lo_master_crs' => $arr_usr_lo_master_crs,
+                'crsitest_itest_submitted' => $initial_test_state,
+                'learn_sugg_reached_percentage' => $learn_sugg_result,
+                'iass_state' => $percentage,
+                'iass_states' => $iass_states,
+                'excercise_percentage' => $excercise_percentage,
+                'logo_path' => $logo_path,
+                'page1_issuer_signature' => $page1_issuer_signature,
+                'standard_value' => $cert_configs->returnPercentValue($this->group_ref_id)
+            );
+
+            $part_pdf->generatePDF($this->twig_template->render($arr_render), count($this->usr_id));
+        }
+        $this->tpl->setOnScreenMessage('info', $this->pl->txt('configset_type_2'), true);
+
+    }
+
+    /**
+     * Replace the placeholders [[ ]] with the {{ }}
+     *
+     * @param string $value
+     * @return array|string|string[]
+     */
+    private function preparePlaceholdersForTwig(string $value)
     {
-		static $loaded = false;
-		if (!$loaded) {
-			Twig_Autoloader::register();
-			$loaded = true;
-		}
-	}
+        $value = str_replace('[[', '{{', $value);
+        $value = str_replace(']]', '}}', $value);
+
+        return $value;
+    }
 }

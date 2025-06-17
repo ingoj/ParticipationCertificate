@@ -12,6 +12,79 @@ class ilParticipationCertificateConfig extends ActiveRecord {
 	const CONFIG_VALUE_TYPE_CERT_TEXT = 1;
 	const CONFIG_VALUE_TYPE_OTHER = 2;
 
+    /**
+     * @var int
+     *
+     * @db_has_field    true
+     * @db_fieldtype    integer
+     * @db_length       8
+     * @db_is_primary   true
+     * @db_sequence     true
+     */
+    protected ?int $id = 0;
+    /**
+     * @var int
+     *
+     * @db_has_field    true
+     * @db_fieldtype    integer
+     * @con_is_notnull  true
+     * @db_length       8
+     */
+    protected int $config_type;
+    /**
+     * @var int
+     *
+     * @db_has_field    true
+     * @db_fieldtype    integer
+     * @con_is_notnull  true
+     * @db_length       8
+     */
+    protected int $group_ref_id = 0;
+    /**
+     * @var int
+     *
+     * @db_has_field    true
+     * @db_fieldtype    integer
+     * @con_is_notnull  true
+     * @db_length       8
+     */
+    protected int $global_config_id = 0;
+    /**
+     * @var int
+     *
+     * @db_has_field    true
+     * @db_fieldtype    integer
+     * @con_is_notnull  true
+     * @db_length       8
+     */
+    protected int $config_value_type;
+    /**
+     * @var string
+     *
+     * @db_has_field    true
+     * @db_fieldtype    text
+     * @con_is_notnull  true
+     * @db_length       1024
+     */
+    protected string $config_key;
+    /**
+     * @var string
+     *
+     * @db_has_field    true
+     * @db_fieldtype    text
+     * @db_length       1024
+     */
+    protected ?string $config_value = "";
+    /**
+     * @var int
+     *
+     * @db_has_field    true
+     * @db_fieldtype    integer
+     * @con_is_notnull  true
+     * @db_length       8
+     */
+    protected int $order_by = 0;
+
 	public function getConnectorContainerName(): string
     {
 		return self::TABLE_NAME;
@@ -79,81 +152,6 @@ class ilParticipationCertificateConfig extends ActiveRecord {
 			$config->create();
 		}
 	}
-
-
-	/**
-	 * @var int
-	 *
-	 * @db_has_field    true
-	 * @db_fieldtype    integer
-	 * @db_length       8
-	 * @db_is_primary   true
-	 * @db_sequence     true
-	 */
-	protected ?int $id = 0;
-	/**
-	 * @var int
-	 *
-	 * @db_has_field    true
-	 * @db_fieldtype    integer
-	 * @con_is_notnull  true
-	 * @db_length       8
-	 */
-	protected int $config_type;
-	/**
-	 * @var int
-	 *
-	 * @db_has_field    true
-	 * @db_fieldtype    integer
-	 * @con_is_notnull  true
-	 * @db_length       8
-	 */
-	protected int $group_ref_id = 0;
-	/**
-	 * @var int
-	 *
-	 * @db_has_field    true
-	 * @db_fieldtype    integer
-	 * @con_is_notnull  true
-	 * @db_length       8
-	 */
-	protected int $global_config_id = 0;
-	/**
-	 * @var int
-	 *
-	 * @db_has_field    true
-	 * @db_fieldtype    integer
-	 * @con_is_notnull  true
-	 * @db_length       8
-	 */
-	protected int $config_value_type;
-	/**
-	 * @var string
-	 *
-	 * @db_has_field    true
-	 * @db_fieldtype    text
-	 * @con_is_notnull  true
-	 * @db_length       1024
-	 */
-	protected string $config_key;
-	/**
-	 * @var string
-	 *
-	 * @db_has_field    true
-	 * @db_fieldtype    text
-	 * @db_length       1024
-	 */
-	protected ?string $config_value = "";
-	/**
-	 * @var int
-	 *
-	 * @db_has_field    true
-	 * @db_fieldtype    integer
-	 * @con_is_notnull  true
-	 * @db_length       8
-	 */
-	protected int $order_by = 0;
-
 
 	/**
 	 * Get a path where the template layout file and static assets are stored
@@ -307,7 +305,6 @@ class ilParticipationCertificateConfig extends ActiveRecord {
 		return array(
 			'udf_firstname' => 0,
 			'udf_lastname' => 0,
-			'udf_gender' => 0,
 			'color' => '73B249',
 			'keyword' => 'Lerngruppe',
 			'Logo' => null,

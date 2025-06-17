@@ -1,13 +1,18 @@
 <?php
 class ilPartCertUserData {
 	protected int $part_cert_usr_id;
+
 	protected ?string $part_cert_firstname;
+
 	protected ?string $part_cert_lastname;
-	protected ?string $part_cert_gender;
-	protected ?string $part_cert_salutation;
+
 	protected string $part_cert_username;
 
-	public function getPartCertUsrId(): int
+    protected ?string $part_cert_gender;
+
+    protected ?string $part_cert_salutation;
+
+    public function getPartCertUsrId(): int
     {
 		return $this->part_cert_usr_id;
 	}
@@ -27,26 +32,23 @@ class ilPartCertUserData {
     {
 		return $this->part_cert_lastname;
 	}
+
+    public function getPartCertGender(): ?string
+    {
+        return $this->part_cert_gender;
+    }
+
+
+    public function setPartCertGender(?string $part_cert_gender): void
+    {
+        $this->part_cert_gender = $part_cert_gender;
+    }
+
 	public function setPartCertLastname(?string $part_cert_lastname): void
     {
 		$this->part_cert_lastname = $part_cert_lastname;
 	}
-	public function getPartCertGender(): ?string
-    {
-		return $this->part_cert_gender;
-	}
-	public function setPartCertGender(?string $part_cert_gender): void
-    {
-		$this->part_cert_gender = $part_cert_gender;
-	}
-	public function getPartCertSalutation(): ?string
-    {
-		return $this->part_cert_salutation;
-	}
-	public function setPartCertSalutation(?string $part_cert_salutation): void
-    {
-		$this->part_cert_salutation = $part_cert_salutation;
-	}
+
 	public function getPartCertUserName(): string
     {
 		return $this->part_cert_username;
@@ -55,4 +57,35 @@ class ilPartCertUserData {
     {
 		$this->part_cert_username = $part_cert_username;
 	}
+
+    public function getPartCertSalutation(): ?string
+    {
+        return $this->part_cert_salutation;
+    }
+
+
+    public function setPartCertSalutation(?string $part_cert_salutation): void
+    {
+        $this->part_cert_salutation = $part_cert_salutation;
+    }
+
+    /**
+     * @param string $salutation
+     * @param string $firstname
+     * @param string $lastname
+     * @return bool
+     */
+    public function checkIfUserDataFilled(
+        string $salutation,
+        string $firstname,
+        string $lastname
+    ): bool {
+        if (empty($salutation) &&
+            empty($firstname) &&
+            empty($lastname)
+        ) {
+            return false;
+        }
+        return true;
+    }
 }

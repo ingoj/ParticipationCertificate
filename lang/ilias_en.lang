@@ -14,6 +14,7 @@ cols_actions#:#Action
 list_actions#:#Actions
 list_results#:#Adjust Results for Printing
 list_print#:#Print
+print#:#Print
 filter_name#:#Name
 header_config#:#Configure
 header_overview#:#Overview
@@ -31,7 +32,6 @@ result_for#:#Results for
 no_records_selected#:#No Users Selected
 upload_header #:# Upload Your PDF Header
 save#:#Save
-udf_gender#:#Custom Field Gender
 udf_lastname#:#Custom Field Last Name
 udf_firstname#:#Custom Field First Name
 config_plugin#:#Configuration Certificate of Participation
@@ -53,6 +53,7 @@ enable_self_print#:#Enable Self-Printing
 color#:#Color Recommended LZ
 keyword#:#Keyword
 logo#:#Logo
+page1_issuer_signature#:#page1_issuer_signature
 udf_percent_value#:#Threshold for Video Conferences (Percentage)
 placeholders#:#The following placeholders are available:
 yes#:#Yes
@@ -96,3 +97,13 @@ unsugg_color#:#Color Not Recommended LZ
 true_name_helper#:#UDF Editor Object for Name Entry
 nonnumeric_ref#:#Input for the UDF Editor Object must be the Ref ID (numeric or empty, other characters are not allowed).
 enable_ementoring#:#Show eMentoring
+back#:#Back
+Mr#:#Mr
+Ms#:#Ms
+user_data_missing#:#User data fields are not filled. Please provide a value before generating the certificate.
+all_user_data_missing#:#Users' data fields are not filled. Please provide a value before generating the certificate.
+start#:#Start
+end#:#End
+sorting#:#Sorting
+excel_export#:#Excel-Export
+csv_export#:#.CSV-Export

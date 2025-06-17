@@ -1,7 +1,5 @@
 <?php
 
-require_once __DIR__ . "/../vendor/autoload.php";
-
 /**
  * Class ilParticipationCertificateUIHookGUI
  *
@@ -16,6 +14,8 @@ class ilParticipationCertificateUIHookGUI extends ilUIHookPluginGUI {
 	protected ?ilObject $learnGroup;
 	protected string $learnGroupTitle;
 	protected array $keywords;
+
+    private string $objecttype;
 
 
 	public function __construct() {

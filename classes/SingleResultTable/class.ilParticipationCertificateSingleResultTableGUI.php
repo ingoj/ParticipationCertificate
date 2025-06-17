@@ -5,22 +5,37 @@ class ilParticipationCertificateSingleResultTableGUI extends ilTable2GUI {
 	const SUCCESSFUL_PROGRESS_CSS_CLASS = "ilCourseObjectiveProgressBarCompleted";
 	const NON_SUCCESSFUL_PROGRESS_CSS_CLASS = "ilCourseObjectiveProgressBarNeutral";
 	const FAILED_PROGRESS_CSS_CLASS = "ilCourseObjectiveProgressBarFailed";
+
 	protected ilTabsGUI $tabs;
+
 	protected ilCtrl $ctrl;
+
 	protected ?object $parent_obj;
+
 	protected ilParticipationCertificatePlugin $pl;
+
 	protected array $filter = array();
+
 	protected int $usr_id;
+
 	protected array $marks = array();
+
 	protected string $color;
+
 	protected array $usr_ids;
+
+    private string $unsugg_color;
+
 	/**
 	 * @var ilLearningObjectivesMasterCrs[]
 	 */
 	protected array $sugg;
 
-
-	public function __construct(ilParticipationCertificateMultipleResultGUI|ilParticipationCertificateResultGUI|ilParticipationCertificateSingleResultGUI $a_parent_obj, string $a_parent_cmd, int $usr_id) {
+    /**
+     * @throws ilCtrlException
+     * @throws ilException
+     */
+    public function __construct(ilParticipationCertificateMultipleResultGUI|ilParticipationCertificateResultGUI|ilParticipationCertificateSingleResultGUI $a_parent_obj, string $a_parent_cmd, int $usr_id) {
 		global $DIC;
 
 		$this->ctrl = $DIC->ctrl();
@@ -66,7 +81,7 @@ class ilParticipationCertificateSingleResultTableGUI extends ilTable2GUI {
 		$this->setRowTemplate('tpl.default_row_single.html', $this->pl->getDirectory());
 		$this->setFormAction($this->ctrl->getFormAction($a_parent_obj));
 
-		$arr_usr_data = ilPartCertUsersData::getData($this->usr_ids);
+		$arr_usr_data = ilPartCertUsersData::getData($this->pl, $this->usr_ids);
 		$nameUser = $arr_usr_data[$usr_id]->getPartCertFirstname() . ' ' . $arr_usr_data[$usr_id]->getPartCertLastname();
 		if ($nameUser == ' ') {
 			$nameUser = $this->pl->txt('loginname') . ' ' . $arr_usr_data[$usr_id]->getPartCertUserName();
@@ -85,9 +100,6 @@ class ilParticipationCertificateSingleResultTableGUI extends ilTable2GUI {
 		$finalTestsStates = ilLearnObjectFinalTestStates::getData([$this->usr_id ]);
 		$sorted = $this->sortColumns();
 		$i = 0;
-
-		/*print_r($sorted);
-		print_r($finalTestsStates);exit;*/
 
 		if (count($finalTestsStates)) {
             foreach ($sorted as $sort_key => $sort_arr) {
@@ -242,9 +254,9 @@ class ilParticipationCertificateSingleResultTableGUI extends ilTable2GUI {
 			$current_percent = 0;
 		}
 		//required to dodge bug in ilContainerObjectiveGUI::renderProgressBar
-		if ($required_percent == 0) {
-			$required_percent = 0.1;
-		}
+        if ($required_percent == 0) {
+            $required_percent = 0.1;
+        }
 
 		if ($current_percent >= $required_percent) {
 			$css_class = self::SUCCESSFUL_PROGRESS_CSS_CLASS;
@@ -256,7 +268,15 @@ class ilParticipationCertificateSingleResultTableGUI extends ilTable2GUI {
 
 		//require_once("Services/Container/classes/class.ilContainerObjectiveGUI.php");
 
-		return \ilContainerObjectiveGUI::renderProgressBar($current_percent, $required_percent, $css_class, '', NULL, $tooltip_id, '');
+		return \ilContainerObjectiveGUI::renderProgressBar(
+            $current_percent,
+            $required_percent,
+            $css_class,
+            '',
+            NULL,
+            $tooltip_id,
+            ''
+        );
 	}
 
 	public function fillRow(array $a_set): void
@@ -269,7 +289,7 @@ class ilParticipationCertificateSingleResultTableGUI extends ilTable2GUI {
 					$this->tpl->setCurrentBlock('td');
 					if (is_array($a_set[$k])) {
 
-						$this->tpl->setVariable('COURSE', $this->buildProgressBar(explode('%', $a_set[$k][0]), $a_set[$k][1], $a_set[$k][2]));
+						$this->tpl->setVariable('COURSE', $this->buildProgressBar(explode('%', $a_set[$k][0]  ?? ''), $a_set[$k][1], $a_set[$k][2]));
 					} else {
 						$this->tpl->setVariable('COURSE', $a_set[$k]);
 					}
