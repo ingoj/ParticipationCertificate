@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "9a3a08ee765d204cc59bd0a6a4f8c293",
+    "content-hash": "9f92006bde0265dca4a4be827a4ef66e",
     "packages": [
         {
             "name": "mpdf/mpdf",
