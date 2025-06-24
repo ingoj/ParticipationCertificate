@@ -181,13 +181,14 @@ class ilParticipationCertificateGUI
     }
 
     /**
+     * @param int $globalConfigId
+     * @return void
      * @throws ilCtrlException
      */
-    private function initToolbar(): void
+    private function initToolbar(?int $globalConfigId = null): void
     {
         global $DIC;
         $ui = $DIC->ui()->factory();
-
 
         $this->toolbar->setFormAction(
             $this->ctrl->getFormAction($this, self::CMD_CONFIG)
@@ -195,7 +196,11 @@ class ilParticipationCertificateGUI
 
         $cert_global_configs = new ilParticipationCertificateGlobalConfigSets();
         $options_template = $cert_global_configs->getSelectOptions();
-        $select = $ui->input()->field()->select('', $options_template);
+
+
+        $select = $ui->input()->field()
+                              ->select('', $options_template)
+                              ->withValue($globalConfigId ?? 0);
 
         $this->toolbar->addComponent($select);
 
@@ -207,13 +212,13 @@ class ilParticipationCertificateGUI
                 const select = $('#ilToolbar select'); 
                 const btn = $('#$id');
                 
-                $('#$id').click(function(e) {
+                btn.click(function(e) {
                     e.preventDefault();
                   
                     const selected = select ? select.val() : null;
-                    const baseUrl = $('#$id').data('action');
+                    const baseUrl = btn.data('action');
                     const url = baseUrl.replace('__TEMPLATE__', encodeURIComponent(selected));
-                   
+                    
                     btn.closest('form').attr('action', url);
                     btn.closest('form').submit();
                 });
@@ -230,11 +235,11 @@ class ilParticipationCertificateGUI
                 const select = $('#ilToolbar select'); 
                 const btn = $('#$id');
                 
-                $('#$id').click(function(e) {
+                btn.click(function(e) {
                     e.preventDefault();
                   
                     const selected = select ? select.val() : null;
-                    const baseUrl = $('#$id').data('action');
+                    const baseUrl = btn.data('action');
                     const url = baseUrl.replace('__TEMPLATE__', encodeURIComponent(selected));
                    
                     btn.closest('form').attr('action', url);
@@ -259,8 +264,6 @@ class ilParticipationCertificateGUI
 
         $inputFields = [];
 
-        $this->initToolbar();
-
         $cert_configs = new ilParticipationCertificateConfigs();
         $arr_config = $cert_configs->getObjConfigSetIfNoneCreateDefaultAndCreateNewObjConfigValues($this->groupRefId);
 
@@ -269,6 +272,8 @@ class ilParticipationCertificateGUI
         if (count($arr_config) > 0) {
             $global_config_id = reset($arr_config)->getGlobalConfigId();
         }
+
+        $this->initToolbar($global_config_id);
 
         if (!empty($global_config_id) && $global_config_id > 0) {
             $global_config_set = $global_config_sets->getConfigSetById($global_config_id);
