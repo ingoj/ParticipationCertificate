@@ -179,7 +179,6 @@ class ilParticipationCertificateConfigs {
 
 	public function setObjToUseCertTemplate(int $obj_ref_id, int $global_template_id): void
     {
-
 		$this->deleteObjConfigSet($obj_ref_id);
 		/**
 		 * @var ilParticipationCertificateObjectConfigSet $part_cert_config
@@ -225,7 +224,6 @@ class ilParticipationCertificateConfigs {
 			$part_cert_config_value->create();
 
 			if($part_cert_template_config_value->getConfigKey() == "logo") {
-
                 $file = ilParticipationCertificateFiles::getFile(
                     $global_template_id,
                     'logo'
@@ -237,22 +235,34 @@ class ilParticipationCertificateConfigs {
 						unlink(ilParticipationCertificateConfig::returnPicturePath('absolute', $obj_ref_id, ilParticipationCertificateConfig::LOGO_FILE_NAME));
 					}
 					copy(ilParticipationCertificateConfig::returnPicturePath('absolute', $global_template_id, ilParticipationCertificateConfig::LOGO_FILE_NAME), ilParticipationCertificateConfig::returnPicturePath('absolute', $obj_ref_id, ilParticipationCertificateConfig::LOGO_FILE_NAME));
-				}
-			}
+
+                    ilParticipationCertificateFiles::setFile($obj_ref_id, 'logo', false);
+                }
+
+                if ($file->getResourceStorage()) {
+                    ilParticipationCertificateFiles::setFile($obj_ref_id, 'logo', true);
+                }
+            }
 
             if($part_cert_template_config_value->getConfigKey() == "page1_issuer_signature") {
-
                 $file = ilParticipationCertificateFiles::getFile(
                     $global_template_id,
                     'page1_issuer_signature'
                 );
 
-                if (!empty($file) && !$file->getResourceStorage() && is_file(ilParticipationCertificateConfig::returnPicturePath('absolute', $global_template_id, ilParticipationCertificateConfig::ISSUER_SIGNATURE_FILE_NAME))) {
+                if (!empty($file)) {
+                    if (!$file->getResourceStorage() && is_file(ilParticipationCertificateConfig::returnPicturePath('absolute', $global_template_id, ilParticipationCertificateConfig::ISSUER_SIGNATURE_FILE_NAME))) {
+                        if(is_file(ilParticipationCertificateConfig::returnPicturePath('absolute', $obj_ref_id, ilParticipationCertificateConfig::ISSUER_SIGNATURE_FILE_NAME))) {
+                            unlink(ilParticipationCertificateConfig::returnPicturePath('absolute', $obj_ref_id, ilParticipationCertificateConfig::ISSUER_SIGNATURE_FILE_NAME));
+                        }
+                        copy(ilParticipationCertificateConfig::returnPicturePath('absolute', $global_template_id, ilParticipationCertificateConfig::ISSUER_SIGNATURE_FILE_NAME), ilParticipationCertificateConfig::returnPicturePath('absolute', $obj_ref_id, ilParticipationCertificateConfig::ISSUER_SIGNATURE_FILE_NAME));
 
-                    if(is_file(ilParticipationCertificateConfig::returnPicturePath('absolute', $obj_ref_id, ilParticipationCertificateConfig::ISSUER_SIGNATURE_FILE_NAME))) {
-                        unlink(ilParticipationCertificateConfig::returnPicturePath('absolute', $obj_ref_id, ilParticipationCertificateConfig::ISSUER_SIGNATURE_FILE_NAME));
+                        ilParticipationCertificateFiles::setFile($obj_ref_id, 'page1_issuer_signature', false);
                     }
-                    copy(ilParticipationCertificateConfig::returnPicturePath('absolute', $global_template_id, ilParticipationCertificateConfig::ISSUER_SIGNATURE_FILE_NAME), ilParticipationCertificateConfig::returnPicturePath('absolute', $obj_ref_id, ilParticipationCertificateConfig::ISSUER_SIGNATURE_FILE_NAME));
+
+                    if ($file->getResourceStorage()) {
+                        ilParticipationCertificateFiles::setFile($obj_ref_id, 'page1_issuer_signature', true);
+                    }
                 }
             }
 		}
