@@ -1,6 +1,10 @@
 <?php
 
 use Mpdf\Mpdf;
+use setasign\Fpdi\PdfParser\PdfParserException;
+use setasign\Fpdi\PdfParser\Type\PdfTypeException;
+use setasign\Fpdi\PdfParser\CrossReference\CrossReferenceException;
+use Mpdf\MpdfException;
 
 /**
  * Class ilParticipationCertificatePDFGenerator
@@ -42,6 +46,12 @@ class ilParticipationCertificatePDFGenerator
         }
     }
 
+    /**
+     * @throws CrossReferenceException
+     * @throws PdfTypeException
+     * @throws MpdfException
+     * @throws PdfParserException
+     */
     public function generatePDF(string $rendered, int $total_users): void
     {
         global $printCount, $tempFile;
@@ -60,25 +70,18 @@ class ilParticipationCertificatePDFGenerator
 
             $mpdf->WriteHTML($rendered, 2);
             $mpdf->Output($this->pl->txt("plugin") . '.pdf', 'D');
-            if (method_exists($this->tpl, 'loadStandardTemplate')) {
-                $this->tpl->loadStandardTemplate();
-            } else {
-                $this->tpl->getStandardTemplate();
-            }
-            $this->ctrl->redirectByClass(ilParticipationCertificateResultGUI::class, ilParticipationCertificateResultGUI::CMD_INIT_TABLE);
+            exit;
         }
         //Checkt ob es der erste Durchlauf ist. Wenn True wird das erste PDF erzeugt und auf dem Server abgelegt.
         if ($printCount == 1) {
             $mpdf->WriteHTML($css, 1);
             $mpdf->WriteHTML($rendered, 2);
             $mpdf->Output($tempFile . '.pdf', 'F');
-        } /*Checkt ob es der letzte Durchlauf ist. Wenn ja wird das letzte PDF erzeugt und das vorhandene PDF auf dem Server
-			 *wird hinten an das erzeugte PDF angehängt. Anschliessend wird das fertige PDF dem User im Browser als Download angeboten.
-			*/ elseif ($printCount == $total_users) {
-
+        } elseif ($printCount == $total_users) {
+            /* Checkt ob es der letzte Durchlauf ist. Wenn ja wird das letzte PDF erzeugt und das vorhandene PDF auf dem Server
+			 wird hinten an das erzeugte PDF angehängt. Anschliessend wird das fertige PDF dem User im Browser als Download angeboten. */
             $mpdf->WriteHTML($css, 1);
             $mpdf->WriteHTML($rendered, 2);
-            //$mpdf->SetImportUse();
             $page = $mpdf->SetSourceFile($tempFile . '.pdf');
             for ($i = 1; $i <= $page; $i++) {
                 $mpdf->AddPage();
@@ -86,18 +89,12 @@ class ilParticipationCertificatePDFGenerator
                 $mpdf->UseTemplate($tplID);
             }
             $mpdf->Output($this->pl->txt("plugin") . '.pdf', 'D');
-            if (method_exists($this->tpl, 'loadStandardTemplate')) {
-                $this->tpl->loadStandardTemplate();
-            } else {
-                $this->tpl->getStandardTemplate();
-            }
-            $this->ctrl->redirectByClass(ilParticipationCertificateResultGUI::class, ilParticipationCertificateResultGUI::CMD_INIT_TABLE);
-        } /*Wenn es nicht der erste oder letzte Durchlauf ist, wird ein neues PDF erzeugt. Die bereits erzeugten PDF auf dem Server
-		 *werden hinten angehängt. Danach wird es wieder auf dem Server gespeichert um im nächsten Durchlauf wieder anzuhängen.
-		 */ else {
+            exit;
+        } else {
+            /* Wenn es nicht der erste oder letzte Durchlauf ist, wird ein neues PDF erzeugt. Die bereits erzeugten PDF auf dem Server
+            werden hinten angehängt. Danach wird es wieder auf dem Server gespeichert um im nächsten Durchlauf wieder anzuhängen.*/
             $mpdf->WriteHTML($css, 1);
             $mpdf->WriteHTML($rendered, 2);
-            //$mpdf->importPage();
             $page = $mpdf->SetSourceFile($tempFile . '.pdf');
             for ($i = 1; $i <= $page; $i++) {
                 $mpdf->AddPage();
