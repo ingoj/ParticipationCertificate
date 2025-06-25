@@ -64,7 +64,6 @@ class ilParticipationCertificatePDFGenerator
         $css = file_get_contents($this->pl->getDirectory() . '/templates/report/Teilnahmebescheinigung.css');
         $printCount++;
 
-
         //Checkt ob es nur einen User in der Gruppe hat. Wenn True wird das PDf direkt nur für diesen gedruckt
         if ($total_users == 1) {
             $mpdf->WriteHTML($css, 1);

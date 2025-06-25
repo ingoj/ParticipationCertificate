@@ -136,36 +136,7 @@ class ilParticipationCertificateTwigParser
 
 
         $logoIsSavedInResourceStorage = false;
-
-        if (is_numeric($global_config_id)) {
-
-            $file = ilParticipationCertificateFiles::getFile(
-                $global_config_id,
-                'logo'
-            );
-
-            if (is_file(ilParticipationCertificateConfig::returnPicturePath('absolute', $global_config_id, ilParticipationCertificateConfig::LOGO_FILE_NAME))) {
-                $logo_path = ilParticipationCertificateConfig::returnPicturePath('absolute', $global_config_id, ilParticipationCertificateConfig::LOGO_FILE_NAME);
-            } elseif($file->getResourceStorage()) {
-                $logoIsSavedInResourceStorage = true;
-            }
-        } else {
-
-            $file = ilParticipationCertificateFiles::getFile(
-                $this->group_ref_id,
-                'logo'
-            );
-
-            if (is_file(ilParticipationCertificateConfig::returnPicturePath('absolute', $this->group_ref_id, ilParticipationCertificateConfig::LOGO_FILE_NAME))) {
-                $logo_path = ilParticipationCertificateConfig::returnPicturePath('absolute', $this->group_ref_id, ilParticipationCertificateConfig::LOGO_FILE_NAME);
-            } elseif ($file->getResourceStorage()) {
-                $logoIsSavedInResourceStorage = true;
-            }else {
-                $logo_path = '';
-            }
-        }
-
-        /*if (is_numeric($global_config_id) && is_file(ilParticipationCertificateConfig::returnPicturePath('absolute', $global_config_id, ilParticipationCertificateConfig::LOGO_FILE_NAME))) {
+        if (is_numeric($global_config_id) && is_file(ilParticipationCertificateConfig::returnPicturePath('absolute', $global_config_id, ilParticipationCertificateConfig::LOGO_FILE_NAME))) {
             $logo_path = ilParticipationCertificateConfig::returnPicturePath('absolute', $global_config_id, ilParticipationCertificateConfig::LOGO_FILE_NAME);
 
             $file = ilParticipationCertificateFiles::getFile(
@@ -189,7 +160,7 @@ class ilParticipationCertificateTwigParser
             }
         } else {
             $logo_path = '';
-        }*/
+        }
 
         $signatureIsSavedInResourceStorage = false;
         if (is_numeric($global_config_id) && is_file(ilParticipationCertificateConfig::returnPicturePath('absolute', $global_config_id, ilParticipationCertificateConfig::ISSUER_SIGNATURE_FILE_NAME))) {
