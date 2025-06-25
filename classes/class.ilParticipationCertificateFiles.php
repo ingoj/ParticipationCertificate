@@ -76,7 +76,7 @@ class ilParticipationCertificateFiles extends ActiveRecord
             'type' => $fileType,
 		])->first();
 
-        return $file;
+        return $file ?? null;
 	}
 
 	static function setFile(
