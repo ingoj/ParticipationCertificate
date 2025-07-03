@@ -94,7 +94,7 @@ class ilParticipationCertificateResultTableGUI implements I\DataRetrieval
         $actions = $this->getActions((bool) $this->ementoring);
         $request = $DIC->http()->request();
 
-        if ($this->cert_access->hasCurrentUserWriteAccess() {
+        if ($this->cert_access->hasCurrentUserWriteAccess()) {
             $table = $this->ui_factory->table()->data(
                 '',
                 $this->getColumsForRepresentation(),
