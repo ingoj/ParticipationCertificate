@@ -107,3 +107,4 @@ end#:#End
 sorting#:#Sorting
 excel_export#:#Excel-Export
 csv_export#:#.CSV-Export
+print_all_info#:#The buttons above the table trigger the output of <strong>all printable</strong> certificates
