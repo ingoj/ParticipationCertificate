@@ -68,8 +68,8 @@ class ilParticipationCertificateResultTableGUI implements I\DataRetrieval
         $this->pl = ilParticipationCertificatePlugin::getInstance();
         $this->refId = $_GET['ref_id'];
 
-        $cert_access = new ilParticipationCertificateAccess($_GET['ref_id']);
-        $this->usr_ids = $cert_access->getUserIdsOfGroup();
+        $this->cert_access = new ilParticipationCertificateAccess($_GET['ref_id']);
+        $this->usr_ids = $this->cert_access->getUserIdsOfGroup();
 
         $ementoring = ilParticipationCertificateConfig::getConfig('enable_ementoring', $_GET['ref_id']);
         if ($ementoring === NULL) {
@@ -93,12 +93,20 @@ class ilParticipationCertificateResultTableGUI implements I\DataRetrieval
 
         $actions = $this->getActions((bool) $this->ementoring);
         $request = $DIC->http()->request();
-        $table = $this->ui_factory->table()->data(
-            '',
-            $this->getColumsForRepresentation(),
-            $this
-        )->withActions($actions)->withRequest($request);
 
+        if ($this->cert_access->hasCurrentUserWriteAccess() {
+            $table = $this->ui_factory->table()->data(
+                '',
+                $this->getColumsForRepresentation(),
+                $this
+            )->withActions($actions)->withRequest($request);
+        } else {
+            $table = $this->ui_factory->table()->data(
+                '',
+                $this->getColumsForRepresentation(),
+                $this
+            )->withRequest($request);
+        }
         return $table;
 
     }
@@ -144,12 +152,12 @@ class ilParticipationCertificateResultTableGUI implements I\DataRetrieval
             yield $row_builder->buildDataRow($record['usr_id'] . '_' . $ementoringIsActive, $record);
         }
     }
-
+    
+    //should not be necessary anymore
     public function getSelectableColumns(): array
     {
         $cols = [];
-        $cert_access = new ilParticipationCertificateAccess($_GET["ref_id"]);
-        $write_access = $cert_access->hasCurrentUserWriteAccess();
+        $write_access = $this->cert_access->hasCurrentUserWriteAccess();
         $cols['loginname'] = array(
             'txt' => $this->pl->txt('loginname'),
             'default' => $write_access,
@@ -228,41 +236,49 @@ class ilParticipationCertificateResultTableGUI implements I\DataRetrieval
     /**
      * @return array
      */
-    protected function getColumsForRepresentation(): array
+    public function getColumsForRepresentation(): array
     {
-        $columns = $this->getSelectableColumns();
+        $write_access = $this->cert_access->hasCurrentUserWriteAccess();
 
         $f = $this->ui_factory;
 
-        return  [
-            'loginname' => $f->table()->column()
-                                      ->text($columns['loginname']['txt'])
-                                      ->withIsSortable(false),
-            'firstname' => $f->table()->column()
-                                      ->text($columns['firstname']['txt'])
-                                      ->withIsSortable(false),
-            'lastname' => $f->table()->column()
-                                      ->text($columns['lastname']['txt'])
-                                      ->withIsSortable(false),
-            'initial_test_finished' => $f->table()->column()
-                                                  ->text($columns['initial_test_finished']['txt'])
-                                                  ->withIsSortable(false),
-            'result_qualifing_tests' => $f->table()->column()
-                                                   ->text($columns['result_qualifing_tests']['txt'])
-                                                   ->withIsSortable(false),
-            'results_qualifing_tests' => $f->table()->column()
-                                                    ->text($columns['results_qualifing_tests']['txt'])
-                                                    ->withIsSortable(false),
-            'eMentoring_finished' => $f->table()->column()
-                                                ->text($columns['eMentoring_finished']['txt'])
-                                                ->withIsSortable(false),
-            'eMentoring_homework' => $f->table()->column()
-                                                ->text($columns['eMentoring_homework']['txt'])
-                                                ->withIsSortable(false),
-            'eMentoring_percentage' => $f->table()->column()
-                                                  ->text($columns['eMentoring_percentage']['txt'])
-                                                  ->withIsSortable(false),
-        ];
+        if ($write_access) {
+            $cols['loginname'] = $f->table()->column()
+                                      ->text($this->pl->txt('loginname'))
+                                      ->withIsSortable(false)
+                                      ->withIsOptional(true);
+        }
+        $cols['firstname'] = $f->table()->column()
+                                      ->text($this->pl->txt('cols_firstname'))
+                                      ->withIsSortable(false);
+        $cols['lastname'] = $f->table()->column()
+                                      ->text($this->pl->txt('cols_lastname'))
+                                      ->withIsSortable(false);
+        $cols['initial_test_finished'] = $f->table()->column()
+                                       ->text($this->pl->txt('cols_initial_test_finished'))
+                                       ->withIsSortable(false);
+        $cols['result_qualifing_tests'] = $f->table()->column()
+                                       ->text($this->pl->txt('cols_result_qualifying'))
+                                       ->withIsSortable(false);
+        $cols['results_qualifing_tests'] = $f->table()->column()
+                                       ->text($this->pl->txt('cols_results_qualifying'))
+                                       ->withIsSortable(false)
+                                       ->withIsOptional(true, false);
+        if ($this->ementoring or $write_access) {
+            $cols['eMentoring_finished'] = $f->table()->column()
+                                                ->text($this->pl->txt('cols_eMentoring_finished'))
+                                                ->withIsSortable(false)
+                                                ->withIsOptional(true, $this->ementoring);
+            $cols['eMentoring_homework'] = $f->table()->column()
+                                                ->text($this->pl->txt('cols_eMentoring_homework'))
+                                                ->withIsSortable(false)
+                                                ->withIsOptional(true, $this->ementoring);
+            $cols['eMentoring_percentage'] = $f->table()->column()
+                                                ->text($this->pl->txt('cols_eMentoring_percentage'))
+                                                ->withIsSortable(false)
+                                                ->withIsOptional(true, $this->ementoring);
+        } 
+        return $cols;
     }
 
     public function records(): array
