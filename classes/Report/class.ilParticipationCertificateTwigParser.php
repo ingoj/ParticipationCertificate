@@ -133,57 +133,62 @@ class ilParticipationCertificateTwigParser
 
         $part_pdf = new ilParticipationCertificatePDFGenerator();
 
+
+        $logo_path = '';
         $logoIsSavedInResourceStorage = false;
-        if (is_numeric($global_config_id) && is_file(ilParticipationCertificateConfig::returnPicturePath('absolute', $global_config_id, ilParticipationCertificateConfig::LOGO_FILE_NAME))) {
-            $logo_path = ilParticipationCertificateConfig::returnPicturePath('absolute', $global_config_id, ilParticipationCertificateConfig::LOGO_FILE_NAME);
+        if (is_numeric($global_config_id)) {
+            $isFile = is_file(ilParticipationCertificateConfig::returnPicturePath('absolute', $refId, ilParticipationCertificateConfig::LOGO_FILE_NAME));
 
             $file = ilParticipationCertificateFiles::getFile(
-                $global_config_id,
+                $refId,
                 'logo'
             );
 
-            if ($file->getResourceStorage()) {
+            if ($isFile && !empty($file) && !$file->getResourceStorage()) {
+                $logo_path = ilParticipationCertificateConfig::returnPicturePath('absolute', $refId, ilParticipationCertificateConfig::LOGO_FILE_NAME);
+            } else if(!empty($file) && $file->getResourceStorage()) {
                 $logoIsSavedInResourceStorage = true;
             }
-
-        } elseif (is_file(ilParticipationCertificateConfig::returnPicturePath('absolute', $this->group_ref_id, ilParticipationCertificateConfig::LOGO_FILE_NAME))) {
-            $logo_path = ilParticipationCertificateConfig::returnPicturePath('absolute', $this->group_ref_id, ilParticipationCertificateConfig::LOGO_FILE_NAME);
-
+        } else {
             $file = ilParticipationCertificateFiles::getFile(
                 $this->group_ref_id,
                 'logo'
             );
 
-            if ($file->getResourceStorage()) {
+            if (!empty($file) && !$file->getResourceStorage() && is_file(ilParticipationCertificateConfig::returnPicturePath('absolute', $this->group_ref_id, ilParticipationCertificateConfig::LOGO_FILE_NAME))) {
+                $logo_path = ilParticipationCertificateConfig::returnPicturePath('absolute', $this->group_ref_id, ilParticipationCertificateConfig::LOGO_FILE_NAME);
+            } elseif (!empty($file) && $file->getResourceStorage()) {
                 $logoIsSavedInResourceStorage = true;
             }
-        } else {
-            $logo_path = '';
         }
 
+        $page1_issuer_signature = '';
         $signatureIsSavedInResourceStorage = false;
-        if (is_numeric($global_config_id) && is_file(ilParticipationCertificateConfig::returnPicturePath('absolute', $global_config_id, ilParticipationCertificateConfig::ISSUER_SIGNATURE_FILE_NAME))) {
-            $page1_issuer_signature = ilParticipationCertificateConfig::returnPicturePath('absolute', $global_config_id, ilParticipationCertificateConfig::ISSUER_SIGNATURE_FILE_NAME);
+        if (is_numeric($global_config_id)) {
+            $isFile = is_file(ilParticipationCertificateConfig::returnPicturePath('absolute', $refId, ilParticipationCertificateConfig::ISSUER_SIGNATURE_FILE_NAME));
 
             $file = ilParticipationCertificateFiles::getFile(
-                $global_config_id,
+                $refId,
                 'page1_issuer_signature'
             );
-            $signatureIsSavedInResourceStorage = $file->getResourceStorage();
 
+            if ($isFile && !empty($file) && !$file->getResourceStorage()) {
+                $page1_issuer_signature = ilParticipationCertificateConfig::returnPicturePath('absolute', $refId, ilParticipationCertificateConfig::ISSUER_SIGNATURE_FILE_NAME);
 
-        } elseif (is_file(ilParticipationCertificateConfig::returnPicturePath('absolute', $this->group_ref_id, ilParticipationCertificateConfig::ISSUER_SIGNATURE_FILE_NAME))) {
-            $page1_issuer_signature = ilParticipationCertificateConfig::returnPicturePath('absolute', $this->group_ref_id, ilParticipationCertificateConfig::ISSUER_SIGNATURE_FILE_NAME);
-
-
+            } else if(!empty($file) && $file->getResourceStorage()) {
+                $signatureIsSavedInResourceStorage = true;
+            }
+        } else {
             $file = ilParticipationCertificateFiles::getFile(
                 $this->group_ref_id,
                 'page1_issuer_signature'
             );
-            $signatureIsSavedInResourceStorage = $file->getResourceStorage();
 
-        } else {
-            $page1_issuer_signature = '';
+            if (!empty($file) && !$file->getResourceStorage() && is_file(ilParticipationCertificateConfig::returnPicturePath('absolute', $this->group_ref_id, ilParticipationCertificateConfig::ISSUER_SIGNATURE_FILE_NAME))) {
+                $page1_issuer_signature = ilParticipationCertificateConfig::returnPicturePath('absolute', $this->group_ref_id, ilParticipationCertificateConfig::ISSUER_SIGNATURE_FILE_NAME);
+            } elseif (!empty($file) && $file->getResourceStorage()) {
+                $signatureIsSavedInResourceStorage = true;
+            }
         }
 
         $this->usr_id = $this->excludeUsersFromPrintIfMissingUserData($this->usr_id);
@@ -281,15 +286,19 @@ class ilParticipationCertificateTwigParser
             }
 
 
-            if ($logoIsSavedInResourceStorage && !empty($processed_arr_text_values['logo'])) {
-                $file = new ilParticipationCertificateFiles();
-                $src = $file->getFileSrcByStorageType(
-                    $processed_arr_text_values['logo'],
-                    $this->group_ref_id,
-                    'logo'
-                );
+            if ($logoIsSavedInResourceStorage) {
 
-                $logo_path = $src;
+                if(!empty($processed_arr_text_values['logo'])) {
+                    $file = new ilParticipationCertificateFiles();
+                    $src = $file->getFileSrcByStorageType(
+                        $processed_arr_text_values['logo'],
+                        $this->group_ref_id,
+                        'logo'
+                    );
+
+                    $logo_path = $src;
+                }
+
             }
 
             if ($signatureIsSavedInResourceStorage && !empty($processed_arr_text_values['page1_issuer_signature'])) {
