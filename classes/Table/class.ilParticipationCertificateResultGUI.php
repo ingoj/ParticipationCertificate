@@ -568,7 +568,9 @@ class ilParticipationCertificateResultGUI
                 $ementor = (bool) $urlParameters[1];
                 $usr_id[] = $userId;
             } else {
-                $ementor = $_GET['ementor'];
+                if ($_GET['ementor'] == 'true') {
+			$ementor = true;
+		}
                 $cert_access = new ilParticipationCertificateAccess($this->groupRefId);
                 $userIds = $cert_access->getUserIdsOfGroup();
                 if (empty($usr_id)) {
