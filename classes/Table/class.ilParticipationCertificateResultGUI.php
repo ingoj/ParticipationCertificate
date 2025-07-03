@@ -143,7 +143,7 @@ class ilParticipationCertificateResultGUI
 
         if ($this->cert_access->hasCurrentUserPrintAccess()) {
 	    if ($this->cert_access->hasCurrentUserWriteAccess()) {
-		    $this->tpl->setOnScreenMessage(info,$this->pl->txt('print_all_info'),true);
+		    $this->tpl->setOnScreenMessage('info',$this->pl->txt('print_all_info'),true);
 	    }
             if ($this->ementoring) {
                 $this->ctrl->setParameter($this, 'ementor', true);
