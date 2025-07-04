@@ -59,6 +59,8 @@ class ilParticipationCertificateResultGUI
         $this->groupRefId = (int)$_GET['ref_id'];
         $this->learnGroup = ilObjectFactory::getInstanceByRefId($_GET['ref_id']);
         $this->lng = $DIC->language();
+	$this->cert_access = new ilParticipationCertificateAccess($_GET['ref_id']);
+	    
         $ementoring = ilParticipationCertificateConfig::getConfig('enable_ementoring', $this->groupRefId);
         if ($ementoring === NULL) {
             $ementoring = true;
@@ -137,10 +139,12 @@ class ilParticipationCertificateResultGUI
         }
         $this->initHeader();
 
-        $cert_access = new ilParticipationCertificateAccess($_GET['ref_id']);
         $ui = $DIC->ui()->factory();
 
-        if ($cert_access->hasCurrentUserPrintAccess()) {
+        if ($this->cert_access->hasCurrentUserPrintAccess()) {
+	    if ($this->cert_access->hasCurrentUserWriteAccess()) {
+		    $this->tpl->setOnScreenMessage('info',$this->pl->txt('print_all_info'),true);
+	    }
             if ($this->ementoring) {
                 $this->ctrl->setParameter($this, 'ementor', true);
                 $toolbarButton = $ui->button()->standard(
@@ -172,21 +176,24 @@ class ilParticipationCertificateResultGUI
                 $this->ctrl->setParameter($this, 'filter_lastname', $_GET['filter_lastname']);
             }
 
-            $toolbarButton = $ui->button()->standard(
-                $this->pl->txt('excel_export'),
-                $this->ctrl->getLinkTarget($this, self::CMD_EXPORT_EXCEL)
-            );
-            $this->toolbar->addComponent($toolbarButton);
+	    if ($this->cert_access->hasCurrentUserWriteAccess()) {
+			
+            	$toolbarButton = $ui->button()->standard(
+                	$this->pl->txt('excel_export'),
+                	$this->ctrl->getLinkTarget($this, self::CMD_EXPORT_EXCEL)
+            	);
+            	$this->toolbar->addComponent($toolbarButton);
 
-            $toolbarButton = $ui->button()->standard(
-                $this->pl->txt('csv_export'),
-                $this->ctrl->getLinkTarget($this, $this::CMD_EXPORT_CSV)
-            );
-            $this->toolbar->addComponent($toolbarButton);
+            	$toolbarButton = $ui->button()->standard(
+                	$this->pl->txt('csv_export'),
+                	$this->ctrl->getLinkTarget($this, $this::CMD_EXPORT_CSV)
+            	);
+            	$this->toolbar->addComponent($toolbarButton);
+	    }
 
         }
         $target_ref = 0;
-        if ($cert_access->isSelfPrintEnabled() and !$cert_access->hasCurrentUserPrintAccess()) {
+        if ($this->cert_access->isSelfPrintEnabled() and !$this->cert_access->hasCurrentUserPrintAccess()) {
 			$global_config_sets = ilParticipationCertificateConfig::where(array("config_type"=>3, "global_config_id" => 0 ))->orderBy('order_by')->get();
             foreach ($global_config_sets as $config) {
 				if ($config->getConfigKey() == "true_name_helper") {
@@ -195,7 +202,7 @@ class ilParticipationCertificateResultGUI
 			}
             $this->tpl->setOnScreenMessage('failure',$this->pl->txt('noname_noprint'), true);
 			if (is_numeric($target_ref) and ($target_ref > 0) and (ilObject::_lookupType(ilObject::_lookupObjectId($target_ref),false) == 'xudf')) {
-                $msgurl= ' <a href="ilias.php?baseClass=ilDashboardGUI&cmd=jumpToProfile">' .  $this->pl->txt('helper_name') . '</a>';
+                $msgurl= ' <a href="ilias.php?baseClass=ilObjPluginDispatchGUI&cmd=forward&ref_id=' . $target_ref . '">' .  $this->pl->txt('helper_name') . '</a>';
                 $msgadd= $this->pl->txt('helper_action_pre') . $msgurl . $this->pl->txt('helper_action_post');
                 $this->tpl->setOnScreenMessage('info',$msgadd, true);
 				//Variants sendQuestion, send Info or unified Failure (with some codechange). two same not possible
@@ -324,21 +331,15 @@ class ilParticipationCertificateResultGUI
     {
         $this->columns = [
             [
-                'text' => 'invisible',
-                'sort_field' => '',
-                'width' => 'invisible',
-                'is_checkbox_action_column' => true
+                'text' => 'invisible'
             ]
         ];
         
-        $selectableColumns = $resultTable->getSelectableColumns();
+        $selectableColumns = $resultTable->getColumsForRepresentation();
         foreach ($selectableColumns as $column) {
             $this->columns[] = [
-                'text' => $column['txt'],
-                'sort_field' => $column['sort_field'],
-                'width' => $column['width'],
-                'is_checkbox_action_column' => true
-            ];
+                'text' => $column->getTitle()
+                ];
         }
 
         $col = 0;
@@ -383,20 +384,14 @@ class ilParticipationCertificateResultGUI
     {
         $this->columns = [
             [
-                'text' => 'invisible',
-                'sort_field' => '',
-                'width' => 'invisible',
-                'is_checkbox_action_column' => true
+                'text' => 'invisible'
             ]
         ];
 
-        $selectableColumns = $resultTable->getSelectableColumns();
+        $selectableColumns = $resultTable->getColumsForRepresentation();
         foreach ($selectableColumns as $column) {
             $this->columns[] = [
-                'text' => $column['txt'],
-                'sort_field' => $column['sort_field'],
-                'width' => $column['width'],
-                'is_checkbox_action_column' => true
+                'text' => $column->getTitle()
             ];
         }
 
@@ -447,8 +442,8 @@ class ilParticipationCertificateResultGUI
 
         $this->tabs->addTab(self::CMD_OVERVIEW, $this->pl->txt('header_overview'),
             $this->ctrl->getLinkTargetByClass(self::class, self::CMD_CONTENT));
-        $cert_access = new ilParticipationCertificateAccess($_GET['ref_id']);
-        if ($cert_access->hasCurrentUserAdminAccess()) {
+        
+        if ($this->cert_access->hasCurrentUserAdminAccess()) {
             $this->tabs->addTab(ilParticipationCertificateGUI::TAB_CONFIG, $this->pl->txt('header_config'),
                 $this->ctrl->getLinkTargetByClass(ilParticipationCertificateGUI::class,
                     ilParticipationCertificateGUI::CMD_CONFIG));
@@ -466,13 +461,12 @@ class ilParticipationCertificateResultGUI
         $renderer = $DIC->ui()->renderer();
 
         $resultTable = new ilParticipationCertificateResultTableGUI();
-        $cert_access = new ilParticipationCertificateAccess($refId);
-
+        
         $filterHtml = '';
         $filterFirstname = '';
         $filterLastname = '';
 
-        if ($cert_access->hasCurrentUserWriteAccess()) {
+        if ($this->cert_access->hasCurrentUserWriteAccess()) {
             $filter = $resultTable->buildFilter();
             $filterData = $DIC->uiService()->filter()->getData($filter);
 
@@ -504,8 +498,10 @@ class ilParticipationCertificateResultGUI
         if (!empty($action)) {
             switch ($action) {
                 case 'print_with_ementorining':
+		    $this->printPdf(true);
+		    break;
                 case 'print_without_ementorining':
-                    $this->printPdf();
+                    $this->printPdf(false);
                     break;
 
                 case 'show_all_results':
@@ -562,13 +558,11 @@ class ilParticipationCertificateResultGUI
      * @throws ilCtrlException
      * @throws Exception
      */
-    public function printPdf(): void
+    public function printPdf(?bool $ementoring = null): void
     {
         global $DIC;
 
-        $cert_access = new ilParticipationCertificateAccess((int) $_GET['ref_id']);
-
-        if ($cert_access->hasCurrentUserPrintAccess()) {
+        if ($this->cert_access->hasCurrentUserPrintAccess()) {
             $ementor = false;
             $usr_id = [];
             if (!empty($_GET['config_entry'])) {
@@ -577,7 +571,9 @@ class ilParticipationCertificateResultGUI
                 $ementor = (bool) $urlParameters[1];
                 $usr_id[] = $userId;
             } else {
-                $ementor = $_GET['ementor'];
+                if ($_GET['ementor'] == 'true') {
+			$ementor = true;
+		}
                 $cert_access = new ilParticipationCertificateAccess($this->groupRefId);
                 $userIds = $cert_access->getUserIdsOfGroup();
                 if (empty($usr_id)) {
@@ -585,6 +581,10 @@ class ilParticipationCertificateResultGUI
                 }
             }
 
+	    if ($ementoring !== null) {
+		    $ementor = $ementoring;
+	    }
+		
             if (!empty($usr_id)) {
                 $arr_usr_data = ilPartCertUsersData::getData($this->pl, $usr_id);
                 $usr_id = $this->excludeUserIfDataMissing($usr_id, $arr_usr_data);
@@ -615,8 +615,7 @@ class ilParticipationCertificateResultGUI
     {
         global $DIC;
 
-        $cert_access = new ilParticipationCertificateAccess($_GET['ref_id']);
-        if ($cert_access->hasCurrentUserPrintAccess()) {
+        if ($this->cert_access->hasCurrentUserPrintAccess()) {
             $configEntries = $_GET['config_entry'];
 
             if (empty($configEntries)) {
@@ -658,8 +657,7 @@ class ilParticipationCertificateResultGUI
     {
         global $DIC;
 
-        $cert_access = new ilParticipationCertificateAccess($_GET['ref_id']);
-        if ($cert_access->hasCurrentUserPrintAccess()) {
+        if ($this->cert_access->hasCurrentUserPrintAccess()) {
             $configEntries = $_GET['config_entry'];
 
             if (empty($configEntries)) {
