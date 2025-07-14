@@ -509,15 +509,22 @@ class ilParticipationCertificateResultGUI
                         $usrId = explode('_', $_GET['config_entry'][0])[0];
                         $this->ctrl->setParameterByClass(ilParticipationCertificateResultGUI::class, 'usr_id', $usrId);
                     }
-
                     $singleResultGui = new ilParticipationCertificateSingleResultGUI();
                     $singleResultGui->display();
                     break;
 
                 case 'show_selected_all_results':
                     $userIds = [];
-                    if (!empty($_GET['config_entry'])) {
-                        $userIds = $this->excludeUserIdsFromUrlParameters($_GET['config_entry']);
+
+                    $configEntries = $_GET['config_entry'];
+                    if (!empty($configEntries)) {
+                        if ($configEntries[0] === 'ALL_OBJECTS') {
+                            $resultTable = new ilParticipationCertificateResultTableGUI();
+                            $data = $resultTable->records();
+                            $userIds = array_column($data, 'usr_id');
+                        } else {
+                            $userIds = $this->excludeUserIdsFromUrlParameters($configEntries);
+                        }
                     }
 
                     new ilParticipationCertificateMultipleResultGUI($userIds, $this->groupRefId);
@@ -625,10 +632,16 @@ class ilParticipationCertificateResultGUI
 
             $usr_ids = [];
 
-            foreach ($configEntries as $entry) {
-                $urlParameters = $this->excludeURLParameters($entry);
-                $userId = $urlParameters[0];
-                $usr_ids[] = $userId;
+            if ($configEntries[0] === 'ALL_OBJECTS') {
+                $resultTable = new ilParticipationCertificateResultTableGUI();
+                $data = $resultTable->records();
+                $usr_ids = array_column($data, 'usr_id');
+            } else {
+                foreach ($configEntries as $entry) {
+                    $urlParameters = $this->excludeURLParameters($entry);
+                    $userId = $urlParameters[0];
+                    $usr_ids[] = $userId;
+                }
             }
 
             $arr_usr_data = ilPartCertUsersData::getData($this->pl, $usr_ids);
@@ -666,10 +679,16 @@ class ilParticipationCertificateResultGUI
             }
             $usr_ids = [];
 
-            foreach ($configEntries as $entry) {
-                $urlParameters = $this->excludeURLParameters($entry);
-                $userId = $urlParameters[0];
-                $usr_ids[] = $userId;
+            if ($configEntries[0] === 'ALL_OBJECTS') {
+                $resultTable = new ilParticipationCertificateResultTableGUI();
+                $data = $resultTable->records();
+                $usr_ids = array_column($data, 'usr_id');
+            } else {
+                foreach ($configEntries as $entry) {
+                    $urlParameters = $this->excludeURLParameters($entry);
+                    $userId = $urlParameters[0];
+                    $usr_ids[] = $userId;
+                }
             }
 
             $arr_usr_data = ilPartCertUsersData::getData($this->pl, $usr_ids);
