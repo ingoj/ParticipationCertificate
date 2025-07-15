@@ -191,7 +191,7 @@ class ilParticipationCertificateResultModificationGUI
         )->withValue((string) $form_data['homework'] ?? '');
 
         if ($form_data['ementoring']) {
-            $inputFields['ementoring'] = $ui->input()->fields()->checkbox(
+            $inputFields['ementoring'] = $ui->input()->field()->checkbox(
                 $this->pl->txt('add_ementoring'),
                 $this->pl->txt('add_ementoring_additional')
             )->withValue(true);
