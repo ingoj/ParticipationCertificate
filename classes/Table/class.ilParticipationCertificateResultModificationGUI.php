@@ -190,10 +190,18 @@ class ilParticipationCertificateResultModificationGUI
             $this->pl->txt('mod_homework')
         )->withValue((string) $form_data['homework'] ?? '');
 
+        if ($form_data['ementoring']) {
+            $inputFields['ementoring'] = $ui->input()->fields()->checkbox(
+                $this->pl->txt('add_ementoring'),
+                $this->pl->txt('add_ementoring_additional')
+            )->withValue(true);
+        }
+
         $section = $ui->input()->field()->section(
             $inputFields,
-            'Resultate für ' . $name_user . ' bearbeiten'
+            sprintf($this->pl->txt('mod_section'), $name_user)
         );
+        
         $formAction = $this->ctrl->getFormActionByClass(
             self::class,
             ilParticipationCertificateResultGUI::CMD_PRINT_PDF,
@@ -234,6 +242,15 @@ class ilParticipationCertificateResultModificationGUI
         } else {
             $array['homework'] = 0;
         }
+
+        $ementor = ilParticipationCertificateConfig::getConfig('enable_ementoring', $this->groupRefId);
+        if ($ementor === NULL) {
+            $ementor = true;
+        } else {
+            $ementor = boolval($ementor);
+        }
+        $array['ementoring'] = $ementor;
+        
         return $array;
     }
 
@@ -255,7 +272,7 @@ class ilParticipationCertificateResultModificationGUI
             $data['conf'],
             $data['homework']
         ];
-        $ementor = $_GET['ementor'];
+        
         $edited = $_GET['edited'];
         $usr_id[] = $this->usr_id;
 
@@ -269,7 +286,7 @@ class ilParticipationCertificateResultModificationGUI
             $this->redirectWithError(self::CMD_DISPLAY, $this->pl->txt('user_data_missing'));
         }
 
-        $twigParser = new ilParticipationCertificateTwigParser($this->groupRefId, array(), $usr_id, $ementor, $edited, $array);
+        $twigParser = new ilParticipationCertificateTwigParser($this->groupRefId, array(), $usr_id, boolval($data['ementoring'] ?? ''), $edited, $array);
         $twigParser->parseData();
     }
 
