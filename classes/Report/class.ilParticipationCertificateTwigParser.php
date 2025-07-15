@@ -93,13 +93,6 @@ class ilParticipationCertificateTwigParser
             $global_config_id = reset($arr_config)->getGlobalConfigId();
         }
 
-        if ($global_config_id > 0) {
-            $global_config_set = $global_config_sets->getConfigSetById($global_config_id);
-            $this->tpl->setOnScreenMessage('info', $this->pl->txt('configset_type_1') . ' ' . $global_config_set->getTitle(), true);
-        } else {
-            $this->tpl->setOnScreenMessage('info', $this->pl->txt('configset_type_2'), true);
-        }
-
         $arr_config_text = [];
         foreach ($arr_config as $config) {
             $arr_config_text[$config->getConfigKey()] = $config->getConfigValue();
@@ -109,12 +102,7 @@ class ilParticipationCertificateTwigParser
             $global_config_id = reset($arr_config)->getGlobalConfigId();
         }
 
-        if ($global_config_id > 0) {
-            $global_config_set = $global_config_sets->getConfigSetById($global_config_id);
-            $this->tpl->setOnScreenMessage('info', $this->pl->txt('configset_type_1') . ' ' . $global_config_set->getTitle(), true);
-        } else {
-            $this->tpl->setOnScreenMessage('info', $this->pl->txt('configset_type_2'), true);
-        }
+        $this->tpl->setOnScreenMessage('success', $this->pl->txt('print_done'), true);
 
         $refId = (int) $_GET['ref_id'];
         $arr_new_iass_states = ilIassStatesMulti::getData($this->usr_ids, $refId);
@@ -329,8 +317,7 @@ class ilParticipationCertificateTwigParser
 
             $part_pdf->generatePDF($this->twig_template->render($arr_render), count($this->usr_id));
         }
-        $this->tpl->setOnScreenMessage('info', $this->pl->txt('configset_type_2'), true);
-
+        
     }
 
     /**
