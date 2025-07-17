@@ -108,3 +108,7 @@ sorting#:#Sortierung
 excel_export#:#Excel-Export
 csv_export#:#.CSV-Export
 print_all_info#:#Die Buttons oben lösen die Ausgabe <strong>aller druckbaren Bescheinigungen</strong> aus
+add_ementoring#:#Druken inklusive Ementoring
+add_ementoring_additional#:#Ernn ein Druck ohne Ementoring gewünscht ist, muss diese Option abgewählt sein
+mod_section#:#Resultate für %s bearbeiten
+print_done#:#Die Teilnahmebescheinigung wurde in einem neuen Tab/Fenster erstellt
