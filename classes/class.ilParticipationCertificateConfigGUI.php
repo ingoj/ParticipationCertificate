@@ -659,8 +659,8 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI
 
                 default:
                     $configValue = $config->getConfigValue();
-                    if (!empty($config->getConfigValue())) {
-                        $configValue = $this->replacePlaceholdersFromOldVersion($config->getConfigValue());
+                    if (!empty($configValue)) {
+                        $configValue = $this->replacePlaceholdersFromOldVersion($configValue);
                     }
 
                     $inputFields[$config->getConfigKey()] = $ui->input()->field()->textarea(
