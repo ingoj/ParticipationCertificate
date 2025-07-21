@@ -559,8 +559,6 @@ class ilParticipationCertificateGUI
                 ->withUseTime(false)
                 ->withLabels($this->pl->txt('start'), $this->pl->txt('end'))
                 ->withFormat($user->getDateFormat())
-                ->withMinValue($startDate)
-                ->withMaxValue($endDate)
                 ->withValue([$startDate, $endDate]);
         } else {
             $period = $durationInput
@@ -629,6 +627,12 @@ class ilParticipationCertificateGUI
         $form = $this->initConfigResultTableForm();
 
         $form = $form->withRequest($DIC->http()->request());
+
+        if (empty($form->getData())) {
+            $this->tpl->setOnScreenMessage('failure', $this->pl->txt('failure_timeframe_save'), true);
+            $this->ctrl->redirect($this, self::CMD_CONFIG_RESULT_TABLE);
+        }
+
         $form_data = $form->getData()['config'];
 
         if ($form->getError()) {
