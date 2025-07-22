@@ -264,9 +264,11 @@ class ilParticipationCertificateSingleResultTableGUI extends ilTable2GUI {
 			$css_class = self::NON_SUCCESSFUL_PROGRESS_CSS_CLASS;
 		} else {
 			$css_class = self::FAILED_PROGRESS_CSS_CLASS;
-		}
 
-		//require_once("Services/Container/classes/class.ilContainerObjectiveGUI.php");
+            if ($current_percent === 0) {
+                $css_class .= ' percent-0';
+            }
+		}
 
 		return \ilContainerObjectiveGUI::renderProgressBar(
             $current_percent,
