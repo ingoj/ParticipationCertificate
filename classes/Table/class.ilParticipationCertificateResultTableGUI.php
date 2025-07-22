@@ -595,7 +595,6 @@ class ilParticipationCertificateResultTableGUI implements I\DataRetrieval
                 if ($a_perc_result === 0 ){
                     $css_class .= ' percent-0';
                 }
-
             }
         }
         return ilContainerObjectiveGUI::renderProgressBar($a_perc_result, $perc_limit, $css_class);
