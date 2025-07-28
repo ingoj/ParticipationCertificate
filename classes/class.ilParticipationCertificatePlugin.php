@@ -53,12 +53,14 @@ class ilParticipationCertificatePlugin extends ilUserInterfaceHookPlugin
         $this->db->dropTable('dhbw_part_cert_ob_conf', false);
         $this->db->dropTable('dhbw_part_cert_conf', false);
         $this->db->dropTable('dhbw_part_cert_gl_conf', false);
+        $this->db->dropTable('dhbw_part_cert_files', false);
 
         $sequences = [
             'participationcert',
             'dhbw_part_cert_ob_conf',
             'dhbw_part_cert_conf',
-            'dhbw_part_cert_gl_conf'
+            'dhbw_part_cert_gl_conf',
+            'dhbw_part_cert_files'
         ];
         foreach ($sequences as $sequence) {
             try {
@@ -74,6 +76,9 @@ class ilParticipationCertificatePlugin extends ilUserInterfaceHookPlugin
         return $this->getDirectory() . "/templates/images/" . $imageName;
     }
 
+    /**
+     * @return void
+     */
     protected function afterUpdate(): void
     {
         // Get all files and directories in the certifications' path

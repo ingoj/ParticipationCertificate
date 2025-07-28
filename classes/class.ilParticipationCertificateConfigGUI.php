@@ -745,45 +745,56 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI
                             }
 
                             if (!empty($input)) {
-                                $global_config = $part_cert_configs->getParticipationTemplateConfigValueByKey(
-                                    $global_config_id,
-                                    $key
-                                );
+                                try {
+                                    $global_config = $part_cert_configs->getParticipationTemplateConfigValueByKey(
+                                        $global_config_id,
+                                        $key
+                                    );
 
-                                $global_config->setConfigValue($input);
-                                $global_config->store();
+                                    $global_config->setConfigValue($input);
+                                    $global_config->store();
 
-                                ilParticipationCertificateFiles::setFile(
-                                    $global_config_id,
-                                    $file,
-                                    true
-                                );
+                                    ilParticipationCertificateFiles::setFile(
+                                        $global_config_id,
+                                        $file,
+                                        true
+                                    );
+                                } catch (\Throwable $e) {
+                                    ilLoggerFactory::getRootLogger()->error("Error uploading file '{$file}': " . $e->getMessage());
+                                    $this->ctrl->redirect($this, self::CMD_SHOW_FORM_ERR);
+                                    return false;
+                                }
                             }
 
                             break;
                         case 'page1_issuer_signature':
                             $file = 'page1_issuer_signature';
                             if (!empty($input)) {
-                                $file = 'page1_issuer_signature';
                                 $input = end($input);
                             } else {
                                 $input = $config->getConfigValue();
                             }
 
                             if (!empty($input)) {
-                                $global_config = $part_cert_configs->getParticipationTemplateConfigValueByKey(
-                                    $global_config_id,
-                                    $key
-                                );
+                                try {
+                                    $global_config = $part_cert_configs->getParticipationTemplateConfigValueByKey(
+                                        $global_config_id,
+                                        $key
+                                    );
 
-                                $global_config->setConfigValue($input);
-                                $global_config->store();
+                                    $global_config->setConfigValue($input);
+                                    $global_config->store();
 
-                                ilParticipationCertificateFiles::setFile(
-                                    $global_config_id,
-                                    $file,
-                                    true
-                                );
+                                    ilParticipationCertificateFiles::setFile(
+                                        $global_config_id,
+                                        $file,
+                                        true
+                                    );
+                                } catch (\Throwable $e) {
+                                        ilLoggerFactory::getRootLogger()->error("Error uploading file '{$file}': " . $e->getMessage());
+                                        $this->ctrl->redirect($this, self::CMD_SHOW_FORM_ERR);
+                                        return false;
+                                    }
                             }
 
                             break;

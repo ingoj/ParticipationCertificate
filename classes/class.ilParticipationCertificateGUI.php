@@ -456,15 +456,22 @@ class ilParticipationCertificateGUI
                     break;
             }
 
-            $config->setConfigValue($input);
-            $config->store();
+            try {
+                $config->setConfigValue($input);
+                $config->store();
 
-            if ($file === 'logo' || $file === 'page1_issuer_signature') {
-                ilParticipationCertificateFiles::setFile(
-                    $this->groupRefId,
-                    $file,
-                    true
-                );
+                if ($file === 'logo' || $file === 'page1_issuer_signature') {
+                    ilParticipationCertificateFiles::setFile(
+                        $this->groupRefId,
+                        $file,
+                        true
+                    );
+                }
+            } catch(\Throwable $e) {
+                ilLoggerFactory::getRootLogger()->error("Error saving config or uploading file '{$file}': " . $e->getMessage());
+
+                $this->tpl->setOnScreenMessage(ilGlobalTemplateInterface::MESSAGE_TYPE_FAILURE, $this->pl->txt('failure_save_config'), true);
+                $this->ctrl->redirect($this, self::CMD_DISPLAY);
             }
         }
 
