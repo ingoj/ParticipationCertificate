@@ -49,6 +49,8 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI
 
     private bool $err_helper;
 
+    private $logger;
+
     /**
      * ilParticipationCertificateConfigGUI constructor.
      */
@@ -60,6 +62,8 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI
         $this->ctrl = $DIC->ctrl();
         $this->tabs = $DIC->tabs();
         $this->ilToolbar = $DIC->toolbar();
+        $this->logger = $DIC->logger()->root();
+
         $this->pl = ilParticipationCertificatePlugin::getInstance();
     }
 
@@ -702,6 +706,8 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI
     {
         global $DIC;
 
+        $this->logger->debug('Start saving participation certificate');
+
         $global_config_id = filter_input(INPUT_GET, 'id');
         $set_type = filter_input(INPUT_GET, 'set_type');
 
@@ -721,6 +727,8 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI
                 foreach ($form_data as $key => $item) {
 
                     if($key !== 'config_title') {
+                        $this->logger->debug('Get config key: ' . $key);
+
                         $config = ilParticipationCertificateConfig::where(array(
                             'config_key' => $key,
                             'global_config_id' => $global_config_id,
@@ -734,6 +742,8 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI
                             $global_config = ilParticipationCertificateGlobalConfigSet::findOrGetInstance($global_config_id);
                             $global_config->setTitle($input);
                             $global_config->store();
+
+                            $this->logger->debug('Save key: ' . $key);
 
                             break;
                         case 'logo':
@@ -754,13 +764,16 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI
                                     $global_config->setConfigValue($input);
                                     $global_config->store();
 
+                                    $this->logger->debug('Save key: ' . $key);
+
                                     ilParticipationCertificateFiles::setFile(
                                         $global_config_id,
                                         $file,
                                         true
                                     );
+                                    $this->logger->debug('Save value for ' . $key . ' in table: dhbw_part_cert_files');
                                 } catch (\Throwable $e) {
-                                    ilLoggerFactory::getRootLogger()->error("Error uploading file '{$file}': " . $e->getMessage());
+                                    $this->logger->debug("Error uploading file '{$file}': " . $e->getMessage());
                                     $this->ctrl->redirect($this, self::CMD_SHOW_FORM_ERR);
                                     return false;
                                 }
@@ -785,16 +798,19 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI
                                     $global_config->setConfigValue($input);
                                     $global_config->store();
 
+                                    $this->logger->debug('Save key: ' . $key);
+
                                     ilParticipationCertificateFiles::setFile(
                                         $global_config_id,
                                         $file,
                                         true
                                     );
+                                    $this->logger->debug('Save value for ' . $key . ' in table: dhbw_part_cert_files');
                                 } catch (\Throwable $e) {
-                                        ilLoggerFactory::getRootLogger()->error("Error uploading file '{$file}': " . $e->getMessage());
-                                        $this->ctrl->redirect($this, self::CMD_SHOW_FORM_ERR);
-                                        return false;
-                                    }
+                                    $this->logger->debug("Error uploading file '{$file}': " . $e->getMessage());
+                                    $this->ctrl->redirect($this, self::CMD_SHOW_FORM_ERR);
+                                    return false;
+                                }
                             }
 
                             break;
@@ -806,6 +822,7 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI
 
                             $global_config->setConfigValue($input);
                             $global_config->store();
+                            $this->logger->debug('Save key: ' . $key);
                             break;
                     }
                 }
@@ -854,6 +871,7 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI
                     $global_config = $part_cert_configs->getParticipationGlobalConfigValueByKey($key);
                     $global_config->setConfigValue($input);
                     $global_config->store();
+                    $this->logger->debug('Save key: ' . $key);
                 }
         }
 
@@ -862,6 +880,7 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI
         } else {
             $this->ctrl->redirect($this, self::CMD_CONFIGURE);
         }
+        $this->logger->debug('End saving participation certificate');
 
         return true;
     }
