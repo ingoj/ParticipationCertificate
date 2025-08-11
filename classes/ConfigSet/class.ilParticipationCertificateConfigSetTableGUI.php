@@ -192,6 +192,7 @@ class ilParticipationCertificateConfigSetTableGUI implements I\DataRetrieval
                                         $configSet['object_gl_conf_template_id']
                                     )) {
                                         $configSetType = '';
+                                        break;
                                     }
                                     $arr_type[] = $this->pl->txt('configset_type_' . $configSet['configset_type']);
                                     $arr_type[] = $this->pl->txt(

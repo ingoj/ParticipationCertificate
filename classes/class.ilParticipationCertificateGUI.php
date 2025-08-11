@@ -12,35 +12,60 @@ use ILIAS\Data\Factory;
 class ilParticipationCertificateGUI
 {
     public const CMD_SAVE = 'save';
+
     public const CMD_CANCEL = 'cancel';
+
     public const CMD_LOOP = 'loop';
+
     public const CMD_CONFIG = 'config';
+
     public const CMD_CONFIG_RESULT_TABLE = 'configResultTable';
+
     public const CMD_RESULT_TABLE_CONFIG = 'saveResultTableConfig';
+
     public const CMD_SELF_PRINT = 'selfPrint';
+
     public const CMD_SELF_PRINT_SAVE = 'saveSelfPrint';
+
     public const CMD_DISPLAY = 'display';
 
     public const CMD_SET_CERT_TEMPLATE = 'setCertTemplate';
+
     public const CMD_SET_OWN_CERT_TEXT_FROM_TEMPLATE = 'setOwnCertTextFromTemplate';
 
     public const TAB_CONFIG = 'config';
+
     public const TAB_CONFIG_DISPLAY = 'config_display';
+
     public const TAB_CONFIG_RESULT_TABLE = 'config_result_table';
+
     public const TAB_CONFIG_SELF_PRINT = 'config_self_print';
+
     private string $objecttype;
+
     private ?ilObject $learnGroup;
+
     public ilTemplate|ilGlobalTemplateInterface $tpl;
+
     public ilCtrl|ilCtrlInterface $ctrl;
+
     public ilTabsGUI $tabs;
+
     public ilGroupParticipants $learnGroupParticipants;
+
     public ilObjGroup $learningGroup;
+
     public ilParticipationCertificateConfig $object;
+
     public ilToolbarGUI $toolbar;
+
     public int $groupRefId;
+
     protected ilParticipationCertificatePlugin $pl;
+
     protected ilLanguage $lng;
 
+    private $logger;
     /**
      *
      * @throws ilCtrlException
@@ -56,6 +81,7 @@ class ilParticipationCertificateGUI
         //$this->objectDefinition = $DIC["objDefinition"];
         $this->groupRefId = (int) $_GET['ref_id'];
         $this->lng = $DIC->language();
+        $this->logger = $DIC->logger()->root();
 
         //Access
         $cert_access = new ilParticipationCertificateAccess($this->groupRefId);
@@ -401,11 +427,15 @@ class ilParticipationCertificateGUI
     {
         global $DIC;
 
+        $this->logger->debug('Start saving participation certificate');
+
         $form = $this->initForm();
         $form = $form->withRequest($DIC->http()->request());
         $form_data = $form->getData()['config'];
 
         if ($form->getError()) {
+            $this->logger->debug('Form validation error');
+
             $this->tpl->setOnScreenMessage(ilGlobalTemplateInterface::MESSAGE_TYPE_FAILURE, $form->getError());
             $this->selfPrint();
             return false;
@@ -456,17 +486,33 @@ class ilParticipationCertificateGUI
                     break;
             }
 
-            $config->setConfigValue($input);
-            $config->store();
+            try {
+                $config->setConfigValue($input);
+                $config->store();
 
-            if ($file === 'logo' || $file === 'page1_issuer_signature') {
-                ilParticipationCertificateFiles::setFile(
-                    $this->groupRefId,
-                    $file,
-                    true
-                );
+                $this->logger->debug('Save key: ' . $key);
+
+                if ($file === 'logo' || $file === 'page1_issuer_signature') {
+                    ilParticipationCertificateFiles::setFile(
+                        $this->groupRefId,
+                        $file,
+                        true
+                    );
+
+                    $this->logger->debug('Save ' . $key . ' in table: dhbw_part_cert_files');
+                }
+            } catch(\Throwable $e) {
+                if (!empty($file)) {
+                    $this->logger->debug("Error uploading file '{$file}': " . $e->getMessage());
+                } else {
+                    $this->logger->debug("Error on saving '{$key}': " . $e->getMessage());
+                }
+                $this->tpl->setOnScreenMessage(ilGlobalTemplateInterface::MESSAGE_TYPE_FAILURE, $this->pl->txt('failure_save_config'), true);
+                $this->ctrl->redirect($this, self::CMD_DISPLAY);
             }
         }
+
+        $this->logger->debug('End saving participation certificate');
 
         $this->tpl->setOnScreenMessage('success', $this->pl->txt('successFormSave'), true);
         $this->ctrl->redirect($this, self::CMD_DISPLAY);
@@ -559,8 +605,6 @@ class ilParticipationCertificateGUI
                 ->withUseTime(false)
                 ->withLabels($this->pl->txt('start'), $this->pl->txt('end'))
                 ->withFormat($user->getDateFormat())
-                ->withMinValue($startDate)
-                ->withMaxValue($endDate)
                 ->withValue([$startDate, $endDate]);
         } else {
             $period = $durationInput
@@ -629,6 +673,12 @@ class ilParticipationCertificateGUI
         $form = $this->initConfigResultTableForm();
 
         $form = $form->withRequest($DIC->http()->request());
+
+        if (empty($form->getData())) {
+            $this->tpl->setOnScreenMessage('failure', $this->pl->txt('failure_timeframe_save'), true);
+            $this->ctrl->redirect($this, self::CMD_CONFIG_RESULT_TABLE);
+        }
+
         $form_data = $form->getData()['config'];
 
         if ($form->getError()) {

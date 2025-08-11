@@ -20,12 +20,15 @@ class ilParticipationCertificateFileUploadHandlerGUI extends AbstractCtrlAwareUp
     /** @var ResourceStakeholder  */
     private $stakeholder;
 
+    private $logger;
+
     public function __construct()
     {
         parent::__construct();
         global $DIC;
         $this->storage = $DIC->resourceStorage();
         $this->stakeholder = new Stakeholder();
+        $this->logger = $DIC->logger()->root();
     }
 
     /**
@@ -69,9 +72,12 @@ class ilParticipationCertificateFileUploadHandlerGUI extends AbstractCtrlAwareUp
                                         ->upload($result, $this->stakeholder)
                                         ->serialize();
             $status = HandlerResult::STATUS_OK;
+
+            $this->logger->debug('Successful Upload file: '. $identifier);
         } else {
             $identifier = '';
             $status = HandlerResult::STATUS_FAILED;
+            $this->logger->debug('Failed Upload file ' . $identifier);
         }
 
         return new BasicHandlerResult(

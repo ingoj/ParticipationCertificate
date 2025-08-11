@@ -1,5 +1,7 @@
 <?php
 use SRAG\ILIAS\Plugins\LearningObjectiveSuggestions\Score\LearningObjectiveScore;
+use SRAG\ILIAS\Plugins\LearningObjectiveSuggestions\Suggestion\LearningObjectiveSuggestion;
+
 class NewLearningObjectiveScores {
 
 	public static function getData(int $usr_id): array
@@ -27,10 +29,13 @@ class NewLearningObjectiveScores {
     {
 		global $DIC;
 		$ilDB = $DIC->database();
-		$select = "select * from " . LearningObjectiveScore::TABLE_NAME . "
-					inner join crs_objectives on " . LearningObjectiveScore::TABLE_NAME . ".objective_id = crs_objectives.objective_id 
-					where user_id =" . $ilDB->quote($usr_id, "integer") . "
-					order by course_obj_id, score DESC";
+        $select = "select scores.*, crs_objectives.*, sort from " . LearningObjectiveScore::TABLE_NAME . " as scores
+					inner join crs_objectives on scores.objective_id = crs_objectives.objective_id 
+					left join " . LearningObjectiveSuggestion::TABLE_NAME . " as suggestion on 
+					crs_objectives.objective_id = suggestion.objective_id AND scores.user_id = suggestion.user_id 
+					where scores.user_id = " . $ilDB->quote($usr_id, "integer") . " 
+					order by scores.course_obj_id DESC, coalesce(suggestion.sort, (SELECT MAX(sugg.sort)+1 FROM " .
+                    LearningObjectiveSuggestion::TABLE_NAME . " as sugg)) ASC, crs_objectives.position ASC";
 
 		return $select;
 	}

@@ -1,8 +1,13 @@
 /* Include CSS, becuase ILIAS does overwrite */
-.ilCourseObjectiveProgressBarCompleted {
-    background-color: #60b060 !important;
+.ilCourseObjectiveProgressBarCompleted.progress-bar {
+    background-color: #60b060;
 }
 
-.ilCourseObjectiveProgressBarFailed {
-    background-color: #b06060 !important;
+.ilCourseObjectiveProgressBarFailed.progress-bar {
+    background-color: #b06060;
+}
+
+.ilCourseObjectiveProgressBarFailed.progress-bar.percent-0  {
+    background-color: transparent;
+    color: #737373;
 }

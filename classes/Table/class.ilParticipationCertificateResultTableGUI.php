@@ -467,9 +467,7 @@ class ilParticipationCertificateResultTableGUI implements I\DataRetrieval
             $this->row_id_token
         );
 
-        $userIsCourseMember = $this->checkIfUserIsCourseMember($DIC);
-
-        if(!$userIsCourseMember) {
+        if($this->cert_access->hasCurrentUserWriteAccess()) {
             $actions['show_all_results'] = $f->table()->action()->single(
                 $this->pl->txt('list_overview'),
                 $url_builder->withParameter($this->action_parameter_token, 'show_all_results'),
@@ -483,7 +481,7 @@ class ilParticipationCertificateResultTableGUI implements I\DataRetrieval
             $this->row_id_token
         );
 
-        if(!$userIsCourseMember) {
+        if($this->cert_access->hasCurrentUserWriteAccess()) {
             $actions['show_selected_all_results'] = $f->table()->action()->multi(
                 $this->pl->txt('list_overview'),
                 $url_builder->withParameter($this->action_parameter_token, 'show_selected_all_results'),
@@ -491,8 +489,7 @@ class ilParticipationCertificateResultTableGUI implements I\DataRetrieval
             );
         }
 
-        $cert_access = new ilParticipationCertificateAccess($this->refId);
-        if ($cert_access->hasCurrentUserWriteAccess()) {
+        if ($this->cert_access->hasCurrentUserWriteAccess()) {
            $actions['adjust_results'] = $f->table()->action()->single(
                $this->pl->txt('list_results'),
                $url_builder->withParameter($this->action_parameter_token, 'adjust_results'),
@@ -500,27 +497,6 @@ class ilParticipationCertificateResultTableGUI implements I\DataRetrieval
            );
         }
         return $actions;
-    }
-
-    /**
-     * @param $dic
-     * @return bool
-     */
-    private function checkIfUserIsCourseMember($dic): bool
-    {
-        $roles = $dic->rbac()->review()->getRoleListByObject($this->refId);
-        $userId = $dic->user()->getId();
-
-        $userIsCourseMember = true;
-        foreach ($roles as $role) {
-            if ($role['title'] === 'il_crs_admin_' . $this->refId | $role['title'] === 'il_grp_admin_' . $this->refId) {
-                $assignedUsers = $dic->rbac()->review()->assignedUsers($role['rol_id']);
-                if (in_array($userId, $assignedUsers)) {
-                    $userIsCourseMember = false;
-                }
-            }
-        }
-        return $userIsCourseMember;
     }
 
     protected function buildProgressBar(int $a_perc_result, int $a_perc_limit): string
@@ -591,6 +567,10 @@ class ilParticipationCertificateResultTableGUI implements I\DataRetrieval
             } else {
                 // <80%
                 $css_class = self::RED_PROGRESS;
+
+                if ($a_perc_result === 0 ){
+                    $css_class .= ' percent-0';
+                }
             }
         }
         return ilContainerObjectiveGUI::renderProgressBar($a_perc_result, $perc_limit, $css_class);

@@ -108,3 +108,9 @@ sorting#:#Sorting
 excel_export#:#Excel-Export
 csv_export#:#.CSV-Export
 print_all_info#:#The buttons above the table trigger the output of <strong>all printable certificates</strong>.
+add_ementoring#:#Pring including Ementoring
+add_ementoring_additional#:#If Ementoring is not to be printed, uncheck here
+mod_section#:#Modify Results for %s
+print_done#:#The Certificate was printed in a new Tab/Window
+failure_timeframe_save#:#The start date must be before the end date
+failure_save_config#:#An error occurred while saving the configuration or uploading the file.

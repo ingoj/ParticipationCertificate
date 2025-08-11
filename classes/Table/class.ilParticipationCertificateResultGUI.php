@@ -201,12 +201,15 @@ class ilParticipationCertificateResultGUI
 				}
 			}
             $this->tpl->setOnScreenMessage('failure',$this->pl->txt('noname_noprint'), true);
-			if (is_numeric($target_ref) and ($target_ref > 0) and (ilObject::_lookupType(ilObject::_lookupObjectId($target_ref),false) == 'xudf')) {
-                $msgurl= ' <a href="ilias.php?baseClass=ilObjPluginDispatchGUI&cmd=forward&ref_id=' . $target_ref . '">' .  $this->pl->txt('helper_name') . '</a>';
-                $msgadd= $this->pl->txt('helper_action_pre') . $msgurl . $this->pl->txt('helper_action_post');
-                $this->tpl->setOnScreenMessage('info',$msgadd, true);
+	    if (is_numeric($target_ref) and ($target_ref > 0) and (ilObject::_lookupType(ilObject::_lookupObjectId($target_ref),false) == 'xudf')) {
+                $msgurl = ' <a href="ilias.php?baseClass=ilObjPluginDispatchGUI&cmd=forward&ref_id=' . $target_ref . '">' .  $this->pl->txt('helper_name') . '</a>';
+	    } else {
+		$msgurl = ' <a href="ilias.php?baseClass=ilDashboardGUI&cmd=jumpToProfile">' . $this->pl->txt('helper_name') . '</a>';
+	    }
+            $msgadd= $this->pl->txt('helper_action_pre') . $msgurl . $this->pl->txt('helper_action_post');
+            $this->tpl->setOnScreenMessage('info',$msgadd, true);
 				//Variants sendQuestion, send Info or unified Failure (with some codechange). two same not possible
-            }
+            
         }
 
         $tableHtml = $this->initTable((int) $_GET['ref_id']);
