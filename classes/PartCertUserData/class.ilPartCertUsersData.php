@@ -4,7 +4,7 @@ class ilPartCertUsersData {
 	/**
 	 * @return ilPartCertUserData[]
 	 */
-	public static function getData(ilParticipationCertificatePlugin $pl, array $arr_usr_ids = [], ?int $limit = null, ?string $sort = null, ?string $sortdir = 'asc'): array
+	public static function getData(ilParticipationCertificatePlugin $pl, array $arr_usr_ids = [], ?int $limit = null, ?int $offset = null, string $sort = null, ?string $sortdir = 'asc'): array
     {
 		global $DIC;
 		$ilDB = $DIC->database();
