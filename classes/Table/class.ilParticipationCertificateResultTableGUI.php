@@ -70,7 +70,9 @@ class ilParticipationCertificateResultTableGUI implements I\DataRetrieval
 
         $this->cert_access = new ilParticipationCertificateAccess($_GET['ref_id']);
         $this->usr_ids = $this->cert_access->getUserIdsOfGroup();
-
+        $this->range = [ null, null ];
+        $this->order = null;
+        
         $ementoring = ilParticipationCertificateConfig::getConfig('enable_ementoring', $_GET['ref_id']);
         if ($ementoring === NULL) {
             $ementoring = true;
@@ -227,6 +229,9 @@ class ilParticipationCertificateResultTableGUI implements I\DataRetrieval
     {
         $sql_order_part = $order->join('ORDER BY', fn(...$o) => implode(' ', $o));
         $sql_range_part = sprintf('LIMIT %2$s OFFSET %1$s', ...$range->unpack());
+        $this->range = $range->unpack();
+        $this->order = $order->join('', fn(...$o) => implode(' ', $o));
+            
         return array_map(
             fn($rec) => array_merge($rec, ['sql_order' => $sql_order_part, 'sql_range' => $sql_range_part]),
             $this->records()
@@ -245,15 +250,15 @@ class ilParticipationCertificateResultTableGUI implements I\DataRetrieval
         if ($write_access) {
             $cols['loginname'] = $f->table()->column()
                                       ->text($this->pl->txt('loginname'))
-                                      ->withIsSortable(false)
+                                      ->withIsSortable(true)
                                       ->withIsOptional(true);
         }
         $cols['firstname'] = $f->table()->column()
                                       ->text($this->pl->txt('cols_firstname'))
-                                      ->withIsSortable(false);
+                                      ->withIsSortable($write_access);
         $cols['lastname'] = $f->table()->column()
                                       ->text($this->pl->txt('cols_lastname'))
-                                      ->withIsSortable(false);
+                                      ->withIsSortable($write_access);
         $cols['initial_test_finished'] = $f->table()->column()
                                        ->text($this->pl->txt('cols_initial_test_finished'))
                                        ->withIsSortable(false);
@@ -283,7 +288,7 @@ class ilParticipationCertificateResultTableGUI implements I\DataRetrieval
 
     public function records(): array
     {
-        $arr_usr_data = ilPartCertUsersData::getData($this->pl, $this->usr_ids);
+        $arr_usr_data = ilPartCertUsersData::getData($this->pl, $this->usr_ids, $this->range[1], $this->range[0], $this->order, '');
 
         $arr_usr_data = $this->excludeUserIdIfFiltered($arr_usr_data);
         $arr_initial_test_states = ilCrsInitialTestStates::getData($this->usr_ids);
@@ -294,7 +299,7 @@ class ilParticipationCertificateResultTableGUI implements I\DataRetrieval
         $arr_excercise_states = ilExcerciseStates::getData($this->usr_ids, $this->refId);
 
         $rows = array();
-        foreach ($this->usr_ids as $usr_id) {
+        foreach ($this->usr_ids as $usr_id=>$userdata) {
             $row = array();
             $row['usr_id'] = $usr_id;
             $row['loginname'] = $arr_usr_data[$usr_id]->getPartCertUserName();
