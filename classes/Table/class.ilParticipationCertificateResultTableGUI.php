@@ -299,7 +299,7 @@ class ilParticipationCertificateResultTableGUI implements I\DataRetrieval
         $arr_excercise_states = ilExcerciseStates::getData($this->usr_ids, $this->refId);
 
         $rows = array();
-        foreach ($this->usr_ids as $usr_id=>$userdata) {
+        foreach ($arr_usr_data as $usr_id=>$userdata) {
             $row = array();
             $row['usr_id'] = $usr_id;
             $row['loginname'] = $arr_usr_data[$usr_id]->getPartCertUserName();
