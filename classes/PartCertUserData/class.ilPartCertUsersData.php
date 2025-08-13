@@ -4,7 +4,7 @@ class ilPartCertUsersData {
 	/**
 	 * @return ilPartCertUserData[]
 	 */
-	public static function getData(ilParticipationCertificatePlugin $pl, array $arr_usr_ids = []): array
+	public static function getData(ilParticipationCertificatePlugin $pl, array $arr_usr_ids = [], ?int $limit = null, ?int $offset = null, string $sort = null, ?string $sortdir = 'asc'): array
     {
 		global $DIC;
 		$ilDB = $DIC->database();
@@ -13,12 +13,12 @@ class ilPartCertUsersData {
             return [];
         }
 
-		$result = $ilDB->query(self::getSQL($arr_usr_ids));
+		$result = $ilDB->query(self::getSQL($arr_usr_ids, $limit, $offset, $sort, $sortdir));
 		$usr_data = array();
 		while ($row = $ilDB->fetchAssoc($result)) {
 			$usr = new ilPartCertUserData();
 			$usr->setPartCertUsrId($row['usr_id']);
-			$usr->setPartCertUserName($row['login']);
+			$usr->setPartCertUserName($row['loginname']);
 			$usr->setPartCertFirstname($row['firstname']);
 			$usr->setPartCertLastname($row['lastname']);
             $usr->setPartCertGender($row['gender']);
@@ -28,14 +28,14 @@ class ilPartCertUsersData {
 
 		return $usr_data;
 	}
-	protected static function getSQL(array $arr_usr_ids = array()): string
+	protected static function getSQL(array $arr_usr_ids = array(), ?int $limit = null, ?int $offset = null, ?string $sort = null, ?string $sortdir = 'asc'): string
     {
 		global $DIC;
 		$ilDB = $DIC->database();
 
         $select = "select
 					usr_data.usr_id,
-					usr_data.login,
+					usr_data.login as loginname,
 					udf_firstname.value as firstname,   
 					udf_lastname.value as lastname,
 					usr_data.gender as gender
@@ -45,7 +45,16 @@ class ilPartCertUsersData {
 					inner join " . ilParticipationCertificateConfig::TABLE_NAME . " as conf_udf_lastname on conf_udf_lastname.config_key = 'udf_lastname'
 					left join udf_text as udf_lastname on udf_lastname.field_id = conf_udf_lastname.config_value and udf_lastname.usr_id = usr_data.usr_id
 	                where " . $ilDB->in('usr_data.usr_id', $arr_usr_ids, false, 'integer');
-
+		if ($sort !== null and $sortdir !== null) {
+			$select .= " order by " . $sort . " " . $sortdir;
+		}
+		if ($limit !== null) {
+			if ($offset !== null) {
+				$select .= " limit " . $limit . " offset " .$offset;
+			} else {
+				$select .= " limit " . $limit . " offset 0";
+			}
+		}
 		return $select;
 	}
 
