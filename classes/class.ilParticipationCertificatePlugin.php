@@ -8,9 +8,12 @@
 class ilParticipationCertificatePlugin extends ilUserInterfaceHookPlugin
 {
     public const PLUGIN_ID = "dhbwparticipationpdf";
+
     public const PLUGIN_NAME = "ParticipationCertificate";
 
     public const PLUGIN_CLASS_NAME = self::class;
+
+    public const PLUGIN_DIRECTORY = "Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/ParticipationCertificate";
 
     public const CERTIFICATIONS_PATH = 'dhbw_part_cert';
 

@@ -13,11 +13,14 @@ use Mpdf\MpdfException;
  */
 class ilParticipationCertificatePDFGenerator
 {
-
     const CMD_PDF = 'generatePDF';
+
     protected ilTemplate|ilGlobalTemplateInterface $tpl;
+
     protected ilCtrlInterface $ctrl;
+
     public string $temp;
+
     protected ilParticipationCertificatePlugin $pl;
 
 
@@ -58,10 +61,13 @@ class ilParticipationCertificatePDFGenerator
 
         require_once __DIR__ . '/../../vendor/autoload.php';
 
+        $rendered = str_replace('http://localhost:8428', 'http://host.docker.internal:8428', $rendered);
+
         //mPDF Instanz wird erzeugt. Mit Margin-Left-Right:20.
         $mpdf = new Mpdf(['tempDir' => '/tmp/mpdf']);
         //Css file wird geladen
-        $css = file_get_contents($this->pl->getDirectory() . '/templates/report/Teilnahmebescheinigung.css');
+
+        $css = file_get_contents('./' . ilParticipationCertificatePlugin::PLUGIN_DIRECTORY . '/templates/report/Teilnahmebescheinigung.css');
         $printCount++;
 
         //Checkt ob es nur einen User in der Gruppe hat. Wenn True wird das PDf direkt nur für diesen gedruckt

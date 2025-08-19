@@ -5,16 +5,24 @@
  */
 class ilParticipationCertificateSingleResultGUI
 {
-
     const CMD_DISPLAY = 'display';
+
     const IDENTIFIER = 'usr_id';
+
     public ilTabsGUI $tabs;
+
     protected ilTemplate|ilGlobalTemplateInterface $tpl;
+
     protected ilCtrl|ilCtrlInterface $ctrl;
+
     protected ilParticipationCertificatePlugin $pl;
+
     protected ilToolbarGUI $toolbar;
+
     protected ?ilObject $learnGroup;
+
     protected array $usr_ids;
+
     protected int $usr_id;
 
     protected ilParticipationCertificateSingleResultTableGUI $table;
@@ -68,10 +76,11 @@ class ilParticipationCertificateSingleResultGUI
 
     /**
      * @throws ilTemplateException
+     * @throws ilCtrlException
      */
     public function display(): void
     {
-        $this->tpl->addCss($this->pl->getDirectory() . '/templates/css/participation-certificate.css');
+        $this->tpl->addCss('./' . ilParticipationCertificatePlugin::PLUGIN_DIRECTORY . '/templates/css/participation-certificate.css');
         $this->initHeader();
 
         $this->initTable();
@@ -95,6 +104,11 @@ class ilParticipationCertificateSingleResultGUI
         $this->ctrl->saveParameterByClass(ilParticipationCertificateResultGUI::class, 'ref_id');
         $this->tabs->setBackTarget($this->pl->txt('header_btn_back'), $this->ctrl->getLinkTargetByClass(ilParticipationCertificateResultGUI::class, ilParticipationCertificateResultGUI::CMD_CONTENT));
     }
+
+    /**
+     * @throws ilException
+     * @throws ilCtrlException
+     */
     public function initTable(): void
     {
         $this->table = new ilParticipationCertificateSingleResultTableGUI($this, ilParticipationCertificateSingleResultGUI::CMD_DISPLAY, $this->usr_id);

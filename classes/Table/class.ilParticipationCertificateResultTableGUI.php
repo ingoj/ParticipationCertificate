@@ -21,6 +21,8 @@ class ilParticipationCertificateResultTableGUI implements I\DataRetrieval
     const RED_PROGRESS = "ilCourseObjectiveProgressBarFailed";
     const NO_PROGRESS = "ilCourseObjectiveProgressBarNeutral";
 
+    private ilParticipationCertificateAccess $cert_access;
+
     protected Factory $df;
     protected DateFormat $current_user_date_format;
 
@@ -382,9 +384,9 @@ class ilParticipationCertificateResultTableGUI implements I\DataRetrieval
                 switch ($countTests) {
                     case 1:
                         if ($countPassed == 1) {
-                            $row['eMentoring_finished'] = ilUtil::img($this->pl->getImagePath("passed.svg"));
+                            $row['eMentoring_finished'] = ilUtil::img("./" . ilParticipationCertificatePlugin::PLUGIN_DIRECTORY . "/templates/images/passed.svg");
                         } else {
-                            $row['eMentoring_finished'] = ilUtil::img($this->pl->getImagePath("failed.svg"));
+                            $row['eMentoring_finished'] = ilUtil::img("./" . ilParticipationCertificatePlugin::PLUGIN_DIRECTORY . "/templates/images/failed.svg");
                         }
                         break;
                     default:
@@ -392,7 +394,7 @@ class ilParticipationCertificateResultTableGUI implements I\DataRetrieval
                         break;
                 }
             } else {
-                $row['eMentoring_finished'] = ilUtil::img($this->pl->getImagePath("not_attempted.svg"));
+                $row['eMentoring_finished'] = ilUtil::img("./" . ilParticipationCertificatePlugin::PLUGIN_DIRECTORY . "/templates/images/not_attempted.svg");
             }
 
             if (key_exists($usr_id, $arr_excercise_states) && is_object($arr_excercise_states[$usr_id])) {

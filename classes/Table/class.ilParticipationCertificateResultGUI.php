@@ -11,10 +11,15 @@ use Twig\Error\LoaderError;
 class ilParticipationCertificateResultGUI
 {
     const CMD_CONTENT = 'content';
+
     const CMD_OVERVIEW = 'overview';
+
     const CMD_PRINT_PDF = 'printpdf';
+
     const CMD_PRINT_SELECTED_WITHOUTE_MENTORING = 'printSelectedWithouteMentoring';
+
     const CMD_PRINT_SELECTED = 'printSelected';
+
     const CMD_INIT_TABLE = 'initTable';
 
     const CMD_EXPORT_EXCEL = 'exportExcel';
@@ -25,6 +30,8 @@ class ilParticipationCertificateResultGUI
      * @var array|array[]
      */
     private array $columns;
+
+    private ilParticipationCertificateAccess $cert_access;
 
     protected ilTemplate|ilGlobalTemplateInterface $tpl;
 
@@ -59,7 +66,7 @@ class ilParticipationCertificateResultGUI
         $this->groupRefId = (int)$_GET['ref_id'];
         $this->learnGroup = ilObjectFactory::getInstanceByRefId($_GET['ref_id']);
         $this->lng = $DIC->language();
-	$this->cert_access = new ilParticipationCertificateAccess($_GET['ref_id']);
+	    $this->cert_access = new ilParticipationCertificateAccess($_GET['ref_id']);
 	    
         $ementoring = ilParticipationCertificateConfig::getConfig('enable_ementoring', $this->groupRefId);
         if ($ementoring === NULL) {
@@ -130,7 +137,7 @@ class ilParticipationCertificateResultGUI
     {
         global $DIC;
 
-        $this->tpl->addCss($this->pl->getDirectory() . '/templates/css/participation-certificate.css');
+        $this->tpl->addCss('./' . ilParticipationCertificatePlugin::PLUGIN_DIRECTORY . '/templates/css/participation-certificate.css');
 
         if (method_exists($this->tpl, 'loadStandardTemplate')) {
             $this->tpl->loadStandardTemplate();

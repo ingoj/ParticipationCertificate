@@ -3,12 +3,16 @@
 use srag\Plugins\UserDefaults\UserSearch\usrdefObj;
 
 class ilParticipationCertificateAccess {
-	protected ilParticipationCertificatePlugin $pl;
-	protected int $group_ref_id;
-	protected ilAccessHandler $access;
-	protected ilObjUser $usr;
-	protected ilDBInterface $db;
 
+	protected ilParticipationCertificatePlugin $pl;
+
+	protected int $group_ref_id;
+
+	protected ilAccessHandler $access;
+
+	protected ilObjUser $usr;
+
+	protected ilDBInterface $db;
 
 	/**
 	 * ilParticipationCertificateAccess constructor.
