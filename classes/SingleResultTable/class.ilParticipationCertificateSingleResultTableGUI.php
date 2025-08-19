@@ -220,23 +220,7 @@ class ilParticipationCertificateSingleResultTableGUI extends ilTable2GUI {
 							}
 						}
 
-
-                        /*if (array_key_exists($locfTestCrsObjId, $row_key)) {
-                            //first line - title lp
-                            $rec_array[$row_key[$locfTestCrsObjId]][$locfTestCrsObjId] = $value->getLocftestObjectiveTitle();
-
-                            $row_key[$locfTestCrsObjId] += 1;
-                            //second line - array progressbar
-                            $rec_array[$row_key[$locfTestCrsObjId]][$locfTestCrsObjId][0] = $value->getLocftestPercentage();
-                            $rec_array[$row_key[$locfTestCrsObjId]][$locfTestCrsObjId][1] = $value->getLocftestQplsRequiredPercentage();
-                            $rec_array[$row_key[$locfTestCrsObjId]][$locfTestCrsObjId][2] = 1;
-
-                            $row_key[$locfTestCrsObjId] += 1;
-
-
-                        }*/
-
-                        /*$rec_array[$row_key[$locfTestCrsObjId]][$value->getLocftestCrsObjId()] = $value->getLocftestObjectiveTitle();
+                        $rec_array[$row_key[$locfTestCrsObjId]][$locfTestCrsObjId] = $value->getLocftestObjectiveTitle();
 
                         $row_key[$locfTestCrsObjId] += 1;
                         //second line - array progressbar
@@ -244,19 +228,7 @@ class ilParticipationCertificateSingleResultTableGUI extends ilTable2GUI {
                         $rec_array[$row_key[$locfTestCrsObjId]][$locfTestCrsObjId][1] = $value->getLocftestQplsRequiredPercentage();
                         $rec_array[$row_key[$locfTestCrsObjId]][$locfTestCrsObjId][2] = 1;
 
-                        $row_key[$locfTestCrsObjId] += 1;*/
-
-                        if (array_key_exists($locfTestCrsObjId, $row_key)) {
-                            $rec_array[$row_key[$locfTestCrsObjId]][$locfTestCrsObjId] = $value->getLocftestObjectiveTitle();
-
-                            $row_key[$locfTestCrsObjId] += 1;
-                            //second line - array progressbar
-                            $rec_array[$row_key[$locfTestCrsObjId]][$locfTestCrsObjId][0] = $value->getLocftestPercentage();
-                            $rec_array[$row_key[$locfTestCrsObjId]][$locfTestCrsObjId][1] = $value->getLocftestQplsRequiredPercentage();
-                            $rec_array[$row_key[$locfTestCrsObjId]][$locfTestCrsObjId][2] = 1;
-
-                            $row_key[$locfTestCrsObjId] += 1;
-                        }
+                        $row_key[$locfTestCrsObjId] += 1;
 
 						$processed[$crs_obj_id][$crs_objective_id] = $usr_id;
                     }
