@@ -61,8 +61,6 @@ class ilParticipationCertificatePDFGenerator
 
         require_once __DIR__ . '/../../vendor/autoload.php';
 
-        $rendered = str_replace('http://localhost:8428', 'http://host.docker.internal:8428', $rendered);
-
         //mPDF Instanz wird erzeugt. Mit Margin-Left-Right:20.
         $mpdf = new Mpdf(['tempDir' => '/tmp/mpdf']);
         //Css file wird geladen

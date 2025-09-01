@@ -13,6 +13,7 @@ use ILIAS\UI\Component\Input\Container\Filter\Standard;
 /**
  * Class ilParticipationCertificateResultTableNewGUI
  */
+#[AllowDynamicProperties]
 class ilParticipationCertificateResultTableGUI implements I\DataRetrieval
 {
     CONST IDENTIFIER = 'ilpartusr';
@@ -547,11 +548,19 @@ class ilParticipationCertificateResultTableGUI implements I\DataRetrieval
                             } else {
                                 // Not in time
                                 $css_class = self::RED_PROGRESS;
+
+                                if ($a_perc_result === 0) {
+                                    $css_class .= ' percent-0';
+                                }
                             }
                         }
                     } else {
                         // End reached
                         $css_class = self::RED_PROGRESS;
+
+                        if ($a_perc_result === 0) {
+                            $css_class .= ' percent-0';
+                        }
                     }
                 }
 
@@ -580,6 +589,12 @@ class ilParticipationCertificateResultTableGUI implements I\DataRetrieval
                 }
             }
         }
+
+        // TODO confirm that with PM
+        if (is_float($perc_limit)) {
+            $perc_limit = round($perc_limit);
+        }
+
         return ilContainerObjectiveGUI::renderProgressBar($a_perc_result, $perc_limit, $css_class);
     }
 

@@ -254,11 +254,10 @@ class ilParticipationCertificateSingleResultTableGUI extends ilTable2GUI {
 		} else {
 			$current_percent = 0;
 		}
+
 		//required to dodge bug in ilContainerObjectiveGUI::renderProgressBar
         if ($required_percent == 0) {
-            //$required_percent = 0.1;
-            // TODO Check it
-            //$required_percent = null;
+            $required_percent = null;
         }
 
 		if ($current_percent >= $required_percent) {

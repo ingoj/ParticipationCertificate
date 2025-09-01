@@ -299,6 +299,9 @@ class ilParticipationCertificateGUI
             $global_config_id = reset($arr_config)->getGlobalConfigId();
         }
 
+        $this->tpl->addCss('./' . ilParticipationCertificatePlugin::PLUGIN_DIRECTORY . '/templates/css/participation-certificate.css');
+
+
         $this->initToolbar($global_config_id);
 
         if (!empty($global_config_id) && $global_config_id > 0) {

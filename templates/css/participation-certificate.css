@@ -11,3 +11,7 @@
     background-color: transparent;
     color: #737373;
 }
+
+.c-toolbar__item .navbar-form .c-input[data-il-ui-component]  {
+    grid-template-columns: 10%;
+}
