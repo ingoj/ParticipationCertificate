@@ -272,6 +272,10 @@ class ilParticipationCertificateSingleResultTableGUI extends ilTable2GUI {
             }
 		}
 
+        if (is_float($required_percent)) {
+            $required_percent = (int) round($required_percent);
+        }
+
 		return \ilContainerObjectiveGUI::renderProgressBar(
             $current_percent,
             $required_percent,

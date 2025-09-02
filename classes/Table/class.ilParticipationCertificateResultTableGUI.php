@@ -590,9 +590,8 @@ class ilParticipationCertificateResultTableGUI implements I\DataRetrieval
             }
         }
 
-        // TODO confirm that with PM
         if (is_float($perc_limit)) {
-            $perc_limit = round($perc_limit);
+            $perc_limit = (int) round($perc_limit);
         }
 
         return ilContainerObjectiveGUI::renderProgressBar($a_perc_result, $perc_limit, $css_class);
