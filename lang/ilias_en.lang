@@ -114,3 +114,4 @@ mod_section#:#Modify Results for %s
 print_done#:#The Certificate was printed in a new Tab/Window
 failure_timeframe_save#:#The start date must be before the end date
 failure_save_config#:#An error occurred while saving the configuration or uploading the file.
+individual_assessments#:#Individual Assessments

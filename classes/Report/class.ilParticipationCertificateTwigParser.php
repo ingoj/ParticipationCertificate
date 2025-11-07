@@ -312,7 +312,11 @@ class ilParticipationCertificateTwigParser
                 'excercise_percentage' => $excercise_percentage,
                 'logo_path' => $logo_path,
                 'page1_issuer_signature' => $page1_issuer_signature,
-                'standard_value' => $cert_configs->returnPercentValue($this->group_ref_id)
+                'standard_value' => $cert_configs->returnPercentValue($this->group_ref_id),
+                'individual_assessments' => [
+                    'label' => $this->pl->txt('individual_assessments'),
+                    'value' => '1/3' // TODO
+                ]
             );
 
             $part_pdf->generatePDF($this->twig_template->render($arr_render), count($this->usr_id));
