@@ -62,7 +62,11 @@ class ilParticipationCertificatePDFGenerator
         require_once __DIR__ . '/../../vendor/autoload.php';
 
         //mPDF Instanz wird erzeugt. Mit Margin-Left-Right:20.
-        $mpdf = new Mpdf(['tempDir' => '/tmp/mpdf']);
+        $mpdf = new Mpdf([
+            'tempDir' => '/tmp/mpdf',
+            'default_font' => 'dejavusans'
+        ]);
+
         //Css file wird geladen
 
         $css = file_get_contents('./' . ilParticipationCertificatePlugin::PLUGIN_DIRECTORY . '/templates/report/Teilnahmebescheinigung.css');

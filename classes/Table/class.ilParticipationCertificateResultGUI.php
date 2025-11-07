@@ -85,6 +85,13 @@ class ilParticipationCertificateResultGUI
     {
         global $DIC;
 
+        $cert_access = new ilParticipationCertificateAccess($this->groupRefId);
+        // TODO Uncomment it, when programming has been completed
+        /*if (!$cert_access->hasCurrentUserWriteAccess()) {
+            $this->tpl->setOnScreenMessage('failure',$this->lng->txt('no_permission'), true);
+            $DIC->ctrl()->redirectToURL('login.php');
+        }*/
+        // TODO remove it. Keep it for accessing participation certificate GUI during programming
         if (!$DIC->rbac()->system()->checkAccess('read', $this->groupRefId)) {
             $this->tpl->setOnScreenMessage('failure',$this->lng->txt('no_permission'), true);
             $DIC->ctrl()->redirectToURL('login.php');

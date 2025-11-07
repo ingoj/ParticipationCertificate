@@ -76,6 +76,7 @@ class ilParticipationCertificateUIHookGUI extends ilUIHookPluginGUI {
 					ilParticipationCertificateResultGUI::class
 				), ilParticipationCertificateResultGUI::CMD_CONTENT));
 			} else {
+                // TODO remove it. Keep it for accessing participation certificate GUI during programming
 				/**
 				 * @var ilTabsGUI $tabs
 				 */
