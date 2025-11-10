@@ -156,9 +156,10 @@ class ilParticipationCertificateResultGUI
         $ui = $DIC->ui()->factory();
 
         if ($this->cert_access->hasCurrentUserPrintAccess()) {
-	    if ($this->cert_access->hasCurrentUserWriteAccess()) {
-		    $this->tpl->setOnScreenMessage('info',$this->pl->txt('print_all_info'),true);
-	    }
+            if ($this->cert_access->hasCurrentUserWriteAccess()) {
+                $this->tpl->setOnScreenMessage('info',$this->pl->txt('print_all_info'),true);
+            }
+
             if ($this->ementoring) {
                 $this->ctrl->setParameter($this, 'ementor', true);
                 $toolbarButton = $ui->button()->standard(
@@ -596,8 +597,8 @@ class ilParticipationCertificateResultGUI
                 $usr_id[] = $userId;
             } else {
                 if ($_GET['ementor'] == 'true') {
-			$ementor = true;
-		}
+			        $ementor = true;
+		         }
                 $cert_access = new ilParticipationCertificateAccess($this->groupRefId);
                 $userIds = $cert_access->getUserIdsOfGroup();
                 if (empty($usr_id)) {
@@ -605,9 +606,9 @@ class ilParticipationCertificateResultGUI
                 }
             }
 
-	    if ($ementoring !== null) {
-		    $ementor = $ementoring;
-	    }
+            if ($ementoring !== null) {
+                $ementor = $ementoring;
+            }
 		
             if (!empty($usr_id)) {
                 $arr_usr_data = ilPartCertUsersData::getData($this->pl, $usr_id);

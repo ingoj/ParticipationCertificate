@@ -2,6 +2,10 @@
 
 use Twig\Error\SyntaxError;
 use Twig\Error\LoaderError;
+use setasign\Fpdi\PdfParser\Type\PdfTypeException;
+use setasign\Fpdi\PdfParser\PdfParserException;
+use setasign\Fpdi\PdfParser\CrossReference\CrossReferenceException;
+use Mpdf\MpdfException;
 
 /**
  * Class ilParticipationCertificateTwigParser
@@ -11,13 +15,21 @@ use Twig\Error\LoaderError;
 class ilParticipationCertificateTwigParser
 {
     protected ilParticipationCertificatePlugin $pl;
+
     protected int $group_ref_id;
+
     protected array $usr_ids;
+
     protected null|int|array $usr_id;
+
     protected bool $ementor = false;
+
     protected bool $footer = false;
+
     protected bool $edited = false;
+
     protected ?array $array;
+
     public ilTemplate|ilGlobalTemplateInterface $tpl;
 
     protected \Twig\TemplateWrapper $twig_template;
@@ -77,13 +89,18 @@ class ilParticipationCertificateTwigParser
     }
 
     /**
+     * @param int|null $trackingToolRefId
      * @return void
+     * @throws CrossReferenceException
      * @throws LoaderError
+     * @throws MpdfException
+     * @throws PdfParserException
+     * @throws PdfTypeException
      * @throws SyntaxError
      * @throws arException
      * @throws ilDateTimeException
      */
-    public function parseData(): void
+    public function parseData(?int $trackingToolRefId = null): void
     {
         $cert_configs = new ilParticipationCertificateConfigs();
         $arr_config = $cert_configs->getObjConfigSetIfNoneCreateDefaultAndCreateNewObjConfigValues($this->group_ref_id);
@@ -104,7 +121,12 @@ class ilParticipationCertificateTwigParser
 
         $this->tpl->setOnScreenMessage('success', $this->pl->txt('print_done'), true);
 
-        $refId = (int) $_GET['ref_id'];
+        if (!empty($trackingToolRefId)) {
+            $refId = $trackingToolRefId;
+        } else {
+            $refId = (int) $_GET['ref_id'];
+        }
+
         $arr_new_iass_states = ilIassStatesMulti::getData($this->usr_ids, $refId);
         $arr_xali_states = xaliStates::getData($this->usr_ids, $refId);
 
@@ -230,7 +252,7 @@ class ilParticipationCertificateTwigParser
                 //Percentage final tests of suggested modules
                 $learn_sugg_result = 0;
                 if (key_exists($usr_id, $arr_learn_sugg_results) && is_object($arr_learn_sugg_results[$usr_id])) {
-                    $learn_sugg_result = $arr_learn_sugg_results[$usr_id]->getAveragePercentage(ilParticipationCertificateConfig::getConfig('calculation_type_processing_state_suggested_objectives', $_GET['ref_id']), true);
+                    $learn_sugg_result = $arr_learn_sugg_results[$usr_id]->getAveragePercentage(ilParticipationCertificateConfig::getConfig('calculation_type_processing_state_suggested_objectives', $refId), true);
                 }
                 //Home Work
                 $excercise_percentage = 0;
