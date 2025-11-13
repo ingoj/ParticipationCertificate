@@ -100,8 +100,12 @@ class ilParticipationCertificateTwigParser
      * @throws arException
      * @throws ilDateTimeException
      */
-    public function parseData(?int $trackingToolRefId = null): void
-    {
+    public function parseData(
+        ?int $trackingToolRefId = null,
+        ?bool $suggestedCourses = null,
+        ?bool $additionalOffer = null,
+        ?bool $initialTest = null
+    ): void {
         $cert_configs = new ilParticipationCertificateConfigs();
         $arr_config = $cert_configs->getObjConfigSetIfNoneCreateDefaultAndCreateNewObjConfigValues($this->group_ref_id);
 
@@ -338,7 +342,10 @@ class ilParticipationCertificateTwigParser
                 'individual_assessments' => [
                     'label' => $this->pl->txt('individual_assessments'),
                     'value' => '1/3' // TODO
-                ]
+                ],
+                'suggested_courses' => $suggestedCourses,
+                'additional_offer' => $additionalOffer,
+                'initial_test' => $initialTest
             );
 
             $part_pdf->generatePDF($this->twig_template->render($arr_render), count($this->usr_id));

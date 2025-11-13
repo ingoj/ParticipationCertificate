@@ -14,6 +14,7 @@
  <div class="table_container">
   <p class="p-default"><b>{{text_values.page1_box1_title}}</b></p>
   <table class="table" id="table1">
+    {% if initial_test %}
     <tr>
       <td class="td1">{{text_values.page1_box1_row1}}</td>
       <td class="td2">
@@ -24,10 +25,13 @@
         {% endif %}
         </td>
     </tr>
+    {% endif %}
+    {% if suggested_courses %}
     <tr>
       <td class="td1">{{text_values.page1_box1_row2}}</td>
       <td class="td2">{{learn_sugg_reached_percentage}}</td>
     </tr>
+    {% endif %}
   </table>
   </div>
 
