@@ -58,15 +58,17 @@ class ilParticipationCertificateResultGUI
     {
         global $DIC;
 
+        $refId = $this->fetchUrlParameter('ref_id', FILTER_DEFAULT);
+
         $this->toolbar = $DIC->toolbar();
         $this->tabs = $DIC->tabs();
         $this->ctrl = $DIC->ctrl();
         $this->tpl = $DIC->ui()->mainTemplate();
         $this->pl = ilParticipationCertificatePlugin::getInstance();
-        $this->groupRefId = (int)$_GET['ref_id'];
-        $this->learnGroup = ilObjectFactory::getInstanceByRefId($_GET['ref_id']);
+        $this->groupRefId = (int)$refId;
+        $this->learnGroup = ilObjectFactory::getInstanceByRefId($refId);
         $this->lng = $DIC->language();
-	    $this->cert_access = new ilParticipationCertificateAccess($_GET['ref_id']);
+	    $this->cert_access = new ilParticipationCertificateAccess($refId);
 	    
         $ementoring = ilParticipationCertificateConfig::getConfig('enable_ementoring', $this->groupRefId);
         if ($ementoring === NULL) {
@@ -86,17 +88,10 @@ class ilParticipationCertificateResultGUI
         global $DIC;
 
         $cert_access = new ilParticipationCertificateAccess($this->groupRefId);
-        // TODO Uncomment it, when programming has been completed
-        /*if (!$cert_access->hasCurrentUserWriteAccess()) {
-            $this->tpl->setOnScreenMessage('failure',$this->lng->txt('no_permission'), true);
-            $DIC->ctrl()->redirectToURL('login.php');
-        }*/
-        // TODO remove it. Keep it for accessing participation certificate GUI during programming
-        if (!$DIC->rbac()->system()->checkAccess('read', $this->groupRefId)) {
+        if (!$cert_access->hasCurrentUserWriteAccess()) {
             $this->tpl->setOnScreenMessage('failure',$this->lng->txt('no_permission'), true);
             $DIC->ctrl()->redirectToURL('login.php');
         }
-
         $nextClass = $this->ctrl->getNextClass();
 
         switch ($nextClass) {
@@ -144,6 +139,8 @@ class ilParticipationCertificateResultGUI
     {
         global $DIC;
 
+        global $rbacreview;
+
         $this->tpl->addCss('./' . ilParticipationCertificatePlugin::PLUGIN_DIRECTORY . '/templates/css/participation-certificate.css');
 
         if (method_exists($this->tpl, 'loadStandardTemplate')) {
@@ -156,9 +153,7 @@ class ilParticipationCertificateResultGUI
         $ui = $DIC->ui()->factory();
 
         if ($this->cert_access->hasCurrentUserPrintAccess()) {
-            if ($this->cert_access->hasCurrentUserWriteAccess()) {
-                $this->tpl->setOnScreenMessage('info',$this->pl->txt('print_all_info'),true);
-            }
+            $this->tpl->setOnScreenMessage('info',$this->pl->txt('print_all_info'),true);
 
             if ($this->ementoring) {
                 $this->ctrl->setParameter($this, 'ementor', true);
@@ -191,22 +186,19 @@ class ilParticipationCertificateResultGUI
                 $this->ctrl->setParameter($this, 'filter_lastname', $_GET['filter_lastname']);
             }
 
-	    if ($this->cert_access->hasCurrentUserWriteAccess()) {
-			
-            	$toolbarButton = $ui->button()->standard(
-                	$this->pl->txt('excel_export'),
-                	$this->ctrl->getLinkTarget($this, self::CMD_EXPORT_EXCEL)
-            	);
-            	$this->toolbar->addComponent($toolbarButton);
+            $toolbarButton = $ui->button()->standard(
+                $this->pl->txt('excel_export'),
+                $this->ctrl->getLinkTarget($this, self::CMD_EXPORT_EXCEL)
+            );
+            $this->toolbar->addComponent($toolbarButton);
 
-            	$toolbarButton = $ui->button()->standard(
-                	$this->pl->txt('csv_export'),
-                	$this->ctrl->getLinkTarget($this, $this::CMD_EXPORT_CSV)
-            	);
-            	$this->toolbar->addComponent($toolbarButton);
-	    }
-
+            $toolbarButton = $ui->button()->standard(
+                $this->pl->txt('csv_export'),
+                $this->ctrl->getLinkTarget($this, $this::CMD_EXPORT_CSV)
+            );
+            $this->toolbar->addComponent($toolbarButton);
         }
+
         $target_ref = 0;
         if ($this->cert_access->isSelfPrintEnabled() and !$this->cert_access->hasCurrentUserPrintAccess()) {
 			$global_config_sets = ilParticipationCertificateConfig::where(array("config_type"=>3, "global_config_id" => 0 ))->orderBy('order_by')->get();
@@ -791,5 +783,15 @@ class ilParticipationCertificateResultGUI
     private function excludeURLParameters(string $parameter): array
     {
         return explode('_', $parameter);
+    }
+
+    /**
+     * @param string $param
+     * @param int    $filter
+     * @return int|null
+     */
+    protected function fetchUrlParameter(string $param, int $filter): ?int
+    {
+        return filter_input(INPUT_GET, $param, $filter);
     }
 }

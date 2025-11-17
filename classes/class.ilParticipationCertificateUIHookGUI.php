@@ -75,17 +75,6 @@ class ilParticipationCertificateUIHookGUI extends ilUIHookPluginGUI {
 					ilUIPluginRouterGUI::class,
 					ilParticipationCertificateResultGUI::class
 				), ilParticipationCertificateResultGUI::CMD_CONTENT));
-			} else {
-                // TODO remove it. Keep it for accessing participation certificate GUI during programming
-				/**
-				 * @var ilTabsGUI $tabs
-				 */
-				$tabs = $a_par["tabs"];
-				$this->ctrl->saveParameterByClass(ilParticipationCertificateResultGUI::class, 'ref_id');
-				$tabs->addTab(self::TAB_CERTIFICATES, $this->pl->txt('pluginreader'), $this->ctrl->getLinkTargetByClass(array(
-					ilUIPluginRouterGUI::class,
-					ilParticipationCertificateResultGUI::class
-				), ilParticipationCertificateResultGUI::CMD_CONTENT));
 			}
 		}
 	}
