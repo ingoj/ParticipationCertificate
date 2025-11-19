@@ -89,7 +89,12 @@ class ilParticipationCertificateTwigParser
     }
 
     /**
-     * @param int|null $trackingToolRefId
+     * @param int|null    $trackingToolRefId
+     * @param bool|null   $suggestedCourses
+     * @param bool|null   $additionalOffer
+     * @param bool|null   $initialTest
+     * @param string|null $firstname
+     * @param string|null $lastname
      * @return void
      * @throws CrossReferenceException
      * @throws LoaderError
@@ -104,7 +109,9 @@ class ilParticipationCertificateTwigParser
         ?int $trackingToolRefId = null,
         ?bool $suggestedCourses = null,
         ?bool $additionalOffer = null,
-        ?bool $initialTest = null
+        ?bool $initialTest = null,
+        ?string $firstname = null,
+        ?string $lastname = null
     ): void {
         $cert_configs = new ilParticipationCertificateConfigs();
         $arr_config = $cert_configs->getObjConfigSetIfNoneCreateDefaultAndCreateNewObjConfigValues($this->group_ref_id);
@@ -137,6 +144,15 @@ class ilParticipationCertificateTwigParser
         $arr_usr_data = ilPartCertUsersData::getData($this->pl, $this->usr_ids);
         $arr_lo_master_crs = ilLearningObjectivesMasterCrs::getData(ilObject::_lookupObjectId($refId), $this->usr_ids);
 
+        foreach ($arr_usr_data as $userId => $data) {
+            if(empty($data->getPartCertFirstname())) {
+                $data->setPartCertFirstname($firstname);
+            }
+
+            if(empty($data->getPartCertLastname())) {
+                $data->setPartCertLastname($lastname);
+            }
+        }
 
         $arr_initial_test_states = ilCrsInitialTestStates::getData($this->usr_ids);
         $arr_excercise_states = ilExcerciseStates::getData($this->usr_ids, $this->group_ref_id);
