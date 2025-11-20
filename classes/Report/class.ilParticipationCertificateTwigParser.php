@@ -106,6 +106,7 @@ class ilParticipationCertificateTwigParser
      * @throws ilDateTimeException
      */
     public function parseData(
+        $selfPrint = false,
         ?int $trackingToolRefId = null,
         ?bool $suggestedCourses = null,
         ?bool $additionalOffer = null,
@@ -341,6 +342,13 @@ class ilParticipationCertificateTwigParser
 
                 $page1_issuer_signature = $src;
             }
+
+            if (!$selfPrint) {
+                $suggestedCourses = true;
+                $additionalOffer = true;
+                $initialTest = true;
+            }
+
 
             $arr_render = array(
                 'text_values' => $processed_arr_text_values,

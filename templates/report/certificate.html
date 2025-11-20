@@ -92,6 +92,7 @@
 <div class="table_container">
   <p><b>{{text_values.page2_box1_title}}</b></p>
   <table class="table" id="table3">
+  {% if initial_test %}
   <tr>
     <td class="td1">{{text_values.page2_box1_row1}}</td>
     <td class="td2">{{text_values.page2_box1_row1_total_questions}} Fragen aus den Themengebieten:
@@ -102,10 +103,13 @@
       </ul>
     </td>
   </tr>
+  {% endif %}
+  {% if suggested_courses %}
   <tr>
     <td class="td1">{{text_values.page2_box1_row2}}</td>
     <td class="td2">{{learn_sugg_reached_percentage}} der empfohlenen Module wurden bearbeitet </td>
   </tr>
+  {% endif %}
   </table>
 </div>
 {% if show_ementoring %}
