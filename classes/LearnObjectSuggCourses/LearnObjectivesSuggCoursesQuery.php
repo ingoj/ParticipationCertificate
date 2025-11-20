@@ -18,9 +18,25 @@ class LearnObjectivesSuggCoursesQuery {
 		global $DIC;
 		$ilDB = $DIC->database();
 
+        $table_name = $this->sanitizeTableName($table_name);
 
 		$sql = "CREATE Temporary Table IF NOT Exists $table_name  (INDEX usc (user_id, target_obj_id, objective_id)) (".$this->getSQL().")";
 		//echo $sql."; ";
 		$ilDB->query($sql);
 	}
+
+    /**
+     * Sanitize table name for security reasons
+     *
+     * @param string $name
+     * @return string
+     */
+    private function sanitizeTableName(string $name): string
+    {
+        // Accept only letters, numbers, and underscores
+        if (!preg_match('/^[A-Za-z0-9_]+$/', $name)) {
+            throw new InvalidArgumentException("Invalid table name: $name");
+        }
+        return $name;
+    }
 }
