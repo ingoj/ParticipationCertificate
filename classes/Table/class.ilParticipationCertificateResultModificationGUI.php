@@ -286,7 +286,14 @@ class ilParticipationCertificateResultModificationGUI
             $this->redirectWithError(self::CMD_DISPLAY, $this->pl->txt('user_data_missing'));
         }
 
-        $twigParser = new ilParticipationCertificateTwigParser($this->groupRefId, array(), $usr_id, boolval($data['ementoring'] ?? ''), $edited, $array);
+        $twigParser = new ilParticipationCertificateTwigParser(
+            array(),
+            $this->groupRefId,
+            $usr_id,
+            boolval($data['ementoring'] ?? ''),
+            $edited,
+            $array
+        );
         $twigParser->parseData();
     }
 

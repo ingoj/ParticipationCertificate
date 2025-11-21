@@ -57,6 +57,7 @@ class ilParticipationCertificateAccess {
 		if ($this->hasCurrentUserWriteAccess()) {
 			return true;
 		}
+
 		// if user has data, check if selfprint is active (changed to a new function)
 		return ($this->isSelfPrintEnabled());
 	}

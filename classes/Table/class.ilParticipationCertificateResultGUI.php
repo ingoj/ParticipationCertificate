@@ -612,8 +612,13 @@ class ilParticipationCertificateResultGUI
                 $this->redirectWithError(self::CMD_CONTENT, $this->pl->txt('user_data_missing'));
             }
 
-            $twigParser = new ilParticipationCertificateTwigParser($this->groupRefId, array(), $usr_id, $ementor,
-                false);
+            $twigParser = new ilParticipationCertificateTwigParser(
+                array(),
+                $this->groupRefId,
+                $usr_id,
+                $ementor,
+                false
+            );
             $twigParser->parseData();
         } else {
             $this->tpl->setOnScreenMessage('failure',$this->lng->txt('no_permission'), true);
@@ -661,7 +666,13 @@ class ilParticipationCertificateResultGUI
                 $this->redirectWithError(self::CMD_CONTENT, $this->pl->txt('all_user_data_missing'));
             }
 
-            $twigParser = new ilParticipationCertificateTwigParser($this->groupRefId, array(), (array) $usr_ids, true, false);
+            $twigParser = new ilParticipationCertificateTwigParser(
+                array(),
+                $this->groupRefId,
+                (array) $usr_ids,
+                true,
+                false
+            );
             $twigParser->parseData();
         } else {
             $DIC->ctrl()->redirectToURL('login.php');
@@ -708,7 +719,13 @@ class ilParticipationCertificateResultGUI
                 $this->redirectWithError(self::CMD_CONTENT, $this->pl->txt('all_user_data_missing'));
             }
 
-            $twigParser = new ilParticipationCertificateTwigParser($this->groupRefId, array(), $usr_ids, false, false);
+            $twigParser = new ilParticipationCertificateTwigParser(
+                array(),
+                $this->groupRefId,
+                $usr_ids,
+                false,
+                false
+            );
             $twigParser->parseData();
         } else {
             $DIC->ctrl()->redirectToURL('login.php');
