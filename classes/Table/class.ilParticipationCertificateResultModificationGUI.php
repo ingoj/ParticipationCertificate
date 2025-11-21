@@ -287,7 +287,6 @@ class ilParticipationCertificateResultModificationGUI
         }
 
         $twigParser = new ilParticipationCertificateTwigParser(
-            array(),
             $this->groupRefId,
             $usr_id,
             boolval($data['ementoring'] ?? ''),

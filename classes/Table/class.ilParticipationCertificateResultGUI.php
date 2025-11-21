@@ -613,7 +613,6 @@ class ilParticipationCertificateResultGUI
             }
 
             $twigParser = new ilParticipationCertificateTwigParser(
-                array(),
                 $this->groupRefId,
                 $usr_id,
                 $ementor,
@@ -667,7 +666,6 @@ class ilParticipationCertificateResultGUI
             }
 
             $twigParser = new ilParticipationCertificateTwigParser(
-                array(),
                 $this->groupRefId,
                 (array) $usr_ids,
                 true,
@@ -720,7 +718,6 @@ class ilParticipationCertificateResultGUI
             }
 
             $twigParser = new ilParticipationCertificateTwigParser(
-                array(),
                 $this->groupRefId,
                 $usr_ids,
                 false,

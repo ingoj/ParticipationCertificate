@@ -35,7 +35,6 @@ class ilParticipationCertificateTwigParser
     protected \Twig\TemplateWrapper $twig_template;
 
     public function __construct(
-        array $twig_options,
         ?int $group_ref_id = null,
         array $usr_id = null,
         bool $ementor = true,
@@ -148,7 +147,9 @@ class ilParticipationCertificateTwigParser
 
         $loMasterCourse = ilLearningObjectivesMasterCrs::getData(ilObject::_lookupObjectId($refId), $this->usr_ids);
 
-        $this->setUserData($userData, $firstname, $lastname);
+        if (!empty($firstname) && !empty($lastname)) {
+            $this->setUserData($userData, $firstname, $lastname);
+        }
 
         $initialTestStates = ilCrsInitialTestStates::getData($this->usr_ids);
         $excerciseStates = ilExcerciseStates::getData($this->usr_ids, $this->group_ref_id);
