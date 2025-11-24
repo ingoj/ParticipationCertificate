@@ -6,6 +6,7 @@ use setasign\Fpdi\PdfParser\Type\PdfTypeException;
 use setasign\Fpdi\PdfParser\PdfParserException;
 use setasign\Fpdi\PdfParser\CrossReference\CrossReferenceException;
 use Mpdf\MpdfException;
+use ILIAS\Container\InternalDomainService;
 
 /**
  * Class ilParticipationCertificateTwigParser
@@ -103,12 +104,165 @@ class ilParticipationCertificateTwigParser
     }
 
     /**
+     * @param int      $containerRefId
+     * @param int      $countIndividualAssessment
+     * @param int      $countCompletedIndividualAssessment
+     * @param int|null $userId
+     * @return void
+     * @throws ilDatabaseException
+     * @throws ilObjectNotFoundException
+     */
+    private function individualAssessments(
+        int $containerRefId,
+        int &$countIndividualAssessment,
+        int &$countCompletedIndividualAssessment,
+        int $userId = null,
+    ): void {
+        global $DIC;
+
+        // TODO Find all groups => find the parent container of them => then check if assessment belongs on this => get data
+        $domain = $DIC->container()
+                            ->internal()
+                            ->domain();
+
+        $containerItemsRefIds = $this->getContainerObjects($domain, $containerRefId);
+
+        // TODO Ask if container has only one group and the group only one individual assessment
+        $containerGroupsRefIds = $this->getContainerGroups($containerItemsRefIds);
+        $individualAssessments = $this->getGroupIndividualAssessments($containerGroupsRefIds, $domain);
+
+        $countIndividualAssessment = 0;
+        $countCompletedIndividualAssessment = 0;
+        $userIndividualAssessment = [];
+        foreach ($individualAssessments as $groupRefId => $groupIndividualAssessment) {
+
+            foreach ($groupIndividualAssessment as $individualAssessment) {
+                $objIndividualAssessment = new ilObjIndividualAssessment($individualAssessment['ref_id']);
+                $storage = $objIndividualAssessment->membersStorage();
+                $individualAssessmentMembers = $storage->loadMembers($objIndividualAssessment);
+
+                if($userId != null) {
+                    foreach($individualAssessmentMembers as $member) {
+                        if ($member['usr_id'] == $userId) {
+                            $userIndividualAssessment = $member;
+
+                            break;
+                        }
+                    }
+                } else {
+                    $userIndividualAssessment = $individualAssessmentMembers->current();
+
+                }
+
+                // TODO Adjust individual assessments for selected uses, when admin print the certificate
+                if (is_array($userIndividualAssessment)) {
+                    $countIndividualAssessment++;
+
+                    if ($userIndividualAssessment['learning_progress'] === LearningObjectiveSuggestionsTrackingToolConstants::STATUS_COMPLETED_INDIVIDUAL_ASSESSEMENTS) {
+                        $countCompletedIndividualAssessment++;
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * @param InternalDomainService $domain
+     * @param int                   $containerRefId
+     * @return array
+     * @throws ilDatabaseException
+     * @throws ilObjectNotFoundException
+     */
+    private function getContainerObjects(
+        InternalDomainService $domain,
+        int $containerRefId
+    ): array {
+        $containerObjectFactory = \ilObjectFactory::getInstanceByRefId($containerRefId);
+
+        $itemPresentation = $domain
+            ->content()
+            ->itemPresentation(
+                $containerObjectFactory, // TODO replace it with container ???
+                null,
+                false
+            );
+
+
+        if ($itemPresentation->hasItems()) {
+            return $itemPresentation->getAllRefIds();
+        }
+        return [];
+
+    }
+
+    /**
+     * @param array $containerItemsRefIds
+     * @return array
+     * @throws ilDatabaseException
+     * @throws ilObjectNotFoundException
+     */
+    private function getContainerGroups(array $containerItemsRefIds): array
+    {
+        $groupRefIds = [];
+        foreach ($containerItemsRefIds as $key => $containerItemRefId) {
+            $itemObject = \ilObjectFactory::getInstanceByRefId($containerItemRefId);
+
+            if ($itemObject->getType() === 'grp') {
+                $groupRefIds[] = $containerItemRefId;
+            }
+        }
+        return $groupRefIds;
+    }
+
+    /**
+     * @param array $containerGroupsRefIds
+     * @param       $domain
+     * @return array
+     * @throws ilDatabaseException
+     * @throws ilObjectNotFoundException
+     */
+    private function getGroupIndividualAssessments(
+        array $containerGroupsRefIds,
+        $domain
+    ): array {
+        $individualAssessments = [];
+        foreach ($containerGroupsRefIds as $key => $containerGroupRefId) {
+            $groupObjectFactory = \ilObjectFactory::getInstanceByRefId($containerGroupRefId);
+
+            $items = $domain
+                ->content()
+                ->itemPresentation(
+                    $groupObjectFactory,
+                    null,
+                    false
+                );
+
+            $groupItems[$containerGroupRefId] = $items->getAllRefIds();
+
+            foreach ($groupItems as $groupItemsRefIds) {
+                foreach ($groupItemsRefIds as $groupItemRefId) {
+                    $groupItemObject = \ilObjectFactory::getInstanceByRefId($groupItemRefId);
+
+                    if ($groupItemObject->getType() === 'iass') {
+                        $individualAssessments[$containerGroupRefId][] = [
+                            'ref_id' => $groupItemObject->getRefId(),
+                            'obj_id' => $groupItemObject->getId()
+                        ];
+                    }
+                }
+            }
+        }
+        return $individualAssessments;
+    }
+
+    /**
      * @param bool        $selfPrint
      * @param bool|null   $suggestedCourses
      * @param bool|null   $additionalOffer
      * @param bool|null   $initialTest
      * @param string|null $firstname
      * @param string|null $lastname
+     * @param int|null    $containerRefId
      * @return void
      * @throws CrossReferenceException
      * @throws LoaderError
@@ -117,7 +271,9 @@ class ilParticipationCertificateTwigParser
      * @throws PdfTypeException
      * @throws SyntaxError
      * @throws arException
+     * @throws ilDatabaseException
      * @throws ilDateTimeException
+     * @throws ilObjectNotFoundException
      */
     public function parseData(
         bool $selfPrint = false,
@@ -125,8 +281,39 @@ class ilParticipationCertificateTwigParser
         ?bool $additionalOffer = null,
         ?bool $initialTest = null,
         ?string $firstname = null,
-        ?string $lastname = null
+        ?string $lastname = null,
+        ?int $containerRefId = null
     ): void {
+
+        $countIndividualAssessments = 0;
+        $countCompletedIndividualAssessments = 0;
+        if ($containerRefId !== null) {
+
+
+
+            if (!$selfPrint) {
+
+                if (count($this->usr_id) == 1) {
+                    $this->individualAssessments(
+                        $containerRefId,
+                        $countIndividualAssessments,
+                        $countCompletedIndividualAssessments,
+                        (int) $this->usr_id[0]
+                    );
+                } else {
+
+                    // TODO individual assessments when more than one user are selected
+                }
+            } else {
+                $this->individualAssessments(
+                    $containerRefId,
+                    $countIndividualAssessments,
+                    $countCompletedIndividualAssessments,
+
+                );
+            }
+        }
+
         $certConfigs = new ilParticipationCertificateConfigs();
         $objConfig = $certConfigs->getObjConfigSetIfNoneCreateDefaultAndCreateNewObjConfigValues($this->group_ref_id);
 
@@ -240,7 +427,9 @@ class ilParticipationCertificateTwigParser
                 $additionalOffer,
                 $initialTest,
                 $firstname,
-                $lastname
+                $lastname,
+                $countIndividualAssessments,
+                $countCompletedIndividualAssessments
             );
 
             $partPdf->generatePDF($this->twig_template->render($arr_render), count($this->usr_id));
@@ -248,9 +437,10 @@ class ilParticipationCertificateTwigParser
     }
 
     /**
-     * @param array  $coursesToPrint
-     * @param string $firstname
-     * @param string $lastname
+     * @param array    $coursesToPrint
+     * @param string   $firstname
+     * @param string   $lastname
+     * @param int|null $containerRefId
      * @return void
      * @throws CrossReferenceException
      * @throws LoaderError
@@ -259,15 +449,29 @@ class ilParticipationCertificateTwigParser
      * @throws PdfTypeException
      * @throws SyntaxError
      * @throws arException
+     * @throws ilDatabaseException
      * @throws ilDateTimeException
+     * @throws ilObjectNotFoundException
      */
 
     // TODO check data
     public function parseDataMultipleCourses(
         array $coursesToPrint,
         string $firstname,
-        string $lastname
+        string $lastname,
+        ?int $containerRefId = null,
     ): void {
+
+        $countIndividualAssessments = 0;
+        $countCompletedIndividualAssessments = 0;
+        if ($containerRefId !== null) {
+            $this->individualAssessments(
+                $containerRefId,
+                $countIndividualAssessments,
+                $countCompletedIndividualAssessments
+            );
+        }
+
         $part_pdf = new ilParticipationCertificatePDFGenerator();
         foreach ( $coursesToPrint as $courseObj ) {
             $certConfigs = new ilParticipationCertificateConfigs();
@@ -372,7 +576,9 @@ class ilParticipationCertificateTwigParser
                 $courseObj['additional_offer'] ?? false,
                 $courseObj['entry_test'] ?? false,
                 $firstname,
-                $lastname
+                $lastname,
+                $countIndividualAssessments,
+                $countCompletedIndividualAssessments
             );
             $part_pdf->generatePDF($this->twig_template->render($arr_render), count($coursesToPrint));
         }
@@ -419,7 +625,6 @@ class ilParticipationCertificateTwigParser
      * @param             $eMentoring
      * @param             $configTexts
      * @param             $userData
-     * @param             $date
      * @param             $loMasterCourse
      * @param             $initialTestStates
      * @param             $learnSuggestionResults
@@ -437,6 +642,8 @@ class ilParticipationCertificateTwigParser
      * @param             $initialTest
      * @param string|null $firstname
      * @param string|null $lastname
+     * @param int|null    $countIndividualAssessments
+     * @param int|null    $countCompletedIndividualAssessments
      * @return array
      * @throws LoaderError
      * @throws SyntaxError
@@ -465,6 +672,8 @@ class ilParticipationCertificateTwigParser
         $initialTest,
         ?string $firstname = null,
         ?string $lastname = null,
+        ?int $countIndividualAssessments = null,
+        ?int $countCompletedIndividualAssessments = null
     ): array {
         $date = new ilDate(time(), IL_CAL_UNIX);
         $percentage = 0;
@@ -607,7 +816,7 @@ class ilParticipationCertificateTwigParser
             'standard_value' => $certConfigValue,
             'individual_assessments' => [
                 'label' => $this->pl->txt('individual_assessments'),
-                'value' => '1/3' // TODO
+                'value' => $countCompletedIndividualAssessments . '/' . $countIndividualAssessments
             ],
             'suggested_courses' => $suggestedCourses,
             'additional_offer' => $additionalOffer,

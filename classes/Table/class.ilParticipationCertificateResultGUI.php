@@ -49,6 +49,8 @@ class ilParticipationCertificateResultGUI
 
     private bool $ementoring;
 
+    private int $courseContainerRefId;
+
     /**
      * @throws ilObjectNotFoundException
      * @throws ilCtrlException
@@ -59,6 +61,7 @@ class ilParticipationCertificateResultGUI
         global $DIC;
 
         $refId = $this->fetchUrlParameter('ref_id', FILTER_DEFAULT);
+        $this->courseContainerRefId = $DIC->repositoryTree()->getParentId($refId);
 
         $this->toolbar = $DIC->toolbar();
         $this->tabs = $DIC->tabs();
@@ -618,7 +621,16 @@ class ilParticipationCertificateResultGUI
                 $ementor,
                 false
             );
-            $twigParser->parseData();
+
+            $twigParser->parseData(
+                false,
+                null,
+                null,
+                null,
+                null,
+                null,
+                $this->courseContainerRefId
+            );
         } else {
             $this->tpl->setOnScreenMessage('failure',$this->lng->txt('no_permission'), true);
             $DIC->ctrl()->redirectToURL('login.php');
@@ -671,7 +683,16 @@ class ilParticipationCertificateResultGUI
                 true,
                 false
             );
-            $twigParser->parseData();
+
+            $twigParser->parseData(
+                false,
+                null,
+                null,
+                null,
+                null,
+                null,
+                $this->courseContainerRefId
+            );
         } else {
             $DIC->ctrl()->redirectToURL('login.php');
         }
