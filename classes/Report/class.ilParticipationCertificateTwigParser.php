@@ -104,19 +104,19 @@ class ilParticipationCertificateTwigParser
     }
 
     /**
-     * @param int      $containerRefId
-     * @param int      $countIndividualAssessment
-     * @param int      $countCompletedIndividualAssessment
-     * @param int|null $userId
+     * @param int $containerRefId
+     * @param int $countIndividualAssessment
+     * @param int $countCompletedIndividualAssessment
+     * @param int $userId
      * @return void
      * @throws ilDatabaseException
      * @throws ilObjectNotFoundException
      */
     private function individualAssessments(
         int $containerRefId,
+        int $userId,
         int &$countIndividualAssessment,
-        int &$countCompletedIndividualAssessment,
-        int $userId = null,
+        int &$countCompletedIndividualAssessment
     ): void {
         global $DIC;
 
@@ -125,42 +125,35 @@ class ilParticipationCertificateTwigParser
                             ->internal()
                             ->domain();
 
-        $containerItemsRefIds = $this->getContainerObjects($domain, $containerRefId);
+        //$containerItemsRefIds = $this->getContainerObjects($domain, $containerRefId);
 
         // TODO Ask if container has only one group and the group only one individual assessment
-        $containerGroupsRefIds = $this->getContainerGroups($containerItemsRefIds);
+        $containerGroupsRefIds = $this->getContainerGroups($containerRefId, $domain);
         $individualAssessments = $this->getGroupIndividualAssessments($containerGroupsRefIds, $domain);
 
         $countIndividualAssessment = 0;
         $countCompletedIndividualAssessment = 0;
-        $userIndividualAssessment = [];
+        /*$userIndividualAssessment = [];*/
+
+        $individualAssessmentMembers = [];
         foreach ($individualAssessments as $groupRefId => $groupIndividualAssessment) {
 
             foreach ($groupIndividualAssessment as $individualAssessment) {
                 $objIndividualAssessment = new ilObjIndividualAssessment($individualAssessment['ref_id']);
                 $storage = $objIndividualAssessment->membersStorage();
-                $individualAssessmentMembers = $storage->loadMembers($objIndividualAssessment);
+                $individualAssessmentMembers[] = $storage->loadMembers($objIndividualAssessment);
+            }
+        }
 
-                if($userId != null) {
-                    foreach($individualAssessmentMembers as $member) {
-                        if ($member['usr_id'] == $userId) {
-                            $userIndividualAssessment = $member;
+        foreach($individualAssessmentMembers as $member) {
+            foreach($member as $data) {
+                if ($data['usr_id'] == $userId) {
 
-                            break;
-                        }
-                    }
-                } else {
-                    $userIndividualAssessment = $individualAssessmentMembers->current();
-
-                }
-
-                // TODO Adjust individual assessments for selected uses, when admin print the certificate
-                if (is_array($userIndividualAssessment)) {
-                    $countIndividualAssessment++;
-
-                    if ($userIndividualAssessment['learning_progress'] === LearningObjectiveSuggestionsTrackingToolConstants::STATUS_COMPLETED_INDIVIDUAL_ASSESSEMENTS) {
+                    if (!empty($data['learning_progress']) && $data['learning_progress'] === LearningObjectiveSuggestionsTrackingToolConstants::STATUS_COMPLETED_INDIVIDUAL_ASSESSEMENTS) {
                         $countCompletedIndividualAssessment++;
                     }
+                    $countIndividualAssessment++;
+                    break;
                 }
             }
         }
@@ -201,7 +194,7 @@ class ilParticipationCertificateTwigParser
      * @throws ilDatabaseException
      * @throws ilObjectNotFoundException
      */
-    private function getContainerGroups(array $containerItemsRefIds): array
+    /*private function getContainerGroups(array $containerItemsRefIds): array
     {
         $groupRefIds = [];
         foreach ($containerItemsRefIds as $key => $containerItemRefId) {
@@ -209,6 +202,33 @@ class ilParticipationCertificateTwigParser
 
             if ($itemObject->getType() === 'grp') {
                 $groupRefIds[] = $containerItemRefId;
+            }
+        }
+        return $groupRefIds;
+    }*/
+
+    private function getContainerGroups(
+        int $containerRefId,
+        $domain
+    ): array {
+        $containerObjectFactory = \ilObjectFactory::getInstanceByRefId($containerRefId);
+
+        $itemPresentation = $domain
+            ->content()
+            ->itemPresentation(
+                $containerObjectFactory, // TODO replace it with container ???
+                null,
+                false
+            );
+
+        $items = $itemPresentation->getAllRefIds();
+        $groupRefIds = [];
+        foreach ($items as $key => $itemRefId) {
+            $itemObject = \ilObjectFactory::getInstanceByRefId($itemRefId);
+
+
+            if ($itemObject->getType() === 'grp') {
+                $groupRefIds[] = $itemRefId;
             }
         }
         return $groupRefIds;
@@ -238,6 +258,7 @@ class ilParticipationCertificateTwigParser
                 );
 
             $groupItems[$containerGroupRefId] = $items->getAllRefIds();
+
 
             foreach ($groupItems as $groupItemsRefIds) {
                 foreach ($groupItemsRefIds as $groupItemRefId) {
@@ -284,35 +305,6 @@ class ilParticipationCertificateTwigParser
         ?string $lastname = null,
         ?int $containerRefId = null
     ): void {
-
-        $countIndividualAssessments = 0;
-        $countCompletedIndividualAssessments = 0;
-        if ($containerRefId !== null) {
-
-
-
-            if (!$selfPrint) {
-
-                if (count($this->usr_id) == 1) {
-                    $this->individualAssessments(
-                        $containerRefId,
-                        $countIndividualAssessments,
-                        $countCompletedIndividualAssessments,
-                        (int) $this->usr_id[0]
-                    );
-                } else {
-
-                    // TODO individual assessments when more than one user are selected
-                }
-            } else {
-                $this->individualAssessments(
-                    $containerRefId,
-                    $countIndividualAssessments,
-                    $countCompletedIndividualAssessments,
-
-                );
-            }
-        }
 
         $certConfigs = new ilParticipationCertificateConfigs();
         $objConfig = $certConfigs->getObjConfigSetIfNoneCreateDefaultAndCreateNewObjConfigValues($this->group_ref_id);
@@ -405,6 +397,16 @@ class ilParticipationCertificateTwigParser
         $this->usr_id = $this->excludeUsersFromPrintIfMissingUserData($this->usr_id);
 
         foreach ($this->usr_id as $usr_id) {
+
+            $countIndividualAssessments = 0;
+            $countCompletedIndividualAssessments = 0;
+            $this->individualAssessments(
+                $containerRefId,
+                (int) $usr_id,
+                $countIndividualAssessments,
+                $countCompletedIndividualAssessments
+            );
+
             $arr_render = $this->fetchDataCertificate(
                 $usr_id,
                 $refId,
@@ -458,7 +460,8 @@ class ilParticipationCertificateTwigParser
     public function parseDataMultipleCourses(
         array $coursesToPrint,
         string $firstname,
-        string $lastname
+        string $lastname,
+        int $userId
     ): void {
         global $DIC;
 
@@ -472,6 +475,7 @@ class ilParticipationCertificateTwigParser
             if ($containerRefId !== null) {
                 $this->individualAssessments(
                     $containerRefId,
+                    $userId,
                     $countIndividualAssessments,
                     $countCompletedIndividualAssessments
                 );
