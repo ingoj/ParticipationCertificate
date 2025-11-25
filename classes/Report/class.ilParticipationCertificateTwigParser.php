@@ -458,22 +458,25 @@ class ilParticipationCertificateTwigParser
     public function parseDataMultipleCourses(
         array $coursesToPrint,
         string $firstname,
-        string $lastname,
-        ?int $containerRefId = null,
+        string $lastname
     ): void {
+        global $DIC;
 
-        $countIndividualAssessments = 0;
-        $countCompletedIndividualAssessments = 0;
-        if ($containerRefId !== null) {
-            $this->individualAssessments(
-                $containerRefId,
-                $countIndividualAssessments,
-                $countCompletedIndividualAssessments
-            );
-        }
-
+        $tree = $DIC->repositoryTree();
         $part_pdf = new ilParticipationCertificatePDFGenerator();
         foreach ( $coursesToPrint as $courseObj ) {
+            $containerRefId = $tree->getParentId($courseObj['ref_id']);
+
+            $countIndividualAssessments = 0;
+            $countCompletedIndividualAssessments = 0;
+            if ($containerRefId !== null) {
+                $this->individualAssessments(
+                    $containerRefId,
+                    $countIndividualAssessments,
+                    $countCompletedIndividualAssessments
+                );
+            }
+
             $certConfigs = new ilParticipationCertificateConfigs();
             $objConfig = $certConfigs->getObjConfigSetIfNoneCreateDefaultAndCreateNewObjConfigValues($courseObj['ref_id']);
 
@@ -684,6 +687,7 @@ class ilParticipationCertificateTwigParser
         }
         $processedTextValues = $configTexts;
 
+
         //Preprocess text values
         foreach ($configTexts as $key => $value) {
             $twig = new Twig\Environment(new Twig\Loader\ArrayLoader());
@@ -696,8 +700,8 @@ class ilParticipationCertificateTwigParser
             $peparsedValue = $template->render([
                 'username' => ($userData[$userId]->getPartCertSalutation() ?
                         $userData[$userId]->getPartCertSalutation() . ' ' : '') .
-                    $firstname ?? $userData[$userId]->getPartCertFirstname() . ' ' .
-                    $lastname ?? $userData[$userId]->getPartCertLastname(),
+                    ($firstname ?? $userData[$userId]->getPartCertFirstname()) . ' ' .
+                    ($lastname ?? $userData[$userId]->getPartCertLastname()),
                 'date' => $date->get(IL_CAL_FKT_DATE, 'd.m.Y')
             ]);
 
