@@ -293,7 +293,10 @@ class ilParticipationCertificateResultModificationGUI
             $edited,
             $array
         );
-        $twigParser->parseData();
+
+        $groupRefId = ParticipationCertificateHelper::getGroupRefId($this->groupRefId);
+
+        $twigParser->parseData(false, $groupRefId);
     }
 
     /**

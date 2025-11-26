@@ -115,3 +115,4 @@ print_done#:#Die Teilnahmebescheinigung wurde in einem neuen Tab/Fenster erstell
 failure_timeframe_save#:#Das Startdatum darf nicht nach dem Enddatum liegen
 failure_save_config#:#Beim Speichern der Konfiguration oder Hochladen der Datei ist ein Fehler aufgetreten.
 individual_assessments#:#Videokonferenzen
+individual_assessments_heading#:#Individuelle Bewertungen

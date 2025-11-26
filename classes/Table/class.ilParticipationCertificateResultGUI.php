@@ -49,8 +49,6 @@ class ilParticipationCertificateResultGUI
 
     private bool $ementoring;
 
-    private int $courseContainerRefId;
-
     /**
      * @throws ilObjectNotFoundException
      * @throws ilCtrlException
@@ -61,8 +59,6 @@ class ilParticipationCertificateResultGUI
         global $DIC;
 
         $refId = $this->fetchUrlParameter('ref_id', FILTER_DEFAULT);
-        $this->courseContainerRefId = $DIC->repositoryTree()->getParentId($refId);
-
         $this->toolbar = $DIC->toolbar();
         $this->tabs = $DIC->tabs();
         $this->ctrl = $DIC->ctrl();
@@ -447,8 +443,7 @@ class ilParticipationCertificateResultGUI
 
         $this->ctrl->setParameterByClass(ilRepositoryGUI::class, 'ref_id', (int)$_GET['ref_id']);
         $this->tabs->setBackTarget($this->pl->txt('header_btn_back'), $this->ctrl->getLinkTargetByClass(array(
-            ilRepositoryGUI::class//,
-            //ilObjGroupGUI::class
+            ilRepositoryGUI::class
         )));
         $this->ctrl->saveParameterByClass(ilParticipationCertificateResultGUI::class, ['ref_id', 'group_id']);
         $this->ctrl->saveParameterByClass(ilParticipationCertificateGUI::class, 'ref_id');
@@ -622,14 +617,11 @@ class ilParticipationCertificateResultGUI
                 false
             );
 
+            $groupRefId = ParticipationCertificateHelper::getGroupRefId($this->groupRefId);
+
             $twigParser->parseData(
                 false,
-                null,
-                null,
-                null,
-                null,
-                null,
-                $this->courseContainerRefId
+                $groupRefId
             );
         } else {
             $this->tpl->setOnScreenMessage('failure',$this->lng->txt('no_permission'), true);
@@ -684,15 +676,9 @@ class ilParticipationCertificateResultGUI
                 false
             );
 
-            $twigParser->parseData(
-                false,
-                null,
-                null,
-                null,
-                null,
-                null,
-                $this->courseContainerRefId
-            );
+            $groupRefId = ParticipationCertificateHelper::getGroupRefId($this->groupRefId);
+
+            $twigParser->parseData(false, $groupRefId);
         } else {
             $DIC->ctrl()->redirectToURL('login.php');
         }
@@ -744,7 +730,10 @@ class ilParticipationCertificateResultGUI
                 false,
                 false
             );
-            $twigParser->parseData();
+
+            $groupRefId = ParticipationCertificateHelper::getGroupRefId($this->groupRefId);
+
+            $twigParser->parseData(false, $groupRefId);
         } else {
             $DIC->ctrl()->redirectToURL('login.php');
         }

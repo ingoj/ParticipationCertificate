@@ -55,14 +55,21 @@
      <td class="td1">{{text_values.page1_box2_row2}}</td>
      <td class="td2">Abgabe von {{excercise_percentage}}% der Hausaufgaben</td>
    </tr>
-   <tr>
-      <td class="td1">{{individual_assessments.label}}</td>
-      <td class="td2">{{individual_assessments.value}}</td>
-   </tr>
   </table>
 </div>
 
 {% endif %}
+
+<div class="table_container">
+    <p class="p-default"><b>{{individual_assessments_heading}}</b></p>
+    <table class="table" id="table5">
+        <tr>
+            <td class="td1">{{individual_assessments.label}}</td>
+            <td class="td2">{{individual_assessments.value}}</td>
+        </tr>
+    </table>
+</div>
+
 <div class="date"> <p>{{text_values.page1_location_date}}</p>  </div>
 <div id="signature">
   {% if page1_issuer_signature %}
