@@ -229,6 +229,16 @@ class ilParticipationCertificateTwigParser
                 $countCompletedIndividualAssessments = $this->getCompletedIndividualAssessments((array) $individualAssessmentsUser);
             }
 
+            $sessions = ParticipationCertificateHelper::getSessions($groupRefId);
+            $countSessions = count($sessions);
+            $countAttendedSessions = 0;
+            foreach ($sessions as $session) {
+                $eventParticipants = new ilEventParticipants($session['obj_id']);
+                if($eventParticipants->hasParticipated($usr_id)) {
+                    $countAttendedSessions++;
+                }
+            }
+
             $arr_render = $this->fetchDataCertificate(
                 $usr_id,
                 $refId,
@@ -253,7 +263,9 @@ class ilParticipationCertificateTwigParser
                 $firstname,
                 $lastname,
                 $countIndividualAssessments,
-                $countCompletedIndividualAssessments
+                $countCompletedIndividualAssessments,
+                $countSessions,
+                $countAttendedSessions
             );
 
             $partPdf->generatePDF($this->twig_template->render($arr_render), count($this->usr_id));
@@ -292,11 +304,24 @@ class ilParticipationCertificateTwigParser
 
             $countIndividualAssessments = 0;
             $countCompletedIndividualAssessments = 0;
+            $countSessions = 0;
+            $countAttendedSessions = 0;
             if ($containerRefId !== null) {
                 $newIassStates = ilIassStatesMulti::getData($this->usr_ids, $courseObj['group_id']);
                 $individualAssessmentsUser = $newIassStates[$userId];
-                $countIndividualAssessments = count((array) $individualAssessmentsUser);
+                $countIndividualAssessments = count(array_keys((array) $individualAssessmentsUser));
                 $countCompletedIndividualAssessments = $this->getCompletedIndividualAssessments((array) $individualAssessmentsUser);
+
+                $sessions = ParticipationCertificateHelper::getSessions($courseObj['group_id']);
+                $countSessions = count(array_keys($sessions));
+
+                foreach ($sessions as $session) {
+                    $eventParticipants = new ilEventParticipants($session['obj_id']);
+                    if($eventParticipants->hasParticipated($userId)) {
+                        $countAttendedSessions++;
+                    }
+                }
+
             }
 
             $certConfigs = new ilParticipationCertificateConfigs();
@@ -403,7 +428,9 @@ class ilParticipationCertificateTwigParser
                 $firstname,
                 $lastname,
                 $countIndividualAssessments,
-                $countCompletedIndividualAssessments
+                $countCompletedIndividualAssessments,
+                $countSessions,
+                $countAttendedSessions
             );
             $part_pdf->generatePDF($this->twig_template->render($arr_render), count($coursesToPrint));
         }
@@ -484,6 +511,8 @@ class ilParticipationCertificateTwigParser
      * @param string|null $lastname
      * @param int|null    $countIndividualAssessments
      * @param int|null    $countCompletedIndividualAssessments
+     * @param int|null    $countSessions
+     * @param int|null    $countAttendedSessions
      * @return array
      * @throws LoaderError
      * @throws SyntaxError
@@ -513,7 +542,9 @@ class ilParticipationCertificateTwigParser
         ?string $firstname = null,
         ?string $lastname = null,
         ?int $countIndividualAssessments = null,
-        ?int $countCompletedIndividualAssessments = null
+        ?int $countCompletedIndividualAssessments = null,
+        ?int $countSessions = null,
+        ?int $countAttendedSessions = null
     ): array {
         $date = new ilDate(time(), IL_CAL_UNIX);
         $percentage = 0;
@@ -523,7 +554,6 @@ class ilParticipationCertificateTwigParser
             $userId = $userId[0];
         }
         $processedTextValues = $configTexts;
-
 
         //Preprocess text values
         foreach ($configTexts as $key => $value) {
@@ -608,7 +638,6 @@ class ilParticipationCertificateTwigParser
             $iassStates = "<img alt='' src=" . ILIAS_ABSOLUTE_PATH . "/" . $this->pl->getImagePath("not_attempted_s.png") . ">";
         }
 
-
         if ($logoIsSavedInResourceStorage) {
 
             if(!empty($processedTextValues['logo'])) {
@@ -641,7 +670,6 @@ class ilParticipationCertificateTwigParser
             $initialTest = true;
         }
 
-
         $data = [
             'text_values' => $processedTextValues,
             'show_ementoring' => $eMentoring,
@@ -659,6 +687,10 @@ class ilParticipationCertificateTwigParser
             'individual_assessments' => [
                 'label' => $this->pl->txt('individual_assessments'),
                 'value' => $countCompletedIndividualAssessments . '/' . $countIndividualAssessments
+            ],
+            'sessions' => [
+                'label' => $this->pl->txt('sessions'),
+                'value' => $countAttendedSessions . '/' . $countSessions
             ],
             'suggested_courses' => $suggestedCourses,
             'additional_offer' => $additionalOffer,

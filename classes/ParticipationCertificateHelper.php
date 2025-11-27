@@ -24,6 +24,17 @@ class ParticipationCertificateHelper
     }
 
     /**
+     * @param int $groupRefId
+     * @return array
+     */
+    public static function getSessions(int $groupRefId): array
+    {
+        global $DIC;
+
+        return $DIC->repositoryTree()->getChildsByType($groupRefId, 'sess');
+    }
+
+    /**
      * @param int                   $containerRefId
      * @param InternalDomainService $domain
      * @return int|null
@@ -57,5 +68,46 @@ class ParticipationCertificateHelper
             }
         }
         return $groupRefId;
+    }
+
+    /**
+     * @param int                   $containerRefId
+     * @param InternalDomainService $domain
+     * @return int|null
+     * @throws ilDatabaseException
+     * @throws ilObjectNotFoundException
+     */
+
+    private static function getSessionsOfContainer(
+        int $containerRefId,
+        InternalDomainService $domain
+    ): int|null {
+        $containerObjectFactory = \ilObjectFactory::getInstanceByRefId($containerRefId);
+
+        $itemPresentation = $domain
+            ->content()
+            ->itemPresentation(
+                $containerObjectFactory, // TODO replace it with container ???
+                null,
+                false
+            );
+
+        $items = $itemPresentation->getAllRefIds();
+
+        $sessionRefIds = null;
+        foreach ($items as $key => $itemRefId) {
+            $itemObject = \ilObjectFactory::getInstanceByRefId($itemRefId);
+
+
+            if ($itemObject->getType() === 'grp') {
+                $sessionRefIds = (int) $itemRefId;
+
+                //break;
+            } else{
+                dd($itemObject->getType());
+
+            }
+        }
+        return $sessionRefIds;
     }
 }

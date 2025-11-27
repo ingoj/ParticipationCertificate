@@ -67,6 +67,10 @@
             <td class="td1">{{individual_assessments.label}}</td>
             <td class="td2">{{individual_assessments.value}}</td>
         </tr>
+        <tr>
+            <td class="td1">{{sessions.label}}</td>
+            <td class="td2">{{sessions.value}}</td>
+        </tr>
     </table>
 </div>
 
@@ -137,6 +141,19 @@
 </div>
 <br/>{{text_values.page1_disclaimer}}<br/>
 {% endif %}
+<div class="table_container">
+    <p class="p-default"><b>{{individual_assessments_heading}}</b></p>
+    <table class="table" id="table6">
+        <tr>
+            <td class="td1">{{individual_assessments.label}}</td>
+            <td class="td2">{{individual_assessments.value}}</td>
+        </tr>
+        <tr>
+            <td class="td1">{{sessions.label}}</td>
+            <td class="td2">{{sessions.value}}</td>
+        </tr>
+    </table>
+</div>
   {% if show_footer %}
   <div class="footer"><i>{{text_values.footer_config}}</i></div>
 {% endif %}
