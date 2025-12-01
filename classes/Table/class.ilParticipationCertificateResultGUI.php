@@ -619,7 +619,7 @@ class ilParticipationCertificateResultGUI
 
             $twigParser->parseData(
                 false,
-                $this->groupRefId/*$groupRefId*/
+                $this->groupRefId
             );
         } else {
             $this->tpl->setOnScreenMessage('failure',$this->lng->txt('no_permission'), true);
