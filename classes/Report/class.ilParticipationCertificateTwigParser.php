@@ -221,7 +221,9 @@ class ilParticipationCertificateTwigParser
             }
         }
 
-        $this->usr_id = $this->excludeUsersFromPrintIfMissingUserData($this->usr_id);
+        if (!$selfPrint) {
+            $this->usr_id = $this->excludeUsersFromPrintIfMissingUserData($this->usr_id);
+        }
 
         foreach ($this->usr_id as $usr_id) {
             $countIndividualAssessments = 0;
