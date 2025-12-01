@@ -66,9 +66,8 @@ class ilParticipationCertificatePDFGenerator
             'tempDir' => '/tmp/mpdf',
             'default_font' => 'dejavusans'
         ]);
-        $rendered = str_replace('http://localhost:8428', 'http://host.docker.internal:8428', $rendered);
-        //Css file wird geladen
 
+        //Css file wird geladen
         $css = file_get_contents('./' . ilParticipationCertificatePlugin::PLUGIN_DIRECTORY . '/templates/report/Teilnahmebescheinigung.css');
         $printCount++;
 
