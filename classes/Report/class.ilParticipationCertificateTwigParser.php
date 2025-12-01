@@ -110,7 +110,6 @@ class ilParticipationCertificateTwigParser
      * @param bool|null   $initialTest
      * @param string|null $firstname
      * @param string|null $lastname
-     * @param int|null    $courseRefId
      * @return void
      * @throws CrossReferenceException
      * @throws LoaderError
@@ -119,7 +118,9 @@ class ilParticipationCertificateTwigParser
      * @throws PdfTypeException
      * @throws SyntaxError
      * @throws arException
+     * @throws ilDatabaseException
      * @throws ilDateTimeException
+     * @throws ilObjectNotFoundException
      */
     public function parseData(
         bool $selfPrint = false,
