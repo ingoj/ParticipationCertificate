@@ -617,11 +617,9 @@ class ilParticipationCertificateResultGUI
                 false
             );
 
-            $groupRefId = ParticipationCertificateHelper::getGroupRefId($this->groupRefId);
-
             $twigParser->parseData(
                 false,
-                $groupRefId
+                $this->groupRefId/*$groupRefId*/
             );
         } else {
             $this->tpl->setOnScreenMessage('failure',$this->lng->txt('no_permission'), true);

@@ -104,12 +104,13 @@ class ilParticipationCertificateTwigParser
 
     /**
      * @param bool        $selfPrint
-     * @param int|null    $groupRefId
+     * @param int|null    $courseRefId
      * @param bool|null   $suggestedCourses
      * @param bool|null   $additionalOffer
      * @param bool|null   $initialTest
      * @param string|null $firstname
      * @param string|null $lastname
+     * @param int|null    $courseRefId
      * @return void
      * @throws CrossReferenceException
      * @throws LoaderError
@@ -122,7 +123,7 @@ class ilParticipationCertificateTwigParser
      */
     public function parseData(
         bool $selfPrint = false,
-        ?int $groupRefId = null,
+        ?int $courseRefId = null,
         ?bool $suggestedCourses = null,
         ?bool $additionalOffer = null,
         ?bool $initialTest = null,
@@ -141,6 +142,8 @@ class ilParticipationCertificateTwigParser
         $this->tpl->setOnScreenMessage('success', $this->pl->txt('print_done'), true);
 
         $refId = $this->group_ref_id;
+
+        $groupRefId = ParticipationCertificateHelper::getGroupRefId($courseRefId);
 
         $newIassStates = ilIassStatesMulti::getData($this->usr_ids, $groupRefId);
         $xaliStates = xaliStates::getData($this->usr_ids, $refId);
@@ -513,6 +516,7 @@ class ilParticipationCertificateTwigParser
      * @param int|null    $countCompletedIndividualAssessments
      * @param int|null    $countSessions
      * @param int|null    $countAttendedSessions
+     * @param int|null    $courseRefId
      * @return array
      * @throws LoaderError
      * @throws SyntaxError
@@ -639,7 +643,6 @@ class ilParticipationCertificateTwigParser
         }
 
         if ($logoIsSavedInResourceStorage) {
-
             if(!empty($processedTextValues['logo'])) {
                 $file = new ilParticipationCertificateFiles();
                 $src = $file->getFileSrcByStorageType(
