@@ -60,6 +60,7 @@
 
 {% endif %}
 
+{% if additional_offer %}
 <div class="table_container">
     <p class="p-default"><b>{{text_values.individual_assessments}}</b></p>
     <table class="table" id="table5">
@@ -79,6 +80,7 @@
         </tr>
     </table>
 </div>
+{% endif %}
 
 <div class="date"> <p>{{text_values.page1_location_date}}</p>  </div>
 <div id="signature">
