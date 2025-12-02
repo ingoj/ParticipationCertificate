@@ -1,6 +1,5 @@
 <?php
-use srag\Plugins\UserDefaults\UserSearch\usrdefObj;
-use SRAG\ILIAS\Plugins\LearningObjectiveSuggestions\Config;
+
 use SRAG\ILIAS\Plugins\LearningObjectiveSuggestions\Config\ConfigProvider;
 
 class ilCrsInitialTestStates {
@@ -54,10 +53,10 @@ class ilCrsInitialTestStates {
 					test_act.submitted as crsitest_itest_submitted
 					FROM 
 					loc_settings
-					inner join " . usrdefObj::TABLE_NAME . " as crs_obj on crs_obj.obj_id =  loc_settings.obj_id
+					inner join object_data as crs_obj on crs_obj.obj_id =  loc_settings.obj_id
 					inner join object_reference as crs_ref on crs_ref.obj_id = crs_obj.obj_id
 					inner join object_reference as itest_ref on itest_ref.ref_id = loc_settings.itest
-					inner join " . usrdefObj::TABLE_NAME . " as itest_obj on itest_obj.obj_id = itest_ref.obj_id
+					inner join object_data as itest_obj on itest_obj.obj_id = itest_ref.obj_id
 					inner join tst_tests as test on test.obj_fi = itest_obj.obj_id
 					inner join tst_active as test_act on test_act.test_fi = test.test_id
 					where loc_settings.itest is not null AND " . $ilDB->in('crs_ref.ref_id', $arr_malok_ids, false, 'integer') . " AND " . $ilDB->in('test_act.user_fi', $arr_usr_ids, false, 'integer');

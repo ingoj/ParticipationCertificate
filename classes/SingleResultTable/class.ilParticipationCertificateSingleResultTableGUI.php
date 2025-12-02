@@ -70,9 +70,7 @@ class ilParticipationCertificateSingleResultTableGUI extends ilTable2GUI {
 
 		$cert_access = new ilParticipationCertificateAccess($_GET['ref_id']);
 		$this->usr_ids = $cert_access->getUserIdsOfGroup();
-
 		$this->usr_id = $usr_id;
-
 		$this->sugg = getLearnSuggs::getData($usr_id);
 
 		parent::__construct($a_parent_obj, $a_parent_cmd);
