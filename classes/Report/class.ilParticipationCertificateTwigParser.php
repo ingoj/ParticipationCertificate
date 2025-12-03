@@ -411,7 +411,7 @@ class ilParticipationCertificateTwigParser
             $arr_render = $this->fetchDataCertificate(
                 $this->usr_id[0],
                 $courseObj['ref_id'],
-                $eMentoring,/*$courseObj['ementoring'] ?? false,*/
+                $eMentoring,
                 $configTexts,
                 $userData,
                 $loMasterCourse,
