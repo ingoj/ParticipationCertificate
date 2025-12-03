@@ -406,10 +406,12 @@ class ilParticipationCertificateTwigParser
                 }
             }
 
+            $eMentoring = (bool) ilParticipationCertificateConfig::getConfig('enable_ementoring', $courseObj['ref_id']);
+
             $arr_render = $this->fetchDataCertificate(
                 $this->usr_id[0],
                 $courseObj['ref_id'],
-                $courseObj['ementoring'] ?? false,
+                $eMentoring,/*$courseObj['ementoring'] ?? false,*/
                 $configTexts,
                 $userData,
                 $loMasterCourse,
@@ -515,7 +517,6 @@ class ilParticipationCertificateTwigParser
      * @param int|null    $countCompletedIndividualAssessments
      * @param int|null    $countSessions
      * @param int|null    $countAttendedSessions
-     * @param int|null    $courseRefId
      * @return array
      * @throws LoaderError
      * @throws SyntaxError
@@ -670,6 +671,10 @@ class ilParticipationCertificateTwigParser
             $suggestedCourses = true;
             $additionalOffer = true;
             $initialTest = true;
+        }
+
+        if ($eMentoring) {
+            $eMentoring = (bool) ilParticipationCertificateConfig::getConfig('enable_ementoring', $refId);
         }
 
         $data = [

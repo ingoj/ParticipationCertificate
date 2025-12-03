@@ -89,7 +89,6 @@ class ilParticipationCertificatePlugin extends ilUserInterfaceHookPlugin
 
     /**
      * @return void
-     * @throws arException
      */
     protected function afterUpdate(): void
     {
