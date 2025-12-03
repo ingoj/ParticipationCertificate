@@ -108,6 +108,7 @@ class ilParticipationCertificateTwigParser
      * @param bool|null   $suggestedCourses
      * @param bool|null   $additionalOffer
      * @param bool|null   $initialTest
+     * @param bool|null   $homework
      * @param string|null $firstname
      * @param string|null $lastname
      * @return void
@@ -128,6 +129,7 @@ class ilParticipationCertificateTwigParser
         ?bool $suggestedCourses = null,
         ?bool $additionalOffer = null,
         ?bool $initialTest = null,
+        ?bool $homework = true,
         ?string $firstname = null,
         ?string $lastname = null
     ): void {
@@ -262,6 +264,7 @@ class ilParticipationCertificateTwigParser
                 $suggestedCourses,
                 $additionalOffer,
                 $initialTest,
+                $homework,
                 $firstname,
                 $lastname,
                 $countIndividualAssessments,
@@ -275,10 +278,11 @@ class ilParticipationCertificateTwigParser
     }
 
     /**
-     * @param array  $coursesToPrint
-     * @param string $firstname
-     * @param string $lastname
-     * @param int    $userId
+     * @param array     $coursesToPrint
+     * @param string    $firstname
+     * @param string    $lastname
+     * @param int       $userId
+     * @param bool|null $homework
      * @return void
      * @throws CrossReferenceException
      * @throws LoaderError
@@ -289,13 +293,12 @@ class ilParticipationCertificateTwigParser
      * @throws arException
      * @throws ilDateTimeException
      */
-
-    // TODO check data
     public function parseDataMultipleCourses(
         array $coursesToPrint,
         string $firstname,
         string $lastname,
-        int $userId
+        int $userId,
+        ?bool $homework = true
     ): void {
         global $DIC;
 
@@ -429,6 +432,7 @@ class ilParticipationCertificateTwigParser
                 $courseObj['suggested_courses'] ?? false,
                 $courseObj['additional_offer'] ?? false,
                 $courseObj['entry_test'] ?? false,
+                $homework,
                 $firstname,
                 $lastname,
                 $countIndividualAssessments,
@@ -511,6 +515,7 @@ class ilParticipationCertificateTwigParser
      * @param             $suggestedCourses
      * @param             $additionalOffer
      * @param             $initialTest
+     * @param bool        $homework
      * @param string|null $firstname
      * @param string|null $lastname
      * @param int|null    $countIndividualAssessments
@@ -543,6 +548,7 @@ class ilParticipationCertificateTwigParser
         $suggestedCourses,
         $additionalOffer,
         $initialTest,
+        bool $homework = true,
         ?string $firstname = null,
         ?string $lastname = null,
         ?int $countIndividualAssessments = null,
@@ -699,6 +705,7 @@ class ilParticipationCertificateTwigParser
                 'label' => $this->pl->txt('sessions'),
                 'value' => $countAttendedSessions . '/' . $countSessions
             ],
+            'homework' => $homework,
             'suggested_courses' => $suggestedCourses,
             'additional_offer' => $additionalOffer,
             'initial_test' => $initialTest

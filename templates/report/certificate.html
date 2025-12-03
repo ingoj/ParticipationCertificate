@@ -51,10 +51,12 @@
        {% endif %}
      </td>
    </tr>
+  {% if homework %}
    <tr>
      <td class="td1">{{text_values.page1_box2_row2}}</td>
      <td class="td2">Abgabe von {{excercise_percentage}}% der Hausaufgaben</td>
    </tr>
+  {% endif %}
   </table>
 </div>
 
@@ -141,10 +143,12 @@
    {{iass_states | raw}}
     </td>
   </tr>
+  {% if homework %}
   <tr>
     <td class="td1">{{text_values.page2_box2_row2}}</td>
     <td class="td2">Abgabe von {{excercise_percentage}}% der Hausaufgaben</td>
   </tr>
+  {% endif %}
   </table>
 </div>
 <br/>{{text_values.page1_disclaimer}}<br/>
