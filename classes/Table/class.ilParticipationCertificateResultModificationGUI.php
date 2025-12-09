@@ -300,9 +300,7 @@ class ilParticipationCertificateResultModificationGUI
             $array
         );
 
-        $groupRefId = ParticipationCertificateHelper::getGroupRefId($this->courseRefId);
-
-        $twigParser->parseData(false, $groupRefId);
+        $twigParser->parseData(false, $this->courseRefId);
     }
 
     /**

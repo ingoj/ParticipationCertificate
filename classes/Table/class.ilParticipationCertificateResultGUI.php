@@ -675,9 +675,7 @@ class ilParticipationCertificateResultGUI
                 false
             );
 
-            $groupRefId = ParticipationCertificateHelper::getGroupRefId($this->courseRefId);
-
-            $twigParser->parseData(false, $groupRefId);
+            $twigParser->parseData(false, $this->courseRefId);
         } else {
             $DIC->ctrl()->redirectToURL('login.php');
         }
@@ -730,9 +728,7 @@ class ilParticipationCertificateResultGUI
                 false
             );
 
-            $groupRefId = ParticipationCertificateHelper::getGroupRefId($this->courseRefId);
-
-            $twigParser->parseData(false, $groupRefId);
+            $twigParser->parseData(false, $this->courseRefId);
         } else {
             $DIC->ctrl()->redirectToURL('login.php');
         }
