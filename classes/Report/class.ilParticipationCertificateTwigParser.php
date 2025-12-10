@@ -147,7 +147,7 @@ class ilParticipationCertificateTwigParser
         $refId = $this->group_ref_id;
 
         $groupRefId = ParticipationCertificateHelper::getGroupRefId($courseRefId);
-        $newIassStates = ilIassStatesMulti::getData($this->usr_ids, $refId);
+        $newIassStates = ilIassStatesMulti::getData($this->usr_ids, $groupRefId);
         $xaliStates = xaliStates::getData($this->usr_ids, $refId);
         $userData = ilPartCertUsersData::getData($this->pl, $this->usr_ids);
         $loMasterCourse = ilLearningObjectivesMasterCrs::getData(ilObject::_lookupObjectId($refId), $this->usr_ids);
@@ -242,6 +242,7 @@ class ilParticipationCertificateTwigParser
                     $countAttendedSessions++;
                 }
             }
+
 
             $arr_render = $this->fetchDataCertificate(
                 $usr_id,
