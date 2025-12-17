@@ -751,10 +751,10 @@ class ilParticipationCertificateGUI
         $ui = $DIC->ui()->factory();
 
         $periodStart = ilParticipationCertificateConfig::getConfig('self_print_start', $this->groupRefId);
-        $startDate = !empty($periodStart) ? DateTimeImmutable::createFromFormat('d.m.Y', $periodStart) : null;
+        $startDate = !empty($periodStart) ? DateTimeImmutable::createFromFormat('d.m.Y H:i:s', $periodStart) : null;
 
         $periodEnd = ilParticipationCertificateConfig::getConfig('self_print_end', $this->groupRefId);
-        $endDate = !empty($periodEnd) ? DateTimeImmutable::createFromFormat('d.m.Y', $periodEnd) : null;
+        $endDate = !empty($periodEnd) ? DateTimeImmutable::createFromFormat('d.m.Y H:i:s', $periodEnd) : null;
 
         $durationInput = $ui->input()->field()->duration($this->pl->txt('period'));
 
@@ -847,20 +847,21 @@ class ilParticipationCertificateGUI
 
         if (!empty($formData['config']['enable-self-printing']['period']['end'])) {
             $endTimestamp = $formData['config']['enable-self-printing']['period']['end']->getTimestamp();
+            $endTimestamp = $endTimestamp + 86399; // to set end date to 23:59:59
         }
 
         $startDate = null;
         if (!empty($startTimestamp)) {
             $startDate = new DateTimeImmutable('@' . $startTimestamp);
             $startDate = $startDate->setTimezone(new DateTimeZone($DIC->user()->getTimeZone()));
-            $startDate = $startDate->format('d.m.Y');
+            $startDate = $startDate->format('d.m.Y H:i:s');
         }
 
         $endDate = null;
         if (!empty($endTimestamp)) {
             $endDate = new DateTimeImmutable('@' . $endTimestamp);
             $endDate = $endDate->setTimezone(new DateTimeZone($DIC->user()->getTimeZone()));
-            $endDate = $endDate->format('d.m.Y');
+            $endDate = $endDate->format('d.m.Y H:i:s');
         }
 
         ilParticipationCertificateConfig::setConfig('self_print_start', $startDate, $this->groupRefId);
