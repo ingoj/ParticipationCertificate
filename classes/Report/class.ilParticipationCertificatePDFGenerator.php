@@ -73,10 +73,17 @@ class ilParticipationCertificatePDFGenerator
 
         //Checkt ob es nur einen User in der Gruppe hat. Wenn True wird das PDf direkt nur für diesen gedruckt
         if ($total_users == 1) {
-            $mpdf->WriteHTML($css, 1);
 
-            $mpdf->WriteHTML($rendered, 2);
-            $mpdf->Output($this->pl->txt("plugin") . '.pdf', 'D');
+            $mpdf->WriteHTML($css, \Mpdf\HTMLParserMode::HEADER_CSS);
+            $mpdf->WriteHTML($rendered, \Mpdf\HTMLParserMode::HTML_BODY);
+
+            // return PDF as a base64 string
+            $pdfString = $mpdf->Output('', \Mpdf\Output\Destination::STRING_RETURN);
+
+            echo json_encode([
+                'success' => true,
+                'pdf_base64' => base64_encode($pdfString)
+            ]);
             exit;
         }
         //Checkt ob es der erste Durchlauf ist. Wenn True wird das erste PDF erzeugt und auf dem Server abgelegt.
