@@ -289,6 +289,7 @@ class ilParticipationCertificateTwigParser
      * @param string    $firstname
      * @param string    $lastname
      * @param int       $userId
+     * @param bool      $printIsAsynchronous
      * @param bool|null $homework
      * @return void
      * @throws CrossReferenceException
@@ -305,6 +306,7 @@ class ilParticipationCertificateTwigParser
         string $firstname,
         string $lastname,
         int $userId,
+        bool $printIsAsynchronous = false,
         ?bool $homework = true
     ): void {
         global $DIC;
@@ -447,7 +449,8 @@ class ilParticipationCertificateTwigParser
             );
             $part_pdf->generatePDF(
                 $this->twig_template->render($arr_render),
-                count($coursesToPrint)
+                count($coursesToPrint),
+                $printIsAsynchronous
             );
         }
     }

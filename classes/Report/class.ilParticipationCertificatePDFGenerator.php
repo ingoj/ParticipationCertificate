@@ -105,6 +105,29 @@ class ilParticipationCertificatePDFGenerator
             $mpdf->WriteHTML($rendered, 2);
             $mpdf->Output($tempFile . '.pdf', 'F');
         } elseif ($printCount == $total_users) {
+
+
+            if ($printIsAsynchronous) {
+                $mpdf->WriteHTML($css, \Mpdf\HTMLParserMode::HEADER_CSS);
+                $mpdf->WriteHTML($rendered, \Mpdf\HTMLParserMode::HTML_BODY);
+
+                $page = $mpdf->SetSourceFile($tempFile . '.pdf');
+                for ($i = 1; $i <= $page; $i++) {
+                    $mpdf->AddPage();
+                    $tplID = $mpdf->ImportPage($i);
+                    $mpdf->UseTemplate($tplID);
+                }
+
+                // return PDF as a base64 string
+                $pdfString = $mpdf->Output('', \Mpdf\Output\Destination::STRING_RETURN);
+
+                echo json_encode([
+                    'success' => true,
+                    'pdf_base64' => base64_encode($pdfString)
+                ]);
+                exit;
+            }
+
             /* Checkt ob es der letzte Durchlauf ist. Wenn ja wird das letzte PDF erzeugt und das vorhandene PDF auf dem Server
 			 wird hinten an das erzeugte PDF angehängt. Anschliessend wird das fertige PDF dem User im Browser als Download angeboten. */
             $mpdf->WriteHTML($css, 1);
