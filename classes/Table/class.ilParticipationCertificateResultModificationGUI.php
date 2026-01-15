@@ -300,7 +300,11 @@ class ilParticipationCertificateResultModificationGUI
             $array
         );
 
-        $twigParser->parseData(false, $this->courseRefId);
+        $twigParser->parseData(
+            false,
+            false,
+            $this->courseRefId
+        );
     }
 
     /**
