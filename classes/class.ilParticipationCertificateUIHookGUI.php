@@ -75,16 +75,6 @@ class ilParticipationCertificateUIHookGUI extends ilUIHookPluginGUI {
 					ilUIPluginRouterGUI::class,
 					ilParticipationCertificateResultGUI::class
 				), ilParticipationCertificateResultGUI::CMD_CONTENT));
-			} else {
-				/**
-				 * @var ilTabsGUI $tabs
-				 */
-				$tabs = $a_par["tabs"];
-				$this->ctrl->saveParameterByClass(ilParticipationCertificateResultGUI::class, 'ref_id');
-				$tabs->addTab(self::TAB_CERTIFICATES, $this->pl->txt('pluginreader'), $this->ctrl->getLinkTargetByClass(array(
-					ilUIPluginRouterGUI::class,
-					ilParticipationCertificateResultGUI::class
-				), ilParticipationCertificateResultGUI::CMD_CONTENT));
 			}
 		}
 	}

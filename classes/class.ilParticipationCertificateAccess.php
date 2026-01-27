@@ -1,14 +1,16 @@
 <?php
 
-use srag\Plugins\UserDefaults\UserSearch\usrdefObj;
-
 class ilParticipationCertificateAccess {
-	protected ilParticipationCertificatePlugin $pl;
-	protected int $group_ref_id;
-	protected ilAccessHandler $access;
-	protected ilObjUser $usr;
-	protected ilDBInterface $db;
 
+	protected ilParticipationCertificatePlugin $pl;
+
+	protected int $group_ref_id;
+
+	protected ilAccessHandler $access;
+
+	protected ilObjUser $usr;
+
+	protected ilDBInterface $db;
 
 	/**
 	 * ilParticipationCertificateAccess constructor.
@@ -53,17 +55,7 @@ class ilParticipationCertificateAccess {
 		if ($this->hasCurrentUserWriteAccess()) {
 			return true;
 		}
-		// find users data for firstname and lastname, return false if length = 0 for at least one
-		$partCertUserdata = new ilPartCertUsersData;
-		$curr_user[] = $this->usr->getId();
-        $userData = $partCertUserdata->getData($this->pl, $curr_user);
 
-		$first = $userData[$curr_user[0]]->getPartCertFirstname();
-		$last = $userData[$curr_user[0]]->getPartCertLastname();
-
-        if (strlen($first ?? '') * strlen($last ?? '') == 0) {
-            return false;
-        }
 		// if user has data, check if selfprint is active (changed to a new function)
 		return ($this->isSelfPrintEnabled());
 	}
@@ -116,7 +108,7 @@ class ilParticipationCertificateAccess {
 				$objecttype = 'grp';
 			}
 			$select = "select obj_members.usr_id from obj_members
-						inner join " . usrdefObj::TABLE_NAME . " as grp_obj on grp_obj.obj_id = obj_members.obj_id and grp_obj.type = '". $objecttype ."'
+						inner join object_data as grp_obj on grp_obj.obj_id = obj_members.obj_id and grp_obj.type = '". $objecttype ."'
 						inner join object_reference as grp_ref on grp_ref.obj_id = obj_members.obj_id
 						where grp_ref.ref_id = " . $this->db->quote($this->group_ref_id, "integer") . " and obj_members.member >= 1";
 			$result = $this->db->query($select);

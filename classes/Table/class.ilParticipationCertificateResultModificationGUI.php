@@ -16,7 +16,7 @@ class ilParticipationCertificateResultModificationGUI
     protected ilCtrl|ilCtrlInterface $ctrl;
     protected ilParticipationCertificatePlugin $pl;
     protected ilToolbarGUI $toolbar;
-    protected int $groupRefId;
+    protected int $courseRefId;
     protected ?ilObject $learnGroup;
     protected array $usr_ids;
     protected mixed $usr_id;
@@ -51,7 +51,11 @@ class ilParticipationCertificateResultModificationGUI
 
     private $dic;
 
-
+    /**
+     * @throws ilCtrlException
+     * @throws ilObjectNotFoundException
+     * @throws ilDatabaseException
+     */
     public function __construct()
     {
         global $DIC;
@@ -63,7 +67,7 @@ class ilParticipationCertificateResultModificationGUI
         $this->tpl = $DIC->ui()->mainTemplate();
         $this->pl = ilParticipationCertificatePlugin::getInstance();
 
-        $this->groupRefId = (int)$_GET['ref_id'];
+        $this->courseRefId = $this->fetchUrlParameter('ref_id', FILTER_SANITIZE_NUMBER_INT);
         $this->learnGroup = ilObjectFactory::getInstanceByRefId($_GET['ref_id']);
         $this->ctrl->saveParameterByClass(ilParticipationCertificateResultModificationGUI::class, ['ref_id', 'group_id']);
         $this->ctrl->saveParameterByClass(ilParticipationCertificateResultModificationGUI::class, 'ementor');
@@ -92,7 +96,9 @@ class ilParticipationCertificateResultModificationGUI
         $this->ctrl->setParameterByClass(ilParticipationCertificateResultModificationGUI::class, 'usr_id', $this->usr_id);
     }
 
-
+    /**
+     * @throws ilCtrlException
+     */
     public function executeCommand(): void
     {
         $nextClass = $this->ctrl->getNextClass();
@@ -116,7 +122,7 @@ class ilParticipationCertificateResultModificationGUI
     {
         global $DIC;
 
-        $cert_access = new ilParticipationCertificateAccess($_GET['ref_id']);
+        $cert_access = new ilParticipationCertificateAccess($this->courseRefId);
         if ($cert_access->hasCurrentUserWriteAccess()) {
             $renderer = $this->dic->ui()->renderer();
             $this->tpl->loadStandardTemplate();
@@ -243,7 +249,7 @@ class ilParticipationCertificateResultModificationGUI
             $array['homework'] = 0;
         }
 
-        $ementor = ilParticipationCertificateConfig::getConfig('enable_ementoring', $this->groupRefId);
+        $ementor = ilParticipationCertificateConfig::getConfig('enable_ementoring', $this->courseRefId);
         if ($ementor === NULL) {
             $ementor = true;
         } else {
@@ -286,8 +292,15 @@ class ilParticipationCertificateResultModificationGUI
             $this->redirectWithError(self::CMD_DISPLAY, $this->pl->txt('user_data_missing'));
         }
 
-        $twigParser = new ilParticipationCertificateTwigParser($this->groupRefId, array(), $usr_id, boolval($data['ementoring'] ?? ''), $edited, $array);
-        $twigParser->parseData();
+        $twigParser = new ilParticipationCertificateTwigParser(
+            $this->courseRefId,
+            $usr_id,
+            boolval($data['ementoring'] ?? ''),
+            $edited,
+            $array
+        );
+
+        $twigParser->parseData(false, $this->courseRefId);
     }
 
     /**
@@ -309,5 +322,10 @@ class ilParticipationCertificateResultModificationGUI
     private function excludeURLParameters(string $parameter): array
     {
         return explode('_', $parameter);
+    }
+
+    protected function fetchUrlParameter(string $param, int $filter): ?int
+    {
+        return filter_input(INPUT_GET, $param, $filter);
     }
 }

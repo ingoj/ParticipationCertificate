@@ -4,7 +4,6 @@
  */
 class ilParticipationCertificateMultipleResultGUI
 {
-
     const CMD_SHOW_ALL_RESULTS = 'show_all_results';
     const CMD_SHOW_SELECTED_ALL_RESULTS = 'show_selected_all_results';
 
@@ -99,7 +98,8 @@ class ilParticipationCertificateMultipleResultGUI
         } else {
             $this->tpl->getStandardTemplate();
         }
-        $this->tpl->addCss($this->pl->getDirectory() . '/templates/css/participation-certificate.css');
+
+        $this->tpl->addCss('./' . ilParticipationCertificatePlugin::PLUGIN_DIRECTORY . '/templates/css/participation-certificate.css');
         $this->initHeader();
 
         $this->initTables();

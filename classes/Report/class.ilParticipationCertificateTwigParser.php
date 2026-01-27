@@ -2,6 +2,10 @@
 
 use Twig\Error\SyntaxError;
 use Twig\Error\LoaderError;
+use setasign\Fpdi\PdfParser\Type\PdfTypeException;
+use setasign\Fpdi\PdfParser\PdfParserException;
+use setasign\Fpdi\PdfParser\CrossReference\CrossReferenceException;
+use Mpdf\MpdfException;
 
 /**
  * Class ilParticipationCertificateTwigParser
@@ -11,27 +15,49 @@ use Twig\Error\LoaderError;
 class ilParticipationCertificateTwigParser
 {
     protected ilParticipationCertificatePlugin $pl;
-    protected int $group_ref_id;
+
+    protected int|array $group_ref_id;
+
     protected array $usr_ids;
+
     protected null|int|array $usr_id;
+
     protected bool $ementor = false;
+
     protected bool $footer = false;
+
     protected bool $edited = false;
+
     protected ?array $array;
+
     public ilTemplate|ilGlobalTemplateInterface $tpl;
 
     protected \Twig\TemplateWrapper $twig_template;
 
-    public function __construct(int $group_ref_id, array $twig_options, array $usr_id = null, bool $ementor = true, bool $edited = false, array|null $array = null)
-    {
+    public function __construct(
+        ?int $group_ref_id = null,
+        array $usr_id = null,
+        bool $ementor = true,
+        bool $edited = false,
+        array|null $array = null,
+        bool $selfPrint = false
+    ) {
         global $DIC;
         $this->pl = ilParticipationCertificatePlugin::getInstance();
         $this->tpl = $DIC->ui()->mainTemplate();
-        $this->group_ref_id = $group_ref_id;
 
-        $cert_access = new ilParticipationCertificateAccess($group_ref_id);
+        if (is_int($group_ref_id)) {
+            $this->group_ref_id = $group_ref_id;
+            $cert_access = new ilParticipationCertificateAccess($group_ref_id);
+            if (!$selfPrint) {
+                $this->usr_ids = $cert_access->getUserIdsOfGroup();
+            }
+        }
 
-        $this->usr_ids = $cert_access->getUserIdsOfGroup();
+        if ($selfPrint) {
+            $this->usr_ids = $usr_id;
+        }
+
         $this->usr_id = $usr_id;
 
         if (empty($this->usr_id)) {
@@ -77,54 +103,68 @@ class ilParticipationCertificateTwigParser
     }
 
     /**
+     * @param bool        $selfPrint
+     * @param int|null    $courseRefId
+     * @param bool|null   $suggestedCourses
+     * @param bool|null   $additionalOffer
+     * @param bool|null   $initialTest
+     * @param bool|null   $homework
+     * @param string|null $firstname
+     * @param string|null $lastname
      * @return void
+     * @throws CrossReferenceException
      * @throws LoaderError
+     * @throws MpdfException
+     * @throws PdfParserException
+     * @throws PdfTypeException
      * @throws SyntaxError
      * @throws arException
+     * @throws ilDatabaseException
      * @throws ilDateTimeException
+     * @throws ilObjectNotFoundException
      */
-    public function parseData(): void
-    {
-        $cert_configs = new ilParticipationCertificateConfigs();
-        $arr_config = $cert_configs->getObjConfigSetIfNoneCreateDefaultAndCreateNewObjConfigValues($this->group_ref_id);
+    public function parseData(
+        bool $selfPrint = false,
+        ?int $courseRefId = null,
+        ?bool $suggestedCourses = true,
+        ?bool $additionalOffer = true,
+        ?bool $initialTest = true,
+        ?bool $homework = true,
+        ?string $firstname = null,
+        ?string $lastname = null
+    ): void {
+        $certConfigs = new ilParticipationCertificateConfigs();
+        $objConfig = $certConfigs->getObjConfigSetIfNoneCreateDefaultAndCreateNewObjConfigValues($this->group_ref_id);
 
-        $global_config_sets = new ilParticipationCertificateGlobalConfigSets();
-        if (count($arr_config) > 0) {
-            $global_config_id = reset($arr_config)->getGlobalConfigId();
+        if (count($objConfig) > 0) {
+            $globalConfigId = reset($objConfig)->getGlobalConfigId();
         }
 
-        $arr_config_text = [];
-        foreach ($arr_config as $config) {
-            $arr_config_text[$config->getConfigKey()] = $config->getConfigValue();
-        }
-
-        if (count($arr_config) > 0) {
-            $global_config_id = reset($arr_config)->getGlobalConfigId();
-        }
+        $configText = $this->getConfigTexts($objConfig);
 
         $this->tpl->setOnScreenMessage('success', $this->pl->txt('print_done'), true);
 
-        $refId = (int) $_GET['ref_id'];
-        $arr_new_iass_states = ilIassStatesMulti::getData($this->usr_ids, $refId);
-        $arr_xali_states = xaliStates::getData($this->usr_ids, $refId);
+        $refId = $this->group_ref_id;
 
-        $arr_usr_data = ilPartCertUsersData::getData($this->pl, $this->usr_ids);
-        $arr_lo_master_crs = ilLearningObjectivesMasterCrs::getData(ilObject::_lookupObjectId($refId), $this->usr_ids);
+        $groupRefId = ParticipationCertificateHelper::getGroupRefId($courseRefId);
+        $newIassStates = ilIassStatesMulti::getData($this->usr_ids, (int) $groupRefId);
+        $xaliStates = xaliStates::getData($this->usr_ids, $refId);
+        $userData = ilPartCertUsersData::getData($this->pl, $this->usr_ids);
+        $loMasterCourse = ilLearningObjectivesMasterCrs::getData(ilObject::_lookupObjectId($refId), $this->usr_ids);
 
+        if (!empty($firstname) && !empty($lastname)) {
+            $this->setUserData($userData, $firstname, $lastname);
+        }
 
-        $arr_initial_test_states = ilCrsInitialTestStates::getData($this->usr_ids);
-        $arr_excercise_states = ilExcerciseStates::getData($this->usr_ids, $this->group_ref_id);
-        $arr_iass_states = ilIassStates::getData($this->usr_ids);
-        $arr_learn_sugg_results = ilLearnObjectSuggResults::getData($this->usr_ids);
+        $initialTestStates = ilCrsInitialTestStates::getData($this->usr_ids);
+        $excerciseStates = ilExcerciseStates::getData($this->usr_ids, $this->group_ref_id);
+        $learnSuggResults = ilLearnObjectSuggResults::getData($this->usr_ids);
 
-        $date = new ilDate(time(), IL_CAL_UNIX);
+        $partPdf = new ilParticipationCertificatePDFGenerator();
 
-        $part_pdf = new ilParticipationCertificatePDFGenerator();
-
-
-        $logo_path = '';
+        $logoPath = '';
         $logoIsSavedInResourceStorage = false;
-        if (is_numeric($global_config_id)) {
+        if (is_numeric($globalConfigId)) {
             $isFile = is_file(ilParticipationCertificateConfig::returnPicturePath('absolute', $refId, ilParticipationCertificateConfig::LOGO_FILE_NAME));
 
             $file = ilParticipationCertificateFiles::getFile(
@@ -133,7 +173,7 @@ class ilParticipationCertificateTwigParser
             );
 
             if ($isFile && !empty($file) && !$file->getResourceStorage()) {
-                $logo_path = ilParticipationCertificateConfig::returnPicturePath('absolute', $refId, ilParticipationCertificateConfig::LOGO_FILE_NAME);
+                $logoPath = ilParticipationCertificateConfig::returnPicturePath('absolute', $refId, ilParticipationCertificateConfig::LOGO_FILE_NAME);
             } else if(!empty($file) && $file->getResourceStorage()) {
                 $logoIsSavedInResourceStorage = true;
             }
@@ -144,15 +184,15 @@ class ilParticipationCertificateTwigParser
             );
 
             if (!empty($file) && !$file->getResourceStorage() && is_file(ilParticipationCertificateConfig::returnPicturePath('absolute', $this->group_ref_id, ilParticipationCertificateConfig::LOGO_FILE_NAME))) {
-                $logo_path = ilParticipationCertificateConfig::returnPicturePath('absolute', $this->group_ref_id, ilParticipationCertificateConfig::LOGO_FILE_NAME);
+                $logoPath = ilParticipationCertificateConfig::returnPicturePath('absolute', $this->group_ref_id, ilParticipationCertificateConfig::LOGO_FILE_NAME);
             } elseif (!empty($file) && $file->getResourceStorage()) {
                 $logoIsSavedInResourceStorage = true;
             }
         }
 
-        $page1_issuer_signature = '';
+        $page1IssuerSignature = '';
         $signatureIsSavedInResourceStorage = false;
-        if (is_numeric($global_config_id)) {
+        if (is_numeric($globalConfigId)) {
             $isFile = is_file(ilParticipationCertificateConfig::returnPicturePath('absolute', $refId, ilParticipationCertificateConfig::ISSUER_SIGNATURE_FILE_NAME));
 
             $file = ilParticipationCertificateFiles::getFile(
@@ -161,7 +201,7 @@ class ilParticipationCertificateTwigParser
             );
 
             if ($isFile && !empty($file) && !$file->getResourceStorage()) {
-                $page1_issuer_signature = ilParticipationCertificateConfig::returnPicturePath('absolute', $refId, ilParticipationCertificateConfig::ISSUER_SIGNATURE_FILE_NAME);
+                $page1IssuerSignature = ilParticipationCertificateConfig::returnPicturePath('absolute', $refId, ilParticipationCertificateConfig::ISSUER_SIGNATURE_FILE_NAME);
 
             } else if(!empty($file) && $file->getResourceStorage()) {
                 $signatureIsSavedInResourceStorage = true;
@@ -173,151 +213,504 @@ class ilParticipationCertificateTwigParser
             );
 
             if (!empty($file) && !$file->getResourceStorage() && is_file(ilParticipationCertificateConfig::returnPicturePath('absolute', $this->group_ref_id, ilParticipationCertificateConfig::ISSUER_SIGNATURE_FILE_NAME))) {
-                $page1_issuer_signature = ilParticipationCertificateConfig::returnPicturePath('absolute', $this->group_ref_id, ilParticipationCertificateConfig::ISSUER_SIGNATURE_FILE_NAME);
+                $page1IssuerSignature = ilParticipationCertificateConfig::returnPicturePath('absolute', $this->group_ref_id, ilParticipationCertificateConfig::ISSUER_SIGNATURE_FILE_NAME);
             } elseif (!empty($file) && $file->getResourceStorage()) {
                 $signatureIsSavedInResourceStorage = true;
             }
         }
 
-        $this->usr_id = $this->excludeUsersFromPrintIfMissingUserData($this->usr_id);
+        if (!$selfPrint) {
+            $this->usr_id = $this->excludeUsersFromPrintIfMissingUserData($this->usr_id);
+        }
 
         foreach ($this->usr_id as $usr_id) {
-            $percentage = 0;
+            $countIndividualAssessments = 0;
+            $countCompletedIndividualAssessments = 0;
 
-            //quickfix, wenn man user auswählt kann es sein, das $usr_id ein array bleibt. Das führt weiter unten zum crash. So wird das array aufgelöst.
-            if (is_array($usr_id)) {
-                $usr_id = $usr_id[0];
-            }
-            $processed_arr_text_values = $arr_config_text;
-
-            //Preprocess text values
-            foreach ($arr_config_text as $key => $value) {
-                $twig = new Twig\Environment(new Twig\Loader\ArrayLoader());
-
-                // Twig use the placeholders {{ }}, but plugins the  [[ ]]
-                $value = $this->preparePlaceholdersForTwig($value);
-
-                $template = $twig->createTemplate((string) $value);
-
-                $peparsed_value = $template->render([
-                    'username' => ($arr_usr_data[$usr_id]->getPartCertSalutation() ?
-                            $arr_usr_data[$usr_id]->getPartCertSalutation() . ' ' : '') .
-                        $arr_usr_data[$usr_id]->getPartCertFirstname() . ' ' .
-                        $arr_usr_data[$usr_id]->getPartCertLastname(),
-                    'date' => $date->get(IL_CAL_FKT_DATE, 'd.m.Y')
-                ]);
-
-                $processed_arr_text_values[$key] = $peparsed_value;
+            if (!empty($newIassStates[$usr_id])) {
+                $individualAssessmentsUser = $newIassStates[$usr_id];
+                $countIndividualAssessments = count((array) $individualAssessmentsUser);
+                $countCompletedIndividualAssessments = $this->getCompletedIndividualAssessments((array) $individualAssessmentsUser);
             }
 
-            //Learning Objective Master Course
-            $arr_usr_lo_master_crs = array();
-            if (is_array($arr_lo_master_crs) && array_key_exists($usr_id, $arr_lo_master_crs) && is_array($arr_lo_master_crs[$usr_id])) {
-                $arr_usr_lo_master_crs = $arr_lo_master_crs[$usr_id];
+            $sessions = ParticipationCertificateHelper::getSessions((int) $groupRefId);
+            $countSessions = count($sessions);
+            $countAttendedSessions = 0;
+            foreach ($sessions as $session) {
+                $eventParticipants = new ilEventParticipants($session['obj_id']);
+                if($eventParticipants->hasParticipated($usr_id)) {
+                    $countAttendedSessions++;
+                }
             }
-            if ($this->edited) {
-                $initial_test_state = $this->array[0];
-                $learn_sugg_result = $this->array[1];
-                $iass_state = $this->array[2];
-                $excercise_percentage = $this->array[3];
+
+
+            $arr_render = $this->fetchDataCertificate(
+                $usr_id,
+                $refId,
+                $this->ementor,
+                $configText,
+                $userData,
+                $loMasterCourse,
+                $initialTestStates,
+                $learnSuggResults,
+                $excerciseStates,
+                $newIassStates,
+                $xaliStates,
+                $logoIsSavedInResourceStorage,
+                $signatureIsSavedInResourceStorage,
+                $selfPrint,
+                $certConfigs->returnPercentValue($this->group_ref_id),
+                $logoPath,
+                $page1IssuerSignature,
+                $suggestedCourses,
+                $additionalOffer,
+                $initialTest,
+                $homework,
+                $firstname,
+                $lastname,
+                $countIndividualAssessments,
+                $countCompletedIndividualAssessments,
+                $countSessions,
+                $countAttendedSessions
+            );
+
+            $partPdf->generatePDF($this->twig_template->render($arr_render), count($this->usr_id));
+        }
+    }
+
+    /**
+     * @param array     $coursesToPrint
+     * @param string    $firstname
+     * @param string    $lastname
+     * @param int       $userId
+     * @param bool|null $homework
+     * @return void
+     * @throws CrossReferenceException
+     * @throws LoaderError
+     * @throws MpdfException
+     * @throws PdfParserException
+     * @throws PdfTypeException
+     * @throws SyntaxError
+     * @throws arException
+     * @throws ilDateTimeException
+     */
+    public function parseDataMultipleCourses(
+        array $coursesToPrint,
+        string $firstname,
+        string $lastname,
+        int $userId,
+        ?bool $homework = true
+    ): void {
+        global $DIC;
+
+        $tree = $DIC->repositoryTree();
+        $part_pdf = new ilParticipationCertificatePDFGenerator();
+        foreach ( $coursesToPrint as $courseObj ) {
+            $containerRefId = $tree->getParentId($courseObj['ref_id']);
+
+            $countIndividualAssessments = 0;
+            $countCompletedIndividualAssessments = 0;
+            $countSessions = 0;
+            $countAttendedSessions = 0;
+            if ($containerRefId !== null) {
+                $newIassStates = ilIassStatesMulti::getData($this->usr_ids, $courseObj['group_id']);
+                $individualAssessmentsUser = $newIassStates[$userId];
+                $countIndividualAssessments = count(array_keys((array) $individualAssessmentsUser));
+                $countCompletedIndividualAssessments = $this->getCompletedIndividualAssessments((array) $individualAssessmentsUser);
+
+                $sessions = ParticipationCertificateHelper::getSessions($courseObj['group_id']);
+                $countSessions = count(array_keys($sessions));
+
+                foreach ($sessions as $session) {
+                    $eventParticipants = new ilEventParticipants($session['obj_id']);
+                    if($eventParticipants->hasParticipated($userId)) {
+                        $countAttendedSessions++;
+                    }
+                }
+
+            }
+
+            $certConfigs = new ilParticipationCertificateConfigs();
+            $objConfig = $certConfigs->getObjConfigSetIfNoneCreateDefaultAndCreateNewObjConfigValues($courseObj['ref_id']);
+
+            if (count($objConfig) > 0) {
+                $globalConfigId = reset($objConfig)->getGlobalConfigId();
+            }
+
+            $configTexts = $this->getConfigTexts($objConfig);
+
+            $this->tpl->setOnScreenMessage('success', $this->pl->txt('print_done'), true);
+
+            $newIassStates = ilIassStatesMulti::getData($this->usr_ids, $courseObj['ref_id']);
+            $xaliStates = xaliStates::getData($this->usr_ids, $courseObj['ref_id']);
+
+            $userData = ilPartCertUsersData::getData($this->pl, $this->usr_ids);
+            $loMasterCourse = ilLearningObjectivesMasterCrs::getData(ilObject::_lookupObjectId($courseObj['ref_id']), $this->usr_ids);
+
+            $this->setUserData($userData, $firstname, $lastname);
+
+            $initialTestStates = ilCrsInitialTestStates::getData($this->usr_ids);
+            $excerciseStates = ilExcerciseStates::getData($this->usr_ids, $courseObj['ref_id']);
+            $learnSugestionResults = ilLearnObjectSuggResults::getData($this->usr_ids);
+
+            $logoPath = '';
+            $logoIsSavedInResourceStorage = false;
+            if (is_numeric($globalConfigId)) {
+                $isFile = is_file(ilParticipationCertificateConfig::returnPicturePath('absolute', $courseObj['ref_id'], ilParticipationCertificateConfig::LOGO_FILE_NAME));
+
+                $file = ilParticipationCertificateFiles::getFile(
+                    $courseObj['ref_id'],
+                    'logo'
+                );
+
+                if ($isFile && !empty($file) && !$file->getResourceStorage()) {
+                    $logoPath = ilParticipationCertificateConfig::returnPicturePath('absolute', $courseObj['ref_id'], ilParticipationCertificateConfig::LOGO_FILE_NAME);
+                } else if(!empty($file) && $file->getResourceStorage()) {
+                    $logoIsSavedInResourceStorage = true;
+                }
             } else {
+                $file = ilParticipationCertificateFiles::getFile(
+                    $courseObj['ref_id'],
+                    'logo'
+                );
 
-                //Initial Test
-                $initial_test_state = 0;
-                if (key_exists($usr_id, $arr_initial_test_states) && is_object($arr_initial_test_states[$usr_id])) {
-                    $initial_test_state = $arr_initial_test_states[$usr_id]->getCrsitestItestSubmitted();
-                }
-                //Percentage final tests of suggested modules
-                $learn_sugg_result = 0;
-                if (key_exists($usr_id, $arr_learn_sugg_results) && is_object($arr_learn_sugg_results[$usr_id])) {
-                    $learn_sugg_result = $arr_learn_sugg_results[$usr_id]->getAveragePercentage(ilParticipationCertificateConfig::getConfig('calculation_type_processing_state_suggested_objectives', $_GET['ref_id']), true);
-                }
-                //Home Work
-                $excercise_percentage = 0;
-                if (key_exists($usr_id, $arr_excercise_states) && is_object($arr_excercise_states[$usr_id])) {
-                    $excercise_percentage = $arr_excercise_states[$usr_id]->getPassedPercentage();
+                if (!empty($file) && !$file->getResourceStorage() && is_file(ilParticipationCertificateConfig::returnPicturePath('absolute', $courseObj['ref_id'], ilParticipationCertificateConfig::LOGO_FILE_NAME))) {
+                    $logoPath = ilParticipationCertificateConfig::returnPicturePath('absolute', $courseObj['ref_id'], ilParticipationCertificateConfig::LOGO_FILE_NAME);
+                } elseif (!empty($file) && $file->getResourceStorage()) {
+                    $logoIsSavedInResourceStorage = true;
                 }
             }
 
-            /*Video Conferences */
-            $countPassed = 0;
-            $countTests = 0;
-            if (key_exists($usr_id, $arr_new_iass_states) && is_array($arr_new_iass_states[$usr_id])) {
-                foreach ($arr_new_iass_states[$usr_id] as $item) {
-                    $countPassed = $countPassed + $item->getPassed();
-                    $countTests = $countTests + $item->getTotal();
-                }
-            }
+            $page1IssuerSignature = '';
+            $signatureIsSavedInResourceStorage = false;
+            if (is_numeric($globalConfigId)) {
+                $isFile = is_file(ilParticipationCertificateConfig::returnPicturePath('absolute', $courseObj['ref_id'], ilParticipationCertificateConfig::ISSUER_SIGNATURE_FILE_NAME));
 
-            if (key_exists($usr_id, $arr_xali_states) && is_object($arr_xali_states[$usr_id])) {
-                $countPassed = $countPassed + $arr_xali_states[$usr_id]->getPassed();
-                $countTests = $countTests + $arr_xali_states[$usr_id]->getTotal();
-            }
-
-            if ($countTests > 0) {
-                $percentage = $countPassed / $countTests * 100;
-
-                switch ($countTests) {
-                    case 1:
-                        if ($countPassed == 1) {
-                            $iass_states = "<img alt='' src=" . ILIAS_ABSOLUTE_PATH . "/" . $this->pl->getImagePath("passed_s.png") . ">";
-                        } else {
-                            $iass_states = "<img alt='' src=" . ILIAS_ABSOLUTE_PATH . "/" . $this->pl->getImagePath("failed_s.png") . ">";
-                        }
-                        break;
-                    default:
-                        $iass_states = $countPassed . "/" . $countTests;
-                        break;
-                }
-            } else {
-                $iass_states = "<img alt='' src=" . ILIAS_ABSOLUTE_PATH . "/" . $this->pl->getImagePath("not_attempted_s.png") . ">";
-            }
-
-
-            if ($logoIsSavedInResourceStorage) {
-
-                if(!empty($processed_arr_text_values['logo'])) {
-                    $file = new ilParticipationCertificateFiles();
-                    $src = $file->getFileSrcByStorageType(
-                        $processed_arr_text_values['logo'],
-                        $this->group_ref_id,
-                        'logo'
-                    );
-
-                    $logo_path = $src;
-                }
-
-            }
-
-            if ($signatureIsSavedInResourceStorage && !empty($processed_arr_text_values['page1_issuer_signature'])) {
-                $file = new ilParticipationCertificateFiles();
-                $src = $file->getFileSrcByStorageType(
-                    $processed_arr_text_values['page1_issuer_signature'],
-                    $this->group_ref_id,
+                $file = ilParticipationCertificateFiles::getFile(
+                    $courseObj['ref_id'],
                     'page1_issuer_signature'
                 );
 
-                $page1_issuer_signature = $src;
+                if ($isFile && !empty($file) && !$file->getResourceStorage()) {
+                    $page1IssuerSignature = ilParticipationCertificateConfig::returnPicturePath('absolute', $courseObj['ref_id'], ilParticipationCertificateConfig::ISSUER_SIGNATURE_FILE_NAME);
+
+                } else if(!empty($file) && $file->getResourceStorage()) {
+                    $signatureIsSavedInResourceStorage = true;
+                }
+            } else {
+                $file = ilParticipationCertificateFiles::getFile(
+                    $courseObj['ref_id'],
+                    'page1_issuer_signature'
+                );
+
+                if (!empty($file) && !$file->getResourceStorage() && is_file(ilParticipationCertificateConfig::returnPicturePath('absolute', $courseObj['ref_id'], ilParticipationCertificateConfig::ISSUER_SIGNATURE_FILE_NAME))) {
+                    $page1IssuerSignature = ilParticipationCertificateConfig::returnPicturePath('absolute', $courseObj['ref_id'], ilParticipationCertificateConfig::ISSUER_SIGNATURE_FILE_NAME);
+                } elseif (!empty($file) && $file->getResourceStorage()) {
+                    $signatureIsSavedInResourceStorage = true;
+                }
             }
 
-            $arr_render = array(
-                'text_values' => $processed_arr_text_values,
-                'show_ementoring' => $this->ementor,
-                'show_footer' => $this->footer,
-                'arr_lo_master_crs' => $arr_usr_lo_master_crs,
-                'crsitest_itest_submitted' => $initial_test_state,
-                'learn_sugg_reached_percentage' => $learn_sugg_result,
-                'iass_state' => $percentage,
-                'iass_states' => $iass_states,
-                'excercise_percentage' => $excercise_percentage,
-                'logo_path' => $logo_path,
-                'page1_issuer_signature' => $page1_issuer_signature,
-                'standard_value' => $cert_configs->returnPercentValue($this->group_ref_id)
+            $arr_render = $this->fetchDataCertificate(
+                $this->usr_id[0],
+                $courseObj['ref_id'],
+                $this->ementor,
+                $configTexts,
+                $userData,
+                $loMasterCourse,
+                $initialTestStates,
+                $learnSugestionResults,
+                $excerciseStates,
+                $newIassStates,
+                $xaliStates,
+                $logoIsSavedInResourceStorage,
+                $signatureIsSavedInResourceStorage,
+                true,
+                $certConfigs->returnPercentValue($courseObj['ref_id']),
+                $logoPath,
+                $page1IssuerSignature,
+                $courseObj['suggested_courses'] ?? false,
+                $courseObj['additional_offer'] ?? false,
+                $courseObj['entry_test'] ?? false,
+                $homework,
+                $firstname,
+                $lastname,
+                $countIndividualAssessments,
+                $countCompletedIndividualAssessments,
+                $countSessions,
+                $countAttendedSessions
+            );
+            $part_pdf->generatePDF($this->twig_template->render($arr_render), count($coursesToPrint));
+        }
+    }
+
+    /**
+     * @param array $individualAssessmentsUser
+     * @return int
+     */
+    private function getCompletedIndividualAssessments(array $individualAssessmentsUser): int
+    {
+        $count = 0;
+        foreach ($individualAssessmentsUser as $assessmentUser) {
+            if ($assessmentUser->getPassed() === 1) {
+                $count++;
+            }
+        }
+        return $count;
+    }
+
+    /**
+     * @param $objConfig
+     * @return array
+     */
+    private function getConfigTexts($objConfig): array
+    {
+        $configTexts = [];
+        foreach ($objConfig as $config) {
+            $configTexts[$config->getConfigKey()] = $config->getConfigValue();
+        }
+        return $configTexts;
+    }
+
+    /**
+     * @param array  $userData
+     * @param string $firstname
+     * @param string $lastname
+     * @return void
+     */
+    private function setUserData(
+        array $userData,
+        string $firstname,
+        string $lastname
+    ): void {
+        foreach ($userData as $data) {
+            if(empty($data->getPartCertFirstname())) {
+                $data->setPartCertFirstname($firstname);
+            }
+
+            if(empty($data->getPartCertLastname())) {
+                $data->setPartCertLastname($lastname);
+            }
+        }
+    }
+
+    /**
+     * @param             $userId
+     * @param             $refId
+     * @param             $eMentoring
+     * @param             $configTexts
+     * @param             $userData
+     * @param             $loMasterCourse
+     * @param             $initialTestStates
+     * @param             $learnSuggestionResults
+     * @param             $excerciseStates
+     * @param             $newIassStates
+     * @param             $xaliStates
+     * @param             $logoIsSavedInResourceStorage
+     * @param             $signatureIsSavedInResourceStorage
+     * @param             $selfPrint
+     * @param             $certConfigValue
+     * @param             $logoPath
+     * @param             $page1IssuerSignature
+     * @param             $suggestedCourses
+     * @param             $additionalOffer
+     * @param             $initialTest
+     * @param bool        $homework
+     * @param string|null $firstname
+     * @param string|null $lastname
+     * @param int|null    $countIndividualAssessments
+     * @param int|null    $countCompletedIndividualAssessments
+     * @param int|null    $countSessions
+     * @param int|null    $countAttendedSessions
+     * @return array
+     * @throws LoaderError
+     * @throws SyntaxError
+     * @throws ilDateTimeException
+     */
+    private function fetchDataCertificate(
+        int $userId,
+        int $refId,
+        bool $eMentoring,
+        array $configTexts,
+        array $userData,
+        array $loMasterCourse,
+        array $initialTestStates,
+        array $learnSuggestionResults,
+        array $excerciseStates,
+        array $newIassStates,
+        array $xaliStates,
+        bool $logoIsSavedInResourceStorage,
+        bool $signatureIsSavedInResourceStorage,
+        bool $selfPrint,
+        string $certConfigValue,
+        string $logoPath,
+        string $page1IssuerSignature,
+        bool $suggestedCourses,
+        bool $additionalOffer,
+        bool $initialTest,
+        ?bool $homework = true,
+        ?string $firstname = null,
+        ?string $lastname = null,
+        ?int $countIndividualAssessments = null,
+        ?int $countCompletedIndividualAssessments = null,
+        ?int $countSessions = null,
+        ?int $countAttendedSessions = null
+    ): array {
+        $date = new ilDate(time(), IL_CAL_UNIX);
+        $percentage = 0;
+
+        //quickfix, wenn man user auswählt kann es sein, das $usr_id ein array bleibt. Das führt weiter unten zum crash. So wird das array aufgelöst.
+        if (is_array($userId)) {
+            $userId = $userId[0];
+        }
+        $processedTextValues = $configTexts;
+
+        //Preprocess text values
+        foreach ($configTexts as $key => $value) {
+            $twig = new Twig\Environment(new Twig\Loader\ArrayLoader());
+
+            // Twig use the placeholders {{ }}, but plugins the  [[ ]]
+            $value = $this->preparePlaceholdersForTwig($value);
+
+            $template = $twig->createTemplate((string) $value);
+
+            $peparsedValue = $template->render([
+                'username' => ($userData[$userId]->getPartCertSalutation() ?
+                        $userData[$userId]->getPartCertSalutation() . ' ' : '') .
+                    ($firstname ?? $userData[$userId]->getPartCertFirstname()) . ' ' .
+                    ($lastname ?? $userData[$userId]->getPartCertLastname()),
+                'date' => $date->get(IL_CAL_FKT_DATE, 'd.m.Y')
+            ]);
+
+            $processedTextValues[$key] = $peparsedValue;
+        }
+
+        //Learning Objective Master Course
+        $useLoMasterCourse = array();
+        if (is_array($loMasterCourse) && array_key_exists($userId, $loMasterCourse) && is_array($loMasterCourse[$userId])) {
+            $useLoMasterCourse = $loMasterCourse[$userId];
+        }
+        if ($this->edited) {
+            $initialTestState = $this->array[0];
+            $learnSuggestResults = $this->array[1];
+            $iassState = $this->array[2];
+            $excercisePercentage = $this->array[3];
+        } else {
+
+            //Initial Test
+            $initialTestState = 0;
+            if (key_exists($userId, $initialTestStates) && is_object($initialTestStates[$userId])) {
+                $initialTestState = $initialTestStates[$userId]->getCrsitestItestSubmitted();
+            }
+            //Percentage final tests of suggested modules
+            $learnSuggestResults = 0;
+            if (key_exists($userId, $learnSuggestionResults) && is_object($learnSuggestionResults[$userId])) {
+                $learnSuggestResults = $learnSuggestionResults[$userId]->getAveragePercentage(ilParticipationCertificateConfig::getConfig('calculation_type_processing_state_suggested_objectives', $refId), true);
+            }
+            //Home Work
+            $excercisePercentage = 0;
+            if (key_exists($userId, $excerciseStates) && is_object($excerciseStates[$userId])) {
+                $excercisePercentage = $excerciseStates[$userId]->getPassedPercentage();
+            }
+        }
+
+        /*Video Conferences */
+        $countPassed = 0;
+        $countTests = 0;
+        if (key_exists($userId, $newIassStates) && is_array($newIassStates[$userId])) {
+            foreach ($newIassStates[$userId] as $item) {
+                $countPassed = $countPassed + $item->getPassed();
+                $countTests = $countTests + $item->getTotal();
+            }
+        }
+
+        if (key_exists($userId, $xaliStates) && is_object($xaliStates[$userId])) {
+            $countPassed = $countPassed + $xaliStates[$userId]->getPassed();
+            $countTests = $countTests + $xaliStates[$userId]->getTotal();
+        }
+
+        if ($countTests > 0) {
+            $percentage = $countPassed / $countTests * 100;
+
+            switch ($countTests) {
+                case 1:
+                    if ($countPassed == 1) {
+                        $iassStates = "<img alt='' src=" . ILIAS_ABSOLUTE_PATH . "/" . $this->pl->getImagePath("passed_s.png") . ">";
+                    } else {
+                        $iassStates = "<img alt='' src=" . ILIAS_ABSOLUTE_PATH . "/" . $this->pl->getImagePath("failed_s.png") . ">";
+                    }
+                    break;
+                default:
+                    $iassStates = $countPassed . "/" . $countTests;
+                    break;
+            }
+        } else {
+            $iassStates = "<img alt='' src=" . ILIAS_ABSOLUTE_PATH . "/" . $this->pl->getImagePath("not_attempted_s.png") . ">";
+        }
+
+        if ($logoIsSavedInResourceStorage) {
+            if(!empty($processedTextValues['logo'])) {
+                $file = new ilParticipationCertificateFiles();
+                $src = $file->getFileSrcByStorageType(
+                    $processedTextValues['logo'],
+                    $refId,
+                    'logo'
+                );
+
+                $logoPath = $src;
+            }
+
+        }
+
+        if ($signatureIsSavedInResourceStorage && !empty($processedTextValues['page1_issuer_signature'])) {
+            $file = new ilParticipationCertificateFiles();
+            $src = $file->getFileSrcByStorageType(
+                $processedTextValues['page1_issuer_signature'],
+                $refId,
+                'page1_issuer_signature'
             );
 
-            $part_pdf->generatePDF($this->twig_template->render($arr_render), count($this->usr_id));
+            $page1IssuerSignature = $src;
         }
-        
+
+        if (!$selfPrint) {
+            $suggestedCourses = true;
+            $additionalOffer = true;
+            $initialTest = true;
+        }
+
+        if ($eMentoring) {
+            $eMentoring = (bool) ilParticipationCertificateConfig::getConfig('enable_ementoring', $refId);
+        }
+
+        $data = [
+            'text_values' => $processedTextValues,
+            'show_ementoring' => $eMentoring,
+            'show_footer' => $this->footer,
+            'arr_lo_master_crs' => $useLoMasterCourse,
+            'crsitest_itest_submitted' => $initialTestState,
+            'learn_sugg_reached_percentage' => $learnSuggestResults,
+            'iass_state' => $percentage,
+            'iass_states' => $iassStates,
+            'excercise_percentage' => $excercisePercentage,
+            'logo_path' => $logoPath,
+            'page1_issuer_signature' => $page1IssuerSignature,
+            'standard_value' => $certConfigValue,
+            'individual_assessments_heading' => $this->pl->txt('individual_assessments_heading'),
+            'individual_assessments' => [
+                'label' => $this->pl->txt('individual_assessments'),
+                'value' => $countCompletedIndividualAssessments . '/' . $countIndividualAssessments
+            ],
+            'sessions' => [
+                'label' => $this->pl->txt('sessions'),
+                'value' => $countAttendedSessions . '/' . $countSessions
+            ],
+            'homework' => $homework,
+            'suggested_courses' => $suggestedCourses,
+            'additional_offer' => $additionalOffer,
+            'initial_test' => $initialTest
+        ];
+
+        return $data;
     }
 
     /**

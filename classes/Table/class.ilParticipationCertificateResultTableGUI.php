@@ -13,6 +13,7 @@ use ILIAS\UI\Component\Input\Container\Filter\Standard;
 /**
  * Class ilParticipationCertificateResultTableNewGUI
  */
+#[AllowDynamicProperties]
 class ilParticipationCertificateResultTableGUI implements I\DataRetrieval
 {
     CONST IDENTIFIER = 'ilpartusr';
@@ -20,6 +21,8 @@ class ilParticipationCertificateResultTableGUI implements I\DataRetrieval
     const ORANGE_PROGRESS = "progress-bar-warning";
     const RED_PROGRESS = "ilCourseObjectiveProgressBarFailed";
     const NO_PROGRESS = "ilCourseObjectiveProgressBarNeutral";
+
+    private ilParticipationCertificateAccess $cert_access;
 
     protected Factory $df;
     protected DateFormat $current_user_date_format;
@@ -387,9 +390,9 @@ class ilParticipationCertificateResultTableGUI implements I\DataRetrieval
                 switch ($countTests) {
                     case 1:
                         if ($countPassed == 1) {
-                            $row['eMentoring_finished'] = ilUtil::img($this->pl->getImagePath("passed.svg"));
+                            $row['eMentoring_finished'] = ilUtil::img("./" . ilParticipationCertificatePlugin::PLUGIN_DIRECTORY . "/templates/images/passed.svg");
                         } else {
-                            $row['eMentoring_finished'] = ilUtil::img($this->pl->getImagePath("failed.svg"));
+                            $row['eMentoring_finished'] = ilUtil::img("./" . ilParticipationCertificatePlugin::PLUGIN_DIRECTORY . "/templates/images/failed.svg");
                         }
                         break;
                     default:
@@ -397,7 +400,7 @@ class ilParticipationCertificateResultTableGUI implements I\DataRetrieval
                         break;
                 }
             } else {
-                $row['eMentoring_finished'] = ilUtil::img($this->pl->getImagePath("not_attempted.svg"));
+                $row['eMentoring_finished'] = ilUtil::img("./" . ilParticipationCertificatePlugin::PLUGIN_DIRECTORY . "/templates/images/not_attempted.svg");
             }
 
             if (key_exists($usr_id, $arr_excercise_states) && is_object($arr_excercise_states[$usr_id])) {
@@ -545,11 +548,19 @@ class ilParticipationCertificateResultTableGUI implements I\DataRetrieval
                             } else {
                                 // Not in time
                                 $css_class = self::RED_PROGRESS;
+
+                                if ($a_perc_result === 0) {
+                                    $css_class .= ' percent-0';
+                                }
                             }
                         }
                     } else {
                         // End reached
                         $css_class = self::RED_PROGRESS;
+
+                        if ($a_perc_result === 0) {
+                            $css_class .= ' percent-0';
+                        }
                     }
                 }
 
@@ -578,6 +589,11 @@ class ilParticipationCertificateResultTableGUI implements I\DataRetrieval
                 }
             }
         }
+
+        if (is_float($perc_limit)) {
+            $perc_limit = (int) round($perc_limit);
+        }
+
         return ilContainerObjectiveGUI::renderProgressBar($a_perc_result, $perc_limit, $css_class);
     }
 

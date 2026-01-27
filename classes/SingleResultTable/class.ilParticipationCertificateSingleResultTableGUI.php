@@ -70,9 +70,7 @@ class ilParticipationCertificateSingleResultTableGUI extends ilTable2GUI {
 
 		$cert_access = new ilParticipationCertificateAccess($_GET['ref_id']);
 		$this->usr_ids = $cert_access->getUserIdsOfGroup();
-
 		$this->usr_id = $usr_id;
-
 		$this->sugg = getLearnSuggs::getData($usr_id);
 
 		parent::__construct($a_parent_obj, $a_parent_cmd);
@@ -185,14 +183,15 @@ class ilParticipationCertificateSingleResultTableGUI extends ilTable2GUI {
 
 	public function parseData(): array
     {
-
-		$arr_FinalTestsStates = ilLearnObjectFinalTestStates::getData([$this->usr_id]);
+        $arr_FinalTestsStates = ilLearnObjectFinalTestStates::getData([$this->usr_id]);
 		$usr_id = $this->usr_id;
 		$rec_array = array();
-	    	$processed = array();
+        $processed = array();
+
 
 		if (count($arr_FinalTestsStates)) {
 
+            $row_key = [];
 			//build_row_key_s
 			foreach ($arr_FinalTestsStates[$usr_id] as $rec) {
 				/**
@@ -207,35 +206,35 @@ class ilParticipationCertificateSingleResultTableGUI extends ilTable2GUI {
 				 */
 
 				foreach($rec_final_tests as $key => $value) {
-                    			if ($value->getLocftestCrsObjId()) {
+                    $locfTestCrsObjId = $value->getLocftestCrsObjId();
+
+                    if ($locfTestCrsObjId) {
 						// check if data already exists
-						$crs_obj_id = $value->getLocftestCrsObjId();
+						$crs_obj_id = $locfTestCrsObjId;
 						$crs_objective_id = $value->getLocftestObjectiveId();
 						if (isset($processed[$crs_obj_id])) {
 							if (isset($processed[$crs_obj_id][$crs_objective_id])) {
 								continue;
 							}
 						}
-                        			//first line - title lp
-                        			$rec_array[$row_key[$value->getLocftestCrsObjId()]][$value->getLocftestCrsObjId()] = $value->getLocftestObjectiveTitle();
 
-                        			$row_key[$value->getLocftestCrsObjId()] += 1;
-                        			//second line - array progressbar
-                        			$rec_array[$row_key[$value->getLocftestCrsObjId()]][$value->getLocftestCrsObjId()][0] = $value->getLocftestPercentage();
-                        			$rec_array[$row_key[$value->getLocftestCrsObjId()]][$value->getLocftestCrsObjId()][1] = $value->getLocftestQplsRequiredPercentage();
-                        			$rec_array[$row_key[$value->getLocftestCrsObjId()]][$value->getLocftestCrsObjId()][2] = 1;
+                        $rec_array[$row_key[$locfTestCrsObjId]][$locfTestCrsObjId] = $value->getLocftestObjectiveTitle();
 
-                        			$row_key[$value->getLocftestCrsObjId()] += 1;
-						$processed[$crs_obj_id][$crs_objective_id]=$usr_id;
-                    			}
-                		}
+                        $row_key[$locfTestCrsObjId] += 1;
+                        //second line - array progressbar
+                        $rec_array[$row_key[$locfTestCrsObjId]][$locfTestCrsObjId][0] = $value->getLocftestPercentage();
+                        $rec_array[$row_key[$locfTestCrsObjId]][$locfTestCrsObjId][1] = $value->getLocftestQplsRequiredPercentage();
+                        $rec_array[$row_key[$locfTestCrsObjId]][$locfTestCrsObjId][2] = 1;
 
+                        $row_key[$locfTestCrsObjId] += 1;
 
-
+						$processed[$crs_obj_id][$crs_objective_id] = $usr_id;
+                    }
+                }
 			}
 		}
 
-		$this->setData($rec_array);
+        $this->setData($rec_array);
 
 		return $rec_array;
 	}
@@ -253,9 +252,10 @@ class ilParticipationCertificateSingleResultTableGUI extends ilTable2GUI {
 		} else {
 			$current_percent = 0;
 		}
+
 		//required to dodge bug in ilContainerObjectiveGUI::renderProgressBar
         if ($required_percent == 0) {
-            $required_percent = 0.1;
+            $required_percent = null;
         }
 
 		if ($current_percent >= $required_percent) {
@@ -269,6 +269,10 @@ class ilParticipationCertificateSingleResultTableGUI extends ilTable2GUI {
                 $css_class .= ' percent-0';
             }
 		}
+
+        if (is_float($required_percent)) {
+            $required_percent = (int) round($required_percent);
+        }
 
 		return \ilContainerObjectiveGUI::renderProgressBar(
             $current_percent,

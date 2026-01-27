@@ -11,10 +11,15 @@ use Twig\Error\LoaderError;
 class ilParticipationCertificateResultGUI
 {
     const CMD_CONTENT = 'content';
+
     const CMD_OVERVIEW = 'overview';
+
     const CMD_PRINT_PDF = 'printpdf';
+
     const CMD_PRINT_SELECTED_WITHOUTE_MENTORING = 'printSelectedWithouteMentoring';
+
     const CMD_PRINT_SELECTED = 'printSelected';
+
     const CMD_INIT_TABLE = 'initTable';
 
     const CMD_EXPORT_EXCEL = 'exportExcel';
@@ -26,6 +31,8 @@ class ilParticipationCertificateResultGUI
      */
     private array $columns;
 
+    private ilParticipationCertificateAccess $cert_access;
+
     protected ilTemplate|ilGlobalTemplateInterface $tpl;
 
     protected ilCtrl|ilCtrlInterface $ctrl;
@@ -35,8 +42,7 @@ class ilParticipationCertificateResultGUI
     protected ilToolbarGUI $toolbar;
 
     protected ilParticipationCertificatePlugin $pl;
-    protected int $groupRefId;
-    protected ?ilObject $learnGroup;
+    protected int $courseRefId;
 
     protected ilLanguage $lng;
 
@@ -51,17 +57,17 @@ class ilParticipationCertificateResultGUI
     {
         global $DIC;
 
+        $refId = $this->fetchUrlParameter('ref_id', FILTER_DEFAULT);
         $this->toolbar = $DIC->toolbar();
         $this->tabs = $DIC->tabs();
         $this->ctrl = $DIC->ctrl();
         $this->tpl = $DIC->ui()->mainTemplate();
         $this->pl = ilParticipationCertificatePlugin::getInstance();
-        $this->groupRefId = (int)$_GET['ref_id'];
-        $this->learnGroup = ilObjectFactory::getInstanceByRefId($_GET['ref_id']);
+        $this->courseRefId = (int) $refId;
         $this->lng = $DIC->language();
-	$this->cert_access = new ilParticipationCertificateAccess($_GET['ref_id']);
+	    $this->cert_access = new ilParticipationCertificateAccess($refId);
 	    
-        $ementoring = ilParticipationCertificateConfig::getConfig('enable_ementoring', $this->groupRefId);
+        $ementoring = ilParticipationCertificateConfig::getConfig('enable_ementoring', $this->courseRefId);
         if ($ementoring === NULL) {
             $ementoring = true;
         } else {
@@ -78,11 +84,11 @@ class ilParticipationCertificateResultGUI
     {
         global $DIC;
 
-        if (!$DIC->rbac()->system()->checkAccess('read', $this->groupRefId)) {
+        $cert_access = new ilParticipationCertificateAccess($this->courseRefId);
+        if (!$cert_access->hasCurrentUserWriteAccess()) {
             $this->tpl->setOnScreenMessage('failure',$this->lng->txt('no_permission'), true);
             $DIC->ctrl()->redirectToURL('login.php');
         }
-
         $nextClass = $this->ctrl->getNextClass();
 
         switch ($nextClass) {
@@ -130,7 +136,9 @@ class ilParticipationCertificateResultGUI
     {
         global $DIC;
 
-        $this->tpl->addCss($this->pl->getDirectory() . '/templates/css/participation-certificate.css');
+        global $rbacreview;
+
+        $this->tpl->addCss('./' . ilParticipationCertificatePlugin::PLUGIN_DIRECTORY . '/templates/css/participation-certificate.css');
 
         if (method_exists($this->tpl, 'loadStandardTemplate')) {
             $this->tpl->loadStandardTemplate();
@@ -142,9 +150,8 @@ class ilParticipationCertificateResultGUI
         $ui = $DIC->ui()->factory();
 
         if ($this->cert_access->hasCurrentUserPrintAccess()) {
-	    if ($this->cert_access->hasCurrentUserWriteAccess()) {
-		    $this->tpl->setOnScreenMessage('info',$this->pl->txt('print_all_info'),true);
-	    }
+            $this->tpl->setOnScreenMessage('info',$this->pl->txt('print_all_info'),true);
+
             if ($this->ementoring) {
                 $this->ctrl->setParameter($this, 'ementor', true);
                 $toolbarButton = $ui->button()->standard(
@@ -176,22 +183,19 @@ class ilParticipationCertificateResultGUI
                 $this->ctrl->setParameter($this, 'filter_lastname', $_GET['filter_lastname']);
             }
 
-	    if ($this->cert_access->hasCurrentUserWriteAccess()) {
-			
-            	$toolbarButton = $ui->button()->standard(
-                	$this->pl->txt('excel_export'),
-                	$this->ctrl->getLinkTarget($this, self::CMD_EXPORT_EXCEL)
-            	);
-            	$this->toolbar->addComponent($toolbarButton);
+            $toolbarButton = $ui->button()->standard(
+                $this->pl->txt('excel_export'),
+                $this->ctrl->getLinkTarget($this, self::CMD_EXPORT_EXCEL)
+            );
+            $this->toolbar->addComponent($toolbarButton);
 
-            	$toolbarButton = $ui->button()->standard(
-                	$this->pl->txt('csv_export'),
-                	$this->ctrl->getLinkTarget($this, $this::CMD_EXPORT_CSV)
-            	);
-            	$this->toolbar->addComponent($toolbarButton);
-	    }
-
+            $toolbarButton = $ui->button()->standard(
+                $this->pl->txt('csv_export'),
+                $this->ctrl->getLinkTarget($this, $this::CMD_EXPORT_CSV)
+            );
+            $this->toolbar->addComponent($toolbarButton);
         }
+
         $target_ref = 0;
         if ($this->cert_access->isSelfPrintEnabled() and !$this->cert_access->hasCurrentUserPrintAccess()) {
 			$global_config_sets = ilParticipationCertificateConfig::where(array("config_type"=>3, "global_config_id" => 0 ))->orderBy('order_by')->get();
@@ -212,7 +216,7 @@ class ilParticipationCertificateResultGUI
             
         }
 
-        $tableHtml = $this->initTable((int) $_GET['ref_id']);
+        $tableHtml = $this->initTable((int) $this->courseRefId);
         $this->tpl->setContent($tableHtml);
 
         if (method_exists($this->tpl, 'printToStdout')) {
@@ -232,14 +236,16 @@ class ilParticipationCertificateResultGUI
 
         $filterFirstname = '';
         $isFilterActive = false;
-        if (!empty($_GET['filter_firstname'])) {
-            $filterFirstname = $_GET['filter_firstname'];
+        $firstname = $this->fetchUrlParameter('filter_firstname', FILTER_DEFAULT);
+        if (!empty($firstname)) {
+            $filterFirstname = $firstname;
             $isFilterActive = true;
         }
 
         $filterLastname = '';
-        if (!empty($_GET['filter_lastname'])) {
-            $filterLastname = $_GET['filter_lastname'];
+        $lastname = $this->fetchUrlParameter('filter_lastname', FILTER_DEFAULT);
+        if (!empty($lastname)) {
+            $filterLastname = $lastname;
             $isFilterActive = true;
         }
 
@@ -280,14 +286,16 @@ class ilParticipationCertificateResultGUI
 
         $filterFirstname = '';
         $isFilterActive = false;
-        if (!empty($_GET['filter_firstname'])) {
-            $filterFirstname = $_GET['filter_firstname'];
+        $firstname = $this->fetchUrlParameter('filter_firstname', FILTER_DEFAULT);
+        if (!empty($firstname)) {
+            $filterFirstname = $firstname;
             $isFilterActive = true;
         }
 
         $filterLastname = '';
-        if (!empty($_GET['filter_lastname'])) {
-            $filterLastname = $_GET['filter_lastname'];
+        $lastname = $this->fetchUrlParameter('filter_lastname', FILTER_DEFAULT);
+        if (!empty($lastname)) {
+            $filterLastname = $lastname;
             $isFilterActive = true;
         }
 
@@ -295,10 +303,7 @@ class ilParticipationCertificateResultGUI
             $resultTable->setFilter($filterFirstname, $filterLastname);
         }
 
-
         $data = $resultTable->records();
-
-
         $csv = new ilCSVWriter();
         $csv->setSeparator(";");
 
@@ -431,14 +436,15 @@ class ilParticipationCertificateResultGUI
      */
     public function initHeader(): void
     {
-        $this->tpl->setTitle($this->learnGroup->getTitle());
-        $this->tpl->setDescription($this->learnGroup->getDescription());
-        $this->tpl->setTitleIcon(ilObject::_getIcon($this->learnGroup->getId()));
+        $courseObject = ilObjectFactory::getInstanceByRefId($this->courseRefId);
+
+        $this->tpl->setTitle($courseObject->getTitle());
+        $this->tpl->setDescription($courseObject->getDescription());
+        $this->tpl->setTitleIcon(ilObject::_getIcon($courseObject->getId()));
 
         $this->ctrl->setParameterByClass(ilRepositoryGUI::class, 'ref_id', (int)$_GET['ref_id']);
         $this->tabs->setBackTarget($this->pl->txt('header_btn_back'), $this->ctrl->getLinkTargetByClass(array(
-            ilRepositoryGUI::class//,
-            //ilObjGroupGUI::class
+            ilRepositoryGUI::class
         )));
         $this->ctrl->saveParameterByClass(ilParticipationCertificateResultGUI::class, ['ref_id', 'group_id']);
         $this->ctrl->saveParameterByClass(ilParticipationCertificateGUI::class, 'ref_id');
@@ -530,7 +536,7 @@ class ilParticipationCertificateResultGUI
                         }
                     }
 
-                    new ilParticipationCertificateMultipleResultGUI($userIds, $this->groupRefId);
+                    new ilParticipationCertificateMultipleResultGUI($userIds, $this->courseRefId);
                     break;
                 case 'adjust_results':
                     $resultModificationGui = new ilParticipationCertificateResultModificationGUI();
@@ -582,18 +588,18 @@ class ilParticipationCertificateResultGUI
                 $usr_id[] = $userId;
             } else {
                 if ($_GET['ementor'] == 'true') {
-			$ementor = true;
-		}
-                $cert_access = new ilParticipationCertificateAccess($this->groupRefId);
+			        $ementor = true;
+		         }
+                $cert_access = new ilParticipationCertificateAccess($this->courseRefId);
                 $userIds = $cert_access->getUserIdsOfGroup();
                 if (empty($usr_id)) {
                     $usr_id = $userIds;
                 }
             }
 
-	    if ($ementoring !== null) {
-		    $ementor = $ementoring;
-	    }
+            if ($ementoring !== null) {
+                $ementor = $ementoring;
+            }
 		
             if (!empty($usr_id)) {
                 $arr_usr_data = ilPartCertUsersData::getData($this->pl, $usr_id);
@@ -605,9 +611,17 @@ class ilParticipationCertificateResultGUI
                 $this->redirectWithError(self::CMD_CONTENT, $this->pl->txt('user_data_missing'));
             }
 
-            $twigParser = new ilParticipationCertificateTwigParser($this->groupRefId, array(), $usr_id, $ementor,
-                false);
-            $twigParser->parseData();
+            $twigParser = new ilParticipationCertificateTwigParser(
+                $this->courseRefId,
+                $usr_id,
+                $ementor,
+                false
+            );
+
+            $twigParser->parseData(
+                false,
+                $this->courseRefId
+            );
         } else {
             $this->tpl->setOnScreenMessage('failure',$this->lng->txt('no_permission'), true);
             $DIC->ctrl()->redirectToURL('login.php');
@@ -654,8 +668,14 @@ class ilParticipationCertificateResultGUI
                 $this->redirectWithError(self::CMD_CONTENT, $this->pl->txt('all_user_data_missing'));
             }
 
-            $twigParser = new ilParticipationCertificateTwigParser($this->groupRefId, array(), (array) $usr_ids, true, false);
-            $twigParser->parseData();
+            $twigParser = new ilParticipationCertificateTwigParser(
+                $this->courseRefId,
+                (array) $usr_ids,
+                true,
+                false
+            );
+
+            $twigParser->parseData(false, $this->courseRefId);
         } else {
             $DIC->ctrl()->redirectToURL('login.php');
         }
@@ -701,8 +721,14 @@ class ilParticipationCertificateResultGUI
                 $this->redirectWithError(self::CMD_CONTENT, $this->pl->txt('all_user_data_missing'));
             }
 
-            $twigParser = new ilParticipationCertificateTwigParser($this->groupRefId, array(), $usr_ids, false, false);
-            $twigParser->parseData();
+            $twigParser = new ilParticipationCertificateTwigParser(
+                $this->courseRefId,
+                $usr_ids,
+                false,
+                false
+            );
+
+            $twigParser->parseData(false, $this->courseRefId);
         } else {
             $DIC->ctrl()->redirectToURL('login.php');
         }
@@ -776,5 +802,15 @@ class ilParticipationCertificateResultGUI
     private function excludeURLParameters(string $parameter): array
     {
         return explode('_', $parameter);
+    }
+
+    /**
+     * @param string $param
+     * @param int    $filter
+     * @return mixed
+     */
+    protected function fetchUrlParameter(string $param, int $filter): mixed
+    {
+        return filter_input(INPUT_GET, $param, $filter);
     }
 }

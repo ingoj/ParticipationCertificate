@@ -1,12 +1,12 @@
 <?php
-use srag\Plugins\UserDefaults\UserSearch\usrdefObj;
+
 class ilIassStatesMulti {
 
-	/**
-	 * @param array $arr_usr_ids
-	 *
-	 * @return ilIassStateMulti[]
-	 */
+    /**
+     * @param array $arr_usr_ids
+     * @param int   $group_ref_id
+     * @return ilIassStateMulti[]
+     */
 	public static function getData(array $arr_usr_ids, int $group_ref_id): array
     {
 		global $DIC;
@@ -58,7 +58,7 @@ class ilIassStatesMulti {
 					COALESCE(round(( COUNT(CASE WHEN iass.learning_progress = 2 THEN iass.learning_progress END)/COUNT(iass.learning_progress) * 100 ),0),0) as iass_passed_percentage
 					FROM 
 					iass_members as iass
-					inner join " . usrdefObj::TABLE_NAME . " as iass_obj on iass_obj.obj_id = iass.obj_id
+					inner join object_data as iass_obj on iass_obj.obj_id = iass.obj_id
 					inner join object_reference as iass_ref on iass_ref.obj_id = iass_obj.obj_id
 					where  " . $ilDB->in('iass.usr_id', $arr_usr_ids, false, 'integer') . "
 					group by 

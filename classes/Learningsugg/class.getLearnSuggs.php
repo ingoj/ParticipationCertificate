@@ -1,5 +1,5 @@
 <?php
-use srag\Plugins\UserDefaults\UserSearch\usrdefObj;
+
 use SRAG\ILIAS\Plugins\LearningObjectiveSuggestions\Suggestion\LearningObjectiveSuggestion;
 
 class getLearnSuggs {
@@ -38,7 +38,7 @@ class getLearnSuggs {
 					sugg.user_id as sugg_for_user
 					FROM " . LearningObjectiveSuggestion::TABLE_NAME . " as sugg
 					inner join crs_objectives as crso on crso.crs_id = sugg.course_obj_id and crso.objective_id = sugg.objective_id
-					inner join " . usrdefObj::TABLE_NAME . " as crs_obj on crs_obj.obj_id = crso.crs_id
+					inner join object_data as crs_obj on crs_obj.obj_id = crso.crs_id
 	                where sugg.user_id =" . $ilDB->quote($usr_id, "integer");
 
 		return $select;
