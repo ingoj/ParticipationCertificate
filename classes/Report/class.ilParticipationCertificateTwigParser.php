@@ -104,6 +104,7 @@ class ilParticipationCertificateTwigParser
 
     /**
      * @param bool        $selfPrint
+     * @param bool        $printIsAsynchronous
      * @param int|null    $courseRefId
      * @param bool|null   $suggestedCourses
      * @param bool|null   $additionalOffer
@@ -125,6 +126,7 @@ class ilParticipationCertificateTwigParser
      */
     public function parseData(
         bool $selfPrint = false,
+        bool $printIsAsynchronous = false,
         ?int $courseRefId = null,
         ?bool $suggestedCourses = true,
         ?bool $additionalOffer = true,
@@ -274,7 +276,11 @@ class ilParticipationCertificateTwigParser
                 $countAttendedSessions
             );
 
-            $partPdf->generatePDF($this->twig_template->render($arr_render), count($this->usr_id));
+            $partPdf->generatePDF(
+                $this->twig_template->render($arr_render),
+                count($this->usr_id),
+                $printIsAsynchronous
+            );
         }
     }
 
@@ -283,6 +289,7 @@ class ilParticipationCertificateTwigParser
      * @param string    $firstname
      * @param string    $lastname
      * @param int       $userId
+     * @param bool      $printIsAsynchronous
      * @param bool|null $homework
      * @return void
      * @throws CrossReferenceException
@@ -299,6 +306,7 @@ class ilParticipationCertificateTwigParser
         string $firstname,
         string $lastname,
         int $userId,
+        bool $printIsAsynchronous = false,
         ?bool $homework = true
     ): void {
         global $DIC;
@@ -439,7 +447,11 @@ class ilParticipationCertificateTwigParser
                 $countSessions,
                 $countAttendedSessions
             );
-            $part_pdf->generatePDF($this->twig_template->render($arr_render), count($coursesToPrint));
+            $part_pdf->generatePDF(
+                $this->twig_template->render($arr_render),
+                count($coursesToPrint),
+                $printIsAsynchronous
+            );
         }
     }
 

@@ -620,6 +620,7 @@ class ilParticipationCertificateResultGUI
 
             $twigParser->parseData(
                 false,
+                false,
                 $this->courseRefId
             );
         } else {
@@ -675,7 +676,11 @@ class ilParticipationCertificateResultGUI
                 false
             );
 
-            $twigParser->parseData(false, $this->courseRefId);
+            $twigParser->parseData(
+                false,
+                false,
+                $this->courseRefId
+            );
         } else {
             $DIC->ctrl()->redirectToURL('login.php');
         }
@@ -728,7 +733,11 @@ class ilParticipationCertificateResultGUI
                 false
             );
 
-            $twigParser->parseData(false, $this->courseRefId);
+            $twigParser->parseData(
+                false,
+                false,
+                $this->courseRefId
+            );
         } else {
             $DIC->ctrl()->redirectToURL('login.php');
         }
