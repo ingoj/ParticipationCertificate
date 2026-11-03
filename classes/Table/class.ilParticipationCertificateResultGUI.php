@@ -373,6 +373,10 @@ class ilParticipationCertificateResultGUI
                 if (is_array($value)) {
                     $value = implode(', ', $value);
                 }
+                if (is_string($value)) {
+                    // table records are HTML-escaped for the web table
+                    $value = html_entity_decode($value, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+                }
                 $a_excel->setCell($a_row, $col++, $value);
             }
 
@@ -421,7 +425,7 @@ class ilParticipationCertificateResultGUI
                 if (is_array($value)) {
                     $value = implode(', ', $value);
                 }
-                $a_csv->addColumn(strip_tags($value));
+                $a_csv->addColumn(html_entity_decode(strip_tags((string) $value), ENT_QUOTES | ENT_HTML5, 'UTF-8'));
             }
         }
         $a_csv->addRow();
@@ -512,6 +516,9 @@ class ilParticipationCertificateResultGUI
                 case 'show_all_results':
                     if (!empty($_GET['config_entry'])) {
                         $usrId = explode('_', $_GET['config_entry'][0])[0];
+                        if ($this->restrictToCourseMembers([$usrId]) === []) {
+                            $this->redirectWithError(self::CMD_CONTENT, $this->lng->txt('no_permission'));
+                        }
                         $this->ctrl->setParameterByClass(ilParticipationCertificateResultGUI::class, 'usr_id', $usrId);
                     }
                     $single_result_gui = new ilParticipationCertificateSingleResultGUI();
@@ -532,6 +539,8 @@ class ilParticipationCertificateResultGUI
                             $user_ids = $this->excludeUserIdsFromUrlParameters($config_entries);
                         }
                     }
+
+                    $user_ids = $this->restrictToCourseMembers($user_ids);
 
                     new ilParticipationCertificateMultipleResultGUI($user_ids, $this->course_ref_id);
                     break;
@@ -585,7 +594,10 @@ class ilParticipationCertificateResultGUI
                 $url_parameters = $this->excludeURLParameters($config_entry[0]);
                 $user_id = $url_parameters[0];
                 $ementor = (bool) $url_parameters[1];
-                $usr_id[] = $user_id;
+                $usr_id = $this->restrictToCourseMembers([$user_id]);
+                if (empty($usr_id)) {
+                    $this->redirectWithError(self::CMD_CONTENT, $this->lng->txt('no_permission'));
+                }
             } else {
                 if ($_GET['ementor'] == 'true') {
 			        $ementor = true;
@@ -662,6 +674,11 @@ class ilParticipationCertificateResultGUI
                 }
             }
 
+            $usr_ids = $this->restrictToCourseMembers($usr_ids);
+            if (empty($usr_ids)) {
+                $this->redirectWithError(self::CMD_CONTENT, $this->lng->txt('no_permission'));
+            }
+
             $arr_usr_data = ilPartCertUsersData::getData($this->pl, $usr_ids);
             $usr_ids = $this->excludeUserIfDataMissing($usr_ids, $arr_usr_data);
 
@@ -717,6 +734,11 @@ class ilParticipationCertificateResultGUI
                     $user_id = $url_parameters[0];
                     $usr_ids[] = $user_id;
                 }
+            }
+
+            $usr_ids = $this->restrictToCourseMembers($usr_ids);
+            if (empty($usr_ids)) {
+                $this->redirectWithError(self::CMD_CONTENT, $this->lng->txt('no_permission'));
             }
 
             $arr_usr_data = ilPartCertUsersData::getData($this->pl, $usr_ids);
@@ -793,6 +815,10 @@ class ilParticipationCertificateResultGUI
     {
         $user_data = new ilPartCertUserData();
         foreach ($usr_id as $key => $id) {
+            if (!isset($arr_usr_data[$id])) {
+                unset($usr_id[$key]);
+                continue;
+            }
             if(!$user_data->checkIfUserDataFilled(
                 $arr_usr_data[$id]->getPartCertSalutation(),
                 $arr_usr_data[$id]->getPartCertFirstname(),
@@ -802,6 +828,23 @@ class ilParticipationCertificateResultGUI
             }
         }
         return array_values($usr_id);
+    }
+
+    /**
+     * Keeps only ids of members of the current course/group, as returned by
+     * ilParticipationCertificateAccess::getUserIdsOfGroup(). User ids come from the
+     * request (config_entry), so they must never be trusted as-is.
+     *
+     * @param array $user_ids
+     * @return int[]
+     */
+    private function restrictToCourseMembers(array $user_ids): array
+    {
+        $member_ids = array_map('intval', $this->cert_access->getUserIdsOfGroup());
+
+        $user_ids = array_map('intval', $user_ids);
+
+        return array_values(array_unique(array_intersect($user_ids, $member_ids)));
     }
 
     /**

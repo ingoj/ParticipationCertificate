@@ -93,7 +93,10 @@ class ilParticipationCertificateGUI implements ilCtrlSecurityInterface
      */
     public function getUnsafeGetCommands(): array
     {
-        return [];
+        return [
+            self::CMD_SET_CERT_TEMPLATE,
+            self::CMD_SET_OWN_CERT_TEXT_FROM_TEMPLATE,
+        ];
     }
 
     /**

@@ -181,6 +181,9 @@ class ilParticipationCertificateSingleResultTableGUI
                         if (is_array($value)) {
                             $exploded_value = explode('%', $value[0]  ?? '');
                             $value = $this->buildProgressBar($exploded_value, $value[1], $value[2]);
+                        } else {
+                            // objective titles are editable by course admins
+                            $value = htmlspecialchars((string) $value, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
                         }
 
                         $background_color = '#FFFFFF';
@@ -193,7 +196,7 @@ class ilParticipationCertificateSingleResultTableGUI
                                 $background_color = '#' . $this->unsugg_color;
                             }
                         }
-                        $row[$column_id] = '<span class="td-span" style="background-color: ' . $background_color . ';' . '">' . $value . '</div>' ?? '';
+                        $row[$column_id] = '<span class="td-span" style="background-color: ' . $background_color . ';' . '">' . $value . '</span>';
                     }
 
                     yield $row_builder->buildDataRow(
@@ -363,7 +366,7 @@ class ilParticipationCertificateSingleResultTableGUI
 
         foreach($columns as $obj_id => $column) {
             $cols['crs_' . $obj_id] = $factory->table()->column()
-                                            ->text($column['txt'])
+                                            ->text(htmlspecialchars((string) $column['txt'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'))
                                             ->withIsOptional(true)
                                             ->withIsSortable(0);
 

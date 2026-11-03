@@ -285,16 +285,16 @@ class ilParticipationCertificateResultTableGUI
         foreach ($arr_usr_data as $usr_id=>$user_data) {
             $row = array();
             $row['usr_id'] = $usr_id;
-            $row['loginname'] = $user_data->getPartCertUserName();
+            $row['loginname'] = htmlspecialchars((string) $user_data->getPartCertUserName(), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
 
             $row['firstname'] = '';
             if ($user_data->getPartCertFirstname()  != NULL) {
-                $row['firstname'] = $user_data->getPartCertFirstname();
+                $row['firstname'] = htmlspecialchars((string) $user_data->getPartCertFirstname(), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
             }
 
             $row['lastname'] = '';
             if ($user_data->getPartCertLastname() != NULL) {
-                $row['lastname'] = $user_data->getPartCertLastname();
+                $row['lastname'] = htmlspecialchars((string) $user_data->getPartCertLastname(), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
             }
 
             $row['initial_test_finished'] = $this->pl->txt('no');
@@ -325,7 +325,7 @@ class ilParticipationCertificateResultTableGUI
 
                             if ($rec->getObjectivesSuggested()) {
                                 if (!array_key_exists($rec->getLocftestObjectiveId(), $rec_array)) {
-                                    $rec_array[$rec->getLocftestObjectiveId()] = $rec->getLocftestLearnObjectiveTitle() . '<br/>';
+                                    $rec_array[$rec->getLocftestObjectiveId()] = htmlspecialchars((string) $rec->getLocftestLearnObjectiveTitle(), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') . '<br/>';
                                 }
 
                                 $loc_test_percentage = $rec->getLocftestPercentage();
@@ -335,7 +335,7 @@ class ilParticipationCertificateResultTableGUI
                                  * @var ilLearnObjectFinalTestState $rec
                                  */
                                 $rec_array[$rec->getLocftestObjectiveId()] .= '- ' . $percentage_text .
-                                    ' ' . $rec->getLocftestObjectiveTitle() . '<br/>';
+                                    ' ' . htmlspecialchars((string) $rec->getLocftestObjectiveTitle(), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') . '<br/>';
                             }
                         }
                     }

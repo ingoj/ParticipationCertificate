@@ -93,7 +93,7 @@ class ilParticipationCertificateSingleResultGUI
         $table = $result_table->getTableForRepresentation();
 
         $table_html = '<div class="dhbw_part_cert_res">';
-        $table_html .= '<h2 class="dhbw-part-cert-heading">' . $this->pl->txt('result_for ') . ' ' . $name_user . '</h2>';
+        $table_html .= '<h2 class="dhbw-part-cert-heading">' . $this->pl->txt('result_for ') . ' ' . htmlspecialchars((string) $name_user, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') . '</h2>';
         $table_html .= $renderer->render($table->withRequest($DIC->http()->request()));
         $table_html .= '</div>';
 

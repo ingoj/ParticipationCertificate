@@ -41,6 +41,24 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI implements i
 
     private const string CMD_CANCEL = 'cancel';
 
+    /**
+     * Commands that only display data. Core already requires 'read' on the
+     * component settings node; every other command additionally requires 'write'.
+     */
+    private const array READ_ONLY_COMMANDS = [
+        self::CMD_CONFIGURE,
+        self::CMD_SORTING,
+        self::CMD_SHOW_FORM,
+        self::CMD_SHOW_FORM_ERR,
+        'returnBack',
+    ];
+
+    /** Table actions (cmd 'action') that only display or navigate. */
+    private const array READ_ONLY_ACTIONS = [
+        'edit',
+        'go-to',
+    ];
+
     protected ilParticipationCertificateConfig $object;
 
     protected ilParticipationCertificatePlugin $pl;
@@ -89,7 +107,16 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI implements i
      */
     public function getUnsafeGetCommands(): array
     {
-        return [];
+        return [
+            self::CMD_ACTION,
+            self::CMD_ADD_CONFIG,
+            self::CMD_COPY_CONFIG,
+            self::CMD_DELETE_CONFIG,
+            self::CMD_SET_ACTIVE,
+            self::CMD_SET_INACTIVE,
+            self::CMD_RESET_CONFIG,
+            'createTemplateFromLocalConfig',
+        ];
     }
 
     /**
@@ -105,6 +132,12 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI implements i
      */
     public function performCommand(string $cmd): void
     {
+        if ($this->requiresWriteAccess($cmd) && !$this->hasCurrentUserWriteAccess()) {
+            global $DIC;
+            $this->tpl->setOnScreenMessage('failure', $DIC->language()->txt('no_permission'), true);
+            $this->ctrl->redirect($this, self::CMD_CONFIGURE);
+        }
+
         if ($cmd !== 'configure') {
             $this->tabs->addTab(
                 'return-back',
@@ -139,6 +172,37 @@ class ilParticipationCertificateConfigGUI extends ilPluginConfigGUI implements i
                 $this->$cmd();
                 break;
         }
+    }
+
+    private function requiresWriteAccess(string $cmd): bool
+    {
+        if ($cmd === self::CMD_ACTION) {
+            $action = Helper::fetchUrlParameter('config_action', 'string');
+            return !in_array($action, self::READ_ONLY_ACTIONS, true);
+        }
+
+        return !in_array($cmd, self::READ_ONLY_COMMANDS, true);
+    }
+
+    /**
+     * 'write' on the Administration > Plugins node (object type 'cmps').
+     * The ref_id is looked up rather than taken from the request, so it cannot be swapped.
+     */
+    private function hasCurrentUserWriteAccess(): bool
+    {
+        global $DIC;
+
+        $rbac_system = $DIC->rbac()->system();
+
+        foreach (ilObject::_getObjectsDataForType('cmps', true) as $object) {
+            foreach (ilObject::_getAllReferences((int) $object['id']) as $ref_id) {
+                if ($rbac_system->checkAccess('write', $ref_id)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 
     /**
