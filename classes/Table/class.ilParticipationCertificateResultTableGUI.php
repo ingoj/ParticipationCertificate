@@ -293,10 +293,12 @@ class ilParticipationCertificateResultTableGUI implements I\DataRetrieval
     {
         $arr_usr_data = ilPartCertUsersData::getData($this->pl, $this->usr_ids, $this->range[1], $this->range[0], $this->order, '');
 
+        $courseObjId = ilObject::_lookupObjectId((int) $this->refId);
+
         $arr_usr_data = $this->excludeUserIdIfFiltered($arr_usr_data);
         $arr_initial_test_states = ilCrsInitialTestStates::getData($this->usr_ids);
-        $arr_learn_reached_percentages = ilLearnObjectSuggResults::getData($this->usr_ids);
-        $arr_final_tests = ilLearnObjectFinalTestStates::getData($this->usr_ids);
+        $arr_learn_reached_percentages = ilLearnObjectSuggResults::getData($courseObjId, $this->usr_ids);
+        $arr_final_tests = ilLearnObjectFinalTestStates::getDataByCourseObjId($courseObjId, $this->usr_ids);
         $arr_new_iass_states = ilIassStatesMulti::getData($this->usr_ids, $this->refId);
         $arr_xali_states = xaliStates::getData($this->usr_ids, $this->refId);
         $arr_excercise_states = ilExcerciseStates::getData($this->usr_ids, $this->refId);
@@ -328,9 +330,9 @@ class ilParticipationCertificateResultTableGUI implements I\DataRetrieval
                 $row['initial_test_finished'] = $this->pl->txt("no");
             }
             if ((key_exists($usr_id, $arr_learn_reached_percentages)) && (is_object($arr_learn_reached_percentages[$usr_id]))) {
-                $row['result_qualifing_tests'] = $this->buildProgressBar($arr_learn_reached_percentages[$usr_id]->getAveragePercentage(ilParticipationCertificateConfig::getConfig('calculation_type_processing_state_suggested_objectives',$_GET['ref_id'])
-                ), $arr_learn_reached_percentages[$usr_id]->getLimitPercentage());
-
+                $learnSuggestionResults = ilLearnObjectSuggResults::getData($courseObjId, $this->usr_ids);
+                $learnSuggestResults = $learnSuggestionResults[$usr_id]->getAveragePercentage(ilParticipationCertificateConfig::getConfig('calculation_type_processing_state_suggested_objectives', $this->refId), true);
+                $row['result_qualifing_tests'] = $learnSuggestResults;
             } else {
                 $row['result_qualifing_tests'] = $this->buildProgressBar(0,0);
             }
@@ -380,9 +382,13 @@ class ilParticipationCertificateResultTableGUI implements I\DataRetrieval
                 }
             }
 
-            if (key_exists($usr_id, $arr_xali_states) && is_object($arr_xali_states[$usr_id])) {
-                $countPassed = $countPassed + $arr_xali_states[$usr_id]->getPassed();
-                $countTests = $countTests + $arr_xali_states[$usr_id]->getTotal();
+            $sessions = ParticipationCertificateHelper::getSessions(ParticipationCertificateHelper::getGroupRefId((int) $this->refId));
+            $countTests = $countTests + count($sessions);
+            foreach ($sessions as $session) {
+                $eventParticipants = new ilEventParticipants($session['obj_id']);
+                if ($eventParticipants->hasParticipated($usr_id)) {
+                    $countPassed++;
+                }
             }
 
             if($countTests > 0) {

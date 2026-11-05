@@ -14,17 +14,19 @@
  <div class="table_container">
   <p class="p-default"><b>{{text_values.page1_box1_title}}</b></p>
   <table class="table" id="table1">
-    {% if initial_test %}
-    <tr>
-      <td class="td1">{{text_values.page1_box1_row1}}</td>
-      <td class="td2">
-        {% if crsitest_itest_submitted %}
-        Ja
-        {% else %}
-        Nein
-        {% endif %}
-        </td>
-    </tr>
+      {% if not final_test %}
+      <tr>
+          <td class="td1">
+              {{text_values.page1_box1_row1}}
+          </td>
+          <td class="td2">
+              {% if crsitest_itest_submitted %}
+              Ja
+              {% else %}
+              Nein
+              {% endif %}
+          </td>
+      </tr>
     {% endif %}
     {% if suggested_courses %}
     <tr>
@@ -32,6 +34,22 @@
       <td class="td2">{{learn_sugg_reached_percentage}}</td>
     </tr>
     {% endif %}
+    {% if additional_offer %}
+      <tr>
+          <td class="td1">{{not_suggested_courses.label}}</td>
+          <td class="td2">{{not_suggested_courses.value}}</td>
+      </tr>
+    {% endif %}
+    {% if final_test %}
+      <tr>
+          <td class="td1">
+              {{text_values.page1_box1_row1_alternative}}
+          </td>
+          <td class="td2">
+              {{final_test_reached_percent}}
+          </td>
+      </tr>
+      {% endif %}
   </table>
   </div>
 
@@ -51,7 +69,7 @@
        {% endif %}
      </td>
    </tr>
-  {% if homework %}
+  {% if homework_included %}
    <tr>
      <td class="td1">{{text_values.page1_box2_row2}}</td>
      <td class="td2">Abgabe von {{excercise_percentage}}% der Hausaufgaben</td>
@@ -59,20 +77,7 @@
   {% endif %}
   </table>
 </div>
-
-{% endif %}
-
-{% if additional_offer %}
-<div class="table_container">
-    <p class="p-default"><b>{{text_values.individual_assessments}}</b></p>
-    <table class="table" id="table5">
-        <tr>
-            <td class="td1">{{individual_assessments.label}}</td>
-            <td class="td2">{{individual_assessments.value}}</td>
-        </tr>
-    </table>
-</div>
-
+{% if sessions_included %}
 <div class="table_container">
     <p class="p-default"><b>{{text_values.sessions}}</b></p>
     <table class="table" id="table7">
@@ -82,6 +87,7 @@
         </tr>
     </table>
 </div>
+{% endif %}
 {% endif %}
 
 <div class="date"> <p>{{text_values.page1_location_date}}</p>  </div>
@@ -113,22 +119,28 @@
 <div class="table_container">
   <p><b>{{text_values.page2_box1_title}}</b></p>
   <table class="table" id="table3">
-  {% if initial_test %}
+  {% if not final_test %}
   <tr>
-    <td class="td1">{{text_values.page2_box1_row1}}</td>
-    <td class="td2">{{text_values.page2_box1_row1_total_questions}} Fragen aus den Themengebieten:
-      <ul>
-      {% for key, lo in arr_lo_master_crs %}
-        <li>{{lo.getLoMasterObjectiveTitle}}</li>
-      {% endfor %}
-      </ul>
-    </td>
+      <td class="td1">{{text_values.page2_box1_row1}}</td>
+      <td class="td2">{{text_values.page2_box1_row1_total_questions}} Fragen aus den Themengebieten:
+          <ul>
+              {% for key, lo in arr_lo_master_crs %}
+              <li>{{lo.getLoMasterObjectiveTitle}}</li>
+              {% endfor %}
+          </ul>
+      </td>
   </tr>
   {% endif %}
   {% if suggested_courses %}
   <tr>
     <td class="td1">{{text_values.page2_box1_row2}}</td>
     <td class="td2">{{learn_sugg_reached_percentage}} der empfohlenen Module wurden bearbeitet </td>
+  </tr>
+  {% endif %}
+  {% if additional_offer %}
+  <tr>
+      <td class="td1">{{not_suggested_courses.label}}</td>
+      <td class="td2">{{not_suggested_courses.value}}</td>
   </tr>
   {% endif %}
   </table>
@@ -152,17 +164,7 @@
   </table>
 </div>
 <br/>{{text_values.page1_disclaimer}}<br/>
-{% endif %}
-{% if additional_offer %}
-<div class="table_container">
-    <p class="p-default"><b>{{text_values.individual_assessments}}</b></p>
-    <table class="table" id="table6">
-        <tr>
-            <td class="td1">{{individual_assessments.label}}</td>
-            <td class="td2">{{individual_assessments.value}}</td>
-        </tr>
-    </table>
-</div>
+{% if sessions_included %}
 <div class="table_container">
     <p class="p-default"><b>{{text_values.sessions}}</b></p>
     <table class="table" id="table8">
@@ -173,7 +175,10 @@
     </table>
 </div>
 {% endif %}
-  {% if show_footer %}
+
+{% endif %}
+
+{% if show_footer %}
   <div class="footer"><i>{{text_values.footer_config}}</i></div>
 {% endif %}
 </div>

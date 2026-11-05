@@ -50,11 +50,11 @@ class ilParticipationCertificateAccess {
 	/**
 	 * @throws Exception
 	 */
-	public function hasCurrentUserPrintAccess(): bool
+	public function hasCurrentUserPrintAccess(?bool $printByCourseMember = false): bool
 	{
-		if ($this->hasCurrentUserWriteAccess()) {
-			return true;
-		}
+        if (!$printByCourseMember && $this->hasCurrentUserWriteAccess()) {
+            return true;
+        }
 
 		// if user has data, check if selfprint is active (changed to a new function)
 		return ($this->isSelfPrintEnabled());
